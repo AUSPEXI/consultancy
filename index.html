@@ -27,11 +27,6 @@
         .btn-outline { background: transparent; color: #000; border: 2px solid #ddd; }
         .btn-outline:hover { border-color: #000; background: transparent; }
 
-        /* Mobile Menu Toggle */
-        .menu-toggle { display: none; cursor: pointer; font-size: 1.5rem; }
-        .nav-links.mobile { position: absolute; top: 100%; left: 0; right: 0; background: #fff; flex-direction: column; padding: 1rem 2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: none; }
-        .nav-links.mobile.active { display: flex; }
-
         /* Hero */
         .hero { min-height: 100vh; display: flex; align-items: center; padding-top: 80px; }
         .hero-content { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
@@ -56,157 +51,300 @@
         /* Background helpers */
         .bg-gray { background: #f9f9f9; }
 
-        /* Solutions Grid - 2x2 on desktop */
-        .solutions-grid {
+        /* (All original component styles preserved below) */
+        .challenge-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;margin-bottom:3rem}.challenge-card{background:#fff;padding:2rem;border-radius:.5rem;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .3s}.challenge-card:hover{box-shadow:0 10px 30px rgba(0,0,0,.1);transform:translateY(-5px)}.challenge-icon{width:40px;height:40px;margin-bottom:1rem}.challenge-card h3{font-size:1.2rem;font-weight:600;margin-bottom:.8rem}.challenge-card p{font-size:.9rem;color:#666;line-height:1.6}.cost-callout{background:#fff;padding:3rem;border-radius:1rem;border:1px solid #eee}.cost-callout h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:2rem}.cost-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;text-align:center}.cost-item h4{font-size:2rem;font-weight:300;margin-bottom:.5rem}.cost-item p{font-size:.9rem;color:#666}
+        .solutions-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(500px,1fr));gap:2rem}.solution-card{background:#f5f5f5;padding:2.5rem;border-radius:1rem;transition:all .3s}.solution-card:hover{background:#ececec}.solution-icon{width:60px;height:60px;background:#fff;border-radius:.75rem;display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem}.solution-icon svg{width:32px;height:32px}.solution-card h3{font-size:1.5rem;font-weight:300;margin-bottom:1.5rem}.solution-list{list-style:none}.solution-list li{display:flex;align-items:flex-start;gap:.8rem;margin-bottom:1rem;font-size:.9rem;color:#555;line-height:1.5}.solution-list li::before{content:'';width:8px;height:8px;background:#000;border-radius:50%;margin-top:.5rem;flex-shrink:0}
+        .process-flow{display:flex;justify-content:center;align-items:center;gap:2rem;margin-top:3rem;background:#f5f5f5;padding:2rem;border-radius:1rem;flex-wrap:wrap}.process-step{text-align:center}.process-step h4{font-size:1.5rem;font-weight:300}.process-arrow{font-size:.9rem;color:#999}
+        .scaling-note{background:#fff;padding:2rem;border-radius:1rem;margin-top:3rem;border:1px solid #eee}.scaling-note h2{font-size:3rem;font-weight:300;margin-bottom:1rem;text-align:center}.scaling-note p{font-size:.95rem;color:#666;line-height:1.6;text-align:center;max-width:800px;margin:0 auto}
+        .results-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;margin-bottom:3rem}.result-card{text-align:center;padding:2rem;background:#f9f9f9;border-radius:1rem;transition:all .3s}.result-card:hover{background:#ececec}.result-icon{margin-bottom:1rem}.result-number{font-size:3.5rem;font-weight:300;margin-bottom:.5rem}.result-label{font-weight:500;margin-bottom:.3rem}.result-description{font-size:.85rem;color:#888}
+        .tech-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem;max-width:100%}.tech-card{background:#fff;border-radius:1rem;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .3s}.tech-card:hover{box-shadow:0 10px 30px rgba(0,0,0,.15)}.tech-image{aspect-ratio:16/9;overflow:hidden;width:100%}.tech-image img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%);transition:filter .5s}.tech-card:hover .tech-image img{filter:grayscale(0%)}.tech-content{padding:2rem}.tech-content h3{font-size:3rem;font-weight:300;margin-bottom:1rem;text-align:center}.tech-category{font-size:.9rem;color:#666;margin-bottom:1rem}.tech-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:.9rem;font-weight:500;padding-top:1rem;border-top:1px solid #eee}.tech-toggle:hover{color:#555}.tech-details{max-height:0;overflow:hidden;transition:max-height .3s ease-out}.tech-details.active{max-height:500px;margin-top:1rem}.tech-details ul{list-style:none}.tech-details li{padding:.5rem 0;font-size:.9rem;color:#666;line-height:1.5}.tech-details li::before{content:'•';margin-right:.5rem;color:#000}
+        .integrations-box{background:#fff;padding:3rem;border-radius:1rem;border:1px solid #eee;margin-top:3rem}.integrations-box h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:1rem}.integrations-box>p{text-align:center;color:#666;margin-bottom:2rem;font-size:.95rem}.integrations-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;margin-bottom:2rem}.integration-item{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.8rem}.integration-icon{width:60px;height:60px;background:#f5f5f5;border-radius:.75rem;display:flex;align-items:center;justify-content:center;transition:all .3s}.integration-item:hover .integration-icon{background:#ececec;transform:translateY(-3px)}.integration-icon svg{width:32px;height:32px}.integration-item p{font-size:.85rem;font-weight:500;color:#333}.integration-note{text-align:center;font-size:.9rem;color:#666;font-style:italic}
+        .expertise-box{background:#fff;padding:3rem;border-radius:1rem;border:1px solid #eee;margin-top:3rem}.expertise-box h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:2rem}.expertise-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;text-align:center}.expertise-item h4{font-size:1.1rem;font-weight:500;margin-bottom:.5rem}.expertise-item p{font-size:.9rem;color:#666}
+        .track-record{background:#f9f9f9;padding:3rem;border-radius:1rem;margin-top:3rem}.track-record h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:2rem}.track-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem}.track-column{display:flex;flex-direction:column;gap:1.5rem}.track-item{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.8rem}.track-dot{width:16px;height:16px;background:#000;border-radius:50%}.track-item h4{font-weight:500}.track-item p{font-size:.9rem;color:#666}
+        .cta-box{background:#000;color:#fff;padding:3rem;border-radius:1rem;text-align:center;margin-top:3rem}.cta-box h3{font-size:1.8rem;font-weight:300;margin-bottom:1rem}.cta-box p{color:#ccc;margin-bottom:1.5rem;max-width:600px;margin-left:auto;margin-right:auto}.cta-box .btn{background:#fff;color:#000}.cta-box .btn:hover{background:#f0f0f0}
+        .methodology-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem}.methodology-card{text-align:center;padding:2rem;border-radius:1rem;transition:all .3s}.methodology-card:hover{background:#f9f9f9}.methodology-number{width:60px;height:60px;background:#000;color:#fff;border-radius:1rem;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:300;margin:0 auto 1.5rem}.methodology-card h3{font-size:1.3rem;font-weight:300;margin-bottom:1rem}.methodology-card p{font-size:.9rem;color:#666;line-height:1.6}
+        .expectations-box{background:#f9f9f9;padding:3rem;border-radius:1rem;margin-top:3rem}.expectations-box h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:2rem}.expectations-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;text-align:center}.expectation-icon{width:48px;height:48px;background:#000;border-radius:1rem;margin:0 auto 1rem}.expectation-item h4{font-weight:500;margin-bottom:.5rem}.expectation-item p{font-size:.9rem;color:#666}
+        .journey-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;position:relative}.journey-card{background:#fff;padding:2.5rem;border-radius:1rem;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .3s}.journey-card:hover{box-shadow:0 10px 30px rgba(0,0,0,.1)}.journey-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}.journey-number{width:48px;height:48px;background:#000;color:#fff;border-radius:1rem;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:300}.journey-card h3{font-size:1.5rem;font-weight:300}.journey-card p{font-size:.95rem;color:#666;line-height:1.6}
+        .connections-box{background:#fff;padding:2.5rem;border-radius:1rem;border:1px solid #eee;margin-top:3rem}.connections-box h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:2rem}.connections-flow{display:flex;justify-content:center;align-items:center;gap:2rem;flex-wrap:wrap}.connection-stage{text-align:center}.connection-stage h4{font-size:1.1rem;font-weight:500;margin-bottom:.3rem}.connection-stage p{font-size:.9rem;color:#666}.connection-arrow{font-size:1.5rem;color:#ccc}
+        .industry-intro{text-align:center;max-width:900px;margin:0 auto 3rem;padding:2rem;background:#fff;border-radius:1rem;border:1px solid #eee}.industry-intro h3{font-size:1.5rem;font-weight:300;margin-bottom:1rem}.industry-intro p{font-size:.95rem;color:#666;line-height:1.6}
+        .industry-accordion{max-width:900px;margin:0 auto}.industry-item{background:#f9f9f9;border-radius:1rem;margin-bottom:1.5rem;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .3s}.industry-item:hover{box-shadow:0 10px 30px rgba(0,0,0,.1)}.industry-header{display:flex;align-items:center;justify-content:space-between;padding:2rem;cursor:pointer}.industry-header-content{display:flex;align-items:center;gap:1.5rem}.industry-icon{width:60px;height:60px;background:#fff;border-radius:1rem;display:flex;align-items:center;justify-content:center}.industry-title h3{font-size:1.5rem;font-weight:300;margin-bottom:.3rem}.industry-size{font-size:.9rem;color:#666}.industry-toggle{font-size:1.5rem;color:#999;transition:transform .3s}.industry-item.active .industry-toggle{transform:rotate(180deg)}.industry-content{max-height:0;overflow:hidden;transition:max-height .3s ease-out}.industry-content.active{max-height:1000px;border-top:1px solid #ddd}.industry-details{padding:2rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem}.industry-detail h4{font-weight:600;margin-bottom:.8rem}.industry-detail p{font-size:.9rem;color:#666;line-height:1.6}.industry-detail ul{list-style:none}.industry-detail li{display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.5rem;font-size:.9rem;color:#666}.industry-detail li::before{content:'';width:8px;height:8px;background:#000;border-radius:50%;margin-top:.5rem;flex-shrink:0}
+        .universal-functions{background:#000;color:#fff;padding:3rem;border-radius:1rem;margin-top:3rem}.universal-functions h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:1rem}.universal-functions>p{text-align:center;color:#ccc;margin-bottom:2rem;max-width:800px;margin-left:auto;margin-right:auto}.functions-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1.5rem;text-align:center}.function-item{font-size:.9rem;color:#ccc}
+        .entry-points{margin-top:3rem}.entry-points h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:2rem}.entry-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}.entry-card{background:#f9f9f9;padding:2rem;border-radius:1rem}.entry-card h4{font-weight:600;margin-bottom:.5rem}.entry-card p{font-size:.9rem;color:#666}
+        .investment-intro{text-align:center;max-width:800px;margin:0 auto 3rem}.investment-intro p{font-size:1rem;color:#666;line-height:1.6}
+        .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;margin-bottom:3rem}.pricing-card{background:#fff;padding:3rem;border-radius:1rem;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .3s;display:flex;flex-direction:column}.pricing-card:hover{box-shadow:0 10px 30px rgba(0,0,0,.1);transform:translateY(-5px)}.pricing-card.featured{border:2px solid #000;position:relative}.pricing-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:.3rem 1rem;border-radius:1rem;font-size:.75rem;font-weight:600}.pricing-header{text-align:center;margin-bottom:2rem;padding-bottom:2rem;border-bottom:1px solid #eee}.pricing-name{font-size:1.5rem;font-weight:300;margin-bottom:.5rem}.pricing-best-for{font-size:.9rem;color:#666;margin-bottom:1.5rem}.pricing-amount{font-size:2.5rem;font-weight:300;margin-bottom:.3rem}.pricing-period{font-size:.9rem;color:#666}.pricing-features{list-style:none;margin-bottom:2rem;flex-grow:1}.pricing-features li{display:flex;align-items:flex-start;gap:.8rem;margin-bottom:1rem;font-size:.9rem;color:#555;line-height:1.5}.pricing-features li::before{content:'';width:8px;height:8px;background:#000;border-radius:50%;margin-top:.5rem;flex-shrink:0}.pricing-card .btn{width:100%;text-align:center}.investment-note{background:#f9f9f9;padding:2rem;border-radius:1rem;text-align:center}.investment-note p{font-size:.95rem;color:#666;line-height:1.6;margin-bottom:1rem}.investment-note p:last-child{margin-bottom:0}
+        .resources-intro{text-align:center;max-width:800px;margin:0 auto 3rem}.resources-intro p{font-size:1rem;color:#666;line-height:1.6}.resources-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem;margin-bottom:3rem}.resource-card{background:#fff;padding:2.5rem;border-radius:1rem;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .3s;text-align:center}.resource-card:hover{box-shadow:0 10px 30px rgba(0,0,0,.1);transform:translateY(-5px)}.resource-icon{width:60px;height:60px;background:#000;border-radius:1rem;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem}.resource-icon svg{width:32px;height:32px;stroke:#fff}.resource-card h3{font-size:1.3rem;font-weight:300;margin-bottom:1rem}.resource-card p{font-size:.9rem;color:#666;line-height:1.6;margin-bottom:1.5rem}
+        .quiz-section{background:#000;color:#fff;padding:3rem;border-radius:1rem}.quiz-section h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:1rem}.quiz-section>p{text-align:center;color:#ccc;margin-bottom:2rem;max-width:700px;margin-left:auto;margin-right:auto}.quiz-form{max-width:700px;margin:0 auto}.quiz-question{background:rgba(255,255,255,.05);padding:1.5rem;border-radius:.5rem;margin-bottom:1.5rem}.quiz-question label{display:block;font-size:.95rem;margin-bottom:1rem;color:#fff;font-weight:500}.quiz-options{display:flex;flex-direction:column;gap:.8rem}.quiz-option{display:flex;align-items:center;gap:.8rem}.quiz-option input[type=radio]{width:18px;height:18px;cursor:pointer}.quiz-option label{font-size:.9rem;color:#ccc;font-weight:400;margin:0;cursor:pointer}.quiz-submit{text-align:center;margin-top:2rem}.quiz-submit .btn{background:#fff;color:#000;padding:1rem 3rem}.quiz-submit .btn:hover{background:#f0f0f0}
+        .contact-grid{display:grid;grid-template-columns:2fr 1fr;gap:3rem}.contact-form-wrapper{background:#fff;padding:3rem;border-radius:1rem;border:1px solid #eee}.contact-form-wrapper h3{font-size:1.8rem;font-weight:300;margin-bottom:2rem}.form-group{margin-bottom:1.5rem}.form-group label{display:block;font-size:.9rem;font-weight:500;margin-bottom:.5rem}.form-group input,.form-group textarea,.form-group select{width:100%;padding:.8rem 1rem;border:1px solid #ddd;border-radius:4px;font-size:.9rem;transition:border-color .3s}.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:#000}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}.form-note{text-align:center;padding-top:2rem;border-top:1px solid #eee;margin-top:2rem}.form-note p{font-size:.9rem;color:#666}.contact-sidebar{display:flex;flex-direction:column;gap:2rem}.contact-info-box{background:#fff;padding:2rem;border-radius:1rem;border:1px solid #eee}.contact-info-box h4{font-size:1.3rem;font-weight:300;margin-bottom:1.5rem}.contact-item{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.5rem}.contact-item svg{width:20px;height:20px;margin-top:.2rem;flex-shrink:0}.contact-item-content h5{font-weight:500;margin-bottom:.3rem}.contact-item-content p{font-size:.9rem;color:#666}.expectations-list{background:#000;color:#fff;padding:2rem;border-radius:1rem}.expectations-list h4{font-size:1.3rem;font-weight:300;margin-bottom:1.5rem}.expectations-list ul{list-style:none}.expectations-list li{display:flex;align-items:flex-start;gap:.8rem;margin-bottom:1rem;font-size:.9rem}.expectations-list li::before{content:'';width:8px;height:8px;background:#fff;border-radius:50%;margin-top:.5rem;flex-shrink:0}
+        footer{background:#000;color:#fff;padding:4rem 0 2rem}.footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:3rem;margin-bottom:3rem}.footer-col h3{font-size:1.2rem;font-weight:300;margin-bottom:1rem}.footer-col p{font-size:.9rem;color:#999;line-height:1.6}.footer-col h4{font-weight:600;margin-bottom:1rem}.footer-links{list-style:none}.footer-links li{margin-bottom:.5rem}.footer-links a{color:#999;text-decoration:none;font-size:.9rem;transition:color .3s}.footer-links a:hover{color:#fff}.footer-contact-info{margin-bottom:1.5rem}.footer-contact-info p{font-size:.9rem;color:#999;margin-bottom:.3rem}.footer-contact-info strong{color:#fff}.footer-bottom{border-top:1px solid #333;padding-top:2rem}.footer-bottom-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}.footer-bottom-content p{font-size:.9rem;color:#666}.footer-bottom-links{display:flex;gap:2rem;align-items:center;flex-wrap:wrap}.footer-bottom-links a{color:#999;text-decoration:none;font-size:.9rem;transition:color .3s}.footer-bottom-links a:hover{color:#fff}.gdpr-badge{display:flex;align-items:center;gap:.5rem;font-size:.9rem;color:#999}.gdpr-dot{width:8px;height:8px;background:#4ade80;border-radius:50%}.footer-credentials{text-align:center;margin-top:2rem}.footer-credentials p{font-size:.75rem;color:#555}
+
+        .tracking-box {
+            background: #fff;
+            padding: 3rem;
+            border-radius: 1rem;
+            border: 1px solid #eee;
+            margin-top: 3rem;
+        }
+
+        .tracking-box h3 {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-bottom: 1rem;
+        }
+
+        .tracking-box > p {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .tracking-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 2rem;
         }
-        .solution-card {
-            background: #f5f5f5;
-            padding: 2.5rem;
-            border-radius: 1rem;
-            transition: all .3s;
-        }
-        .solution-card:hover { background: #ececec; }
-        .solution-icon { width: 60px; height: 60px; background: #fff; border-radius: .75rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; }
-        .solution-icon svg { width: 32px; height: 32px; }
-        .solution-card h3 { font-size: 1.5rem; font-weight: 300; margin-bottom: 1.5rem; }
-        .solution-list { list-style: none; }
-        .solution-list li { display: flex; align-items: flex-start; gap: .8rem; margin-bottom: 1rem; font-size: .9rem; color: #555; line-height: 1.5; }
-        .solution-list li::before { content: ''; width: 8px; height: 8px; background: #000; border-radius: 50%; margin-top: .5rem; flex-shrink: 0; }
 
-        /* Explainability Features - 3x2 on desktop */
+        .tracking-tier {
+            background: #f9f9f9;
+            padding: 2rem;
+            border-radius: 1rem;
+        }
+
+        .tracking-tier h4 {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .tracking-tier ul {
+            list-style: none;
+        }
+
+        .tracking-tier li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .tracking-tier li::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #000;
+            border-radius: 50%;
+            margin-top: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        /* Explainability Section Styles */
+        .explainability-intro {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 1rem;
+            border: 2px solid #000;
+        }
+
+        .explainability-intro h3 {
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-bottom: 1rem;
+        }
+
+        .explainability-intro .tagline {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #000;
+            margin-bottom: 1rem;
+        }
+
+        .explainability-intro p {
+            font-size: 1rem;
+            color: #666;
+            line-height: 1.6;
+        }
+
         .explainability-features {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 2rem;
             margin-bottom: 3rem;
         }
+
         .explainability-card {
             background: #f9f9f9;
             padding: 2.5rem;
             border-radius: 1rem;
             transition: all 0.3s;
         }
+
         .explainability-card:hover {
             background: #ececec;
             transform: translateY(-5px);
         }
-        .explainability-card h4 { font-size: 1.3rem; font-weight: 500; margin-bottom: 1rem; }
-        .explainability-card p { font-size: 0.9rem; color: #666; line-height: 1.6; }
 
-        /* Other grids */
-        .challenge-grid, .results-grid, .pricing-grid, .methodology-grid, .journey-grid, .tracking-grid, .expectations-grid, .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
+        .explainability-card h4 {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
         }
 
-        /* FIXED: Built on Proven Experience – now centered */
-        .experience-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 0 auto;
-            justify-content: center;
+        .explainability-card p {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.6;
         }
 
-        /* FIXED: Seamless Integrations – force 1 column on mobile */
-        .integrations-grid {
+        .explainability-comparison {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 2rem;
+            margin-top: 3rem;
         }
 
-        .challenge-card, .result-card, .pricing-card, .integration-item, .methodology-card, .journey-card, .tracking-tier, .expectation-item, .tech-card, .experience-card {
-            background: #fff;
-            padding: 2rem;
+        .comparison-card {
+            padding: 2.5rem;
             border-radius: 1rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,.05);
-            transition: all .3s;
-        }
-        .challenge-card:hover, .result-card:hover, .pricing-card:hover, .tech-card:hover, .experience-card:hover {
-            box-shadow: 0 10px 30px rgba(0,0,0,.1);
-            transform: translateY(-5px);
+            text-align: center;
         }
 
-        .contact-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 3rem; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-
-        /* Responsive Breakpoints */
-        @media (max-width: 1024px) {
-            .hero-content { grid-template-columns: 1fr; text-align: center; }
-            .hero-image { max-width: 400px; margin: 0 auto; }
-            .hero-stat { position: static; margin: 2rem auto 0; display: inline-block; }
-            .solutions-grid { grid-template-columns: 1fr 1fr; }
-            .explainability-features { grid-template-columns: 1fr 1fr; }
+        .comparison-card.black-box {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
         }
 
+        .comparison-card.glass-box {
+            background: #000;
+            color: #fff;
+            border: 2px solid #000;
+        }
+
+        .comparison-card h4 {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 1.5rem;
+        }
+
+        .comparison-card ul {
+            list-style: none;
+            text-align: left;
+        }
+
+        .comparison-card ul li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .comparison-card.black-box ul li {
+            color: #666;
+        }
+
+        .comparison-card.glass-box ul li {
+            color: #ccc;
+        }
+
+        .comparison-card.black-box ul li::before {
+            content: '✗';
+            color: #999;
+            font-weight: bold;
+        }
+
+        .comparison-card.glass-box ul li::before {
+            content: '✓';
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .addon-pricing {
+            background: #000;
+            color: #fff;
+            padding: 3rem;
+            border-radius: 1rem;
+            margin-top: 3rem;
+        }
+
+        .addon-pricing h4 {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-bottom: 1rem;
+        }
+
+        .addon-pricing .price {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .addon-pricing .price-period {
+            text-align: center;
+            color: #ccc;
+            margin-bottom: 2rem;
+        }
+
+        .addon-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .addon-feature {
+            text-align: center;
+        }
+
+        .addon-feature h5 {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .addon-feature p {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .container { padding: 0 1.5rem; }
-            nav { padding: 1rem; }
             .nav-links { display: none; }
-            .menu-toggle { display: block; }
-            .nav-links.mobile { display: none; }
-            .nav-links.mobile.active { display: flex; }
-
+            .hero-content { grid-template-columns: 1fr; }
             .hero-text h1 { font-size: 2.5rem; }
-            .section-header h2 { font-size: 2.2rem; }
-            .section-header p { font-size: 1rem; }
-
-            .solutions-grid,
-            .explainability-features,
-            .tech-grid,
-            .integrations-grid,
-            .pricing-grid,
-            .methodology-grid,
-            .journey-grid,
-            .tracking-grid,
-            .expectations-grid,
-            .experience-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .contact-grid,
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .hero-cta,
-            .hero-badges {
-                justify-content: center;
-            }
-
-            .btn { width: 100%; text-align: center; }
-            .btn-outline { margin-top: 1rem; }
+            .section-header h2 { font-size: 2rem; }
+            .challenge-grid,.solutions-grid,.tech-grid,.methodology-grid,.journey-grid,.why-grid,.results-grid,.pricing-grid,.resources-grid,.explainability-features,.explainability-comparison{ grid-template-columns: 1fr; }
+            .contact-grid { grid-template-columns: 1fr; }
+            .form-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .connections-flow,.process-flow { flex-direction: column; }
+            .connection-arrow,.process-arrow { transform: rotate(90deg); }
+        .integrations-grid {
+            grid-template-columns: 1fr;
         }
-
-        @media (max-width: 480px) {
-            .hero-text h1 { font-size: 2rem; letter-spacing: -1px; }
-            .hero-text p { font-size: 1rem; }
-            .section-header h2 { font-size: 1.8rem; }
-            .solution-card, .explainability-card { padding: 2rem; }
-            .hero-image { aspect-ratio: 1; }
-            .hero-stat { padding: 1rem 1.5rem; }
-            .hero-stat-number { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body>
-
-    <!-- Header with Mobile Menu -->
+    <!-- Header -->
     <header>
         <nav>
             <div class="logo">Auspexi</div>
-            <ul class="nav-links" id="navLinks">
+            <ul class="nav-links">
                 <li><a href="#solutions">Solutions</a></li>
                 <li><a href="#explainability">Explainability</a></li>
                 <li><a href="#technology">Technology</a></li>
                 <li><a href="#methodology">Methodology</a></li>
                 <li><a href="#investment">Investment</a></li>
             </ul>
-            <div class="menu-toggle" onclick="toggleMenu()">Menu</div>
             <a href="#contact" class="btn">Contact</a>
         </nav>
     </header>
@@ -219,13 +357,13 @@
                     <h1>AI Automation Infrastructure You Own, Not Rent</h1>
                     <p>Build automation systems on YOUR servers with 90% local AI. No API price hostage situations. Complete transparency and explainability.</p>
                     <div class="hero-badges">
-                        <div class="badge"><div class="badge-icon">Check</div><span>90% Local AI</span></div>
-                        <div class="badge"><div class="badge-icon">Check</div><span>Self-Hosted</span></div>
-                        <div class="badge"><div class="badge-icon">Check</div><span>Explainable AI</span></div>
-                        <div class="badge"><div class="badge-icon">Check</div><span>Audit Ready</span></div>
+                        <div class="badge"><div class="badge-icon">✓</div><span>90% Local AI</span></div>
+                        <div class="badge"><div class="badge-icon">✓</div><span>Self-Hosted</span></div>
+                        <div class="badge"><div class="badge-icon">✓</div><span>Explainable AI</span></div>
+                        <div class="badge"><div class="badge-icon">✓</div><span>Audit Ready</span></div>
                     </div>
                     <div class="hero-cta">
-                        <a href="#contact" class="btn">Book Free Consultation</a>
+                        <a href="#contact" class="btn">Book Free Consultation →</a>
                         <a href="#explainability" class="btn btn-outline">Learn About Explainability</a>
                     </div>
                 </div>
@@ -248,12 +386,29 @@
                 <p>Build AI automation on infrastructure you control. Real ownership, measurable improvements, no vendor lock-in.</p>
             </div>
 
-            <!-- Challenges (4 cards) -->
             <div class="challenge-grid">
-                <!-- Add your challenge cards here if needed -->
+                <div class="challenge-card">
+                    <svg class="challenge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    <h3>API Price Hostage Situations</h3>
+                    <p>Businesses locked into expensive API pricing with costs spiralling as usage grows. No control over pricing changes.</p>
+                </div>
+                <div class="challenge-card">
+                    <svg class="challenge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path></svg>
+                    <h3>Black Box AI Systems</h3>
+                    <p>No visibility into how AI makes decisions. Compliance nightmares and zero accountability when things go wrong.</p>
+                </div>
+                <div class="challenge-card">
+                    <svg class="challenge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <h3>Single Vendor Dependency</h3>
+                    <p>What happens when OpenAI has an outage? When your vendor changes terms? When they shut down an API?</p>
+                </div>
+                <div class="challenge-card">
+                    <svg class="challenge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <h3>Data Control Concerns</h3>
+                    <p>Your sensitive business data flowing through third-party APIs. Who has access? Where is it stored? How is it used?</p>
+                </div>
             </div>
 
-            <!-- Solutions: 2x2 Grid -->
             <div class="solutions-grid">
                 <div class="solution-card">
                     <div class="solution-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
@@ -300,15 +455,43 @@
                     </ul>
                 </div>
             </div>
+
+            <div class="cost-callout">
+                <h3>The True Cost of API-Dependent AI</h3>
+                <div class="cost-grid">
+                    <div class="cost-item"><h4>£5,000+/month</h4><p>Typical API costs at scale</p></div>
+                    <div class="cost-item"><h4>£30/month</h4><p>Our infrastructure costs</p></div>
+                    <div class="cost-item"><h4>166x</h4><p>Cost difference</p></div>
+                </div>
+            </div>
+
+            <div class="results-grid">
+                <div class="result-card"><div class="result-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg></div><div class="result-number">95%+</div><div class="result-label">Operating margin</div><div class="result-description">Minimal infrastructure costs</div></div>
+                <div class="result-card"><div class="result-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg></div><div class="result-number">Zero</div><div class="result-label">Math errors</div><div class="result-description">Compiler-verified calculations</div></div>
+                <div class="result-card"><div class="result-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg></div><div class="result-number">100%</div><div class="result-label">Data ownership</div><div class="result-description">Your servers, your control</div></div>
+                <div class="result-card"><div class="result-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg></div><div class="result-number">6</div><div class="result-label">Stakeholder groups</div><div class="result-description">Ethical decision framework</div></div>
+            </div>
+
+            <div class="cta-box">
+                <h3>Own Your AI Infrastructure</h3>
+                <p>Stop renting AI. Start owning it. Let's discuss how self-hosted, explainable AI can transform your business without vendor lock-in.</p>
+                <a href="#contact" class="btn">Book Your Free Consultation</a>
+            </div>
         </div>
     </section>
 
-    <!-- 2) EXPLAINABILITY -->
+    <!-- 2) EXPLAINABILITY - NEW SECTION -->
     <section id="explainability" class="bg-gray">
         <div class="container">
             <div class="section-header">
                 <h2>Transparent AI You Can Trust</h2>
                 <p>Every decision comes with a clear reasoning trail. No black boxes.</p>
+            </div>
+
+            <div class="explainability-intro">
+                <p class="tagline">Most AI consultancies deliver black boxes. We deliver glass boxes.</p>
+                <h3>Complete AI Explainability & Audit Trails</h3>
+                <p>When AI makes a decision that affects your business, you need to know why. Our explainability layer captures every reasoning step, making AI decisions transparent, auditable, and compliant.</p>
             </div>
 
             <div class="explainability-features">
@@ -337,67 +520,472 @@
                     <p>Easy review and override dashboard. Humans stay in control with clear workflows for reviewing low-confidence or flagged decisions.</p>
                 </div>
             </div>
+
+            <div class="explainability-comparison">
+                <div class="comparison-card black-box">
+                    <h4>Traditional AI (Black Box)</h4>
+                    <ul>
+                        <li>No visibility into decision-making</li>
+                        <li>Compliance nightmares</li>
+                        <li>Can't explain to regulators</li>
+                        <li>When it fails, you don't know why</li>
+                        <li>Impossible to improve systematically</li>
+                    </ul>
+                </div>
+                <div class="comparison-card glass-box">
+                    <h4>Auspexi AI (Glass Box)</h4>
+                    <ul>
+                        <li>Complete reasoning capture</li>
+                        <li>Full audit trails included</li>
+                        <li>Regulator-ready reports</li>
+                        <li>Mathematical verification</li>
+                        <li>Ethical stakeholder balancing</li>
+                        <li>Root cause analysis built-in</li>
+                        <li>Continuous improvement through data</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="addon-pricing">
+                <h4>AI Explainability & Audit Package</h4>
+                <div class="price">+£400/month</div>
+                <div class="price-period">Added to any service tier</div>
+                <div class="addon-features">
+                    <div class="addon-feature">
+                        <h5>Reasoning Capture</h5>
+                        <p>Every AI decision logged with full reasoning trail</p>
+                    </div>
+                    <div class="addon-feature">
+                        <h5>Math Verification</h5>
+                        <p>Math compiler proves calculations correct</p>
+                    </div>
+                    <div class="addon-feature">
+                        <h5>Compliance Reports</h5>
+                        <p>Monthly audit-ready reports (PDF/JSON/CSV)</p>
+                    </div>
+                    <div class="addon-feature">
+                        <h5>API Access</h5>
+                        <p>Call our explainability API for on-demand insights</p>
+                    </div>
+                    <div class="addon-feature">
+                        <h5>Human Review Dashboard</h5>
+                        <p>Review and override low-confidence decisions</p>
+                    </div>
+                    <div class="addon-feature">
+                        <h5>Audit Assessment</h5>
+                        <p>Quarterly compliance readiness review</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="addon-pricing" style="margin-top: 2rem;">
+                <h4>Philosophy Framework Integration</h4>
+                <div class="price">+£300/month</div>
+                <div class="price-period">Ethical AI decision-making</div>
+                <div class="addon-features">
+                    <div class="addon-feature">
+                        <h5>Stakeholder Balance</h5>
+                        <p>Configure priorities across 6 groups</p>
+                    </div>
+                    <div class="addon-feature">
+                        <h5>Impact Analysis</h5>
+                        <p>See how decisions affect all stakeholders</p>
+                    </div>
+                    <div class="addon-feature">
+                        <h5>Philosophical Foundations</h5>
+                        <p>Teleology, epistemology, ontology</p>
+                    </div>
+                    <div class="addon-feature">
+                        <h5>Ethical Reports</h5>
+                        <p>Stakeholder impact documentation</p>
+                    </div>
+                    <div class="addon-feature">
+                        <h5>Custom Frameworks</h5>
+                        <p>Tailor to your values and priorities</p>
+                    </div>
+                    <div class="addon-feature">
+                        <h5>Open Source</h5>
+                        <p>Built on philosophyframework.com</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Built on Proven Experience (FIXED: now centered) -->
-    <section id="experience" class="bg-gray">
+    <!-- 3) TECHNOLOGY -->
+    <section id="technology">
         <div class="container">
             <div class="section-header">
-                <h2>Built on Proven Experience</h2>
-                <p>Real-world results from enterprise deployments.</p>
+                <h2>Technology That Works For You</h2>
+                <p>Future-proof architecture built on open standards, not proprietary platforms.</p>
             </div>
-            <div class="experience-grid">
-                <div class="experience-card">
-                    <h4>Finance Automation</h4>
-                    <p>Reduced invoice processing time by 92%</p>
+
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <div class="tech-image"><img src="./images/circuit-brain.jfif" alt="Local AI Models" onerror="this.onerror=null; this.src='./images/circuit-brain.jpg';"></div>
+                    <div class="tech-content">
+                        <h3>Local AI Models</h3>
+                        <p class="tech-category">90% of workload</p>
+                        <div class="tech-toggle" onclick="toggleTech(this)"><span>View Capabilities</span><span>▼</span></div>
+                        <div class="tech-details"><ul>
+                            <li>Llama 3, Mistral, and other open-source models</li>
+                            <li>Run on your infrastructure for cost control</li>
+                            <li>Fine-tune on your specific data</li>
+                            <li>No per-token pricing</li>
+                            <li>Complete data privacy</li>
+                        </ul></div>
+                    </div>
                 </div>
-                <div class="experience-card">
-                    <h4>Supply Chain</h4>
-                    <p>Cut inventory errors by 87%</p>
+                <div class="tech-card">
+                    <div class="tech-image"><img src="./images/ai-chip.jfif" alt="Cloud AI Fallback" onerror="this.onerror=null; this.src='./images/ai-chip.jpg';"></div>
+                    <div class="tech-content">
+                        <h3>Cloud AI Fallback</h3>
+                        <p class="tech-category">10% specialised tasks</p>
+                        <div class="tech-toggle" onclick="toggleTech(this)"><span>View Capabilities</span><span>▼</span></div>
+                        <div class="tech-details"><ul>
+                            <li>OpenAI, Anthropic, Google for complex reasoning</li>
+                            <li>Automatic failover between providers</li>
+                            <li>Used only when local AI insufficient</li>
+                            <li>Multi-provider resilience</li>
+                            <li>Cost-optimised routing</li>
+                        </ul></div>
+                    </div>
                 </div>
-                <div class="experience-card">
-                    <h4>Customer Service</h4>
-                    <p>Automated 78% of tier-1 tickets</p>
+                <div class="tech-card">
+                    <div class="tech-image"><img src="./images/blue-ai-letters.jfif" alt="MCP Protocol" onerror="this.onerror=null; this.src='./images/blue-ai-letters.jpg';"></div>
+                    <div class="tech-content">
+                        <h3>MCP Protocol</h3>
+                        <p class="tech-category">Future-proof integration</p>
+                        <div class="tech-toggle" onclick="toggleTech(this)"><span>View Capabilities</span><span>▼</span></div>
+                        <div class="tech-details"><ul>
+                            <li>Model Context Protocol for universal AI connections</li>
+                            <li>Not locked to any vendor's ecosystem</li>
+                            <li>Easy integration with new AI models</li>
+                            <li>Standardized tool-calling</li>
+                            <li>Open-source and extensible</li>
+                        </ul></div>
+                    </div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-image"><img src="./images/cube-structure.jfif" alt="Self-Hosted Infrastructure" onerror="this.onerror=null; this.src='./images/cube-structure.jpg';"></div>
+                    <div class="tech-content">
+                        <h3>Self-Hosted</h3>
+                        <p class="tech-category">Your servers, your rules</p>
+                        <div class="tech-toggle" onclick="toggleTech(this)"><span>View Capabilities</span><span>▼</span></div>
+                        <div class="tech-details"><ul>
+                            <li>Deploy on your own servers or private cloud</li>
+                            <li>Complete data ownership and control</li>
+                            <li>Meet any compliance requirement</li>
+                            <li>No vendor can change pricing or terms</li>
+                            <li>Fully portable if you change consultants</li>
+                        </ul></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="track-record">
+                <h3>Built on Proven Experience</h3>
+                <div class="track-grid">
+                    <div class="track-column">
+                        <div class="track-item"><div class="track-dot"></div><div><h4>Production AI Systems</h4><p>Multiple platforms processing millions of requests</p></div></div>
+                        <div class="track-item"><div class="track-dot"></div><div><h4>Synthetic Data & Analytics</h4><p>Advanced platforms handling 1B+ records daily</p></div></div>
+                        <div class="track-item"><div class="track-dot"></div><div><h4>Philosophy Framework</h4><p>Open-source ethical AI framework (philosophyframework.com)</p></div></div>
+                        <div class="track-item"><div class="track-dot"></div><div><h4>AI Course Development</h4><p>4,200-hour curriculum with 875 practical challenges</p></div></div>
+                    </div>
+                    <div class="track-column">
+                        <div class="track-item"><div class="track-dot"></div><div><h4>Full-Stack Development</h4><p>React, TypeScript, Node.js, serverless architecture</p></div></div>
+                        <div class="track-item"><div class="track-dot"></div><div><h4>Mathematical Verification</h4><p>Chuck-math compiler integration for provable accuracy</p></div></div>
+                        <div class="track-item"><div class="track-dot"></div><div><h4>25+ Years Leadership</h4><p>Technology, operations, and business strategy</p></div></div>
+                        <div class="track-item"><div class="track-dot"></div><div><h4>Compliance-Ready</h4><p>GDPR, SOX, industry-specific requirements</p></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="integrations-box">
+                <h3>Seamless Integrations</h3>
+                <p>We work with the tools you already use, reducing risk and accelerating implementation.</p>
+                <div class="integrations-grid">
+                    <div class="integration-item"><div class="integration-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg></div><p>Google Workspace</p></div>
+                    <div class="integration-item"><div class="integration-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div><p>Microsoft 365</p></div>
+                    <div class="integration-item"><div class="integration-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg></div><p>Zapier</p></div>
+                    <div class="integration-item"><div class="integration-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div><p>Salesforce</p></div>
+                    <div class="integration-item"><div class="integration-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div><p>Xero</p></div>
+                    <div class="integration-item"><div class="integration-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg></div><p>HubSpot</p></div>
+                    <div class="integration-item"><div class="integration-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></div><p>Slack</p></div>
+                    <div class="integration-item"><div class="integration-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div><p>Notion</p></div>
+                </div>
+                <p class="integration-note">+ Many more through custom API connections</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4) METHODOLOGY -->
+    <section id="methodology" class="bg-gray">
+        <div class="container">
+            <div class="section-header">
+                <h2>How We Work Together</h2>
+                <p>A collaborative, transparent approach that ensures your AI infrastructure delivers measurable value.</p>
+            </div>
+
+            <div class="methodology-grid">
+                <div class="methodology-card"><div class="methodology-number">1</div><h3>Discover & Assess</h3><p>Map your workflows, identify automation opportunities, and assess your readiness for self-hosted AI infrastructure.</p></div>
+                <div class="methodology-card"><div class="methodology-number">2</div><h3>Design Architecture</h3><p>Create a resilient, multi-provider architecture tailored to your needs. Local AI for most tasks, cloud fallback for complexity.</p></div>
+                <div class="methodology-card"><div class="methodology-number">3</div><h3>Build & Deploy</h3><p>Implement on your infrastructure with complete explainability and mathematical verification built-in. Test thoroughly before going live.</p></div>
+                <div class="methodology-card"><div class="methodology-number">4</div><h3>Monitor & Evolve</h3><p>Continuous improvement through audit trails and reasoning analysis. Optimise based on real usage patterns.</p></div>
+            </div>
+
+            <div class="journey-grid">
+                <div class="journey-card"><div class="journey-header"><div class="journey-number">1</div><h3>Start Smart</h3></div><p>Begin with one high-impact workflow on your infrastructure. Prove the value of local AI and build confidence in the approach.</p></div>
+                <div class="journey-card"><div class="journey-header"><div class="journey-number">2</div><h3>Expand Strategically</h3></div><p>Add explainability and audit capabilities. Connect workflows to create compound efficiency gains across your operation.</p></div>
+                <div class="journey-card"><div class="journey-header"><div class="journey-number">3</div><h3>Scale With Confidence</h3></div><p>Your infrastructure grows with you. No surprise costs, no vendor constraints, complete control over your AI destiny.</p></div>
+            </div>
+
+            <div class="tracking-box">
+                <h3>Measuring Impact</h3>
+                <p>Transparent tracking helps you see the value of your investment at every stage.</p>
+                <div class="tracking-grid">
+                    <div class="tracking-tier">
+                        <h4>Efficiency Metrics</h4>
+                        <ul>
+                            <li>Time saved per workflow</li>
+                            <li>Tasks automated per day</li>
+                            <li>Error reduction rates</li>
+                            <li>Team productivity gains</li>
+                        </ul>
+                    </div>
+                    <div class="tracking-tier">
+                        <h4>Cost Metrics</h4>
+                        <ul>
+                            <li>Infrastructure costs vs API costs</li>
+                            <li>ROI calculations</li>
+                            <li>Cost per transaction</li>
+                            <li>Scaling cost projections</li>
+                        </ul>
+                    </div>
+                    <div class="tracking-tier">
+                        <h4>Quality Metrics</h4>
+                        <ul>
+                            <li>Decision accuracy rates</li>
+                            <li>Confidence score distributions</li>
+                            <li>Human override frequency</li>
+                            <li>Compliance adherence</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expectations-box">
+                <h3>What You Can Expect</h3>
+                <div class="expectations-grid">
+                    <div class="expectation-item"><div class="expectation-icon"></div><h4>Complete Transparency</h4><p>Full visibility into costs, decisions, and system performance at all times</p></div>
+                    <div class="expectation-item"><div class="expectation-icon"></div><h4>True Ownership</h4><p>Your infrastructure, your data, your control. No hostage situations, ever</p></div>
+                    <div class="expectation-item"><div class="expectation-icon"></div><h4>Ongoing Partnership</h4><p>Available for optimization, troubleshooting, and strategic guidance as you grow</p></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Seamless Integrations (FIXED: now stacks on mobile) -->
-    <section id="integrations">
+    <!-- 5) INVESTMENT -->
+    <section id="investment">
         <div class="container">
             <div class="section-header">
-                <h2>Seamless Integrations</h2>
-                <p>Works with your existing stack.</p>
+                <h2>Investment & Packages</h2>
+                <p>Transparent pricing designed for rapid ROI. Own your infrastructure, control your costs.</p>
             </div>
-            <div class="integrations-grid">
-                <div class="integration-item">SAP</div>
-                <div class="integration-item">Oracle</div>
-                <div class="integration-item">Microsoft Dynamics</div>
-                <div class="integration-item">Salesforce</div>
-                <div class="integration-item">Notion</div>
-                <div class="integration-item">Slack</div>
+
+            <div class="investment-intro">
+                <p>These are starting points for our conversation. Every business is unique—let's discuss your specific needs and design the right package for you.</p>
+            </div>
+
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <div class="pricing-name">Small Business</div>
+                        <div class="pricing-best-for">1-2 workflows</div>
+                        <div class="pricing-amount">£2,000-£3,000</div>
+                        <div class="pricing-period">Setup + £300-£500/month</div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>1-2 automated workflows on your infrastructure</li>
+                        <li>90% local AI deployment</li>
+                        <li>Basic multi-provider fallback</li>
+                        <li>Team training and documentation</li>
+                        <li>Monthly maintenance and updates</li>
+                        <li>Email support</li>
+                        <li><strong>Add Explainability: +£400/month</strong></li>
+                        <li><strong>Add Philosophy Framework: +£300/month</strong></li>
+                    </ul>
+                    <a href="#contact" class="btn">Get Started</a>
+                </div>
+
+                <div class="pricing-card featured">
+                    <div class="pricing-badge">Most Popular</div>
+                    <div class="pricing-header">
+                        <div class="pricing-name">Growing Business</div>
+                        <div class="pricing-best-for">3-5 workflows</div>
+                        <div class="pricing-amount">£4,000-£6,000</div>
+                        <div class="pricing-period">Setup + £600-£900/month</div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>3-5 connected workflows with integrations</li>
+                        <li>Self-hosted infrastructure on your servers</li>
+                        <li>Advanced multi-provider resilience</li>
+                        <li>Custom fine-tuning on your data</li>
+                        <li>Active evolution and optimisation</li>
+                        <li>Priority support</li>
+                        <li><strong>Add Explainability: +£400/month</strong></li>
+                        <li><strong>Add Philosophy Framework: +£300/month</strong></li>
+                    </ul>
+                    <a href="#contact" class="btn">Get Started</a>
+                </div>
+
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <div class="pricing-name">Enterprise</div>
+                        <div class="pricing-best-for">6+ workflows</div>
+                        <div class="pricing-amount">£8,000-£12,000</div>
+                        <div class="pricing-period">Setup + £1,200-£1,800/month</div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>Enterprise-wide AI infrastructure</li>
+                        <li>Complete self-hosted deployment</li>
+                        <li>Advanced explainability and compliance</li>
+                        <li>Mathematical verification included</li>
+                        <li>Internal MCP knowledge server</li>
+                        <li>Deep partnership with strategic guidance</li>
+                        <li>Dedicated support and SLA</li>
+                        <li><strong>Explainability & Philosophy Framework included</strong></li>
+                    </ul>
+                    <a href="#contact" class="btn">Get Started</a>
+                </div>
+            </div>
+
+            <div class="cost-callout">
+                <h3>Optional Add-Ons</h3>
+                <div class="cost-grid">
+                    <div class="cost-item"><h4>+£400/month</h4><p>Explainability & Audit Package</p></div>
+                    <div class="cost-item"><h4>+£300/month</h4><p>Philosophy Framework Integration</p></div>
+                    <div class="cost-item"><h4>Both Included</h4><p>In Enterprise tier</p></div>
+                </div>
+            </div>
+
+            <div class="investment-note">
+                <p><strong>Infrastructure costs separate:</strong> Approximately £30/month for hosting, or use your existing servers at no additional cost.</p>
+                <p><strong>No API hostage situations:</strong> With 90% local AI, your operational costs stay predictable and low regardless of scale.</p>
+                <p>Every engagement starts with a free consultation where we assess your needs and provide a detailed, fixed-price proposal.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6) CONTACT -->
+    <section id="contact" class="bg-gray">
+        <div class="container">
+            <div class="section-header">
+                <h2>Let's Build Your AI Infrastructure</h2>
+                <p>Free consultation to explore how self-hosted, explainable AI can transform your business without vendor lock-in.</p>
+            </div>
+
+            <div class="contact-grid">
+                <div class="contact-form-wrapper">
+                    <h3>Get Started Today</h3>
+                    <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+                        <input type="hidden" name="form-name" value="contact">
+                        <p style="display:none;"><label>Don't fill this out if you're human: <input name="bot-field" /></label></p>
+                        <div class="form-grid">
+                            <div class="form-group"><label for="name">Full Name *</label><input type="text" id="name" name="name" placeholder="Your full name" required></div>
+                            <div class="form-group"><label for="email">Email Address *</label><input type="email" id="email" name="email" placeholder="you@company.com" required></div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group"><label for="company">Company Name</label><input type="text" id="company" name="company" placeholder="Your Company Ltd"></div>
+                            <div class="form-group"><label for="company-size">Company Size</label><select id="company-size" name="company-size"><option value="">Select size...</option><option value="1-20">1-20 employees</option><option value="20-100">20-100 employees</option><option value="100+">100+ employees</option></select></div>
+                        </div>
+                        <div class="form-group"><label for="message">What brings you here?</label><textarea id="message" name="message" rows="4" placeholder="Tell us about your AI infrastructure needs, concerns about vendor lock-in, or compliance requirements..."></textarea></div>
+                        <button type="submit" class="btn" style="width:100%;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; margin-right:.5rem;"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg>Book Free Consultation</button>
+                        <div class="form-note"><p>We'll discuss your needs, assess your AI readiness, and explore how self-hosted AI can work for your business.</p></div>
+                    </form>
+                </div>
+
+                <div class="contact-sidebar">
+                    <div class="contact-info-box">
+                        <h4>Contact Information</h4>
+                        <div class="contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"></path><rect x="2" y="4" width="20" height="16" rx="2"></rect></svg><div class="contact-item-content"><h5>Email</h5><p>Response within 24 hours</p></div></div>
+                        <div class="contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg><div class="contact-item-content"><h5>Location</h5><p>Guildford, Surrey, UK</p><p>Remote consultations available</p></div></div>
+                        <div class="contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg><div class="contact-item-content"><h5>Consultation</h5><p>60-minute strategic assessment</p><p>Free, no obligation</p></div></div>
+                    </div>
+                    <div class="expectations-list">
+                        <h4>What to Expect</h4>
+                        <ul>
+                            <li>Analysis of your current infrastructure</li>
+                            <li>Assessment of local vs cloud AI opportunities</li>
+                            <li>Preliminary architecture design</li>
+                            <li>ROI projections and timeline estimates</li>
+                            <li>Explainability and compliance discussion</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer style="background:#000; color:#fff; padding:3rem 0; text-align:center; font-size:0.9rem;">
+    <footer>
         <div class="container">
-            <p>&copy; 2025 Auspexi. All rights reserved. | <a href="#privacy" style="color:#ccc; text-decoration:none;">Privacy Policy</a></p>
+            <div class="footer-grid">
+                <div class="footer-col"><h3>Auspexi</h3><p>AI automation infrastructure you own, not rent. Founded by Gwylym Pryce-Owen, combining 25+ years of technology leadership with cutting-edge AI implementation.</p></div>
+                <div class="footer-col">
+                    <h4>Navigation</h4>
+                    <ul class="footer-links">
+                        <li><a href="#solutions">Solutions</a></li>
+                        <li><a href="#explainability">Explainability</a></li>
+                        <li><a href="#technology">Technology</a></li>
+                        <li><a href="#methodology">Methodology</a></li>
+                        <li><a href="#investment">Investment</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://philosophyframework.com/" target="_blank">Philosophy Framework ↗</a></li>
+                        <li><a href="#contact">Architecture Assessment</a></li>
+                        <li><a href="#contact">ROI Calculator</a></li>
+                        <li><a href="#contact">Compliance Guide</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <div class="footer-contact-info"><p>Location</p><p><strong>Guildford, Surrey, UK</strong></p></div>
+                    <div class="footer-contact-info"><p>Service Area</p><p><strong>Worldwide</strong></p></div>
+                    <a href="#contact" class="btn" style="margin-top: 1rem;">Schedule Consultation</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p>© 2025 Auspexi. All rights reserved.</p>
+                    <div class="footer-bottom-links">
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <div class="gdpr-badge"><div class="gdpr-dot"></div><span>GDPR Compliant</span></div>
+                    </div>
+                </div>
+                <div class="footer-credentials"><p>Self-Hosted AI • Multi-Provider Architecture • Complete Explainability • Zero Vendor Lock-In</p></div>
+            </div>
         </div>
     </footer>
 
     <script>
-        // Mobile Menu Toggle
-        function toggleMenu() {
-            const nav = document.getElementById('navLinks');
-            nav.classList.toggle('mobile');
-            nav.classList.toggle('active');
+        // Toggle technology details
+        function toggleTech(element) {
+            const details = element.nextElementSibling;
+            const arrow = element.querySelector('span:last-child');
+            if (details.classList.contains('active')) {
+                details.classList.remove('active');
+                arrow.textContent = '▼';
+            } else {
+                details.classList.add('active');
+                arrow.textContent = '▲';
+            }
         }
-
-        // Smooth Scroll
+        // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 const target = document.querySelector(this.getAttribute('href'));
