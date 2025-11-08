@@ -3,19 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AI automation infrastructure you own, not rent. 90% local AI, self-hosted solutions, complete explainability and audit trails. Ethical AI implementation for businesses.">
-    <meta name="keywords" content="AI automation, self-hosted AI, explainable AI, AI audit trails, local AI deployment, ethical AI implementation, AI consultancy">
+    <meta name="description" content="AI automation infrastructure you own, not rent. Flexible deployment—cloud today, local when economics make sense. Complete explainability and audit trails.">
+    <meta name="keywords" content="AI automation, flexible AI deployment, explainable AI, AI audit trails, cost-optimized AI, ethical AI implementation, AI consultancy">
     <title>Auspexi | AI Automation Infrastructure You Own</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; line-height: 1.6; color: #000; background: #fff; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
-
-        /* Keep anchors from hiding under fixed header */
         section { padding: 6rem 0; scroll-margin-top: 100px; }
-
-        /* Header */
         header { position: fixed; top: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); z-index: 1000; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
         nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; max-width: 1200px; margin: 0 auto; }
         .logo { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.5px; }
@@ -26,8 +22,6 @@
         .btn:hover { background: #333; transform: translateY(-2px); }
         .btn-outline { background: transparent; color: #000; border: 2px solid #ddd; }
         .btn-outline:hover { border-color: #000; background: transparent; }
-
-        /* Hero */
         .hero { min-height: 100vh; display: flex; align-items: center; padding-top: 80px; }
         .hero-content { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
         .hero-text h1 { font-size: 3.5rem; font-weight: 300; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -2px; }
@@ -42,299 +36,43 @@
         .hero-stat { position: absolute; bottom: -1.5rem; right: -1.5rem; background: #fff; padding: 1.5rem 2rem; border-radius: 0.5rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); text-align: center; }
         .hero-stat-number { font-size: 2rem; font-weight: 300; }
         .hero-stat-label { font-size: 0.9rem; color: #666; }
-
-        /* Section header */
         .section-header { text-align: center; max-width: 800px; margin: 0 auto 4rem; }
         .section-header h2 { font-size: 3rem; font-weight: 300; margin-bottom: 1rem; letter-spacing: -1px; }
         .section-header p { font-size: 1.2rem; color: #666; line-height: 1.6; }
-
-        /* Background helpers */
         .bg-gray { background: #f9f9f9; }
-
-        /* (All original component styles preserved below) */
         .challenge-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;margin-bottom:3rem}.challenge-card{background:#fff;padding:2rem;border-radius:.5rem;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .3s}.challenge-card:hover{box-shadow:0 10px 30px rgba(0,0,0,.1);transform:translateY(-5px)}.challenge-icon{width:40px;height:40px;margin-bottom:1rem}.challenge-card h3{font-size:1.2rem;font-weight:600;margin-bottom:.8rem}.challenge-card p{font-size:.9rem;color:#666;line-height:1.6}.cost-callout{background:#fff;padding:3rem;border-radius:1rem;border:1px solid #eee}.cost-callout h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:2rem}.cost-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;text-align:center}.cost-item h4{font-size:2rem;font-weight:300;margin-bottom:.5rem}.cost-item p{font-size:.9rem;color:#666}
         .solutions-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(500px,1fr));gap:2rem}.solution-card{background:#f5f5f5;padding:2.5rem;border-radius:1rem;transition:all .3s}.solution-card:hover{background:#ececec}.solution-icon{width:60px;height:60px;background:#fff;border-radius:.75rem;display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem}.solution-icon svg{width:32px;height:32px}.solution-card h3{font-size:1.5rem;font-weight:300;margin-bottom:1.5rem}.solution-list{list-style:none}.solution-list li{display:flex;align-items:flex-start;gap:.8rem;margin-bottom:1rem;font-size:.9rem;color:#555;line-height:1.5}.solution-list li::before{content:'';width:8px;height:8px;background:#000;border-radius:50%;margin-top:.5rem;flex-shrink:0}
-        .process-flow{display:flex;justify-content:center;align-items:center;gap:2rem;margin-top:3rem;background:#f5f5f5;padding:2rem;border-radius:1rem;flex-wrap:wrap}.process-step{text-align:center}.process-step h4{font-size:1.5rem;font-weight:300}.process-arrow{font-size:.9rem;color:#999}
-        .scaling-note{background:#fff;padding:2rem;border-radius:1rem;margin-top:3rem;border:1px solid #eee}.scaling-note h2{font-size:3rem;font-weight:300;margin-bottom:1rem;text-align:center}.scaling-note p{font-size:.95rem;color:#666;line-height:1.6;text-align:center;max-width:800px;margin:0 auto}
         .results-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;margin-bottom:3rem}.result-card{text-align:center;padding:2rem;background:#f9f9f9;border-radius:1rem;transition:all .3s}.result-card:hover{background:#ececec}.result-icon{margin-bottom:1rem}.result-number{font-size:3.5rem;font-weight:300;margin-bottom:.5rem}.result-label{font-weight:500;margin-bottom:.3rem}.result-description{font-size:.85rem;color:#888}
         .tech-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem;max-width:100%}.tech-card{background:#fff;border-radius:1rem;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .3s}.tech-card:hover{box-shadow:0 10px 30px rgba(0,0,0,.15)}.tech-image{aspect-ratio:16/9;overflow:hidden;width:100%}.tech-image img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%);transition:filter .5s}.tech-card:hover .tech-image img{filter:grayscale(0%)}.tech-content{padding:2rem}.tech-content h3{font-size:3rem;font-weight:300;margin-bottom:1rem;text-align:center}.tech-category{font-size:.9rem;color:#666;margin-bottom:1rem}.tech-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:.9rem;font-weight:500;padding-top:1rem;border-top:1px solid #eee}.tech-toggle:hover{color:#555}.tech-details{max-height:0;overflow:hidden;transition:max-height .3s ease-out}.tech-details.active{max-height:500px;margin-top:1rem}.tech-details ul{list-style:none}.tech-details li{padding:.5rem 0;font-size:.9rem;color:#666;line-height:1.5}.tech-details li::before{content:'•';margin-right:.5rem;color:#000}
         .integrations-box{background:#fff;padding:3rem;border-radius:1rem;border:1px solid #eee;margin-top:3rem}.integrations-box h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:1rem}.integrations-box>p{text-align:center;color:#666;margin-bottom:2rem;font-size:.95rem}.integrations-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;margin-bottom:2rem}.integration-item{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.8rem}.integration-icon{width:60px;height:60px;background:#f5f5f5;border-radius:.75rem;display:flex;align-items:center;justify-content:center;transition:all .3s}.integration-item:hover .integration-icon{background:#ececec;transform:translateY(-3px)}.integration-icon svg{width:32px;height:32px}.integration-item p{font-size:.85rem;font-weight:500;color:#333}.integration-note{text-align:center;font-size:.9rem;color:#666;font-style:italic}
-        .expertise-box{background:#fff;padding:3rem;border-radius:1rem;border:1px solid #eee;margin-top:3rem}.expertise-box h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:2rem}.expertise-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;text-align:center}.expertise-item h4{font-size:1.1rem;font-weight:500;margin-bottom:.5rem}.expertise-item p{font-size:.9rem;color:#666}
         .track-record{background:#f9f9f9;padding:3rem;border-radius:1rem;margin-top:3rem}.track-record h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:2rem}.track-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem}.track-column{display:flex;flex-direction:column;gap:1.5rem}.track-item{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.8rem}.track-dot{width:16px;height:16px;background:#000;border-radius:50%}.track-item h4{font-weight:500}.track-item p{font-size:.9rem;color:#666}
         .cta-box{background:#000;color:#fff;padding:3rem;border-radius:1rem;text-align:center;margin-top:3rem}.cta-box h3{font-size:1.8rem;font-weight:300;margin-bottom:1rem}.cta-box p{color:#ccc;margin-bottom:1.5rem;max-width:600px;margin-left:auto;margin-right:auto}.cta-box .btn{background:#fff;color:#000}.cta-box .btn:hover{background:#f0f0f0}
         .methodology-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem}.methodology-card{text-align:center;padding:2rem;border-radius:1rem;transition:all .3s}.methodology-card:hover{background:#f9f9f9}.methodology-number{width:60px;height:60px;background:#000;color:#fff;border-radius:1rem;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:300;margin:0 auto 1.5rem}.methodology-card h3{font-size:1.3rem;font-weight:300;margin-bottom:1rem}.methodology-card p{font-size:.9rem;color:#666;line-height:1.6}
         .expectations-box{background:#f9f9f9;padding:3rem;border-radius:1rem;margin-top:3rem}.expectations-box h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:2rem}.expectations-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;text-align:center}.expectation-icon{width:48px;height:48px;background:#000;border-radius:1rem;margin:0 auto 1rem}.expectation-item h4{font-weight:500;margin-bottom:.5rem}.expectation-item p{font-size:.9rem;color:#666}
         .journey-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;position:relative}.journey-card{background:#fff;padding:2.5rem;border-radius:1rem;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .3s}.journey-card:hover{box-shadow:0 10px 30px rgba(0,0,0,.1)}.journey-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}.journey-number{width:48px;height:48px;background:#000;color:#fff;border-radius:1rem;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:300}.journey-card h3{font-size:1.5rem;font-weight:300}.journey-card p{font-size:.95rem;color:#666;line-height:1.6}
-        .connections-box{background:#fff;padding:2.5rem;border-radius:1rem;border:1px solid #eee;margin-top:3rem}.connections-box h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:2rem}.connections-flow{display:flex;justify-content:center;align-items:center;gap:2rem;flex-wrap:wrap}.connection-stage{text-align:center}.connection-stage h4{font-size:1.1rem;font-weight:500;margin-bottom:.3rem}.connection-stage p{font-size:.9rem;color:#666}.connection-arrow{font-size:1.5rem;color:#ccc}
-        .industry-intro{text-align:center;max-width:900px;margin:0 auto 3rem;padding:2rem;background:#fff;border-radius:1rem;border:1px solid #eee}.industry-intro h3{font-size:1.5rem;font-weight:300;margin-bottom:1rem}.industry-intro p{font-size:.95rem;color:#666;line-height:1.6}
-        .industry-accordion{max-width:900px;margin:0 auto}.industry-item{background:#f9f9f9;border-radius:1rem;margin-bottom:1.5rem;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .3s}.industry-item:hover{box-shadow:0 10px 30px rgba(0,0,0,.1)}.industry-header{display:flex;align-items:center;justify-content:space-between;padding:2rem;cursor:pointer}.industry-header-content{display:flex;align-items:center;gap:1.5rem}.industry-icon{width:60px;height:60px;background:#fff;border-radius:1rem;display:flex;align-items:center;justify-content:center}.industry-title h3{font-size:1.5rem;font-weight:300;margin-bottom:.3rem}.industry-size{font-size:.9rem;color:#666}.industry-toggle{font-size:1.5rem;color:#999;transition:transform .3s}.industry-item.active .industry-toggle{transform:rotate(180deg)}.industry-content{max-height:0;overflow:hidden;transition:max-height .3s ease-out}.industry-content.active{max-height:1000px;border-top:1px solid #ddd}.industry-details{padding:2rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem}.industry-detail h4{font-weight:600;margin-bottom:.8rem}.industry-detail p{font-size:.9rem;color:#666;line-height:1.6}.industry-detail ul{list-style:none}.industry-detail li{display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.5rem;font-size:.9rem;color:#666}.industry-detail li::before{content:'';width:8px;height:8px;background:#000;border-radius:50%;margin-top:.5rem;flex-shrink:0}
-        .universal-functions{background:#000;color:#fff;padding:3rem;border-radius:1rem;margin-top:3rem}.universal-functions h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:1rem}.universal-functions>p{text-align:center;color:#ccc;margin-bottom:2rem;max-width:800px;margin-left:auto;margin-right:auto}.functions-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1.5rem;text-align:center}.function-item{font-size:.9rem;color:#ccc}
-        .entry-points{margin-top:3rem}.entry-points h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:2rem}.entry-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}.entry-card{background:#f9f9f9;padding:2rem;border-radius:1rem}.entry-card h4{font-weight:600;margin-bottom:.5rem}.entry-card p{font-size:.9rem;color:#666}
+        .tracking-box{background:#fff;padding:3rem;border-radius:1rem;border:1px solid #eee;margin-top:3rem}.tracking-box h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:1rem}.tracking-box>p{text-align:center;color:#666;margin-bottom:2rem;max-width:800px;margin-left:auto;margin-right:auto}.tracking-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem}.tracking-tier{background:#f9f9f9;padding:2rem;border-radius:1rem}.tracking-tier h4{font-weight:600;margin-bottom:1rem;text-align:center}.tracking-tier ul{list-style:none}.tracking-tier li{display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.8rem;font-size:.9rem;color:#666}.tracking-tier li::before{content:'';width:8px;height:8px;background:#000;border-radius:50%;margin-top:.5rem;flex-shrink:0}
+        .explainability-intro{text-align:center;max-width:800px;margin:0 auto 3rem;padding:2rem;background:#fff;border-radius:1rem;border:2px solid #000}.explainability-intro h3{font-size:1.8rem;font-weight:300;margin-bottom:1rem}.explainability-intro .tagline{font-size:1.3rem;font-weight:500;color:#000;margin-bottom:1rem}.explainability-intro p{font-size:1rem;color:#666;line-height:1.6}
+        .explainability-features{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:2rem;margin-bottom:3rem}.explainability-card{background:#f9f9f9;padding:2.5rem;border-radius:1rem;transition:all .3s}.explainability-card:hover{background:#ececec;transform:translateY(-5px)}.explainability-card h4{font-size:1.3rem;font-weight:500;margin-bottom:1rem}.explainability-card p{font-size:.9rem;color:#666;line-height:1.6}
+        .explainability-comparison{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:3rem}.comparison-card{padding:2.5rem;border-radius:1rem;text-align:center}.comparison-card.black-box{background:#f5f5f5;border:1px solid #ddd}.comparison-card.glass-box{background:#000;color:#fff;border:2px solid #000}.comparison-card h4{font-size:1.5rem;font-weight:300;margin-bottom:1.5rem}.comparison-card ul{list-style:none;text-align:left}.comparison-card ul li{display:flex;align-items:flex-start;gap:.8rem;margin-bottom:1rem;font-size:.9rem;line-height:1.5}.comparison-card.black-box ul li{color:#666}.comparison-card.glass-box ul li{color:#ccc}.comparison-card.black-box ul li::before{content:'✗';color:#999;font-weight:bold}.comparison-card.glass-box ul li::before{content:'✓';color:#4ade80;font-weight:bold}
+        .addon-pricing{background:#000;color:#fff;padding:3rem;border-radius:1rem;margin-top:3rem}.addon-pricing h4{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:1rem}.addon-pricing .price{text-align:center;font-size:3rem;font-weight:300;margin-bottom:.5rem}.addon-pricing .price-period{text-align:center;color:#ccc;margin-bottom:2rem}.addon-features{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem}.addon-feature{text-align:center}.addon-feature h5{font-weight:500;margin-bottom:.5rem}.addon-feature p{font-size:.9rem;color:#ccc}
         .investment-intro{text-align:center;max-width:800px;margin:0 auto 3rem}.investment-intro p{font-size:1rem;color:#666;line-height:1.6}
         .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;margin-bottom:3rem}.pricing-card{background:#fff;padding:3rem;border-radius:1rem;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .3s;display:flex;flex-direction:column}.pricing-card:hover{box-shadow:0 10px 30px rgba(0,0,0,.1);transform:translateY(-5px)}.pricing-card.featured{border:2px solid #000;position:relative}.pricing-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:.3rem 1rem;border-radius:1rem;font-size:.75rem;font-weight:600}.pricing-header{text-align:center;margin-bottom:2rem;padding-bottom:2rem;border-bottom:1px solid #eee}.pricing-name{font-size:1.5rem;font-weight:300;margin-bottom:.5rem}.pricing-best-for{font-size:.9rem;color:#666;margin-bottom:1.5rem}.pricing-amount{font-size:2.5rem;font-weight:300;margin-bottom:.3rem}.pricing-period{font-size:.9rem;color:#666}.pricing-features{list-style:none;margin-bottom:2rem;flex-grow:1}.pricing-features li{display:flex;align-items:flex-start;gap:.8rem;margin-bottom:1rem;font-size:.9rem;color:#555;line-height:1.5}.pricing-features li::before{content:'';width:8px;height:8px;background:#000;border-radius:50%;margin-top:.5rem;flex-shrink:0}.pricing-card .btn{width:100%;text-align:center}.investment-note{background:#f9f9f9;padding:2rem;border-radius:1rem;text-align:center}.investment-note p{font-size:.95rem;color:#666;line-height:1.6;margin-bottom:1rem}.investment-note p:last-child{margin-bottom:0}
-        .resources-intro{text-align:center;max-width:800px;margin:0 auto 3rem}.resources-intro p{font-size:1rem;color:#666;line-height:1.6}.resources-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem;margin-bottom:3rem}.resource-card{background:#fff;padding:2.5rem;border-radius:1rem;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .3s;text-align:center}.resource-card:hover{box-shadow:0 10px 30px rgba(0,0,0,.1);transform:translateY(-5px)}.resource-icon{width:60px;height:60px;background:#000;border-radius:1rem;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem}.resource-icon svg{width:32px;height:32px;stroke:#fff}.resource-card h3{font-size:1.3rem;font-weight:300;margin-bottom:1rem}.resource-card p{font-size:.9rem;color:#666;line-height:1.6;margin-bottom:1.5rem}
-        .quiz-section{background:#000;color:#fff;padding:3rem;border-radius:1rem}.quiz-section h3{text-align:center;font-size:1.8rem;font-weight:300;margin-bottom:1rem}.quiz-section>p{text-align:center;color:#ccc;margin-bottom:2rem;max-width:700px;margin-left:auto;margin-right:auto}.quiz-form{max-width:700px;margin:0 auto}.quiz-question{background:rgba(255,255,255,.05);padding:1.5rem;border-radius:.5rem;margin-bottom:1.5rem}.quiz-question label{display:block;font-size:.95rem;margin-bottom:1rem;color:#fff;font-weight:500}.quiz-options{display:flex;flex-direction:column;gap:.8rem}.quiz-option{display:flex;align-items:center;gap:.8rem}.quiz-option input[type=radio]{width:18px;height:18px;cursor:pointer}.quiz-option label{font-size:.9rem;color:#ccc;font-weight:400;margin:0;cursor:pointer}.quiz-submit{text-align:center;margin-top:2rem}.quiz-submit .btn{background:#fff;color:#000;padding:1rem 3rem}.quiz-submit .btn:hover{background:#f0f0f0}
         .contact-grid{display:grid;grid-template-columns:2fr 1fr;gap:3rem}.contact-form-wrapper{background:#fff;padding:3rem;border-radius:1rem;border:1px solid #eee}.contact-form-wrapper h3{font-size:1.8rem;font-weight:300;margin-bottom:2rem}.form-group{margin-bottom:1.5rem}.form-group label{display:block;font-size:.9rem;font-weight:500;margin-bottom:.5rem}.form-group input,.form-group textarea,.form-group select{width:100%;padding:.8rem 1rem;border:1px solid #ddd;border-radius:4px;font-size:.9rem;transition:border-color .3s}.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:#000}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}.form-note{text-align:center;padding-top:2rem;border-top:1px solid #eee;margin-top:2rem}.form-note p{font-size:.9rem;color:#666}.contact-sidebar{display:flex;flex-direction:column;gap:2rem}.contact-info-box{background:#fff;padding:2rem;border-radius:1rem;border:1px solid #eee}.contact-info-box h4{font-size:1.3rem;font-weight:300;margin-bottom:1.5rem}.contact-item{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.5rem}.contact-item svg{width:20px;height:20px;margin-top:.2rem;flex-shrink:0}.contact-item-content h5{font-weight:500;margin-bottom:.3rem}.contact-item-content p{font-size:.9rem;color:#666}.expectations-list{background:#000;color:#fff;padding:2rem;border-radius:1rem}.expectations-list h4{font-size:1.3rem;font-weight:300;margin-bottom:1.5rem}.expectations-list ul{list-style:none}.expectations-list li{display:flex;align-items:flex-start;gap:.8rem;margin-bottom:1rem;font-size:.9rem}.expectations-list li::before{content:'';width:8px;height:8px;background:#fff;border-radius:50%;margin-top:.5rem;flex-shrink:0}
         footer{background:#000;color:#fff;padding:4rem 0 2rem}.footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:3rem;margin-bottom:3rem}.footer-col h3{font-size:1.2rem;font-weight:300;margin-bottom:1rem}.footer-col p{font-size:.9rem;color:#999;line-height:1.6}.footer-col h4{font-weight:600;margin-bottom:1rem}.footer-links{list-style:none}.footer-links li{margin-bottom:.5rem}.footer-links a{color:#999;text-decoration:none;font-size:.9rem;transition:color .3s}.footer-links a:hover{color:#fff}.footer-contact-info{margin-bottom:1.5rem}.footer-contact-info p{font-size:.9rem;color:#999;margin-bottom:.3rem}.footer-contact-info strong{color:#fff}.footer-bottom{border-top:1px solid #333;padding-top:2rem}.footer-bottom-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}.footer-bottom-content p{font-size:.9rem;color:#666}.footer-bottom-links{display:flex;gap:2rem;align-items:center;flex-wrap:wrap}.footer-bottom-links a{color:#999;text-decoration:none;font-size:.9rem;transition:color .3s}.footer-bottom-links a:hover{color:#fff}.gdpr-badge{display:flex;align-items:center;gap:.5rem;font-size:.9rem;color:#999}.gdpr-dot{width:8px;height:8px;background:#4ade80;border-radius:50%}.footer-credentials{text-align:center;margin-top:2rem}.footer-credentials p{font-size:.75rem;color:#555}
-
-        .tracking-box {
-            background: #fff;
-            padding: 3rem;
-            border-radius: 1rem;
-            border: 1px solid #eee;
-            margin-top: 3rem;
-        }
-
-        .tracking-box h3 {
-            text-align: center;
-            font-size: 1.8rem;
-            font-weight: 300;
-            margin-bottom: 1rem;
-        }
-
-        .tracking-box > p {
-            text-align: center;
-            color: #666;
-            margin-bottom: 2rem;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .tracking-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .tracking-tier {
-            background: #f9f9f9;
-            padding: 2rem;
-            border-radius: 1rem;
-        }
-
-        .tracking-tier h4 {
-            font-weight: 600;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .tracking-tier ul {
-            list-style: none;
-        }
-
-        .tracking-tier li {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.5rem;
-            margin-bottom: 0.8rem;
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .tracking-tier li::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            background: #000;
-            border-radius: 50%;
-            margin-top: 0.5rem;
-            flex-shrink: 0;
-        }
-
-        /* Explainability Section Styles */
-        .explainability-intro {
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto 3rem;
-            padding: 2rem;
-            background: #fff;
-            border-radius: 1rem;
-            border: 2px solid #000;
-        }
-
-        .explainability-intro h3 {
-            font-size: 1.8rem;
-            font-weight: 300;
-            margin-bottom: 1rem;
-        }
-
-        .explainability-intro .tagline {
-            font-size: 1.3rem;
-            font-weight: 500;
-            color: #000;
-            margin-bottom: 1rem;
-        }
-
-        .explainability-intro p {
-            font-size: 1rem;
-            color: #666;
-            line-height: 1.6;
-        }
-
-        .explainability-features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .explainability-card {
-            background: #f9f9f9;
-            padding: 2.5rem;
-            border-radius: 1rem;
-            transition: all 0.3s;
-        }
-
-        .explainability-card:hover {
-            background: #ececec;
-            transform: translateY(-5px);
-        }
-
-        .explainability-card h4 {
-            font-size: 1.3rem;
-            font-weight: 500;
-            margin-bottom: 1rem;
-        }
-
-        .explainability-card p {
-            font-size: 0.9rem;
-            color: #666;
-            line-height: 1.6;
-        }
-
-        .explainability-comparison {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .comparison-card {
-            padding: 2.5rem;
-            border-radius: 1rem;
-            text-align: center;
-        }
-
-        .comparison-card.black-box {
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-        }
-
-        .comparison-card.glass-box {
-            background: #000;
-            color: #fff;
-            border: 2px solid #000;
-        }
-
-        .comparison-card h4 {
-            font-size: 1.5rem;
-            font-weight: 300;
-            margin-bottom: 1.5rem;
-        }
-
-        .comparison-card ul {
-            list-style: none;
-            text-align: left;
-        }
-
-        .comparison-card ul li {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.8rem;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .comparison-card.black-box ul li {
-            color: #666;
-        }
-
-        .comparison-card.glass-box ul li {
-            color: #ccc;
-        }
-
-        .comparison-card.black-box ul li::before {
-            content: '✗';
-            color: #999;
-            font-weight: bold;
-        }
-
-        .comparison-card.glass-box ul li::before {
-            content: '✓';
-            color: #4ade80;
-            font-weight: bold;
-        }
-
-        .addon-pricing {
-            background: #000;
-            color: #fff;
-            padding: 3rem;
-            border-radius: 1rem;
-            margin-top: 3rem;
-        }
-
-        .addon-pricing h4 {
-            text-align: center;
-            font-size: 1.8rem;
-            font-weight: 300;
-            margin-bottom: 1rem;
-        }
-
-        .addon-pricing .price {
-            text-align: center;
-            font-size: 3rem;
-            font-weight: 300;
-            margin-bottom: 0.5rem;
-        }
-
-        .addon-pricing .price-period {
-            text-align: center;
-            color: #ccc;
-            margin-bottom: 2rem;
-        }
-
-        .addon-features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .addon-feature {
-            text-align: center;
-        }
-
-        .addon-feature h5 {
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .addon-feature p {
-            font-size: 0.9rem;
-            color: #ccc;
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
             .nav-links { display: none; }
             .hero-content { grid-template-columns: 1fr; }
             .hero-text h1 { font-size: 2.5rem; }
             .section-header h2 { font-size: 2rem; }
-            .challenge-grid,.solutions-grid,.tech-grid,.methodology-grid,.journey-grid,.why-grid,.results-grid,.pricing-grid,.resources-grid,.explainability-features,.explainability-comparison{ grid-template-columns: 1fr; }
+            .challenge-grid,.solutions-grid,.tech-grid,.methodology-grid,.journey-grid,.results-grid,.pricing-grid,.explainability-features,.explainability-comparison{ grid-template-columns: 1fr; }
             .contact-grid { grid-template-columns: 1fr; }
             .form-grid { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr; }
-            .connections-flow,.process-flow { flex-direction: column; }
-            .connection-arrow,.process-arrow { transform: rotate(90deg); }
-        .integrations-grid {
-            grid-template-columns: 1fr;
-        }
+            .integrations-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header>
         <nav>
             <div class="logo">Auspexi</div>
@@ -349,16 +87,15 @@
         </nav>
     </header>
 
-    <!-- Hero -->
     <section class="hero" id="home">
         <div class="container">
             <div class="hero-content">
                 <div class="hero-text">
                     <h1>AI Automation Infrastructure You Own, Not Rent</h1>
-                    <p>Build automation systems on YOUR servers with 90% local AI. No API price hostage situations. Complete transparency and explainability.</p>
+                    <p>Build automation systems with flexible deployment—cloud today, local when economics make sense. No API vendor lock-in. Complete transparency and explainability.</p>
                     <div class="hero-badges">
-                        <div class="badge"><div class="badge-icon">✓</div><span>90% Local AI</span></div>
-                        <div class="badge"><div class="badge-icon">✓</div><span>Self-Hosted</span></div>
+                        <div class="badge"><div class="badge-icon">✓</div><span>Flexible Deployment</span></div>
+                        <div class="badge"><div class="badge-icon">✓</div><span>Cost Optimized</span></div>
                         <div class="badge"><div class="badge-icon">✓</div><span>Explainable AI</span></div>
                         <div class="badge"><div class="badge-icon">✓</div><span>Audit Ready</span></div>
                     </div>
@@ -378,12 +115,11 @@
         </div>
     </section>
 
-    <!-- 1) SOLUTIONS -->
     <section id="solutions">
         <div class="container">
             <div class="section-header">
                 <h2>The AI Ownership Approach</h2>
-                <p>Build AI automation on infrastructure you control. Real ownership, measurable improvements, no vendor lock-in.</p>
+                <p>Design for ownership and cost control. Start with cloud, migrate to local when economics make sense. No vendor lock-in, complete architecture portability.</p>
             </div>
 
             <div class="challenge-grid">
@@ -412,24 +148,24 @@
             <div class="solutions-grid">
                 <div class="solution-card">
                     <div class="solution-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
-                    <h3>90% Local AI</h3>
+                    <h3>Flexible AI Deployment</h3>
                     <ul class="solution-list">
-                        <li>Run AI models on your own infrastructure</li>
-                        <li>Predictable, low operating costs</li>
-                        <li>No per-token pricing anxiety</li>
-                        <li>10% cloud AI only for specialised tasks</li>
+                        <li>Start with cloud AI (£20-100/month)</li>
+                        <li>Migrate to local when ROI clear (>£200/month API bills)</li>
+                        <li>IBM Granite runs cloud OR local (no vendor lock-in)</li>
                         <li>Multi-provider fallbacks for resilience</li>
+                        <li>Architecture designed for portability</li>
                     </ul>
                 </div>
                 <div class="solution-card">
                     <div class="solution-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>
-                    <h3>Self-Hosted Infrastructure</h3>
+                    <h3>Architecture You Own</h3>
                     <ul class="solution-list">
-                        <li>Complete data ownership and control</li>
-                        <li>Deploy on your servers or private cloud</li>
+                        <li>Design for ownership from day one</li>
+                        <li>Deploy on cloud or your servers—your choice</li>
                         <li>Meet compliance requirements (GDPR, SOX)</li>
                         <li>No vendor lock-in or surprise price changes</li>
-                        <li>Full system portability</li>
+                        <li>Complete system portability</li>
                     </ul>
                 </div>
                 <div class="solution-card">
@@ -457,30 +193,29 @@
             </div>
 
             <div class="cost-callout">
-                <h3>The True Cost of API-Dependent AI</h3>
+                <h3>Economics of AI Deployment</h3>
                 <div class="cost-grid">
-                    <div class="cost-item"><h4>£5,000+/month</h4><p>Typical API costs at scale</p></div>
-                    <div class="cost-item"><h4>£30/month</h4><p>Our infrastructure costs</p></div>
-                    <div class="cost-item"><h4>166x</h4><p>Cost difference</p></div>
+                    <div class="cost-item"><h4>£50-100/month</h4><p>Small business cloud AI</p></div>
+                    <div class="cost-item"><h4>€184/month</h4><p>Local GPU server (8B models)</p></div>
+                    <div class="cost-item"><h4>ROI at scale</h4><p>Local pays off at >£200/month API bills</p></div>
                 </div>
             </div>
 
             <div class="results-grid">
-                <div class="result-card"><div class="result-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg></div><div class="result-number">95%+</div><div class="result-label">Operating margin</div><div class="result-description">Minimal infrastructure costs</div></div>
+                <div class="result-card"><div class="result-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg></div><div class="result-number">Flexible</div><div class="result-label">Deployment options</div><div class="result-description">Cloud or local, you choose</div></div>
                 <div class="result-card"><div class="result-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg></div><div class="result-number">Zero</div><div class="result-label">Math errors</div><div class="result-description">Compiler-verified calculations</div></div>
-                <div class="result-card"><div class="result-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg></div><div class="result-number">100%</div><div class="result-label">Data ownership</div><div class="result-description">Your servers, your control</div></div>
+                <div class="result-card"><div class="result-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg></div><div class="result-number">100%</div><div class="result-label">Portability</div><div class="result-description">Your architecture, your choice</div></div>
                 <div class="result-card"><div class="result-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg></div><div class="result-number">6</div><div class="result-label">Stakeholder groups</div><div class="result-description">Ethical decision framework</div></div>
             </div>
 
             <div class="cta-box">
-                <h3>Own Your AI Infrastructure</h3>
-                <p>Stop renting AI. Start owning it. Let's discuss how self-hosted, explainable AI can transform your business without vendor lock-in.</p>
+                <h3>Design for Ownership, Deploy for Economics</h3>
+                <p>We architect systems for cost control and portability. Start with cloud AI, migrate to local when ROI is clear. No vendor lock-in, complete flexibility.</p>
                 <a href="#contact" class="btn">Book Your Free Consultation</a>
             </div>
         </div>
     </section>
 
-<!-- 2) SECURITY FIRST -->
     <section id="security" class="bg-gray">
         <div class="container">
             <div class="section-header">
@@ -590,7 +325,6 @@
         </div>
     </section>
 
-    <!-- 3) EXPLAINABILITY - NEW SECTION -->
     <section id="explainability" class="bg-gray">
         <div class="container">
             <div class="section-header">
@@ -722,7 +456,6 @@
         </div>
     </section>
 
-       <!-- 3) TECHNOLOGY -->
     <section id="technology">
         <div class="container">
             <div class="section-header">
@@ -735,30 +468,32 @@
                     <div class="tech-image"><img src="./images/circuit-brain.jfif" alt="IBM Granite AI Engine" onerror="this.onerror=null; this.src='./images/circuit-brain.jpg';"></div>
                     <div class="tech-content">
                         <h3>IBM Granite AI</h3>
-                        <p class="tech-category">Primary engine (90% of workload)</p>
+                        <p class="tech-category">Flexible deployment (cloud or local)</p>
                         <div class="tech-toggle" onclick="toggleTech(this)"><span>View Capabilities</span><span>▼</span></div>
                         <div class="tech-details"><ul>
                             <li>Enterprise-grade AI trained on 12 trillion vetted tokens</li>
                             <li>IBM IP indemnity coverage (uncapped protection)</li>
                             <li>Industry-leading safety and governance built-in</li>
                             <li>Optimised for RAG, tool calling, and enterprise tasks</li>
-                            <li>Runs locally on your infrastructure (cost control + data sovereignty)</li>
+                            <li>Deploy via cloud API OR local on your infrastructure</li>
                             <li>Apache 2.0 licensed (no vendor lock-in)</li>
+                            <li>Local deployment: €184/month GPU server (Granite 8B models)</li>
+                            <li>Cloud deployment: £20-100/month (ideal for starting out)</li>
                         </ul></div>
                     </div>
                 </div>
                 <div class="tech-card">
-                    <div class="tech-image"><img src="./images/ai-chip.jfif" alt="Cloud AI Fallback" onerror="this.onerror=null; this.src='./images/ai-chip.jpg';"></div>
+                    <div class="tech-image"><img src="./images/ai-chip.jfif" alt="Multi-Provider Architecture" onerror="this.onerror=null; this.src='./images/ai-chip.jpg';"></div>
                     <div class="tech-content">
-                        <h3>Cloud AI Fallback</h3>
-                        <p class="tech-category">Complex reasoning (10% of workload)</p>
+                        <h3>Multi-Provider Resilience</h3>
+                        <p class="tech-category">Never a single point of failure</p>
                         <div class="tech-toggle" onclick="toggleTech(this)"><span>View Capabilities</span><span>▼</span></div>
                         <div class="tech-details"><ul>
-                            <li>Anthropic Claude for advanced reasoning tasks</li>
+                            <li>Anthropic Claude for complex reasoning tasks</li>
                             <li>Automatic failover between providers</li>
-                            <li>Used only when local AI insufficient</li>
-                            <li>Multi-provider resilience (never single point of failure)</li>
-                            <li>Cost-optimised routing (expensive AI only when necessary)</li>
+                            <li>Cost-optimised routing (expensive AI only when needed)</li>
+                            <li>Multi-provider resilience (never dependent on one vendor)</li>
+                            <li>Architecture supports easy provider switching</li>
                         </ul></div>
                     </div>
                 </div>
@@ -778,17 +513,18 @@
                     </div>
                 </div>
                 <div class="tech-card">
-                    <div class="tech-image"><img src="./images/cube-structure.jfif" alt="Self-Hosted Infrastructure" onerror="this.onerror=null; this.src='./images/cube-structure.jpg';"></div>
+                    <div class="tech-image"><img src="./images/cube-structure.jfif" alt="Flexible Infrastructure" onerror="this.onerror=null; this.src='./images/cube-structure.jpg';"></div>
                     <div class="tech-content">
-                        <h3>Self-Hosted</h3>
-                        <p class="tech-category">Your servers, your rules</p>
+                        <h3>Flexible Infrastructure</h3>
+                        <p class="tech-category">Cloud today, local when economics make sense</p>
                         <div class="tech-toggle" onclick="toggleTech(this)"><span>View Capabilities</span><span>▼</span></div>
                         <div class="tech-details"><ul>
-                            <li>Deploy on your own servers or private cloud</li>
-                            <li>Complete data ownership and control</li>
+                            <li>Start with cloud deployment (£20-100/month)</li>
+                            <li>Migrate to self-hosted when ROI clear (>£200/month API bills)</li>
+                            <li>Complete data ownership and control (local deployment)</li>
                             <li>Meet any compliance requirement (GDPR, SOX, HIPAA)</li>
-                            <li>No vendor can change pricing or terms on your infrastructure</li>
-                            <li>Fully portable if you change consultants</li>
+                            <li>Architecture designed for portability and flexibility</li>
+                            <li>No vendor can lock you in or change terms</li>
                         </ul></div>
                     </div>
                 </div>
@@ -800,11 +536,11 @@
                     <div class="track-column">
                         <div class="track-item"><div class="track-dot"></div><div><h4>Enterprise-Grade Foundation</h4><p>IBM Granite AI trained specifically for business use with governance, safety, and compliance built-in</p></div></div>
                         <div class="track-item"><div class="track-dot"></div><div><h4>IP Indemnity Protection</h4><p>IBM provides uncapped indemnity for third-party IP claims on Granite models—unique among open-source AI</p></div></div>
-                        <div class="track-item"><div class="track-dot"></div><div><h4>Cost Predictability</h4><p>90% local processing means predictable costs. No surprise API bills as your usage grows</p></div></div>
-                        <div class="track-item"><div class="track-dot"></div><div><h4>Multi-Model Resilience</h4><p>If one model fails, automatic failover ensures your systems never stop working</p></div></div>
+                        <div class="track-item"><div class="track-dot"></div><div><h4>Deployment Flexibility</h4><p>Start with cloud (£20-100/month), migrate to local when ROI justifies it (>£200/month API bills = €184/month GPU server pays for itself)</p></div></div>
+                        <div class="track-item"><div class="track-dot"></div><div><h4>Multi-Provider Resilience</h4><p>If one provider fails, automatic failover ensures your systems never stop working</p></div></div>
                     </div>
                     <div class="track-column">
-                        <div class="track-item"><div class="track-dot"></div><div><h4>Data Sovereignty</h4><p>Your sensitive data stays on your infrastructure. No third-party processing for 90% of tasks</p></div></div>
+                        <div class="track-item"><div class="track-dot"></div><div><h4>Cost Control</h4><p>Architecture designed for ownership—cloud deployment until scale justifies local infrastructure investment</p></div></div>
                         <div class="track-item"><div class="track-dot"></div><div><h4>Superior Safety</h4><p>Granite's industry-leading robustness against adversarial prompts protects your business</p></div></div>
                         <div class="track-item"><div class="track-dot"></div><div><h4>No Vendor Lock-In</h4><p>Apache 2.0 license plus MCP protocol means you're never trapped with one provider</p></div></div>
                         <div class="track-item"><div class="track-dot"></div><div><h4>Future-Proof Architecture</h4><p>As AI models improve, we integrate them seamlessly. Your infrastructure remains stable</p></div></div>
@@ -829,7 +565,7 @@
             </div>
         </div>
     </section>
-    <!-- 4) METHODOLOGY -->
+
     <section id="methodology" class="bg-gray">
         <div class="container">
             <div class="section-header">
@@ -838,16 +574,16 @@
             </div>
 
             <div class="methodology-grid">
-                <div class="methodology-card"><div class="methodology-number">1</div><h3>Discover & Assess</h3><p>Map your workflows, identify automation opportunities, and assess your readiness for self-hosted AI infrastructure.</p></div>
-                <div class="methodology-card"><div class="methodology-number">2</div><h3>Design Architecture</h3><p>Create a resilient, multi-provider architecture tailored to your needs. Local AI for most tasks, cloud fallback for complexity.</p></div>
-                <div class="methodology-card"><div class="methodology-number">3</div><h3>Build & Deploy</h3><p>Implement on your infrastructure with complete explainability and mathematical verification built-in. Test thoroughly before going live.</p></div>
-                <div class="methodology-card"><div class="methodology-number">4</div><h3>Monitor & Evolve</h3><p>Continuous improvement through audit trails and reasoning analysis. Optimise based on real usage patterns.</p></div>
+                <div class="methodology-card"><div class="methodology-number">1</div><h3>Discover & Assess</h3><p>Map your workflows, identify automation opportunities, and assess deployment options based on your current costs and scale.</p></div>
+                <div class="methodology-card"><div class="methodology-number">2</div><h3>Design Architecture</h3><p>Create a resilient, multi-provider architecture tailored to your needs. Cloud start for quick wins, with clear path to local deployment when ROI justifies it.</p></div>
+                <div class="methodology-card"><div class="methodology-number">3</div><h3>Build & Deploy</h3><p>Implement on your chosen infrastructure with complete explainability and mathematical verification built-in. Test thoroughly before going live.</p></div>
+                <div class="methodology-card"><div class="methodology-number">4</div><h3>Monitor & Evolve</h3><p>Continuous improvement through audit trails and reasoning analysis. Track costs and optimize deployment strategy as you scale.</p></div>
             </div>
 
             <div class="journey-grid">
-                <div class="journey-card"><div class="journey-header"><div class="journey-number">1</div><h3>Start Smart</h3></div><p>Begin with one high-impact workflow on your infrastructure. Prove the value of local AI and build confidence in the approach.</p></div>
-                <div class="journey-card"><div class="journey-header"><div class="journey-number">2</div><h3>Expand Strategically</h3></div><p>Add explainability and audit capabilities. Connect workflows to create compound efficiency gains across your operation.</p></div>
-                <div class="journey-card"><div class="journey-header"><div class="journey-number">3</div><h3>Scale With Confidence</h3></div><p>Your infrastructure grows with you. No surprise costs, no vendor constraints, complete control over your AI destiny.</p></div>
+                <div class="journey-card"><div class="journey-header"><div class="journey-number">1</div><h3>Start Smart</h3></div><p>Begin with one high-impact workflow on cloud infrastructure. Prove the value quickly with minimal upfront investment, then expand strategically.</p></div>
+                <div class="journey-card"><div class="journey-header"><div class="journey-number">2</div><h3>Expand Strategically</h3></div><p>Add explainability and audit capabilities. Connect workflows to create compound efficiency gains. Track API costs to identify optimal migration timing.</p></div>
+                <div class="journey-card"><div class="journey-header"><div class="journey-number">3</div><h3>Scale With Confidence</h3></div><p>When API bills exceed £200/month, migrate to local deployment (€184/month GPU server). Your architecture was designed for this from day one.</p></div>
             </div>
 
             <div class="tracking-box">
@@ -866,10 +602,10 @@
                     <div class="tracking-tier">
                         <h4>Cost Metrics</h4>
                         <ul>
-                            <li>Infrastructure costs vs API costs</li>
-                            <li>ROI calculations</li>
-                            <li>Cost per transaction</li>
-                            <li>Scaling cost projections</li>
+                            <li>API costs vs local infrastructure costs</li>
+                            <li>ROI calculations and break-even analysis</li>
+                            <li>Cost per transaction tracking</li>
+                            <li>Migration timing recommendations</li>
                         </ul>
                     </div>
                     <div class="tracking-tier">
@@ -888,14 +624,13 @@
                 <h3>What You Can Expect</h3>
                 <div class="expectations-grid">
                     <div class="expectation-item"><div class="expectation-icon"></div><h4>Complete Transparency</h4><p>Full visibility into costs, decisions, and system performance at all times</p></div>
-                    <div class="expectation-item"><div class="expectation-icon"></div><h4>True Ownership</h4><p>Your infrastructure, your data, your control. No hostage situations, ever</p></div>
+                    <div class="expectation-item"><div class="expectation-icon"></div><h4>True Ownership</h4><p>Your architecture, your data, your control. Deploy cloud or local based on your economics</p></div>
                     <div class="expectation-item"><div class="expectation-icon"></div><h4>Ongoing Partnership</h4><p>Available for optimization, troubleshooting, and strategic guidance as you grow</p></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 5) INVESTMENT -->
     <section id="investment">
         <div class="container">
             <div class="section-header">
@@ -916,9 +651,9 @@
                         <div class="pricing-period">Setup + £300-£500/month</div>
                     </div>
                     <ul class="pricing-features">
-                        <li>1-2 automated workflows on your infrastructure</li>
-                        <li>90% local AI deployment</li>
-                        <li>Basic multi-provider fallback</li>
+                        <li>1-2 automated workflows on cloud infrastructure</li>
+                        <li>Flexible deployment architecture</li>
+                        <li>Multi-provider fallback</li>
                         <li>Team training and documentation</li>
                         <li>Monthly maintenance and updates</li>
                         <li>Email support</li>
@@ -938,10 +673,10 @@
                     </div>
                     <ul class="pricing-features">
                         <li>3-5 connected workflows with integrations</li>
-                        <li>Self-hosted infrastructure on your servers</li>
+                        <li>Cloud or local deployment based on your economics</li>
                         <li>Advanced multi-provider resilience</li>
                         <li>Custom fine-tuning on your data</li>
-                        <li>Active evolution and optimisation</li>
+                        <li>Active evolution and optimization</li>
                         <li>Priority support</li>
                         <li><strong>Add Explainability: +£400/month</strong></li>
                         <li><strong>Add Philosophy Framework: +£300/month</strong></li>
@@ -958,7 +693,7 @@
                     </div>
                     <ul class="pricing-features">
                         <li>Enterprise-wide AI infrastructure</li>
-                        <li>Complete self-hosted deployment</li>
+                        <li>Local deployment on your infrastructure</li>
                         <li>Advanced explainability and compliance</li>
                         <li>Mathematical verification included</li>
                         <li>Internal MCP knowledge server</li>
@@ -980,19 +715,19 @@
             </div>
 
             <div class="investment-note">
-                <p><strong>Infrastructure costs separate:</strong> Approximately £30/month for hosting, or use your existing servers at no additional cost.</p>
-                <p><strong>No API hostage situations:</strong> With 90% local AI, your operational costs stay predictable and low regardless of scale.</p>
-                <p>Every engagement starts with a free consultation where we assess your needs and provide a detailed, fixed-price proposal.</p>
+                <p><strong>Infrastructure costs:</strong> Small clients typically start with cloud deployment (£20-100/month AI APIs) on £30/month hosting infrastructure.</p>
+                <p><strong>Local deployment economics:</strong> GPU server (€184/month) becomes cost-effective when API bills exceed £200/month. We help you determine the right time to migrate.</p>
+                <p><strong>No vendor lock-in:</strong> Architecture designed for portability—cloud today, local tomorrow, or switch providers anytime. You own the architecture.</p>
+                <p>Every engagement starts with a free consultation where we assess your needs and provide a detailed, fixed-price proposal with clear deployment recommendations.</p>
             </div>
         </div>
     </section>
 
-    <!-- 6) CONTACT -->
     <section id="contact" class="bg-gray">
         <div class="container">
             <div class="section-header">
                 <h2>Let's Build Your AI Infrastructure</h2>
-                <p>Free consultation to explore how self-hosted, explainable AI can transform your business without vendor lock-in.</p>
+                <p>Free consultation to explore how flexible, explainable AI deployment can transform your business—cloud today, local when economics make sense.</p>
             </div>
 
             <div class="contact-grid">
@@ -1009,9 +744,9 @@
                             <div class="form-group"><label for="company">Company Name</label><input type="text" id="company" name="company" placeholder="Your Company Ltd"></div>
                             <div class="form-group"><label for="company-size">Company Size</label><select id="company-size" name="company-size"><option value="">Select size...</option><option value="1-20">1-20 employees</option><option value="20-100">20-100 employees</option><option value="100+">100+ employees</option></select></div>
                         </div>
-                        <div class="form-group"><label for="message">What brings you here?</label><textarea id="message" name="message" rows="4" placeholder="Tell us about your AI infrastructure needs, concerns about vendor lock-in, or compliance requirements..."></textarea></div>
+                        <div class="form-group"><label for="message">What brings you here?</label><textarea id="message" name="message" rows="4" placeholder="Tell us about your AI infrastructure needs, current API costs, or compliance requirements..."></textarea></div>
                         <button type="submit" class="btn" style="width:100%;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; margin-right:.5rem;"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg>Book Free Consultation</button>
-                        <div class="form-note"><p>We'll discuss your needs, assess your AI readiness, and explore how self-hosted AI can work for your business.</p></div>
+                        <div class="form-note"><p>We'll discuss your needs, assess your current costs, and explore deployment options—cloud, local, or hybrid based on your economics.</p></div>
                     </form>
                 </div>
 
@@ -1025,10 +760,10 @@
                     <div class="expectations-list">
                         <h4>What to Expect</h4>
                         <ul>
-                            <li>Analysis of your current infrastructure</li>
-                            <li>Assessment of local vs cloud AI opportunities</li>
+                            <li>Analysis of your current infrastructure and costs</li>
+                            <li>Cloud vs local deployment economics assessment</li>
                             <li>Preliminary architecture design</li>
-                            <li>ROI projections and timeline estimates</li>
+                            <li>ROI projections and migration timeline</li>
                             <li>Explainability and compliance discussion</li>
                         </ul>
                     </div>
@@ -1037,7 +772,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer>
         <div class="container">
             <div class="footer-grid">
@@ -1077,13 +811,12 @@
                         <div class="gdpr-badge"><div class="gdpr-dot"></div><span>GDPR Compliant</span></div>
                     </div>
                 </div>
-                <div class="footer-credentials"><p>Self-Hosted AI • Multi-Provider Architecture • Complete Explainability • Zero Vendor Lock-In</p></div>
+                <div class="footer-credentials"><p>Flexible Deployment • Multi-Provider Architecture • Complete Explainability • Zero Vendor Lock-In • IBM Granite AI</p></div>
             </div>
         </div>
     </footer>
 
     <script>
-        // Toggle technology details
         function toggleTech(element) {
             const details = element.nextElementSibling;
             const arrow = element.querySelector('span:last-child');
@@ -1095,7 +828,6 @@
                 arrow.textContent = '▲';
             }
         }
-        // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 const target = document.querySelector(this.getAttribute('href'));
@@ -1107,11 +839,4 @@
         });
     </script>
 </body>
-
 </html>
-
-
-
-
-
-
