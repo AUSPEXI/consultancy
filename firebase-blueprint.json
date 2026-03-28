@@ -1,0 +1,88 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the Auspexi dashboard.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user"] }
+      },
+      "required": ["email", "role"]
+    },
+    "SovMetric": {
+      "title": "SOV Metric",
+      "description": "Daily metrics for Generative Engine Optimization.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "directTraffic": { "type": "number" },
+        "aiCitations": { "type": "number" }
+      },
+      "required": ["userId", "date", "directTraffic", "aiCitations"]
+    },
+    "Fact": {
+      "title": "Fact",
+      "description": "A high-entropy fact stored in the Fact-Vault.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "statement": { "type": "string" },
+        "entropyScore": { "type": "number" },
+        "cliffhangerActive": { "type": "boolean" },
+        "category": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "statement", "entropyScore", "cliffhangerActive", "category", "createdAt"]
+    },
+    "Competitor": {
+      "title": "Competitor",
+      "description": "A tracked competitor for decay and trojan horse opportunities.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "decayStatus": { "type": "string", "enum": ["healthy", "decaying", "stale"] },
+        "trojanHorseOpportunity": { "type": "boolean" },
+        "lastUpdated": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "decayStatus", "trojanHorseOpportunity", "lastUpdated"]
+    },
+    "Lead": {
+      "title": "Lead",
+      "description": "A captured lead from the landing page.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "source": { "type": "string" },
+        "status": { "type": "string", "enum": ["new", "contacted"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "source", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles."
+    },
+    "/sovMetrics/{metricId}": {
+      "schema": { "$ref": "#/entities/SovMetric" },
+      "description": "SOV metrics over time."
+    },
+    "/facts/{factId}": {
+      "schema": { "$ref": "#/entities/Fact" },
+      "description": "Facts in the Fact-Vault."
+    },
+    "/competitors/{competitorId}": {
+      "schema": { "$ref": "#/entities/Competitor" },
+      "description": "Tracked competitors."
+    },
+    "/leads/{leadId}": {
+      "schema": { "$ref": "#/entities/Lead" },
+      "description": "Captured leads."
+    }
+  }
+}
