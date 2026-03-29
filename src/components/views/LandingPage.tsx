@@ -603,6 +603,8 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         source={modalSource} 
+        initialEmail={email}
+        initialDomain={domain}
       />
     </div>
   );

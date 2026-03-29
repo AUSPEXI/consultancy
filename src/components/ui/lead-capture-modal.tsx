@@ -12,16 +12,27 @@ interface LeadCaptureModalProps {
   isOpen: boolean;
   onClose: () => void;
   source: string;
+  initialEmail?: string;
+  initialDomain?: string;
 }
 
-export function LeadCaptureModal({ isOpen, onClose, source }: LeadCaptureModalProps) {
+export function LeadCaptureModal({ isOpen, onClose, source, initialEmail = '', initialDomain = '' }: LeadCaptureModalProps) {
   const { user, signInWithGoogle } = useAuth();
-  const [email, setEmail] = useState('');
-  const [domain, setDomain] = useState('');
+  const [email, setEmail] = useState(initialEmail);
+  const [domain, setDomain] = useState(initialDomain);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [report, setReport] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setEmail(initialEmail);
+      setDomain(initialDomain);
+      setError('');
+      setReport(null);
+    }
+  }, [isOpen, initialEmail, initialDomain]);
 
   if (!isOpen) return null;
 
