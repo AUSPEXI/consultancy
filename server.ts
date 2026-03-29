@@ -305,7 +305,7 @@ async function setupFrontendAndStart() {
     });
     app.use(vite.middlewares);
   } else {
-    if (!process.env.VERCEL) {
+    if (!process.env.VERCEL && !process.env.NETLIFY) {
       const distPath = path.join(process.cwd(), 'dist');
       app.use(express.static(distPath));
       app.get('*', (req, res) => {
@@ -314,13 +314,15 @@ async function setupFrontendAndStart() {
     }
   }
 
-  if (!process.env.VERCEL) {
+  if (!process.env.VERCEL && !process.env.NETLIFY && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
   }
 }
 
-setupFrontendAndStart();
+if (!process.env.VERCEL && !process.env.NETLIFY && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  setupFrontendAndStart();
+}
 
 export default app;

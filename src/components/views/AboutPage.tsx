@@ -2,10 +2,16 @@ import { motion } from 'framer-motion';
 import { Target, BrainCircuit, LineChart, ShieldCheck, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { PublicHeader } from '@/components/ui/public-header';
+import { Footerdemo } from '@/components/ui/footer-section';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function AboutPage() {
+  const { signInWithGoogle } = useAuth();
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-24 pb-16 overflow-x-hidden">
+      <PublicHeader onLoginClick={signInWithGoogle} />
       <div className="max-w-7xl mx-auto px-6">
         {/* Hero Section */}
         <motion.div 
@@ -188,6 +194,7 @@ export function AboutPage() {
         </div>
 
       </div>
+      <Footerdemo />
     </div>
   );
 }

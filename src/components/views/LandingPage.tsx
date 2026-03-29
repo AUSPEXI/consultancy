@@ -60,6 +60,17 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
     }
   };
 
+  const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth >= 768 : true);
+
+  useEffect(() => {
+    const checkIsDesktop = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+    checkIsDesktop();
+    window.addEventListener('resize', checkIsDesktop);
+    return () => window.removeEventListener('resize', checkIsDesktop);
+  }, []);
+
   const handleOpenModal = (source: string) => {
     setModalSource(source);
     setIsModalOpen(true);
@@ -222,12 +233,14 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
             </div>
 
             {/* Right Column */}
-            <div className="md:col-span-7 relative h-[400px] md:h-[600px] w-full flex items-center justify-end">
+            <div className="md:col-span-7 relative h-[400px] md:h-[600px] w-full flex items-center justify-end hidden md:flex">
               <div className="absolute inset-0 w-[120%] -right-[10%] h-full">
-                <SplineScene 
-                  scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-                  className="w-full h-full"
-                />
+                {isDesktop && (
+                  <SplineScene 
+                    scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                    className="w-full h-full"
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -563,7 +576,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
 
       {/* CTA Section */}
       <section className="py-32 relative overflow-hidden">
-        <DottedSurface className="absolute inset-0 z-0 opacity-50" />
+        {isDesktop && <DottedSurface className="absolute inset-0 z-0 opacity-50" />}
         <div className="absolute inset-0 bg-zinc-800/10 z-0"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-zinc-800/20 rounded-full blur-[120px] pointer-events-none z-0"></div>
         

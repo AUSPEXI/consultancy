@@ -29,7 +29,7 @@ export function FloatingVoiceButton() {
           animate={{ opacity: 1, x: 0, scale: 1 }}
           exit={{ opacity: 0, x: 50, scale: 0.8 }}
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-          className="fixed top-32 lg:top-48 right-6 z-50 flex flex-col items-end gap-4"
+          className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4"
         >
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl rounded-2xl p-4 max-w-[250px] relative">
             <button 
@@ -38,18 +38,21 @@ export function FloatingVoiceButton() {
             >
               <X className="w-4 h-4" />
             </button>
-            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 mb-1">
-              Have questions?
-            </p>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                AI Agent Online
+              </p>
+            </div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-3">
-              Talk to our AI Sales Agent right now.
+              Have questions? Talk to our AI Sales Agent right now.
             </p>
             <Link 
               to="/voice-agents"
               className="flex items-center justify-center gap-2 w-full bg-zinc-700 hover:bg-zinc-600 text-white text-sm font-medium py-2 px-4 rounded-xl transition-colors"
             >
               <Mic className="w-4 h-4" />
-              Start Call
+              Start Voice Chat
             </Link>
           </div>
           
