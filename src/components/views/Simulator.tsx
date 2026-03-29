@@ -3,9 +3,10 @@ import { MonitorPlay, Loader2, Bot, Sparkles } from 'lucide-react';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
+import { logAuditAction } from '@/lib/audit';
 
 export function Simulator() {
-  const { tier } = useAuth();
+  const { tier, user } = useAuth();
   const [query, setQuery] = useState('');
   const [brand, setBrand] = useState('');
   const [isSimulating, setIsSimulating] = useState(false);
@@ -72,7 +73,11 @@ export function Simulator() {
         }
       });
 
-      setResults(JSON.parse(response.text || "{}"));
+      const parsedResult = JSON.parse(response.text || "{}");
+      setResults(parsedResult);
+      if (user) {
+        await logAuditAction(user.uid, 'Ran SOV Simulation', { query, brand, sovScore: parsedResult.sovScore });
+      }
     } catch (error) {
       console.error("Error simulating:", error);
       alert("Failed to run simulation. Please try again.");

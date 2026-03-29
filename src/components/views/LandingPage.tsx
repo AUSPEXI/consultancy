@@ -483,17 +483,17 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <PricingCard
               tier="Basic"
-              price="$499/mo"
+              price="$89/mo"
               bestFor="For startups establishing AI presence"
               CTA="Start Basic"
               onClick={() => handleCheckout('Basic')}
               benefits={[
-                { text: "Monthly AI SOV Report", checked: true },
-                { text: "JS Pixel (Client-Side)", checked: true },
+                { text: "AI SOV Overview & Fact-Vault", checked: true },
+                { text: "Content Scorer Access", checked: true },
                 { text: "10 Facts Extracted / mo", checked: true },
-                { text: "AI 'To-Do' List", checked: true },
                 { text: "Standard Analytics", checked: true },
-                { text: "No Off-Page Seeding", checked: false },
+                { text: "Advanced Audit Logging", checked: true },
+                { text: "Hallucination Detection", checked: false },
               ]}
             />
             <PricingCard
@@ -503,11 +503,11 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               CTA="Start Medium"
               onClick={() => handleCheckout('Medium')}
               benefits={[
-                { text: "Weekly AI SOV + Competitor Decay", checked: true },
-                { text: "JS Pixel + Semantic HTML Fixes", checked: true },
+                { text: "SOV Simulator & Brand Monitor", checked: true },
+                { text: "Competitor Radar", checked: true },
                 { text: "50 Facts Extracted / mo", checked: true },
-                { text: "4 Data-Style Posts / mo", checked: true },
-                { text: "Dark AI Traffic Tracking", checked: true },
+                { text: "Basic Hallucination Detection", checked: true },
+                { text: "Built on SOC 2 Compliant Infrastructure", checked: true },
                 { text: "Reddit/Quora Seeding", checked: true },
               ]}
             />
@@ -518,11 +518,11 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               CTA="Talk to AI Sales"
               onClick={() => window.location.href = '/voice-agents'}
               benefits={[
-                { text: "Real-Time Dashboard", checked: true },
-                { text: "Edge SEO (Cloudflare Server-Side)", checked: true },
+                { text: "Edge & Schema Generator", checked: true },
+                { text: "Agent Orchestration", checked: true },
                 { text: "Unlimited Facts + CMS Auto-Sync", checked: true },
-                { text: "Daily Posts + Info Cliffhangers", checked: true },
-                { text: "Full Prompt-to-Conversion Pipeline", checked: true },
+                { text: "Advanced Hallucination Detection", checked: true },
+                { text: "Built on SOC 2 Compliant Infrastructure", checked: true },
                 { text: "Active 'Trojan Horse' Overwrites", checked: true },
               ]}
             />

@@ -3,9 +3,10 @@ import { Radar, Loader2, AlertOctagon, MessageSquare, TrendingDown } from 'lucid
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
+import { logAuditAction } from '@/lib/audit';
 
 export function BrandMonitor() {
-  const { tier } = useAuth();
+  const { tier, user } = useAuth();
   const [brand, setBrand] = useState('');
   const [isMonitoring, setIsMonitoring] = useState(false);
   const [results, setResults] = useState<any>(null);
@@ -94,7 +95,11 @@ export function BrandMonitor() {
         }
       });
 
-      setResults(JSON.parse(response.text || "{}"));
+      const parsedResult = JSON.parse(response.text || "{}");
+      setResults(parsedResult);
+      if (user) {
+        await logAuditAction(user.uid, 'Ran Brand Monitor', { brand, riskScore: parsedResult.riskScore });
+      }
     } catch (error) {
       console.error("Error monitoring brand:", error);
       alert("Failed to run monitor. Please try again.");

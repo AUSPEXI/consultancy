@@ -3,9 +3,10 @@ import { Code, Server, RefreshCw, Loader2, ArrowRight, Copy, CheckCircle2, FileJ
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
+import { logAuditAction } from '@/lib/audit';
 
 export function Technical() {
-  const { tier } = useAuth();
+  const { tier, user } = useAuth();
   const [inputText, setInputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<{ fluff: string; table: string } | null>(null);
@@ -72,6 +73,9 @@ export function Technical() {
           fluff: parsed.detectedFluff,
           table: parsed.htmlTable
         });
+        if (user) {
+          await logAuditAction(user.uid, 'Restructured Semantic HTML', { length: inputText.length });
+        }
       }
     } catch (error) {
       console.error('Error restructuring text:', error);
@@ -110,6 +114,9 @@ export function Technical() {
       });
 
       setSchemaResult(response.text);
+      if (user) {
+        await logAuditAction(user.uid, 'Generated JSON-LD Schema', { factLength: factText.length });
+      }
     } catch (error) {
       console.error('Error generating schema:', error);
       alert('Failed to generate schema. Please try again.');
@@ -176,6 +183,9 @@ export default {
   }
 };`;
     setWorkerScript(script);
+    if (user) {
+      logAuditAction(user.uid, 'Generated Edge SEO Worker', { domain });
+    }
   };
 
   const copyWorker = () => {

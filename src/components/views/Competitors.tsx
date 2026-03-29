@@ -6,6 +6,7 @@ import { collection, addDoc, onSnapshot, query, where, orderBy } from 'firebase/
 import { GoogleGenAI } from '@google/genai';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
+import { logAuditAction } from '@/lib/audit';
 
 interface Competitor {
   id: string;
@@ -109,6 +110,7 @@ export function Competitors() {
           trojanHorseOpportunity: analysis.trojanHorseOpportunity || false,
           lastUpdated: new Date().toISOString().split('T')[0],
         });
+        await logAuditAction(user.uid, 'Analyzed Competitor', { url: inputUrl, status: analysis.decayStatus, trojanHorse: analysis.trojanHorseOpportunity });
         setIsModalOpen(false);
         setInputUrl('');
       }

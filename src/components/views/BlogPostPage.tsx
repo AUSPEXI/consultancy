@@ -52,31 +52,37 @@ export function BlogPostPage() {
               {post.excerpt}
             </p>
             
-            <h2>The Shift from SEO to GEO</h2>
-            <p>
-              For the last two decades, SEO has been a game of keywords, backlinks, and technical site structure. The goal was simple: rank as high as possible on the SERP (Search Engine Results Page) so users would click your blue link.
-            </p>
-            <p>
-              But the landscape has fundamentally changed. Generative AI models like ChatGPT, Gemini, and Claude are now providing direct answers to users' questions. They synthesize information from across the web and present it in a conversational format.
-            </p>
-            
-            <h3>Why Traditional SEO is Failing</h3>
-            <p>
-              When a user asks an AI a question, they aren't looking for a list of links to click. They are looking for the answer. If your content is optimized for clicks rather than citations, you will be left behind.
-            </p>
-            <ul>
-              <li><strong>Zero-Click Searches:</strong> Users get their answer without ever visiting your site.</li>
-              <li><strong>Contextual Relevance:</strong> AI models prioritize highly specific, factual data over generic, keyword-stuffed content.</li>
-              <li><strong>Authority Signals:</strong> AI models look for consensus across multiple high-authority platforms (Reddit, LinkedIn, etc.), not just your own domain.</li>
-            </ul>
+            {post.content ? (
+              <div dangerouslySetInnerHTML={{ __html: post.content }} />
+            ) : (
+              <>
+                <h2>The Shift from SEO to GEO</h2>
+                <p>
+                  For the last two decades, SEO has been a game of keywords, backlinks, and technical site structure. The goal was simple: rank as high as possible on the SERP (Search Engine Results Page) so users would click your blue link.
+                </p>
+                <p>
+                  But the landscape has fundamentally changed. Generative AI models like ChatGPT, Gemini, and Claude are now providing direct answers to users' questions. They synthesize information from across the web and present it in a conversational format.
+                </p>
+                
+                <h3>Why Traditional SEO is Failing</h3>
+                <p>
+                  When a user asks an AI a question, they aren't looking for a list of links to click. They are looking for the answer. If your content is optimized for clicks rather than citations, you will be left behind.
+                </p>
+                <ul>
+                  <li><strong>Zero-Click Searches:</strong> Users get their answer without ever visiting your site.</li>
+                  <li><strong>Contextual Relevance:</strong> AI models prioritize highly specific, factual data over generic, keyword-stuffed content.</li>
+                  <li><strong>Authority Signals:</strong> AI models look for consensus across multiple high-authority platforms (Reddit, LinkedIn, etc.), not just your own domain.</li>
+                </ul>
 
-            <h2>How to Optimize for Generative Engines</h2>
-            <p>
-              To succeed in this new era, you need to shift your focus from ranking links to ranking facts. This is the core of Generative Engine Optimization (GEO).
-            </p>
-            <p>
-              By structuring your data as "Cite-Magnets" and seeding those facts across the internet, you can force AI models to cite your brand as the primary source of truth.
-            </p>
+                <h2>How to Optimize for Generative Engines</h2>
+                <p>
+                  To succeed in this new era, you need to shift your focus from ranking links to ranking facts. This is the core of Generative Engine Optimization (GEO).
+                </p>
+                <p>
+                  By structuring your data as "Cite-Magnets" and seeding those facts across the internet, you can force AI models to cite your brand as the primary source of truth.
+                </p>
+              </>
+            )}
             
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-8 my-12 text-center">
               <h3 className="text-2xl font-bold mb-4 mt-0">Ready to dominate AI search?</h3>

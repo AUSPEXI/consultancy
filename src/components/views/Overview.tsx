@@ -7,6 +7,7 @@ import { collection, addDoc, onSnapshot, query, where, orderBy, limit } from 'fi
 import { GoogleGenAI } from '@google/genai';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
+import { logAuditAction } from '@/lib/audit';
 
 export function Overview() {
   const { user, tier } = useAuth();
@@ -87,6 +88,7 @@ export function Overview() {
         directTraffic: prevDirect + Math.floor(Math.random() * 40) + 10,
         aiCitations: Math.floor(Math.random() * 15) + 5
       });
+      await logAuditAction(user.uid, 'Ran SOV Audit', { date: dateStr });
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'sovMetrics');
     } finally {

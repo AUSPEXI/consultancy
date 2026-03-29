@@ -7,7 +7,7 @@ Auspexi is a platform designed to help brands optimize their content for Generat
 - **GEO Dashboard**: Track AI Share of Voice, competitor decay, and citation frequency.
 - **Fact-Vault**: Extract and store "High-Entropy Facts" (Cite-Magnets) to feed to LLMs.
 - **Omnichannel Amplifier**: Generate platform-specific social media content to seed facts across the web.
-- **Lead Capture Funnel**: A specialized funnel that generates a comprehensive GEO report using Exa.ai and Gemini, offering a time-limited $499 lifetime deal.
+- **Lead Capture Funnel**: A specialized funnel that generates a comprehensive GEO report using Exa.ai and Gemini, offering a time-limited $499/mo full access pipeline offer.
 - **Stripe Integration**: Handles subscriptions and one-time payments.
 
 ## API Keys & Configuration
@@ -32,5 +32,5 @@ While the core architecture, UI, and integrations are in place, here are the rec
 3. The backend uses **Exa.ai** to crawl their domain and competitors.
 4. The backend uses **Gemini 3.1 Pro** to generate a comprehensive, data-driven GEO report.
 5. The report is displayed to the user immediately.
-6. A "Time-Limited Offer" is presented to buy lifetime dashboard access for $499.
+6. A "Time-Limited Offer" is presented to buy full dashboard access for $499/mo.
 7. (Future) The report is emailed to them, starting a drip campaign.

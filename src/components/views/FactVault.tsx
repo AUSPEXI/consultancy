@@ -7,6 +7,7 @@ import { GoogleGenAI } from '@google/genai';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { AmplifyModal } from '@/components/ui/AmplifyModal';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
+import { logAuditAction } from '@/lib/audit';
 
 interface Fact {
   id: string;
@@ -126,6 +127,7 @@ export function FactVault() {
             createdAt: new Date().toISOString().split('T')[0],
           });
         }
+        await logAuditAction(user.uid, 'Extracted Facts', { count: extractedFacts.length, source: 'Text Input' });
         setIsModalOpen(false);
         setInputText('');
       }
@@ -182,6 +184,7 @@ export function FactVault() {
             createdAt: new Date().toISOString().split('T')[0],
           });
         }
+        await logAuditAction(user.uid, 'Researched Facts', { count: extractedFacts.length, industry });
         setIsResearchModalOpen(false);
         setIndustry('');
       }

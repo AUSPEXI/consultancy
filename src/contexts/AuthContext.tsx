@@ -4,7 +4,7 @@ import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { auth, signInWithGoogle, logout, db } from '../firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 
-export type UserTier = 'Free' | 'Basic' | 'Medium' | 'Premium' | 'LifetimeDeal';
+export type UserTier = 'Free' | 'Basic' | 'Medium' | 'Premium' | 'PipelineOffer';
 
 interface AuthContextType {
   user: User | null;

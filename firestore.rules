@@ -55,7 +55,7 @@ service cloud.firestore {
              (!('email' in data) || data.email == null || (data.email is string && isValidEmail(data.email))) &&
              (!('name' in data) || (data.name is string && data.name.size() <= 100)) &&
              (!('role' in data) || data.role in ['admin', 'user']) &&
-             (!('tier' in data) || data.tier in ['Free', 'Basic', 'Medium', 'Premium', 'LifetimeDeal']);
+             (!('tier' in data) || data.tier in ['Free', 'Basic', 'Medium', 'Premium', 'PipelineOffer']);
     }
 
     function isValidSovMetric(data) {
@@ -135,6 +135,12 @@ service cloud.firestore {
       allow create: if isValidLead(request.resource.data) && request.resource.data.status == 'new';
       allow update: if isAdmin() && isValidLead(request.resource.data);
       allow delete: if isAdmin();
+    }
+
+    match /audit_logs/{logId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid || isAdmin();
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if false; // Immutable
     }
   }
 }

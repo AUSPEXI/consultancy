@@ -3,11 +3,12 @@ import { PenTool, Loader2, CheckCircle2, AlertTriangle, ArrowRight, LayoutTempla
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
+import { logAuditAction } from '@/lib/audit';
 
 type ContentType = 'sales' | 'blog' | 'technical';
 
 export function ContentScorer() {
-  const { tier } = useAuth();
+  const { tier, user } = useAuth();
   const [content, setContent] = useState('');
   const [contentType, setContentType] = useState<ContentType>('sales');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -17,9 +18,11 @@ export function ContentScorer() {
   const [publishSuccess, setPublishSuccess] = useState(false);
 
   const handlePublish = async () => {
+    if (!user) return;
     setIsPublishing(true);
     // Simulate API call to update website
     await new Promise(resolve => setTimeout(resolve, 2000));
+    await logAuditAction(user.uid, 'Published Content', { contentType, score: result?.overallScore });
     setIsPublishing(false);
     setPublishSuccess(true);
     setTimeout(() => {
@@ -100,7 +103,11 @@ export function ContentScorer() {
         }
       });
 
-      setResult(JSON.parse(response.text || "{}"));
+      const parsedResult = JSON.parse(response.text || "{}");
+      setResult(parsedResult);
+      if (user) {
+        await logAuditAction(user.uid, 'Scored Content', { contentType, score: parsedResult.overallScore });
+      }
     } catch (error) {
       console.error("Error scoring content:", error);
       alert("Failed to analyze content. Please try again.");

@@ -25,20 +25,8 @@ export function LeadCaptureModal({ isOpen, onClose, source, initialEmail = '', i
   const [error, setError] = useState('');
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-  React.useEffect(() => {
-    if (isOpen) {
-      setEmail(initialEmail);
-      setDomain(initialDomain);
-      setError('');
-      setReport(null);
-    }
-  }, [isOpen, initialEmail, initialDomain]);
-
-  if (!isOpen) return null;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !domain) return;
+  const generateReport = async (targetEmail: string, targetDomain: string) => {
+    if (!targetEmail || !targetDomain) return;
 
     setIsSubmitting(true);
     setError('');
@@ -47,8 +35,8 @@ export function LeadCaptureModal({ isOpen, onClose, source, initialEmail = '', i
       // Save lead to Firestore
       try {
         await addDoc(collection(db, 'leads'), {
-          email,
-          domain,
+          email: targetEmail,
+          domain: targetDomain,
           source: source || 'direct',
           status: 'new',
           createdAt: new Date().toISOString().split('T')[0] + 'T00:00:00Z',
@@ -61,7 +49,7 @@ export function LeadCaptureModal({ isOpen, onClose, source, initialEmail = '', i
       const response = await fetch('/api/generate-report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, domain }),
+        body: JSON.stringify({ email: targetEmail, domain: targetDomain }),
       });
 
       const data = await response.json();
@@ -78,7 +66,27 @@ export function LeadCaptureModal({ isOpen, onClose, source, initialEmail = '', i
     }
   };
 
-  const handleLifetimeDeal = async () => {
+  React.useEffect(() => {
+    if (isOpen) {
+      setEmail(initialEmail);
+      setDomain(initialDomain);
+      setError('');
+      setReport(null);
+      
+      if (initialEmail && initialDomain) {
+        generateReport(initialEmail, initialDomain);
+      }
+    }
+  }, [isOpen, initialEmail, initialDomain]);
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await generateReport(email, domain);
+  };
+
+  const handlePipelineOffer = async () => {
     try {
       setIsCheckingOut(true);
       const response = await fetch('/api/create-checkout-session', {
@@ -87,7 +95,7 @@ export function LeadCaptureModal({ isOpen, onClose, source, initialEmail = '', i
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          tier: 'LifetimeDeal',
+          tier: 'PipelineOffer',
           userId: user?.uid,
           email: email, // Pass the email they entered!
         }),
@@ -140,21 +148,21 @@ export function LeadCaptureModal({ isOpen, onClose, source, initialEmail = '', i
                   <Sparkles className="w-3.5 h-3.5" />
                   Exclusive Offer
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Lifetime Dashboard Access</h3>
+                <h3 className="text-xl font-bold text-white mb-2">Full Access Pipeline Offer</h3>
                 <p className="text-zinc-400 text-sm mb-6">
-                  Get full access to the Auspexi GEO Dashboard forever. Track your Share of Voice, analyze competitors, and extract Cite-Magnets.
+                  Get full access to the Auspexi GEO Dashboard. Track your Share of Voice, analyze competitors, and extract Cite-Magnets.
                 </p>
                 
                 <div className="mb-6">
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-bold text-white">$499</span>
-                    <span className="text-zinc-500 line-through text-sm">$4,999/yr</span>
+                    <span className="text-zinc-500 text-sm">/mo</span>
                   </div>
-                  <p className="text-emerald-400 text-xs font-medium mt-1">One-time payment. No subscriptions.</p>
+                  <p className="text-emerald-400 text-xs font-medium mt-1">Cancel anytime. Lock in this rate forever.</p>
                 </div>
 
                 <Button 
-                  onClick={handleLifetimeDeal}
+                  onClick={handlePipelineOffer}
                   disabled={isCheckingOut}
                   className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-12 text-base font-medium group"
                 >
@@ -162,13 +170,13 @@ export function LeadCaptureModal({ isOpen, onClose, source, initialEmail = '', i
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
-                      Claim Lifetime Deal
+                      Claim Full Access
                       <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                     </>
                   )}
                 </Button>
                 <p className="text-center text-zinc-500 text-xs mt-4">
-                  Offer valid for the next 24 hours only. If you cancel and sign back up, standard pricing will apply.
+                  Exclusive pipeline offer. If you cancel and sign back up, standard pricing will apply.
                 </p>
               </div>
             </div>

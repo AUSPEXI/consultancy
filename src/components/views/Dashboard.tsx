@@ -9,6 +9,7 @@ import { Agents } from '@/components/views/Agents';
 import { ContentScorer } from '@/components/views/ContentScorer';
 import { Simulator } from '@/components/views/Simulator';
 import { BrandMonitor } from '@/components/views/BrandMonitor';
+import { AuditLogs } from '@/components/views/AuditLogs';
 
 export function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -19,6 +20,7 @@ export function Dashboard() {
       case 'overview': return <Overview />;
       case 'fact-vault': return <FactVault />;
       case 'content-scorer': return <ContentScorer />;
+      case 'audit-logs': return <AuditLogs />;
       case 'simulator': return <Simulator />;
       case 'brand-monitor': return <BrandMonitor />;
       case 'competitors': return <Competitors />;

@@ -92,17 +92,17 @@ app.use(express.json());
       const searchResult = await exa.searchAndContents(`site:${domain} OR "${domain}"`, {
         type: "neural",
         useAutoprompt: true,
-        numResults: 3,
+        numResults: 8,
         text: true
       });
 
-      const domainContext = searchResult.results.map(r => r.text).join("\n\n").substring(0, 15000);
+      const domainContext = searchResult.results.map(r => r.text).join("\n\n").substring(0, 20000);
 
       // 2. Generate the report using Gemini
       const prompt = `
 You are an expert in Generative Engine Optimization (GEO).
 Generate a comprehensive sales funnel report for the domain: ${domain}.
-Use the following context gathered from the web about this domain:
+Use the following context gathered from the web about this domain (which includes multiple pages like their homepage, blog, and about pages):
 ${domainContext}
 
 Report Structure & Requirements:
@@ -111,28 +111,27 @@ Report Structure & Requirements:
 - Introduce the concept that "Ranking #1 means less than ever" if an AI answer appears above the content without citing the brand.
 - Define their new primary KPI: AI Share of Voice (AI SOV)—the percentage of AI responses that mention their brand versus competitors.
 
-2. Audit of "Areas of Concern" (Using GEO Research Metrics)
-Analyze the likely "Citation Failure Modes" for this domain:
-- Retrieval Failures: Does their content lack the "Topical Depth" and "Semantic Breadth" required for AI to find it?
-- Extraction Failures: Does the domain use a "Narrative-First" style rather than a "Machine-Readable" style? Highlight the absence of the Inverted Pyramid of Synthesis—where the direct answer is missing from the first sentence.
-- Synthesis Failures: Does the content rely on qualitative adjectives (e.g., "fast," "efficient") instead of Fact-Maxing (raw data and technical specs)?
-- Entity Clarity Gaps: Is the brand name repeated near key facts to prevent "concept collisions" where AI might attribute their data to a competitor?
+2. GEO Opportunity Analysis (The Dual-Optimization Approach)
+Analyze the domain's current content strategy based ON THE ACTUAL CONTEXT PROVIDED. Specifically, evaluate how well they balance Human-Centric Sales Copy with AI-Readable Data (Dual-Optimization):
+- Human vs. AI Balance: Acknowledge that human-readable narrative is essential for conversions, but AI requires dense, factual data (Fact-Maxing). Assess if their current copy leans too far into qualitative marketing fluff, or if they successfully blend human storytelling with hard, extractable facts.
+- Semantic Architecture: Do they use the "Inverted Pyramid of Synthesis" (putting the direct, factual answer first for AI, followed by the human narrative)? If they do this well, praise them but suggest scaling it. If they don't, point it out as an opportunity.
+- Entity Clarity: Are their core brand concepts clearly defined, or is there a risk of "Concept Collision" with competitors?
 
 3. The GEO Transformation Strategy (Our Services)
-Explain how we will implement the "High-Performing Trio" of enhancements that boost visibility by up to 40%:
-- Statistics Addition (~40% boost): We will turn their qualitative claims into "Statistically Irresistible" anchors.
-- Quotation Addition (~32%–40% boost): We will integrate expert quotes from recognized authorities to provide AI with extractable evidence.
-- Authoritative Citations (~31%–40% boost): We will link to high-authority external sources (research papers, industry reports) to signal trust to the LLM.
+Explain how we will implement the "High-Performing Trio" of enhancements to boost their visibility:
+- Statistics Addition: Turning qualitative claims into "Statistically Irresistible" anchors.
+- Quotation Addition: Integrating expert quotes to provide AI with extractable evidence (Social Proof tokens).
+- Authoritative Citations: Linking to high-authority external sources to signal trust to the LLM.
 
 4. Technical & Off-Page Architecture
-- Technical Layer: Describe our implementation of JSON-LD Schema (FAQ, Organization, and Product) to increase extraction accuracy by 300%.
-- Digital Ecosystem Expansion: Detail how we will manage their narrative on "Consensus Platforms" like Reddit, Quora, and Industry Forums, which are the primary grounding sources for AI engines.
+- Technical Layer: Describe our implementation of JSON-LD Schema (FAQ, Organization, and Product) to structure their data for LLM crawlers.
+- Digital Ecosystem Expansion: Detail how we will manage their narrative on "Consensus Platforms" like Reddit, Quora, and Industry Forums.
 
 5. Projected ROI & Measurement
 - Explain that AI-referred visitors convert at 4.4x the rate of traditional organic search because they arrive pre-informed.
-- Propose a GEO Dashboard to track Citation Frequency, Sentiment Analysis, and "Citation Gaps" where competitors are appearing but they are not.
+- Propose a GEO Dashboard to track Citation Frequency, Sentiment Analysis, and Citation Gaps.
 
-Tone: Professional, data-driven, and urgent. Use terms like "Cite-Magnet," "High-Entropy Data," and "Retrieval-Augmented Generation (RAG)" to demonstrate technical expertise.
+Tone: Professional, data-driven, and consultative. Use terms like "Cite-Magnet," "High-Entropy Data," and "Dual-Optimization" to demonstrate technical expertise. Do not just blindly criticize; if the context shows they have good technical depth, acknowledge it as a strong foundation that needs our tools to scale.
 Format the output in clean Markdown.
 `;
 
@@ -248,7 +247,7 @@ Format the output in clean Markdown.
       let mode: 'subscription' | 'payment' = 'subscription';
 
       if (tier === 'Basic') {
-        unitAmount = 49900; // $499.00
+        unitAmount = 8900; // $89.00
         productName = 'Auspexi Basic Tier';
       } else if (tier === 'Medium') {
         unitAmount = 149900; // $1,499.00
@@ -256,10 +255,10 @@ Format the output in clean Markdown.
       } else if (tier === 'Premium') {
         unitAmount = 499900; // $4,999.00
         productName = 'Auspexi Premium Tier';
-      } else if (tier === 'LifetimeDeal') {
-        unitAmount = 49900; // $499.00 one-time
-        productName = 'Auspexi Lifetime Dashboard Access (One-Time Offer)';
-        mode = 'payment';
+      } else if (tier === 'PipelineOffer') {
+        unitAmount = 49900; // $499.00
+        productName = 'Auspexi Full Access (Pipeline Offer)';
+        mode = 'subscription';
       } else {
         return res.status(400).json({ error: 'Invalid tier selected' });
       }
