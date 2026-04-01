@@ -11,8 +11,25 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Facebook, Instagram, Linkedin, Moon, Send, Sun, Twitter } from "lucide-react"
+import { Facebook, Instagram, Linkedin, Moon, Send, Sun, Twitter, Youtube, MessageSquare } from "lucide-react"
 import { Link } from "react-router-dom"
+
+const TiktokIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+  </svg>
+);
 
 function Footerdemo() {
   const [isDarkMode, setIsDarkMode] = React.useState(true)
@@ -96,7 +113,7 @@ function Footerdemo() {
           </div>
           <div className="relative">
             <h3 className="mb-4 text-lg font-semibold">Follow Us</h3>
-            <div className="mb-6 flex space-x-4">
+            <div className="mb-6 flex flex-wrap gap-4">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -120,6 +137,58 @@ function Footerdemo() {
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Connect with us on LinkedIn</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" className="rounded-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800">
+                      <Instagram className="h-4 w-4" />
+                      <span className="sr-only">Instagram</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Follow us on Instagram</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" className="rounded-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800">
+                      <TiktokIcon className="h-4 w-4" />
+                      <span className="sr-only">TikTok</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Follow us on TikTok</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" className="rounded-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800">
+                      <Youtube className="h-4 w-4" />
+                      <span className="sr-only">YouTube</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Subscribe to our YouTube Channel</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" className="rounded-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800">
+                      <MessageSquare className="h-4 w-4" />
+                      <span className="sr-only">Reddit</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Join our Reddit Community</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

@@ -6,6 +6,9 @@ import dotenv from "dotenv";
 import Exa from "exa-js";
 import { GoogleGenAI } from "@google/genai";
 import nodemailer from "nodemailer";
+import { z } from "zod";
+import rateLimit from "express-rate-limit";
+import { blogPosts } from "./src/data/blogPosts.ts";
 
 dotenv.config();
 
@@ -45,6 +48,72 @@ function getGemini(): GoogleGenAI {
   return geminiClient;
 }
 
+// --- Security Layers (Auspexi 5-Layer Architecture) ---
+
+// Layer 4: Rate Limiting
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // Limit each IP to 20 AI requests per window
+  message: { error: "Too many requests from this IP, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Layer 1: Input Validation Schema
+const amplifyRequestSchema = z.object({
+  fact: z.string().min(5, "Fact is too short.").max(1000, "Fact is too long. Maximum 1000 characters allowed."),
+});
+
+// Layer 2: Prompt Injection Detection
+const INJECTION_PATTERNS = [
+  /ignore\s+(all\s+)?previous\s+instructions?/i,
+  /disregard\s+(all\s+)?above/i,
+  /forget\s+(everything|all|previous)/i,
+  /new\s+instructions?:/i,
+  /system\s*:\s*/i,
+  /\[SYSTEM\]/i,
+  /\<\|im_start\|\>/,
+  /\<\|system\|\>/,
+  /assistant\s*:\s*/i,
+  /you\s+are\s+now/i,
+  /act\s+as\s+(if\s+)?you/i,
+  /pretend\s+(you\s+are|to\s+be)/i,
+  /roleplay\s+as/i,
+  /simulate\s+(being\s+)?a/i,
+  /override\s+your/i,
+  /bypass\s+your/i,
+  /\\n\\n#\s/,
+  /triple-quoted/i,
+  /base64.*decode/i,
+  /rot13|caesar|cipher/i
+];
+
+function detectPromptInjection(input: string): boolean {
+  return INJECTION_PATTERNS.some(pattern => pattern.test(input));
+}
+
+// Layer 3: Output Filtering (PII & Secrets)
+const SENSITIVE_PATTERNS = {
+  creditCard: /\b\d{4}[\s\-]?\d{4}[\s\-]?\d{4}[\s\-]?\d{4}\b/g,
+  ssn: /\b\d{3}-\d{2}-\d{4}\b/g,
+  apiKey: /\b(sk|pk)_[a-zA-Z0-9]{32,}\b/g,
+  email: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
+  phone: /\b(\+?1?[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g,
+  ipAddress: /\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b/g,
+  jwt: /eyJ[a-zA-Z0-9_-]+\.eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/g,
+  awsKey: /AKIA[0-9A-Z]{16}/g
+};
+
+function filterSensitiveData(output: string): string {
+  let filtered = output;
+  Object.entries(SENSITIVE_PATTERNS).forEach(([type, pattern]) => {
+    filtered = filtered.replace(pattern, `[REDACTED_${type.toUpperCase()}]`);
+  });
+  return filtered;
+}
+
+// --- End Security Layers ---
+
 const app = express();
 const PORT = 3000;
 
@@ -54,6 +123,60 @@ app.use(express.json());
 // API routes FIRST
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok", message: "Auspexi Backend is running" });
+  });
+
+  app.post("/api/amplify", aiLimiter, async (req, res) => {
+    try {
+      // Layer 1: Input Validation
+      const parsed = amplifyRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid request data", details: parsed.error.issues });
+      }
+      const { fact } = parsed.data;
+
+      // Layer 2: Prompt Injection Detection
+      if (detectPromptInjection(fact)) {
+        console.warn(`[SECURITY] Prompt injection detected from IP: ${req.ip}`);
+        return res.status(400).json({ error: "Security Policy Violation: Invalid input pattern detected." });
+      }
+
+      const ai = getGemini();
+      const prompt = `
+        You are an expert Generative Engine Optimization (GEO) and social media strategist.
+        Take the following core fact and rewrite it into 6 distinct social media posts optimized for maximum engagement and AI citation indexing.
+        The goal is to seed this fact across the internet to build authority.
+        
+        Core Fact: "${fact}"
+        
+        Generate:
+        1. A professional, thought-leadership post for LinkedIn.
+        2. A conversational, value-driven post for Reddit (suitable for a relevant subreddit).
+        3. A punchy, engaging thread or post for Twitter/X.
+        4. A short, hook-driven script for a YouTube Short.
+        5. A highly engaging, trend-aware script or caption for TikTok.
+        6. A visually descriptive caption with relevant hashtags for Instagram.
+        
+        Return ONLY a JSON object with the following keys: 'linkedin', 'reddit', 'twitter', 'youtube', 'tiktok', 'instagram'.
+        The values should be the generated text for each platform.
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3.1-pro-preview",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+        }
+      });
+
+      // Layer 3: Output Filtering
+      const rawOutput = response.text || "{}";
+      const filteredOutput = filterSensitiveData(rawOutput);
+
+      res.json(JSON.parse(filteredOutput));
+    } catch (error: any) {
+      console.error("Error generating omnichannel content:", error);
+      res.status(500).json({ error: "Internal server error during generation" });
+    }
   });
 
   app.post("/api/exa-search", async (req, res) => {
@@ -101,7 +224,7 @@ app.use(express.json());
       // 2. Generate the report using Gemini
       const prompt = `
 You are an expert in Generative Engine Optimization (GEO).
-Generate a comprehensive sales funnel report for the domain: ${domain}.
+Generate a comprehensive GEO Strategy report for the domain: ${domain}.
 Use the following context gathered from the web about this domain (which includes multiple pages like their homepage, blog, and about pages):
 ${domainContext}
 
@@ -234,6 +357,56 @@ Format the output in clean Markdown.
     } catch (error: any) {
       console.error("Error generating shadow link:", error);
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Dynamic Sitemap Generator
+  app.get("/sitemap.xml", (req, res) => {
+    try {
+      const appUrl = process.env.APP_URL || `http://localhost:${PORT}`;
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Define static routes
+      const staticRoutes = [
+        "",
+        "/blog",
+      ];
+
+      // Generate XML for static routes
+      const staticUrls = staticRoutes.map(route => `
+  <url>
+    <loc>${appUrl}${route}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>${route === "" ? "1.0" : "0.8"}</priority>
+  </url>`).join('');
+
+      // Generate XML for dynamic blog posts
+      const blogUrls = blogPosts.map(post => {
+        // Convert 'Mar 31, 2026' to YYYY-MM-DD for sitemap
+        const dateObj = new Date(post.date);
+        const formattedDate = !isNaN(dateObj.getTime()) ? dateObj.toISOString().split('T')[0] : today;
+        
+        return `
+  <url>
+    <loc>${appUrl}/blog/${post.slug}</loc>
+    <lastmod>${formattedDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>`;
+      }).join('');
+
+      const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${staticUrls}
+${blogUrls}
+</urlset>`;
+
+      res.header('Content-Type', 'application/xml');
+      res.send(sitemap);
+    } catch (error) {
+      console.error("Error generating sitemap:", error);
+      res.status(500).send("Error generating sitemap");
     }
   });
 

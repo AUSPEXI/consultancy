@@ -15,7 +15,7 @@ import { LeadCaptureModal } from '@/components/ui/lead-capture-modal';
 import { useAuth } from '@/contexts/AuthContext';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Link, useLocation } from 'react-router-dom';
-import { blogPosts } from './BlogPage';
+import { blogPosts } from '@/data/blogPosts';
 
 export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
   const { user } = useAuth();
@@ -233,14 +233,12 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
             </div>
 
             {/* Right Column */}
-            <div className="md:col-span-7 relative h-[400px] md:h-[600px] w-full flex items-center justify-end hidden md:flex">
+            <div className="md:col-span-7 relative h-[400px] md:h-[600px] w-full flex items-center justify-end">
               <div className="absolute inset-0 w-[120%] -right-[10%] h-full">
-                {isDesktop && (
-                  <SplineScene 
-                    scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-                    className="w-full h-full"
-                  />
-                )}
+                <SplineScene 
+                  scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                  className="w-full h-full"
+                />
               </div>
             </div>
           </div>

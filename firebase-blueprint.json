@@ -61,6 +61,18 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["email", "source", "status", "createdAt"]
+    },
+    "AuditLog": {
+      "title": "Audit Log",
+      "description": "Immutable audit log for SOC 2 compliance.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "action": { "type": "string" },
+        "details": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "action", "timestamp"]
     }
   },
   "firestore": {
@@ -83,6 +95,10 @@
     "/leads/{leadId}": {
       "schema": { "$ref": "#/entities/Lead" },
       "description": "Captured leads."
+    },
+    "/audit_logs/{logId}": {
+      "schema": { "$ref": "#/entities/AuditLog" },
+      "description": "Immutable audit logs."
     }
   }
 }

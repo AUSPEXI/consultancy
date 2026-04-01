@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Code, Server, RefreshCw, Loader2, ArrowRight, Copy, CheckCircle2, FileJson } from 'lucide-react';
+import { Code, Server, RefreshCw, Loader2, ArrowRight, Copy, CheckCircle2, FileJson, Download } from 'lucide-react';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
@@ -194,11 +194,37 @@ export default {
     setTimeout(() => setCopiedWorker(false), 2000);
   };
 
+  const downloadWorker = () => {
+    const blob = new Blob([workerScript], { type: 'text/javascript' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'worker.js';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const copySchema = () => {
     if (schemaResult) {
       navigator.clipboard.writeText(schemaResult);
       setCopiedSchema(true);
       setTimeout(() => setCopiedSchema(false), 2000);
+    }
+  };
+
+  const downloadSchema = () => {
+    if (schemaResult) {
+      const blob = new Blob([schemaResult], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'schema.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
   };
 
@@ -250,13 +276,22 @@ export default {
               <div className="mt-6 animate-in slide-in-from-bottom-4 duration-500">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">worker.js</span>
-                  <button 
-                    onClick={copyWorker}
-                    className="text-xs font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
-                  >
-                    {copiedWorker ? <CheckCircle2 className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                    {copiedWorker ? 'Copied!' : 'Copy Script'}
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={downloadWorker}
+                      className="text-xs font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
+                    >
+                      <Download className="w-3 h-3" />
+                      Download
+                    </button>
+                    <button 
+                      onClick={copyWorker}
+                      className="text-xs font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
+                    >
+                      {copiedWorker ? <CheckCircle2 className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                      {copiedWorker ? 'Copied!' : 'Copy Script'}
+                    </button>
+                  </div>
                 </div>
                 <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 overflow-x-auto">
                   <pre className="text-xs text-zinc-300 font-mono">
@@ -384,13 +419,22 @@ export default {
             <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 mt-6 animate-in slide-in-from-bottom-4 duration-500">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-medium text-amber-400 uppercase tracking-wider">JSON-LD Schema</span>
-                <button 
-                  onClick={copySchema}
-                  className="text-xs font-medium text-amber-400 hover:text-amber-300 flex items-center gap-1"
-                >
-                  {copiedSchema ? <CheckCircle2 className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                  {copiedSchema ? 'Copied!' : 'Copy Code'}
-                </button>
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={downloadSchema}
+                    className="text-xs font-medium text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                  >
+                    <Download className="w-3 h-3" />
+                    Download
+                  </button>
+                  <button 
+                    onClick={copySchema}
+                    className="text-xs font-medium text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                  >
+                    {copiedSchema ? <CheckCircle2 className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                    {copiedSchema ? 'Copied!' : 'Copy Code'}
+                  </button>
+                </div>
               </div>
               <pre className="text-xs text-zinc-300 font-mono overflow-x-auto p-4 bg-zinc-900 rounded border border-zinc-800">
                 {schemaResult}
