@@ -13,6 +13,8 @@ import { FAQPage } from '@/components/views/FAQPage';
 import { VoiceAgentsPage } from '@/components/views/VoiceAgentsPage';
 import { AboutPage } from '@/components/views/AboutPage';
 import { ResourcesPage } from '@/components/views/ResourcesPage';
+import { PrivacyPolicyPage } from '@/components/views/PrivacyPolicyPage';
+import { TermsOfServicePage } from '@/components/views/TermsOfServicePage';
 import { useAuth } from '@/contexts/AuthContext';
 import { VoiceAgentProvider } from '@/contexts/VoiceAgentContext';
 import { doc, setDoc } from 'firebase/firestore';
@@ -72,6 +74,8 @@ export default function App() {
           <Route path="/resources" element={<ResourcesPage />} />
           <Route path="/voice-agents" element={<VoiceAgentsPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms" element={<TermsOfServicePage />} />
           <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/" />} />
         </Routes>
         <FloatingVoiceButton />

@@ -73,6 +73,18 @@
         "timestamp": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "action", "timestamp"]
+    },
+    "KnowledgeGraphNode": {
+      "title": "Knowledge Graph Node",
+      "description": "Learned facts and questions from voice agent conversations.",
+      "type": "object",
+      "properties": {
+        "topic": { "type": "string" },
+        "fact": { "type": "string" },
+        "source": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["topic", "fact", "source", "createdAt"]
     }
   },
   "firestore": {
@@ -99,6 +111,10 @@
     "/audit_logs/{logId}": {
       "schema": { "$ref": "#/entities/AuditLog" },
       "description": "Immutable audit logs."
+    },
+    "/knowledge_graph/{nodeId}": {
+      "schema": { "$ref": "#/entities/KnowledgeGraphNode" },
+      "description": "Learned facts from voice agent conversations."
     }
   }
 }

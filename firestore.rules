@@ -99,6 +99,14 @@ service cloud.firestore {
              data.createdAt is string && isValidDateString(data.createdAt);
     }
 
+    function isValidKnowledgeGraphNode(data) {
+      return hasOnlyAllowedFields(['topic', 'fact', 'source', 'createdAt']) &&
+             data.topic is string && data.topic.size() > 0 && data.topic.size() <= 200 &&
+             data.fact is string && data.fact.size() > 0 && data.fact.size() <= 2000 &&
+             data.source is string && data.source.size() <= 200 &&
+             data.createdAt is string && isValidDateString(data.createdAt);
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
@@ -141,6 +149,13 @@ service cloud.firestore {
       allow read: if isAuthenticated() && resource.data.userId == request.auth.uid || isAdmin();
       allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
       allow update, delete: if false; // Immutable
+    }
+
+    match /knowledge_graph/{nodeId} {
+      allow read: if true; // Publicly readable for the voice agent
+      allow create: if isAuthenticated() && isValidKnowledgeGraphNode(request.resource.data);
+      allow update: if isAdmin() && isValidKnowledgeGraphNode(request.resource.data);
+      allow delete: if isAdmin();
     }
   }
 }

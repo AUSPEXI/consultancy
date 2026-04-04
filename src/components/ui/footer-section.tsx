@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Facebook, Instagram, Linkedin, Moon, Send, Sun, Twitter, Youtube, MessageSquare } from "lucide-react"
+import { Facebook, Instagram, Linkedin, Moon, Send, Sun, Youtube, MessageSquare } from "lucide-react"
 import { Link } from "react-router-dom"
 
 const TiktokIcon = ({ className }: { className?: string }) => (
@@ -28,6 +28,19 @@ const TiktokIcon = ({ className }: { className?: string }) => (
     className={className}
   >
     <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+  </svg>
+);
+
+const XIcon = ({ className }: { className?: string }) => (
+  <svg
+    role="img"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="currentColor"
+    className={className}
+  >
+    <title>X</title>
+    <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
   </svg>
 );
 
@@ -117,35 +130,26 @@ function Footerdemo() {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" className="rounded-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800">
-                      <Twitter className="h-4 w-4" />
-                      <span className="sr-only">Twitter</span>
+                    <Button variant="outline" size="icon" className="rounded-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800" asChild>
+                      <a href="https://x.com/Auspexi" target="_blank" rel="noopener noreferrer">
+                        <XIcon className="h-4 w-4" />
+                        <span className="sr-only">X (formerly Twitter)</span>
+                      </a>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Follow us on Twitter</p>
+                    <p>Follow us on X</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" className="rounded-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800">
-                      <Linkedin className="h-4 w-4" />
-                      <span className="sr-only">LinkedIn</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Connect with us on LinkedIn</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" className="rounded-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800">
-                      <Instagram className="h-4 w-4" />
-                      <span className="sr-only">Instagram</span>
+                    <Button variant="outline" size="icon" className="rounded-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800" asChild>
+                      <a href="https://www.instagram.com/auspexidotcom/" target="_blank" rel="noopener noreferrer">
+                        <Instagram className="h-4 w-4" />
+                        <span className="sr-only">Instagram</span>
+                      </a>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -156,9 +160,11 @@ function Footerdemo() {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" className="rounded-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800">
-                      <TiktokIcon className="h-4 w-4" />
-                      <span className="sr-only">TikTok</span>
+                    <Button variant="outline" size="icon" className="rounded-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800" asChild>
+                      <a href="https://www.tiktok.com/@auspexi.com" target="_blank" rel="noopener noreferrer">
+                        <TiktokIcon className="h-4 w-4" />
+                        <span className="sr-only">TikTok</span>
+                      </a>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -169,9 +175,11 @@ function Footerdemo() {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" className="rounded-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800">
-                      <Youtube className="h-4 w-4" />
-                      <span className="sr-only">YouTube</span>
+                    <Button variant="outline" size="icon" className="rounded-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800" asChild>
+                      <a href="https://www.youtube.com/channel/UCYcTIGhBKY_IIx5WcM68zdg" target="_blank" rel="noopener noreferrer">
+                        <Youtube className="h-4 w-4" />
+                        <span className="sr-only">YouTube</span>
+                      </a>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -182,9 +190,11 @@ function Footerdemo() {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" className="rounded-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800">
-                      <MessageSquare className="h-4 w-4" />
-                      <span className="sr-only">Reddit</span>
+                    <Button variant="outline" size="icon" className="rounded-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800" asChild>
+                      <a href="https://www.reddit.com/user/Gold-Charge-6536/" target="_blank" rel="noopener noreferrer">
+                        <MessageSquare className="h-4 w-4" />
+                        <span className="sr-only">Reddit</span>
+                      </a>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -200,12 +210,12 @@ function Footerdemo() {
             © 2026 Auspexi. All rights reserved.
           </p>
           <nav className="flex gap-4 text-sm">
-            <a href="#" className="transition-colors hover:text-white text-zinc-400">
+            <Link to="/privacy" className="transition-colors hover:text-white text-zinc-400">
               Privacy Policy
-            </a>
-            <a href="#" className="transition-colors hover:text-white text-zinc-400">
+            </Link>
+            <Link to="/terms" className="transition-colors hover:text-white text-zinc-400">
               Terms of Service
-            </a>
+            </Link>
           </nav>
         </div>
       </div>

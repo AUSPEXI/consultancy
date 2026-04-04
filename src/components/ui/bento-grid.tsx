@@ -38,8 +38,8 @@ const BentoCard = ({
   background: ReactNode;
   Icon: any;
   description: string;
-  href: string;
-  cta: string;
+  href?: string;
+  cta?: string;
   key?: string | number;
 }) => (
   <div
@@ -52,7 +52,7 @@ const BentoCard = ({
     )}
   >
     <div>{background}</div>
-    <div className="pointer-events-none z-10 flex transform-gpu flex-col gap-1 p-6 pb-16 transition-all duration-300 group-hover:-translate-y-5">
+    <div className={cn("pointer-events-none z-10 flex transform-gpu flex-col gap-1 p-6 transition-all duration-300", href && cta ? "pb-16 group-hover:-translate-y-5" : "pb-6")}>
       <Icon className="h-12 w-12 origin-left transform-gpu text-zinc-300 transition-all duration-300 ease-in-out group-hover:scale-75" />
       <h3 className="text-xl font-semibold text-zinc-100">
         {name}
@@ -60,18 +60,20 @@ const BentoCard = ({
       <p className="max-w-lg text-zinc-400">{description}</p>
     </div>
 
-    <div
-      className={cn(
-        "pointer-events-none absolute bottom-0 flex w-full translate-y-5 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100",
-      )}
-    >
-      <Button variant="ghost" asChild size="sm" className="pointer-events-auto">
-        <a href={href}>
-          {cta}
-          <ArrowRightIcon className="ml-2 h-4 w-4" />
-        </a>
-      </Button>
-    </div>
+    {href && cta && (
+      <div
+        className={cn(
+          "pointer-events-none absolute bottom-0 flex w-full translate-y-5 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100",
+        )}
+      >
+        <Button variant="ghost" asChild size="sm" className="pointer-events-auto">
+          <a href={href}>
+            {cta}
+            <ArrowRightIcon className="ml-2 h-4 w-4" />
+          </a>
+        </Button>
+      </div>
+    )}
     <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/[.03] group-hover:dark:bg-neutral-800/10" />
   </div>
 );

@@ -66,6 +66,8 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
   const sessionRef = useRef<any>(null);
   const nextPlayTimeRef = useRef<number>(0);
   const activeSourcesRef = useRef<AudioBufferSourceNode[]>([]);
+  const transcriptRef = useRef<{ role: string, text: string }[]>([]);
+  const knowledgeGraphRef = useRef<string>("");
 
   const stopAllSources = () => {
     activeSourcesRef.current.forEach(source => {
@@ -73,6 +75,79 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
     });
     activeSourcesRef.current = [];
     setIsSpeaking(false);
+  };
+
+  const fetchKnowledgeGraph = async () => {
+    try {
+      const { collection, getDocs, query, orderBy, limit } = await import('firebase/firestore');
+      const { db } = await import('@/firebase');
+      const q = query(collection(db, 'knowledge_graph'), orderBy('createdAt', 'desc'), limit(50));
+      const snapshot = await getDocs(q);
+      const facts = snapshot.docs.map(doc => doc.data().fact);
+      if (facts.length > 0) {
+        knowledgeGraphRef.current = "Here are some learned facts from previous conversations that you should know:\n" + facts.map(f => `- ${f}`).join("\n");
+      }
+    } catch (err) {
+      console.error("Failed to fetch knowledge graph:", err);
+    }
+  };
+
+  const processTranscriptAndExtractKnowledge = async (transcript: { role: string, text: string }[]) => {
+    if (transcript.length < 2) return; // Not enough conversation to extract anything useful
+
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+    if (!apiKey) return;
+
+    try {
+      const ai = new GoogleGenAI({ apiKey });
+      const conversationText = transcript.map(t => `${t.role}: ${t.text}`).join("\n");
+      
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `Analyze the following conversation between a user and an Auspexi AI agent. 
+Extract any NEW, USEFUL facts, frequently asked questions, or insights about the user's needs or Auspexi's services that the agent should remember for future conversations.
+Do not extract personal information (like names or emails).
+Format the output as a JSON array of objects with 'topic' and 'fact' string properties. If there is nothing useful to extract, return an empty array [].
+
+Conversation:
+${conversationText}`,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                topic: { type: Type.STRING },
+                fact: { type: Type.STRING }
+              },
+              required: ["topic", "fact"]
+            }
+          }
+        }
+      });
+
+      const extractedFacts = JSON.parse(response.text || "[]");
+      
+      if (extractedFacts.length > 0) {
+        const { collection, addDoc } = await import('firebase/firestore');
+        const { db } = await import('@/firebase');
+        const { auth } = await import('@/firebase');
+        
+        for (const factObj of extractedFacts) {
+          await addDoc(collection(db, 'knowledge_graph'), {
+            topic: factObj.topic,
+            fact: factObj.fact,
+            source: "voice_agent_conversation",
+            createdAt: new Date().toISOString(),
+            userId: auth.currentUser?.uid || "anonymous"
+          });
+        }
+        console.log(`Extracted and saved ${extractedFacts.length} facts to the knowledge graph.`);
+      }
+    } catch (err) {
+      console.error("Failed to extract knowledge from transcript:", err);
+    }
   };
 
   const playAudio = (base64: string) => {
@@ -108,6 +183,9 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
     try {
       setIsConnecting(true);
       setError(null);
+      transcriptRef.current = []; // Reset transcript for new session
+
+      await fetchKnowledgeGraph();
 
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
       if (!apiKey) {
@@ -116,6 +194,11 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
 
       const ai = new GoogleGenAI({ apiKey });
 
+      const baseInstruction = "You are an Auspexi Sales & Support Representative. Your job is to answer questions about GEO (Generative Engine Optimization) and help onboard users. Auspexi helps brands master visibility in AI search (like ChatGPT, Gemini, Perplexity). Be concise, conversational, and friendly. Do not use markdown or long lists since this is a voice conversation. If the user shows interest in our services, ask for their name and email address so our team can follow up. Once you have their name, email, and understand what they are looking for, call the 'sendCallLog' tool to send this information to the team. If they ask about pricing, features, or want to read the blog, you can use the navigateToPage tool to take them there.";
+      const systemInstruction = knowledgeGraphRef.current 
+        ? `${baseInstruction}\n\n${knowledgeGraphRef.current}`
+        : baseInstruction;
+
       const sessionPromise = ai.live.connect({
         model: "gemini-2.5-flash-native-audio-preview-12-2025",
         config: {
@@ -123,22 +206,48 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: "Zephyr" } },
           },
-          systemInstruction: "You are an Auspexi Sales & Support Representative. Your job is to answer questions about GEO (Generative Engine Optimization) and help onboard users. Auspexi helps brands master visibility in AI search (like ChatGPT, Gemini, Perplexity). Be concise, conversational, and friendly. Do not use markdown or long lists since this is a voice conversation. At the end of the conversation, ask the user how you performed. If they give you a good review, tell them that Auspexi also builds custom Voice Agents just like you, and offer to help them set one up. If they are interested in voice agents, use the navigateToPage tool to take them to the 'voice-agents' page. If they ask about pricing, features, or want to read the blog, you can use the navigateToPage tool to take them there.",
+          systemInstruction: systemInstruction,
+          inputAudioTranscription: {},
+          outputAudioTranscription: {},
           tools: [{
-            functionDeclarations: [{
-              name: "navigateToPage",
-              description: "Navigates the user's browser to a specific page on the Auspexi website.",
-              parameters: {
-                type: Type.OBJECT,
-                properties: {
-                  page: {
-                    type: Type.STRING,
-                    description: "The page to navigate to. Allowed values: 'pricing', 'features', 'blog', 'faq', 'home', 'voice-agents', 'about'"
-                  }
-                },
-                required: ["page"]
+            functionDeclarations: [
+              {
+                name: "navigateToPage",
+                description: "Navigates the user's browser to a specific page on the Auspexi website.",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: {
+                    page: {
+                      type: Type.STRING,
+                      description: "The page to navigate to. Allowed values: 'pricing', 'features', 'blog', 'faq', 'home', 'voice-agents', 'about'"
+                    }
+                  },
+                  required: ["page"]
+                }
+              },
+              {
+                name: "sendCallLog",
+                description: "Sends a summary of the conversation and the user's contact information to the Auspexi team for follow-up.",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: {
+                    name: {
+                      type: Type.STRING,
+                      description: "The user's name."
+                    },
+                    email: {
+                      type: Type.STRING,
+                      description: "The user's email address."
+                    },
+                    summary: {
+                      type: Type.STRING,
+                      description: "A detailed summary of the conversation, what the user is looking for, and any specific questions they had."
+                    }
+                  },
+                  required: ["name", "summary"]
+                }
               }
-            }]
+            ]
           }]
         },
         callbacks: {
@@ -222,7 +331,56 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
                       }]
                     });
                   });
+                } else if (call.name === "sendCallLog") {
+                  const { name, email, summary } = call.args as any;
+                  
+                  fetch('/api/send-call-log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, summary })
+                  }).then(res => res.json()).then(data => {
+                    sessionPromise.then((session) => {
+                      session.sendToolResponse({
+                        functionResponses: [{
+                          id: call.id,
+                          name: call.name,
+                          response: { result: data.success ? "Call log sent successfully. You can let the user know." : "Failed to send call log." }
+                        }]
+                      });
+                    });
+                  }).catch(err => {
+                    console.error("Failed to send call log:", err);
+                    sessionPromise.then((session) => {
+                      session.sendToolResponse({
+                        functionResponses: [{
+                          id: call.id,
+                          name: call.name,
+                          response: { result: "Failed to send call log due to a network error." }
+                        }]
+                      });
+                    });
+                  });
                 }
+              }
+            }
+
+            const inputTranscription = message.serverContent?.inputTranscription?.text;
+            if (inputTranscription) {
+              const last = transcriptRef.current[transcriptRef.current.length - 1];
+              if (last && last.role === "user") {
+                last.text += " " + inputTranscription;
+              } else {
+                transcriptRef.current.push({ role: "user", text: inputTranscription });
+              }
+            }
+
+            const outputTranscription = message.serverContent?.outputTranscription?.text;
+            if (outputTranscription) {
+              const last = transcriptRef.current[transcriptRef.current.length - 1];
+              if (last && last.role === "agent") {
+                last.text += " " + outputTranscription;
+              } else {
+                transcriptRef.current.push({ role: "agent", text: outputTranscription });
               }
             }
 
@@ -252,6 +410,11 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
   };
 
   const disconnect = () => {
+    if (transcriptRef.current.length > 0) {
+      processTranscriptAndExtractKnowledge([...transcriptRef.current]);
+      transcriptRef.current = [];
+    }
+
     if (sessionRef.current) {
       sessionRef.current.close();
       sessionRef.current = null;
