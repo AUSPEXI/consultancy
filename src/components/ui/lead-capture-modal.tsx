@@ -60,7 +60,7 @@ export function LeadCaptureModal({ isOpen, onClose, source, initialEmail = '', i
       }
     } catch (err: any) {
       console.error('Error generating report:', err);
-      setError('Something went wrong. Please try again.');
+      setError(err.message || 'Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

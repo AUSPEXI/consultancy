@@ -28,7 +28,7 @@ function getStripe(): Stripe {
 let exaClient: Exa | null = null;
 function getExa(): Exa {
   if (!exaClient) {
-    const key = process.env.EXA_API_KEY;
+    const key = process.env.EXA_API_KEY || process.env.VITE_EXA_API_KEY;
     if (!key) {
       throw new Error('EXA_API_KEY environment variable is required');
     }
@@ -40,7 +40,7 @@ function getExa(): Exa {
 let geminiClient: GoogleGenAI | null = null;
 function getGemini(): GoogleGenAI {
   if (!geminiClient) {
-    const key = process.env.GEMINI_API_KEY;
+    const key = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
     if (!key) {
       throw new Error('GEMINI_API_KEY environment variable is required');
     }
