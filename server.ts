@@ -314,82 +314,43 @@ Format the output in clean Markdown.
           });
           console.log(`Report emailed successfully to ${email}`);
 
-          // Email 2: Countdown Reminder (Simulated delay of 1 minute for demo purposes)
-          // In a production environment, this would be handled by a cron job or a service like Resend/SendGrid drip campaigns.
-          setTimeout(async () => {
-            const email2Html = `
-<div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background-color: #09090b; color: #fafafa; border-radius: 8px; overflow: hidden; border: 1px solid #27272a;">
-  <div style="padding: 32px; text-align: center; border-bottom: 1px solid #27272a; background: linear-gradient(to right, #18181b, #09090b);">
-    <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.05em; color: #ffffff;">Auspexi</h1>
-  </div>
-  <div style="padding: 32px; background-color: #09090b;">
-    <h2 style="margin-top: 0; font-size: 20px; color: #fbbf24;">⏳ 48 Hours Left: Lock in your Lifetime Discount</h2>
-    <p style="color: #d4d4d8; line-height: 1.6;">Hi there,</p>
-    <p style="color: #d4d4d8; line-height: 1.6;">We hope you found the GEO report for <strong>${domain}</strong> valuable. The AI search landscape is shifting rapidly, and early adopters are capturing the lion's share of AI Share of Voice (SOV).</p>
-    <p style="color: #d4d4d8; line-height: 1.6;">As a thank you for trying our free report, we're offering you a <strong>frozen lifetime discount</strong> on our Premium tier. This offer expires in 48 hours.</p>
-    
-    <div style="background-color: #18181b; padding: 24px; border-radius: 6px; margin: 24px 0; border: 1px solid #27272a; text-align: center;">
-      <h3 style="margin-top: 0; color: #fafafa;">The Pipeline Offer</h3>
-      <p style="color: #a1a1aa; margin-bottom: 24px;">Full access to all Auspexi tools, forever.</p>
-      <a href="${appUrl}/#pricing" style="display: inline-block; background-color: #fbbf24; color: #09090b; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px;">Claim Your Lifetime Deal</a>
-    </div>
-  </div>
-  <div style="padding: 24px; text-align: center; border-top: 1px solid #27272a; color: #71717a; font-size: 12px;">
-    © 2026 Auspexi. All rights reserved.
-  </div>
-</div>`;
+          // Add to HubSpot CRM
+          const hubspotToken = process.env.HUBSPOT_ACCESS_TOKEN || process.env.VITE_HUBSPOT_ACCESS_TOKEN;
+          if (hubspotToken) {
             try {
-              await transporter.sendMail({
-                from: `"Auspexi" <${emailUser}>`,
-                to: email,
-                subject: `⏳ 48 Hours Left: Lock in your Lifetime Discount`,
-                html: email2Html,
+              const hsResponse = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${hubspotToken}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  properties: {
+                    email: email,
+                    website: domain,
+                    lifecyclestage: 'lead',
+                    hs_lead_status: 'NEW'
+                  }
+                })
               });
-              console.log(`Email 2 (Countdown) sent to ${email}`);
-            } catch (e) {
-              console.error("Failed to send Email 2:", e);
+              
+              if (hsResponse.ok) {
+                console.log(`Successfully added ${email} to HubSpot`);
+              } else {
+                const hsError = await hsResponse.json();
+                // If contact already exists, HubSpot returns a 409. We can ignore it or update it, but logging is fine for now.
+                if (hsResponse.status === 409) {
+                  console.log(`Contact ${email} already exists in HubSpot.`);
+                } else {
+                  console.error('HubSpot API Error:', hsError);
+                }
+              }
+            } catch (hsError) {
+              console.error('Error adding to HubSpot:', hsError);
             }
-          }, 60 * 1000); // 1 minute delay
-
-          // Email 3: Final Attempt + Bonus (Simulated delay of 2 minutes for demo purposes)
-          setTimeout(async () => {
-            const email3Html = `
-<div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background-color: #09090b; color: #fafafa; border-radius: 8px; overflow: hidden; border: 1px solid #27272a;">
-  <div style="padding: 32px; text-align: center; border-bottom: 1px solid #27272a; background: linear-gradient(to right, #18181b, #09090b);">
-    <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.05em; color: #ffffff;">Auspexi</h1>
-  </div>
-  <div style="padding: 32px; background-color: #09090b;">
-    <h2 style="margin-top: 0; font-size: 20px; color: #ef4444;">Final Notice + Exclusive Bonus 🎁</h2>
-    <p style="color: #d4d4d8; line-height: 1.6;">Hi there,</p>
-    <p style="color: #d4d4d8; line-height: 1.6;">This is your last chance to grab the Auspexi lifetime deal for <strong>${domain}</strong>. After today, the price goes back to normal.</p>
-    <p style="color: #d4d4d8; line-height: 1.6;">To make this an absolute no-brainer, if you sign up today, we're including a <strong>Free Custom Voice Agent Setup</strong> (a $999 value).</p>
-    
-    <ul style="color: #d4d4d8; line-height: 1.6; padding-left: 20px;">
-      <li style="margin-bottom: 8px;">Lifetime frozen pricing</li>
-      <li style="margin-bottom: 8px;">Full access to Cite-Magnet Injections & Fact-Vault</li>
-      <li style="margin-bottom: 8px;"><strong>BONUS:</strong> Custom AI Voice Agent trained on your domain</li>
-    </ul>
-
-    <div style="text-align: center; margin-top: 32px;">
-      <a href="${appUrl}/#pricing" style="display: inline-block; background-color: #fafafa; color: #09090b; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 16px;">Secure Your Deal & Bonus</a>
-    </div>
-  </div>
-  <div style="padding: 24px; text-align: center; border-top: 1px solid #27272a; color: #71717a; font-size: 12px;">
-    © 2026 Auspexi. All rights reserved.
-  </div>
-</div>`;
-            try {
-              await transporter.sendMail({
-                from: `"Auspexi" <${emailUser}>`,
-                to: email,
-                subject: `Final Notice + Bonus: Free Voice Agent Setup`,
-                html: email3Html,
-              });
-              console.log(`Email 3 (Final Offer) sent to ${email}`);
-            } catch (e) {
-              console.error("Failed to send Email 3:", e);
-            }
-          }, 2 * 60 * 1000); // 2 minutes delay
+          } else {
+            console.log('No HUBSPOT_ACCESS_TOKEN found, skipping CRM sync.');
+          }
 
         } else {
           console.log('Email credentials not configured. Skipping email send.');
