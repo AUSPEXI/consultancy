@@ -265,34 +265,27 @@ Format the output in clean Markdown.
       });
 
       const reportMarkdown = response.text || "";
-      
-      // Send the response back to the client IMMEDIATELY so Netlify doesn't time out (504)
-      res.json({ success: true, report: reportMarkdown });
+      const reportHtml = await marked.parse(reportMarkdown);
+      const appUrl = process.env.APP_URL || `http://localhost:${PORT}`;
 
-      // Run the email and HubSpot sync in the background asynchronously
-      // Note: In some strict serverless environments, background tasks might be killed after the response is sent.
-      // However, Netlify functions often allow a few extra seconds of execution if the event loop isn't empty.
-      (async () => {
-        try {
-          const reportHtml = await marked.parse(reportMarkdown);
-          const appUrl = process.env.APP_URL || `http://localhost:${PORT}`;
+      const emailUser = process.env.EMAIL_USER;
+      const emailPass = process.env.EMAIL_APP_PASSWORD;
+      const hubspotToken = process.env.HUBSPOT_ACCESS_TOKEN || process.env.VITE_HUBSPOT_ACCESS_TOKEN;
 
-          const emailUser = process.env.EMAIL_USER;
-          const emailPass = process.env.EMAIL_APP_PASSWORD;
+      // Prepare Email Promise
+      const sendEmailPromise = (async () => {
+        if (emailUser && emailPass) {
+          const transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            auth: {
+              user: emailUser,
+              pass: emailPass,
+            },
+          });
 
-          if (emailUser && emailPass) {
-            const transporter = nodemailer.createTransport({
-              host: 'smtp.gmail.com',
-              port: 465,
-              secure: true,
-              auth: {
-                user: emailUser,
-                pass: emailPass,
-              },
-            });
-
-            // Email 1: The Report
-            const email1Html = `
+          const email1Html = `
 <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background-color: #09090b; color: #fafafa; border-radius: 8px; overflow: hidden; border: 1px solid #27272a;">
   <div style="padding: 32px; text-align: center; border-bottom: 1px solid #27272a; background: linear-gradient(to right, #18181b, #09090b);">
     <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.05em; color: #ffffff;">Auspexi</h1>
@@ -313,58 +306,59 @@ Format the output in clean Markdown.
   </div>
 </div>`;
 
-            await transporter.sendMail({
-              from: `"Auspexi" <${emailUser}>`,
-              to: email,
-              subject: `Your GEO Visibility Report for ${domain}`,
-              html: email1Html,
-            });
-            console.log(`Report emailed successfully to ${email}`);
-
-            // Add to HubSpot CRM
-            const hubspotToken = process.env.HUBSPOT_ACCESS_TOKEN || process.env.VITE_HUBSPOT_ACCESS_TOKEN;
-            if (hubspotToken) {
-              try {
-                const hsResponse = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
-                  method: 'POST',
-                  headers: {
-                    'Authorization': `Bearer ${hubspotToken}`,
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({
-                    properties: {
-                      email: email,
-                      website: domain,
-                      lifecyclestage: 'lead',
-                      hs_lead_status: 'NEW'
-                    }
-                  })
-                });
-                
-                if (hsResponse.ok) {
-                  console.log(`Successfully added ${email} to HubSpot`);
-                } else {
-                  const hsError = await hsResponse.json();
-                  if (hsResponse.status === 409) {
-                    console.log(`Contact ${email} already exists in HubSpot.`);
-                  } else {
-                    console.error('HubSpot API Error:', hsError);
-                  }
-                }
-              } catch (hsError) {
-                console.error('Error adding to HubSpot:', hsError);
-              }
-            } else {
-              console.log('No HUBSPOT_ACCESS_TOKEN found, skipping CRM sync.');
-            }
-
-          } else {
-            console.log('Email credentials not configured. Skipping email send.');
-          }
-        } catch (backgroundErr) {
-          console.error('Background processing failed:', backgroundErr);
+          await transporter.sendMail({
+            from: `"Auspexi" <${emailUser}>`,
+            to: email,
+            subject: `Your GEO Visibility Report for ${domain}`,
+            html: email1Html,
+          });
+          console.log(`Report emailed successfully to ${email}`);
+        } else {
+          console.log('Email credentials not configured. Skipping email send.');
         }
       })();
+
+      // Prepare HubSpot Promise
+      const syncHubspotPromise = (async () => {
+        if (hubspotToken) {
+          const hsResponse = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${hubspotToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              properties: {
+                email: email,
+                website: domain,
+                lifecyclestage: 'lead',
+                hs_lead_status: 'NEW'
+              }
+            })
+          });
+          
+          if (hsResponse.ok) {
+            console.log(`Successfully added ${email} to HubSpot`);
+          } else {
+            const hsError = await hsResponse.json();
+            if (hsResponse.status === 409) {
+              console.log(`Contact ${email} already exists in HubSpot.`);
+            } else {
+              console.error('HubSpot API Error:', hsError);
+            }
+          }
+        } else {
+          console.log('No HUBSPOT_ACCESS_TOKEN found, skipping CRM sync.');
+        }
+      })();
+
+      // Run both email sending and HubSpot sync concurrently to save time,
+      // and wait for them to finish before returning the response.
+      // This prevents Netlify from killing the function prematurely.
+      await Promise.allSettled([sendEmailPromise, syncHubspotPromise]);
+
+      // Send the final response to the client
+      res.json({ success: true, report: reportMarkdown });
 
     } catch (error: any) {
       console.error("Error generating report:", error);
