@@ -259,10 +259,20 @@ Tone: Professional, data-driven, and consultative. Use terms like "Cite-Magnet,"
 Format the output in clean Markdown.
 `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: prompt,
-      });
+      let response;
+      try {
+        response = await ai.models.generateContent({
+          model: "gemini-3-flash-preview",
+          contents: prompt,
+        });
+      } catch (geminiError: any) {
+        console.warn("Primary Gemini model failed, trying fallback:", geminiError.message);
+        // Fallback to a highly available model if the preview model is experiencing high demand (503)
+        response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: prompt,
+        });
+      }
 
       const reportMarkdown = response.text || "";
       const reportHtml = await marked.parse(reportMarkdown);
