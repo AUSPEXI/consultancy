@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Link, useLocation } from 'react-router-dom';
 import { blogPosts } from '@/data/blogPosts';
+import { cn } from '@/lib/utils';
 
 export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
   const { user } = useAuth();
@@ -25,6 +26,19 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalSource, setModalSource] = useState('trial');
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [currency, setCurrency] = useState<'GBP' | 'USD'>('GBP');
+
+  useEffect(() => {
+    // Auto-detect IP for currency
+    fetch('https://ipapi.co/json/')
+      .then(res => res.json())
+      .then(data => {
+        if (data.country_code === 'US') {
+          setCurrency('USD');
+        }
+      })
+      .catch(err => console.error('Error fetching IP data:', err));
+  }, []);
 
   const handleCheckout = async (tier: string) => {
     if (!user) {
@@ -463,15 +477,26 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">Simple, Transparent Pricing</h2>
-            <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
+            <p className="text-zinc-400 max-w-2xl mx-auto text-lg mb-8">
               Invest in your brand's future visibility. Cancel anytime after your first month.
             </p>
+            
+            <div className="flex items-center justify-center gap-3">
+              <span className={cn("text-sm font-medium", currency === 'USD' ? "text-white" : "text-zinc-500")}>USD</span>
+              <button 
+                onClick={() => setCurrency(c => c === 'GBP' ? 'USD' : 'GBP')}
+                className="relative inline-flex h-6 w-11 items-center rounded-full bg-zinc-800 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+              >
+                <span className={cn("inline-block h-4 w-4 transform rounded-full bg-pink-500 transition-transform", currency === 'GBP' ? "translate-x-6" : "translate-x-1")} />
+              </button>
+              <span className={cn("text-sm font-medium", currency === 'GBP' ? "text-white" : "text-zinc-500")}>GBP</span>
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <PricingCard
               tier="Basic"
-              price="$89/mo"
+              price={currency === 'USD' ? "$89/mo" : "£75/mo"}
               bestFor="For startups establishing AI presence"
               CTA="Start Basic"
               onClick={() => handleCheckout('Basic')}
@@ -486,7 +511,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
             />
             <PricingCard
               tier="Medium"
-              price="$1,499/mo"
+              price={currency === 'USD' ? "$1,499/mo" : "£1,199/mo"}
               bestFor="For growing brands dominating niches"
               CTA="Start Medium"
               onClick={() => handleCheckout('Medium')}
@@ -501,7 +526,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
             />
             <PricingCard
               tier="Premium"
-              price="$4,999/mo"
+              price={currency === 'USD' ? "$4,999/mo" : "£3,999/mo"}
               bestFor="For enterprise market leaders"
               CTA="Talk to AI Sales"
               onClick={() => window.location.href = '/voice-agents'}

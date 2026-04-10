@@ -342,7 +342,8 @@ Format the output in clean Markdown.
                 email: email,
                 website: domain,
                 lifecyclestage: 'lead',
-                hs_lead_status: 'NEW'
+                hs_lead_status: 'NEW',
+                geo_report_sent: 'true'
               }
             })
           });

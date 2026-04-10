@@ -10,6 +10,7 @@ import { ContentScorer } from '@/components/views/ContentScorer';
 import { Simulator } from '@/components/views/Simulator';
 import { BrandMonitor } from '@/components/views/BrandMonitor';
 import { AuditLogs } from '@/components/views/AuditLogs';
+import { Copilot } from '@/components/Copilot';
 
 export function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -31,7 +32,7 @@ export function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-zinc-950 text-zinc-50 font-sans overflow-hidden">
+    <div className="flex h-screen bg-zinc-950 text-zinc-50 font-sans overflow-hidden relative">
       <Sidebar 
         activeTab={activeTab} 
         setActiveTab={(tab) => {
@@ -51,6 +52,8 @@ export function Dashboard() {
           </div>
         </main>
       </div>
+
+      <Copilot activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
 }
