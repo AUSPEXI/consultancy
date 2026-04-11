@@ -3,8 +3,19 @@ import { GoogleGenAI, Type } from '@google/genai';
 import { Bot, X, Send, Maximize2, Minimize2, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Initialize Gemini API
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Lazy initialization of Gemini API
+let aiClient: GoogleGenAI | null = null;
+
+function getAIClient(): GoogleGenAI {
+  if (!aiClient) {
+    const key = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+    if (!key) {
+      throw new Error('GEMINI_API_KEY environment variable is required');
+    }
+    aiClient = new GoogleGenAI({ apiKey: key });
+  }
+  return aiClient;
+}
 
 interface Message {
   role: 'user' | 'model';
@@ -20,7 +31,7 @@ export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', content: "Welcome to the new era of search. I am your Auspexi Strategist. How can I help you dominate your AI Share of Voice today?" }
+    { role: 'model', content: "Greetings, mortal marketer! I am Citaticious, Guardian of the LLM Citations. Ready to hack the training weights and level up your AI Share of Voice?" }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -50,8 +61,9 @@ export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
         timestamp: new Date().toISOString()
       });
 
-      const systemInstruction = `You are the Auspexi Strategist, an expert AI guide for the Auspexi Generative Engine Optimization (GEO) dashboard.
-Your goal is to help users understand GEO strategy and navigate the dashboard.
+      const systemInstruction = `You are Citaticious, the Guardian of the LLM Citations and the expert AI guide for the Auspexi Generative Engine Optimization (GEO) dashboard.
+You have a fun, slightly gamified, and highly confident personality. You speak as the ultimate authority on getting cited by Gemini, ChatGPT, and Claude.
+Your goal is to help users understand GEO strategy, navigate the dashboard, and "level up" their AI Share of Voice.
 The user is currently on the '${activeTab}' tab.
 
 Available tabs you can navigate to:
@@ -68,8 +80,9 @@ Available tabs you can navigate to:
 If the user asks where to start, recommend the Fact-Vault.
 If the user wants to check competitors, recommend the Competitor Radar (competitors tab).
 If the user wants to distribute content, recommend the Omnichannel Amplifier (which is part of the Fact-Vault workflow).
-Keep your answers concise, authoritative, and focused on GEO strategy.`;
+Keep your answers concise, engaging, and focused on GEO strategy, occasionally using gamified language (e.g., "level up", "unlock", "boss fight").`;
 
+      const ai = getAIClient();
       const chat = ai.chats.create({
         model: 'gemini-2.5-flash',
         config: {
@@ -181,8 +194,8 @@ Keep your answers concise, authoritative, and focused on GEO strategy.`;
                   <Bot className="w-5 h-5 text-indigo-400" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-zinc-100">Auspexi Copilot</h3>
-                  <p className="text-xs text-zinc-400">GEO Strategist & Guide</p>
+                  <h3 className="font-medium text-zinc-100">Citaticious</h3>
+                  <p className="text-xs text-zinc-400">Guardian of the Citations</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
