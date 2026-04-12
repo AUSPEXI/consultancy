@@ -28,7 +28,7 @@ export function BlogPage() {
                 </div>
                 <div className="p-6 flex flex-col flex-1">
                   <div className="flex items-center gap-3 text-xs font-medium text-zinc-500 mb-3">
-                    <span className="text-indigo-400 bg-indigo-400/10 px-2 py-1 rounded-md">{post.category}</span>
+                    <span className="text-pink-400 bg-pink-400/10 px-2 py-1 rounded-md">{post.category}</span>
                     <span>•</span>
                     <span>{post.date}</span>
                   </div>

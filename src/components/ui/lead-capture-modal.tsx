@@ -131,20 +131,20 @@ export function LeadCaptureModal({ isOpen, onClose, source, initialEmail = '', i
             {/* Report Section */}
             <div className="flex-1 overflow-y-auto max-h-[70vh] pr-4 custom-scrollbar">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-indigo-500/20 rounded-lg flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-indigo-400" />
+                <div className="w-10 h-10 bg-pink-500/20 rounded-lg flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-pink-400" />
                 </div>
                 <h2 className="text-2xl font-bold font-heading text-white">Your GEO Visibility Report</h2>
               </div>
-              <div className="prose prose-invert prose-zinc max-w-none prose-headings:font-heading prose-a:text-indigo-400">
+              <div className="prose prose-invert prose-zinc max-w-none prose-headings:font-heading prose-a:text-pink-400">
                 <Markdown>{report}</Markdown>
               </div>
             </div>
 
             {/* Offer Section */}
             <div className="w-full md:w-80 flex-shrink-0">
-              <div className="sticky top-0 bg-zinc-950 border border-indigo-500/30 rounded-xl p-6 shadow-[0_0_30px_-10px_rgba(99,102,241,0.2)]">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-4">
+              <div className="sticky top-0 bg-zinc-950 border border-pink-500/30 rounded-xl p-6 shadow-[0_0_30px_-10px_rgba(99,102,241,0.2)]">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-pink-500/20 text-pink-300 text-xs font-semibold uppercase tracking-wider mb-4">
                   <Sparkles className="w-3.5 h-3.5" />
                   Exclusive Offer
                 </div>
@@ -165,7 +165,7 @@ export function LeadCaptureModal({ isOpen, onClose, source, initialEmail = '', i
                 <Button 
                   onClick={handlePipelineOffer}
                   disabled={isCheckingOut}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-12 text-base font-medium group"
+                  className="w-full bg-pink-600 hover:bg-pink-700 text-white h-12 text-base font-medium group"
                 >
                   {isCheckingOut ? (
                     <Loader2 className="w-5 h-5 animate-spin" />

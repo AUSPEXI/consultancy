@@ -13,6 +13,10 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase SDK
+console.log("Firebase Config:", {
+  ...firebaseConfig,
+  apiKey: firebaseConfig.apiKey ? "SET" : "MISSING"
+});
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);

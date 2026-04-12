@@ -16,7 +16,7 @@ export function BlogPostPage() {
       <div className="min-h-screen bg-zinc-950 text-zinc-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Post Not Found</h1>
-          <Link to="/blog" className="text-indigo-400 hover:text-indigo-300">Return to Blog</Link>
+          <Link to="/blog" className="text-pink-400 hover:text-pink-300">Return to Blog</Link>
         </div>
       </div>
     );
@@ -35,7 +35,7 @@ export function BlogPostPage() {
           
           <div className="mb-12">
             <div className="flex items-center gap-3 text-sm font-medium text-zinc-500 mb-6">
-              <span className="text-indigo-400 bg-indigo-400/10 px-3 py-1 rounded-md">{post.category}</span>
+              <span className="text-pink-400 bg-pink-400/10 px-3 py-1 rounded-md">{post.category}</span>
               <span>•</span>
               <span>{post.date}</span>
             </div>
@@ -47,7 +47,7 @@ export function BlogPostPage() {
             </div>
           </div>
           
-          <div className="prose prose-invert prose-zinc max-w-none prose-headings:font-heading prose-headings:font-bold prose-a:text-indigo-400 hover:prose-a:text-indigo-300 prose-img:rounded-xl">
+          <div className="prose prose-invert prose-zinc max-w-none prose-headings:font-heading prose-headings:font-bold prose-a:text-pink-400 hover:prose-a:text-pink-300 prose-img:rounded-xl">
             <p className="lead text-xl text-zinc-300 mb-8">
               {post.excerpt}
             </p>
@@ -89,7 +89,7 @@ export function BlogPostPage() {
               <p className="text-zinc-400 mb-6">
                 Start extracting high-entropy facts and tracking your Share of Voice today.
               </p>
-              <Link to="/" className="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+              <Link to="/" className="inline-flex items-center justify-center bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
                 Start Your Free Trial
               </Link>
             </div>

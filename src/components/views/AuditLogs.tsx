@@ -64,7 +64,7 @@ export function AuditLogs() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-indigo-400" />
+            <ShieldCheck className="w-6 h-6 text-pink-400" />
             Advanced Audit Logs
           </h2>
           <p className="text-zinc-400 mt-1">
@@ -105,7 +105,7 @@ export function AuditLogs() {
                       {formatDate(log.timestamp)}
                     </td>
                     <td className="px-6 py-4 text-white font-medium flex items-center gap-2">
-                      <Activity className="w-4 h-4 text-indigo-400" />
+                      <Activity className="w-4 h-4 text-pink-400" />
                       {log.action}
                     </td>
                     <td className="px-6 py-4 text-zinc-400">

@@ -4,7 +4,7 @@
  */
 
 import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { LandingPage } from '@/components/views/LandingPage';
 import { Dashboard } from '@/components/views/Dashboard';
 import { BlogPage } from '@/components/views/BlogPage';
@@ -23,8 +23,9 @@ import { ScrollToTop } from '@/components/ScrollToTop';
 import { FloatingVoiceButton } from '@/components/ui/floating-voice-button';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 
-export default function App() {
+function AppContent() {
   const { user, loading, signInWithGoogle } = useAuth();
+  const location = useLocation();
 
   useEffect(() => {
     const handleStripeRedirect = async () => {
@@ -57,29 +58,37 @@ export default function App() {
   if (loading) {
     return (
       <div className="flex h-screen bg-zinc-950 items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-pink-500"></div>
       </div>
     );
   }
 
+  const isDashboard = location.pathname.startsWith('/dashboard');
+
+  return (
+    <VoiceAgentProvider>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={!user ? <LandingPage onLoginClick={signInWithGoogle} /> : <Navigate to="/dashboard" />} />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/blog/:slug" element={<BlogPostPage />} />
+        <Route path="/faq" element={<FAQPage />} />
+        <Route path="/resources" element={<ResourcesPage />} />
+        <Route path="/voice-agents" element={<VoiceAgentsPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/terms" element={<TermsOfServicePage />} />
+        <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/" />} />
+      </Routes>
+      {!isDashboard && <FloatingVoiceButton />}
+    </VoiceAgentProvider>
+  );
+}
+
+export default function App() {
   return (
     <Router>
-      <VoiceAgentProvider>
-        <ScrollToTop />
-        <Routes>
-          <Route path="/" element={!user ? <LandingPage onLoginClick={signInWithGoogle} /> : <Navigate to="/dashboard" />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/blog/:slug" element={<BlogPostPage />} />
-          <Route path="/faq" element={<FAQPage />} />
-          <Route path="/resources" element={<ResourcesPage />} />
-          <Route path="/voice-agents" element={<VoiceAgentsPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/privacy" element={<PrivacyPolicyPage />} />
-          <Route path="/terms" element={<TermsOfServicePage />} />
-          <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/" />} />
-        </Routes>
-        <FloatingVoiceButton />
-      </VoiceAgentProvider>
+      <AppContent />
     </Router>
   );
 }

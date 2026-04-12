@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useRef, useEffect, ReactNode } from 'react';
 import { GoogleGenAI, LiveServerMessage, Modality, Type } from "@google/genai";
 import { useNavigate } from 'react-router-dom';
+import { collection, getDocs, query, orderBy, limit, addDoc } from 'firebase/firestore';
+import { db, auth } from '@/firebase';
 
 // Base64 to Int16Array
 function base64ToInt16Array(base64: string) {
@@ -79,8 +81,6 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
 
   const fetchKnowledgeGraph = async () => {
     try {
-      const { collection, getDocs, query, orderBy, limit } = await import('firebase/firestore');
-      const { db } = await import('@/firebase');
       const q = query(collection(db, 'knowledge_graph'), orderBy('createdAt', 'desc'), limit(50));
       const snapshot = await getDocs(q);
       const facts = snapshot.docs.map(doc => doc.data().fact);
@@ -130,10 +130,6 @@ ${conversationText}`,
       const extractedFacts = JSON.parse(response.text || "[]");
       
       if (extractedFacts.length > 0) {
-        const { collection, addDoc } = await import('firebase/firestore');
-        const { db } = await import('@/firebase');
-        const { auth } = await import('@/firebase');
-        
         for (const factObj of extractedFacts) {
           await addDoc(collection(db, 'knowledge_graph'), {
             topic: factObj.topic,

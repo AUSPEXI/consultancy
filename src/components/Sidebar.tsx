@@ -65,7 +65,7 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
       )}>
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white">
+            <div className="w-8 h-8 rounded-lg bg-pink-600 flex items-center justify-center font-bold text-white">
               A
             </div>
             <span className="text-xl font-semibold text-white tracking-tight">Auspexi</span>

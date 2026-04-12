@@ -298,8 +298,8 @@ export default {
                     {workerScript}
                   </pre>
                 </div>
-                <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg">
-                  <p className="text-xs text-indigo-300">
+                <div className="mt-4 p-3 bg-pink-500/10 border border-pink-500/20 rounded-lg">
+                  <p className="text-xs text-pink-300">
                     <strong>Next Steps:</strong> Go to your Cloudflare Dashboard, create a new Worker, paste this code, and deploy. Your site will now inject GEO Schema directly at the edge!
                   </p>
                 </div>
@@ -312,7 +312,7 @@ export default {
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden relative">
           <div className="p-6 border-b border-zinc-800">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
+              <div className="p-2 bg-pink-500/10 rounded-lg text-pink-400">
                 <Code className="w-5 h-5" />
               </div>
               <h3 className="text-base font-semibold text-white">The "Table-Maker" Module</h3>
@@ -327,13 +327,13 @@ export default {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Paste a dense paragraph here (e.g., 'Our basic plan costs $49 and includes 10 audits. The pro plan is $99 for 50 audits...')"
-              className="w-full h-32 bg-zinc-950 border border-zinc-800 rounded-lg p-4 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none text-sm"
+              className="w-full h-32 bg-zinc-950 border border-zinc-800 rounded-lg p-4 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50 resize-none text-sm"
             />
             
             <button 
               onClick={handleRestructure}
               disabled={isProcessing || !inputText.trim()}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
             >
               {isProcessing ? (
                 <>
@@ -370,7 +370,7 @@ export default {
                       navigator.clipboard.writeText(result.table);
                       alert('HTML copied to clipboard!');
                     }}
-                    className="text-xs font-medium text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+                    className="text-xs font-medium text-pink-400 hover:text-pink-300 flex items-center gap-1"
                   >
                     Copy HTML Code <ArrowRight className="w-3 h-3" />
                   </button>

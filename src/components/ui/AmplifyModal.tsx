@@ -129,7 +129,7 @@ export const AmplifyModal: React.FC<AmplifyModalProps> = ({ fact, onClose }) => 
         <div className="flex-1 overflow-y-auto p-6">
           {isGenerating ? (
             <div className="flex flex-col items-center justify-center h-64 space-y-4">
-              <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+              <Loader2 className="w-8 h-8 text-pink-500 animate-spin" />
               <p className="text-zinc-400 animate-pulse">Generating platform-optimized content...</p>
             </div>
           ) : error ? (

@@ -95,7 +95,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       Icon: Search,
       name: "Zero-Click Dominance",
       description: "Ensure your brand is the definitive answer when users query AI, completely bypassing the traditional SERP. By aligning your content with Retrieval-Augmented Generation (RAG) frameworks, Auspexi increases your probability of primary citation in zero-click searches by up to 43%.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-indigo-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:row-start-1 lg:row-end-4 lg:col-start-2 lg:col-end-3",
     },
     {
@@ -574,7 +574,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
                   <img src={post.image} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                 </div>
                 <div className="flex items-center gap-3 text-xs font-medium text-zinc-500 mb-2">
-                  <span className="text-indigo-400 bg-indigo-400/10 px-2 py-1 rounded-md">{post.category}</span>
+                  <span className="text-pink-400 bg-pink-400/10 px-2 py-1 rounded-md">{post.category}</span>
                   <span>•</span>
                   <span>{post.date}</span>
                 </div>
