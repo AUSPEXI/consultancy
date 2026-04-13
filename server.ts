@@ -202,6 +202,86 @@ app.use(express.json());
     }
   });
 
+  app.post("/api/run-daily-audit", async (req, res) => {
+    try {
+      const { userId, brand, domain, competitors, keywords } = req.body;
+      if (!userId || !brand || !domain || !keywords || keywords.length === 0) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const exa = getExa();
+      const ai = getGemini();
+
+      // 1. Search Exa for the keywords
+      let combinedContext = "";
+      for (const keyword of keywords.slice(0, 3)) { // Limit to 3 keywords to save time/tokens
+        const searchResult = await exa.searchAndContents(keyword, {
+          type: "neural",
+          useAutoprompt: true,
+          numResults: 5,
+          text: true
+        });
+        combinedContext += `\n\n--- Results for keyword: ${keyword} ---\n`;
+        combinedContext += searchResult.results.map(r => r.text).join("\n\n").substring(0, 5000);
+      }
+
+      // 2. Ask Gemini to calculate SOV based on the context
+      const prompt = `
+You are an expert Generative Engine Optimization (GEO) analyst.
+Analyze the following search results for the target keywords.
+Calculate the "Share of Voice" (SOV) percentage for the primary brand and its competitors.
+The SOV is the percentage of positive or neutral mentions/recommendations out of all brand mentions.
+
+Primary Brand: ${brand}
+Domain: ${domain}
+Competitors: ${competitors.join(", ")}
+
+Search Context:
+${combinedContext.substring(0, 30000)}
+
+Return ONLY a JSON object with the following keys (ensure they add up to 100 or less if there's 'other' noise):
+- 'brand': integer percentage for ${brand}
+- 'compA': integer percentage for ${competitors[0] || 'Competitor A'}
+- 'compB': integer percentage for ${competitors[1] || 'Competitor B'}
+- 'aiCitations': integer count of how many times the primary brand was explicitly cited in the context.
+`;
+
+      let response;
+      try {
+        response = await ai.models.generateContent({
+          model: "gemini-3.1-pro-preview",
+          contents: prompt,
+          config: { responseMimeType: "application/json" }
+        });
+      } catch (geminiError: any) {
+        console.warn("Primary Gemini model failed, trying fallback:", geminiError.message);
+        response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: prompt,
+          config: { responseMimeType: "application/json" }
+        });
+      }
+
+      const rawOutput = response.text || "{}";
+      const parsedData = JSON.parse(rawOutput);
+
+      res.json({ 
+        success: true, 
+        metrics: {
+          brand: parsedData.brand || 0,
+          compA: parsedData.compA || 0,
+          compB: parsedData.compB || 0,
+          aiCitations: parsedData.aiCitations || 0,
+          directTraffic: Math.floor(Math.random() * 500) + 100 // Simulated direct traffic for now
+        }
+      });
+
+    } catch (error: any) {
+      console.error("Error running daily audit:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.post("/api/generate-report", async (req, res) => {
     try {
       const { domain, email } = req.body;

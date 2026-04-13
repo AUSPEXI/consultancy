@@ -10,7 +10,7 @@ import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
 
 export function Overview() {
-  const { user, tier } = useAuth();
+  const { user, tier, userData } = useAuth();
   const [metrics, setMetrics] = useState<any[]>([]);
   const [isAuditing, setIsAuditing] = useState(false);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
@@ -59,36 +59,62 @@ export function Overview() {
     if (!user) return;
     setIsAuditing(true);
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-      if (!apiKey) throw new Error("API key is missing");
-      
-      // Simulate Gemini analyzing current SOV
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const lastDate = metrics.length > 0 ? new Date(metrics[metrics.length - 1].date) : new Date();
-      if (metrics.length > 0) {
-        lastDate.setDate(lastDate.getDate() + 1);
-      }
-      
-      const dateStr = lastDate.toISOString().split('T')[0];
-      const shortDate = lastDate.toLocaleDateString('en-US', { weekday: 'short' });
+      if (userData?.brand && userData?.domain && userData?.keywords && userData.keywords.length > 0) {
+        // Run real audit
+        const response = await fetch('/api/run-daily-audit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user.uid,
+            brand: userData.brand,
+            domain: userData.domain,
+            competitors: userData.competitors || [],
+            keywords: userData.keywords
+          })
+        });
+        
+        const data = await response.json();
+        if (data.success && data.metrics) {
+          const today = new Date();
+          await addDoc(collection(db, 'sovMetrics'), {
+            userId: user.uid,
+            date: today.toISOString().split('T')[0],
+            shortDate: today.toLocaleDateString('en-US', { weekday: 'short' }),
+            ...data.metrics
+          });
+          await logAuditAction(user.uid, 'Ran Real SOV Audit', { date: today.toISOString().split('T')[0] });
+        } else {
+          throw new Error(data.error || 'Failed to run audit');
+        }
+      } else {
+        // Fallback to simulated audit if onboarding data is missing
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        const lastDate = metrics.length > 0 ? new Date(metrics[metrics.length - 1].date) : new Date();
+        if (metrics.length > 0) {
+          lastDate.setDate(lastDate.getDate() + 1);
+        }
+        
+        const dateStr = lastDate.toISOString().split('T')[0];
+        const shortDate = lastDate.toLocaleDateString('en-US', { weekday: 'short' });
 
-      const prevBrand = metrics.length > 0 ? metrics[metrics.length - 1].brand : 12;
-      const prevCompA = metrics.length > 0 ? metrics[metrics.length - 1].compA : 45;
-      const prevCompB = metrics.length > 0 ? metrics[metrics.length - 1].compB : 30;
-      const prevDirect = metrics.length > 0 ? metrics[metrics.length - 1].directTraffic : 120;
-      
-      await addDoc(collection(db, 'sovMetrics'), {
-        userId: user.uid,
-        date: dateStr,
-        shortDate: shortDate,
-        brand: Math.min(100, prevBrand + Math.floor(Math.random() * 8) + 2),
-        compA: Math.max(0, prevCompA - Math.floor(Math.random() * 5)),
-        compB: Math.max(0, prevCompB - Math.floor(Math.random() * 5)),
-        directTraffic: prevDirect + Math.floor(Math.random() * 40) + 10,
-        aiCitations: Math.floor(Math.random() * 15) + 5
-      });
-      await logAuditAction(user.uid, 'Ran SOV Audit', { date: dateStr });
+        const prevBrand = metrics.length > 0 ? metrics[metrics.length - 1].brand : 12;
+        const prevCompA = metrics.length > 0 ? metrics[metrics.length - 1].compA : 45;
+        const prevCompB = metrics.length > 0 ? metrics[metrics.length - 1].compB : 30;
+        const prevDirect = metrics.length > 0 ? metrics[metrics.length - 1].directTraffic : 120;
+        
+        await addDoc(collection(db, 'sovMetrics'), {
+          userId: user.uid,
+          date: dateStr,
+          shortDate: shortDate,
+          brand: Math.min(100, prevBrand + Math.floor(Math.random() * 8) + 2),
+          compA: Math.max(0, prevCompA - Math.floor(Math.random() * 5)),
+          compB: Math.max(0, prevCompB - Math.floor(Math.random() * 5)),
+          directTraffic: prevDirect + Math.floor(Math.random() * 40) + 10,
+          aiCitations: Math.floor(Math.random() * 15) + 5
+        });
+        await logAuditAction(user.uid, 'Ran Simulated SOV Audit', { date: dateStr });
+      }
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'sovMetrics');
     } finally {

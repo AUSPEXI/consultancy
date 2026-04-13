@@ -11,10 +11,13 @@ import { Simulator } from '@/components/views/Simulator';
 import { BrandMonitor } from '@/components/views/BrandMonitor';
 import { AuditLogs } from '@/components/views/AuditLogs';
 import { Copilot } from '@/components/Copilot';
+import { OnboardingModal } from '@/components/ui/onboarding-modal';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { userData, loading } = useAuth();
 
   const renderContent = () => {
     switch (activeTab) {
@@ -31,8 +34,16 @@ export function Dashboard() {
     }
   };
 
+  if (loading) {
+    return <div className="flex h-screen bg-zinc-950 items-center justify-center text-zinc-400">Loading...</div>;
+  }
+
   return (
     <div className="flex h-screen bg-zinc-950 text-zinc-50 font-sans overflow-hidden relative">
+      {userData && userData.onboardingCompleted === false && (
+        <OnboardingModal onComplete={() => {}} />
+      )}
+      
       <Sidebar 
         activeTab={activeTab} 
         setActiveTab={(tab) => {

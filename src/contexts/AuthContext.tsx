@@ -6,9 +6,20 @@ import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 
 export type UserTier = 'Free' | 'Basic' | 'Medium' | 'Premium' | 'PipelineOffer';
 
+export interface UserData {
+  tier: UserTier;
+  email?: string | null;
+  onboardingCompleted?: boolean;
+  brand?: string;
+  domain?: string;
+  competitors?: string[];
+  keywords?: string[];
+}
+
 interface AuthContextType {
   user: User | null;
   tier: UserTier;
+  userData: UserData | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
@@ -19,11 +30,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [tier, setTier] = useState<UserTier>('Free');
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const refreshTier = async () => {
-    // No-op: Tier is now managed by onSnapshot
-  };
 
   useEffect(() => {
     let unsubscribeUserDoc: (() => void) | undefined;
@@ -37,8 +45,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           const userDoc = await getDoc(userDocRef);
           if (!userDoc.exists()) {
-            await setDoc(userDocRef, { tier: 'Free', email: currentUser.email });
+            const initialData: UserData = { tier: 'Free', email: currentUser.email, onboardingCompleted: false };
+            await setDoc(userDocRef, initialData);
             setTier('Free');
+            setUserData(initialData);
           }
         } catch (error) {
           handleFirestoreError(error, OperationType.GET, `users/${currentUser.uid}`);
@@ -47,9 +57,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Listen for real-time tier changes
         unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
           if (docSnap.exists()) {
-            setTier(docSnap.data().tier || 'Free');
+            const data = docSnap.data() as UserData;
+            setTier(data.tier || 'Free');
+            setUserData(data);
           } else {
             setTier('Free');
+            setUserData(null);
           }
         }, (error) => {
           handleFirestoreError(error, OperationType.GET, `users/${currentUser.uid}`);
@@ -57,6 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       } else {
         setTier('Free');
+        setUserData(null);
         if (unsubscribeUserDoc) {
           unsubscribeUserDoc();
         }
@@ -73,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, tier, loading, signInWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, tier, userData, loading, signInWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );
