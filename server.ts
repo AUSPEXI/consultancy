@@ -243,6 +243,8 @@ Return ONLY a JSON object with the following keys (ensure they add up to 100 or 
 - 'brand': integer percentage for ${brand}
 - 'compA': integer percentage for ${competitors[0] || 'Competitor A'}
 - 'compB': integer percentage for ${competitors[1] || 'Competitor B'}
+- 'compC': integer percentage for ${competitors[2] || 'Competitor C'}
+- 'compD': integer percentage for ${competitors[3] || 'Competitor D'}
 - 'aiCitations': integer count of how many times the primary brand was explicitly cited in the context.
 `;
 
@@ -271,6 +273,8 @@ Return ONLY a JSON object with the following keys (ensure they add up to 100 or 
           brand: parsedData.brand || 0,
           compA: parsedData.compA || 0,
           compB: parsedData.compB || 0,
+          compC: parsedData.compC || 0,
+          compD: parsedData.compD || 0,
           aiCitations: parsedData.aiCitations || 0,
           directTraffic: Math.floor(Math.random() * 500) + 100 // Simulated direct traffic for now
         }

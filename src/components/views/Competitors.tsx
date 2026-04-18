@@ -70,17 +70,40 @@ export function Competitors() {
       if (!apiKey) {
         throw new Error("API key is missing");
       }
+      
+      let hostname = inputUrl;
+      try {
+        hostname = new URL(inputUrl).hostname;
+      } catch (e) {
+        // Fallback to raw input
+      }
+
+      // 1. Pull real data from the competitor's URL/domain via Exa
+      const exaRes = await fetch('/api/exa-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: `site:${hostname}`, numResults: 3 })
+      });
+      const exaData = await exaRes.json();
+      
+      const contextText = exaData.success && exaData.results.length > 0
+        ? exaData.results.map((r: any) => `Title: ${r.title}\nText: ${r.text}`).join("\n\n")
+        : "No direct scraping data available. Analyze the domain logically based on typical corporate decay patterns.";
+
       const ai = new GoogleGenAI({ apiKey });
 
       const prompt = `
         You are an expert Generative Engine Optimization (GEO) agent.
-        Analyze the competitor at the following URL: ${inputUrl}
+        Analyze the competitor at the following domain: ${hostname}
         
-        Determine if their content is showing signs of "Data Decay" (outdated information, broken links, lack of recent updates).
+        Recent Scraped Context:
+        ${contextText}
+        
+        Determine if their content is showing signs of "Data Decay" (outdated information, lack of detail, generic PR speak).
         Also determine if there is a "Trojan Horse Opportunity" (a gap where we can inject our own high-entropy facts to steal their AI citations).
         
         Return ONLY a JSON object with:
-        - 'name' (string): The name of the competitor or website.
+        - 'name' (string): The name of the competitor.
         - 'decayStatus' (string): Must be one of: "healthy", "decaying", or "stale".
         - 'trojanHorseOpportunity' (boolean): True if there is a gap we can exploit.
       `;
@@ -96,13 +119,6 @@ export function Competitors() {
       const analysis = JSON.parse(response.text || "{}");
       
       if (analysis) {
-        let hostname = inputUrl;
-        try {
-          hostname = new URL(inputUrl).hostname;
-        } catch (e) {
-          // Fallback to raw input if not a valid URL object
-        }
-
         await addDoc(collection(db, 'competitors'), {
           userId: user.uid,
           name: analysis.name || hostname,

@@ -101,6 +101,8 @@ export function Overview() {
         const prevBrand = metrics.length > 0 ? metrics[metrics.length - 1].brand : 12;
         const prevCompA = metrics.length > 0 ? metrics[metrics.length - 1].compA : 45;
         const prevCompB = metrics.length > 0 ? metrics[metrics.length - 1].compB : 30;
+        const prevCompC = metrics.length > 0 ? metrics[metrics.length - 1].compC || 15 : 15;
+        const prevCompD = metrics.length > 0 ? metrics[metrics.length - 1].compD || 10 : 10;
         const prevDirect = metrics.length > 0 ? metrics[metrics.length - 1].directTraffic : 120;
         
         await addDoc(collection(db, 'sovMetrics'), {
@@ -110,6 +112,8 @@ export function Overview() {
           brand: Math.min(100, prevBrand + Math.floor(Math.random() * 8) + 2),
           compA: Math.max(0, prevCompA - Math.floor(Math.random() * 5)),
           compB: Math.max(0, prevCompB - Math.floor(Math.random() * 5)),
+          compC: Math.max(0, prevCompC - Math.floor(Math.random() * 3)),
+          compD: Math.max(0, prevCompD - Math.floor(Math.random() * 2)),
           directTraffic: prevDirect + Math.floor(Math.random() * 40) + 10,
           aiCitations: Math.floor(Math.random() * 15) + 5
         });
@@ -151,11 +155,11 @@ export function Overview() {
   };
 
   const displayData = metrics.length > 0 ? metrics : [
-    { shortDate: 'Mon', brand: 12, compA: 45, compB: 30, directTraffic: 120, aiCitations: 2 },
-    { shortDate: 'Tue', brand: 18, compA: 42, compB: 28, directTraffic: 132, aiCitations: 3 },
-    { shortDate: 'Wed', brand: 25, compA: 38, compB: 25, directTraffic: 250, aiCitations: 12 },
-    { shortDate: 'Thu', brand: 32, compA: 35, compB: 22, directTraffic: 280, aiCitations: 15 },
-    { shortDate: 'Fri', brand: 45, compA: 30, compB: 18, directTraffic: 210, aiCitations: 8 },
+    { shortDate: 'Mon', brand: 12, compA: 45, compB: 30, compC: 15, compD: 10, directTraffic: 120, aiCitations: 2 },
+    { shortDate: 'Tue', brand: 18, compA: 42, compB: 28, compC: 14, compD: 9, directTraffic: 132, aiCitations: 3 },
+    { shortDate: 'Wed', brand: 25, compA: 38, compB: 25, compC: 18, compD: 12, directTraffic: 250, aiCitations: 12 },
+    { shortDate: 'Thu', brand: 32, compA: 35, compB: 22, compC: 16, compD: 8, directTraffic: 280, aiCitations: 15 },
+    { shortDate: 'Fri', brand: 45, compA: 30, compB: 18, compC: 12, compD: 6, directTraffic: 210, aiCitations: 8 },
   ];
 
   const latest = displayData[displayData.length - 1];
@@ -233,8 +237,10 @@ export function Overview() {
                   itemStyle={{ color: '#e4e4e7' }}
                 />
                 <Area type="monotone" dataKey="brand" name="Your Brand" stroke="#6366f1" strokeWidth={2} fillOpacity={1} fill="url(#colorBrand)" />
-                <Area type="monotone" dataKey="compA" name="Competitor A" stroke="#ef4444" strokeWidth={2} fillOpacity={0} fill="transparent" strokeDasharray="4 4" />
-                <Area type="monotone" dataKey="compB" name="Competitor B" stroke="#f59e0b" strokeWidth={2} fillOpacity={0} fill="transparent" strokeDasharray="4 4" />
+                <Area type="monotone" dataKey="compA" name="Competitor 1" stroke="#ef4444" strokeWidth={2} fillOpacity={0} fill="transparent" strokeDasharray="4 4" />
+                <Area type="monotone" dataKey="compB" name="Competitor 2" stroke="#f59e0b" strokeWidth={2} fillOpacity={0} fill="transparent" strokeDasharray="4 4" />
+                <Area type="monotone" dataKey="compC" name="Competitor 3" stroke="#8b5cf6" strokeWidth={2} fillOpacity={0} fill="transparent" strokeDasharray="4 4" />
+                <Area type="monotone" dataKey="compD" name="Competitor 4" stroke="#14b8a6" strokeWidth={2} fillOpacity={0} fill="transparent" strokeDasharray="4 4" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
