@@ -40,7 +40,7 @@ export function Dashboard() {
 
   return (
     <div className="flex h-screen bg-zinc-950 text-zinc-50 font-sans overflow-hidden relative">
-      {userData && userData.onboardingCompleted === false && (
+      {userData && !userData.onboardingCompleted && (
         <OnboardingModal onComplete={() => {}} />
       )}
       

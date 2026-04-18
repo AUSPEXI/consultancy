@@ -59,7 +59,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (docSnap.exists()) {
             const data = docSnap.data() as UserData;
             setTier(data.tier || 'Free');
-            setUserData(data);
+            setUserData({
+              ...data,
+              onboardingCompleted: data.onboardingCompleted ?? false
+            });
           } else {
             setTier('Free');
             setUserData(null);
