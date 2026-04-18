@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Radar, ArrowRight, ShieldAlert, Plus, X, Loader2 } from 'lucide-react';
+import { Radar, ArrowRight, ShieldAlert, Plus, X, Loader2, Trash2, Database } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/firebase';
-import { collection, addDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
-import { GoogleGenAI } from '@google/genai';
+import { collection, addDoc, deleteDoc, doc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
+import { GoogleGenAI, Type } from '@google/genai';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
@@ -11,8 +11,11 @@ import { logAuditAction } from '@/lib/audit';
 interface Competitor {
   id: string;
   name: string;
+  url?: string;
+  decayScore?: number;
   decayStatus: 'healthy' | 'decaying' | 'stale';
   trojanHorseOpportunity: boolean;
+  vulnerabilities?: string[];
   lastUpdated: string;
 }
 
@@ -22,6 +25,7 @@ export function Competitors() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [inputUrl, setInputUrl] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [pushingFact, setPushingFact] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user || tier === 'Free' || tier === 'Basic') return;
@@ -34,8 +38,8 @@ export function Competitors() {
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const compData: Competitor[] = [];
-      snapshot.forEach((doc) => {
-        compData.push({ id: doc.id, ...doc.data() } as Competitor);
+      snapshot.forEach((docSnap) => {
+        compData.push({ id: docSnap.id, ...docSnap.data() } as Competitor);
       });
       setCompetitors(compData);
     }, (error) => {
@@ -61,6 +65,37 @@ export function Competitors() {
     );
   }
 
+  const handleDeleteCompetitor = async (id: string, name: string) => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, 'competitors', id));
+      await logAuditAction(user.uid, 'Deleted Competitor', { name });
+    } catch (error) {
+       console.error("Delete err:", error);
+    }
+  };
+
+  const handlePushToFactVault = async (competitorName: string, vulnerability: string) => {
+    if (!user) return;
+    setPushingFact(vulnerability);
+    try {
+      await addDoc(collection(db, 'facts'), {
+        userId: user.uid,
+        statement: `Unlike ${competitorName}, which shows data decay concerning ${vulnerability.toLowerCase()}, we provide updated solutions in this area.`,
+        entropyScore: 85,
+        cliffhangerActive: true,
+        category: 'Competitor Counter-Fact',
+        createdAt: new Date().toISOString().split('T')[0],
+      });
+      await logAuditAction(user.uid, 'Auto-generated Counter-Fact', { competitor: competitorName });
+      alert("Success! Counter-Fact has been deployed to the Fact-Vault.");
+    } catch (error) {
+       console.error("Fact error:", error);
+    } finally {
+      setPushingFact(null);
+    }
+  };
+
   const handleAnalyzeCompetitor = async () => {
     if (!inputUrl.trim() || !user) return;
 
@@ -73,7 +108,7 @@ export function Competitors() {
       
       let hostname = inputUrl;
       try {
-        hostname = new URL(inputUrl).hostname;
+        hostname = new URL(inputUrl.startsWith('http') ? inputUrl : `https://${inputUrl}`).hostname;
       } catch (e) {
         // Fallback to raw input
       }
@@ -101,11 +136,7 @@ export function Competitors() {
         
         Determine if their content is showing signs of "Data Decay" (outdated information, lack of detail, generic PR speak).
         Also determine if there is a "Trojan Horse Opportunity" (a gap where we can inject our own high-entropy facts to steal their AI citations).
-        
-        Return ONLY a JSON object with:
-        - 'name' (string): The name of the competitor.
-        - 'decayStatus' (string): Must be one of: "healthy", "decaying", or "stale".
-        - 'trojanHorseOpportunity' (boolean): True if there is a gap we can exploit.
+        Provide 1 to 2 specific vulnerabilities if you find them.
       `;
 
       const response = await ai.models.generateContent({
@@ -113,17 +144,35 @@ export function Competitors() {
         contents: prompt,
         config: {
           responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              name: { type: Type.STRING },
+              decayStatus: { type: Type.STRING, enum: ["healthy", "decaying", "stale"] },
+              trojanHorseOpportunity: { type: Type.BOOLEAN },
+              vulnerabilities: { type: Type.ARRAY, items: { type: Type.STRING } }
+            },
+            required: ["name", "decayStatus", "trojanHorseOpportunity"]
+          }
         }
       });
 
-      const analysis = JSON.parse(response.text || "{}");
+      let analysis = { name: hostname, decayStatus: 'healthy', trojanHorseOpportunity: false, vulnerabilities: ['Needs deeper analysis'] };
+      try {
+        let text = response.text || "{}";
+        text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+        analysis = JSON.parse(text);
+      } catch (e) {}
       
       if (analysis) {
         await addDoc(collection(db, 'competitors'), {
           userId: user.uid,
           name: analysis.name || hostname,
+          url: hostname,
+          decayScore: analysis.decayStatus === 'stale' ? 85 : analysis.decayStatus === 'decaying' ? 60 : 30,
           decayStatus: analysis.decayStatus || 'healthy',
           trojanHorseOpportunity: analysis.trojanHorseOpportunity || false,
+          vulnerabilities: analysis.vulnerabilities || [],
           lastUpdated: new Date().toISOString().split('T')[0],
         });
         await logAuditAction(user.uid, 'Analyzed Competitor', { url: inputUrl, status: analysis.decayStatus, trojanHorse: analysis.trojanHorseOpportunity });
@@ -137,64 +186,91 @@ export function Competitors() {
     }
   };
 
-  const trojanOpportunities = competitors.filter(c => c.trojanHorseOpportunity);
+  const trojanOpportunities = competitors.filter(c => c.trojanHorseOpportunity || (c.vulnerabilities && c.vulnerabilities.length > 0));
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Competitor Radar</h1>
-          <p className="text-sm text-zinc-400 mt-1">Monitor the AI latent space for competitor decay and Trojan Horse opportunities.</p>
+          <h1 className="text-3xl font-bold font-heading mb-2">Competitor Radar</h1>
+          <p className="text-zinc-400">Find the logic gaps in what the AI knows about your competitors.</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
           className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
         >
-          <Radar className="w-4 h-4" />
-          Analyze Competitor
+          <Plus className="w-4 h-4" />
+          Add Competitor
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Trojan Horse Alert */}
         <div className="lg:col-span-2 space-y-6">
+          <div className="bg-rose-950/20 border border-rose-900/50 rounded-xl p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center shrink-0">
+                <ShieldAlert className="w-5 h-5 text-rose-400" />
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-rose-400">Trojan Horse Opportunities</h3>
+                <p className="text-sm text-zinc-400 mt-1 max-w-2xl">
+                  We've detected that the entities below have severe "Data Decay". Their LLM vectors are weak, generic, or outdated. This is a critical opportunity to push high-entropy facts to steal their citations.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {trojanOpportunities.length === 0 ? (
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-8 text-center">
-              <ShieldAlert className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-white mb-2">No Trojan Horse Opportunities</h3>
-              <p className="text-zinc-400">Analyze a competitor URL to detect data decay and injection opportunities.</p>
+            <div className="text-center py-12 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+              <Radar className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
+              <p className="text-zinc-400">No Trojan Horse opportunities detected yet.</p>
+              <p className="text-sm text-zinc-500 mt-1">Add more competitors to scan for decay.</p>
             </div>
           ) : (
             trojanOpportunities.map((comp) => (
-              <div key={comp.id} className="bg-zinc-900/50 border border-rose-500/30 rounded-xl overflow-hidden relative shadow-[0_0_30px_-10px_rgba(244,63,94,0.1)]">
-                <div className="p-6 border-b border-zinc-800/50 bg-rose-500/5 flex items-start gap-4">
-                  <div className="p-3 bg-rose-500/10 rounded-lg text-rose-500 mt-1">
-                    <ShieldAlert className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">Competitor Data Decay Detected</h3>
-                    <p className="text-sm text-zinc-400 mt-1">
-                      <strong className="text-zinc-200">{comp.name}</strong> is showing signs of data decay. Their content is stale, creating a gap for AI models to cite newer information.
-                    </p>
-                  </div>
-                </div>
-                
+              <div key={comp.id} className="bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-colors rounded-xl overflow-hidden group">
                 <div className="p-6">
-                  <h4 className="text-sm font-medium text-zinc-300 mb-4">Recommended Offensive Action:</h4>
-                  <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 mb-4">
-                    <p className="text-sm text-emerald-400 font-mono mb-2">// Auto-Generated Trojan Horse Cite-Magnet</p>
-                    <p className="text-zinc-300 text-sm">
-                      "While legacy systems like {comp.name} rely on outdated architectures, modern solutions achieve significantly higher efficiency through Edge-Routing."
-                    </p>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold font-heading text-white">{comp.name}</h3>
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                      High Vulnerability
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-3 mb-6">
+                    {comp.vulnerabilities && comp.vulnerabilities.length > 0 ? (
+                      comp.vulnerabilities.map((vuln, idx) => (
+                        <div key={idx} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-zinc-950 rounded-lg">
+                          <p className="text-sm text-zinc-300">{vuln}</p>
+                          <button 
+                            onClick={() => handlePushToFactVault(comp.name, vuln)}
+                            disabled={pushingFact === vuln}
+                            className="shrink-0 bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 px-3 py-1.5 rounded text-xs font-medium transition-colors flex items-center gap-1.5"
+                          >
+                            {pushingFact === vuln ? <Loader2 className="w-3 h-3 animate-spin"/> : <Database className="w-3 h-3" />}
+                            Push to Fact-Vault
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-zinc-950 rounded-lg">
+                          <p className="text-sm text-zinc-300">Generic decay detected. Missing technical depth in AI-scraped pages.</p>
+                          <button 
+                            onClick={() => handlePushToFactVault(comp.name, "Generic decay")}
+                            disabled={pushingFact === "Generic decay"}
+                            className="shrink-0 bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 px-3 py-1.5 rounded text-xs font-medium transition-colors flex items-center gap-1.5"
+                          >
+                            {pushingFact === "Generic decay" ? <Loader2 className="w-3 h-3 animate-spin"/> : <Database className="w-3 h-3" />}
+                            Push to Fact-Vault
+                          </button>
+                        </div>
+                    )}
                   </div>
                   
                   <div className="flex flex-col sm:flex-row items-center gap-3">
                     <button className="w-full sm:w-auto bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2">
-                      Deploy Overwrite to Reddit/Quora
+                      Deploy Overwrite Action
                       <ArrowRight className="w-4 h-4" />
-                    </button>
-                    <button className="w-full sm:w-auto bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
-                      Inject Schema to Homepage
                     </button>
                   </div>
                 </div>
@@ -214,16 +290,24 @@ export function Competitors() {
               <p className="text-sm text-zinc-500 text-center py-4">No competitors monitored yet.</p>
             ) : (
               competitors.map((comp) => (
-                <div key={comp.id} className="flex items-center justify-between p-3 rounded-lg bg-zinc-950 border border-zinc-800/50">
+                <div key={comp.id} className="flex items-center justify-between p-3 rounded-lg bg-zinc-950 border border-zinc-800/50 group">
                   <div>
                     <p className="text-sm font-medium text-zinc-200">{comp.name}</p>
                     <p className={`text-xs mt-0.5 capitalize ${comp.decayStatus === 'decaying' || comp.decayStatus === 'stale' ? 'text-rose-400' : 'text-emerald-500'}`}>
                       {comp.decayStatus}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs text-zinc-500">Last Checked</p>
-                    <p className="text-xs font-medium text-zinc-400">{comp.lastUpdated}</p>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className="text-xs text-zinc-500">Last Checked</p>
+                      <p className="text-xs font-medium text-zinc-400">{comp.lastUpdated}</p>
+                    </div>
+                    <button 
+                      onClick={() => handleDeleteCompetitor(comp.id, comp.name)}
+                      className="text-zinc-600 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               ))
@@ -237,7 +321,7 @@ export function Competitors() {
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl w-full max-w-md overflow-hidden shadow-2xl">
             <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-white">Analyze Competitor</h2>
+              <h2 className="text-lg font-semibold text-white">Add Competitor</h2>
               <button 
                 onClick={() => setIsModalOpen(false)}
                 className="text-zinc-400 hover:text-white transition-colors"
@@ -253,7 +337,7 @@ export function Competitors() {
                 type="url"
                 value={inputUrl}
                 onChange={(e) => setInputUrl(e.target.value)}
-                placeholder="https://competitor.com/blog-post"
+                placeholder="https://example.com"
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
               />
             </div>
@@ -277,7 +361,7 @@ export function Competitors() {
                 ) : (
                   <>
                     <Radar className="w-4 h-4" />
-                    Run Analysis
+                    Analyze Domain
                   </>
                 )}
               </button>

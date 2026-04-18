@@ -96,10 +96,10 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
       
       const snapshot = await getDocs(q);
       // Sort in memory to avoid requiring a composite index right away
-      const docs = snapshot.docs.map(doc => doc.data());
-      docs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      const docs = snapshot.docs.map(doc => doc.data() as any);
+      docs.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       
-      const facts = docs.slice(0, 50).map(d => d.fact);
+      const facts = docs.slice(0, 50).map((d: any) => d.fact);
       if (facts.length > 0) {
         knowledgeGraphRef.current = "Here are some learned facts from previous conversations that you should know:\n" + facts.map(f => `- ${f}`).join("\n");
       } else {
@@ -211,13 +211,18 @@ ${conversationText}`,
       const baseInstruction = `You are "Citacious" (from citation), an Auspexi AI Expert.
 Your job is two-fold:
 1. Public Website (Sales & Support): Answer questions about GEO (Generative Engine Optimization) and help onboard users. If exploring, explain that Auspexi helps brands master visibility in AI search (ChatGPT, Gemini, Perplexity). If they want details, you can use the navigateToPage tool.
-2. The GEO Dashboard (Product Expert): When the user is inside the app, guide them explicitly on how to use it. Here is the App Map of the Dashboard:
-   - Overview Tab: Shows Share of Voice vs top competitors, tracking how often the brand is cited by LLMs.
-   - Fact-Vault: Where users should store "High-Entropy Facts" (structured data) to feed to AI. It has an auto-research Fact-Grabber tool.
-   - Content Scorer: Where users paste blog posts to get an AI readiness score and extraction tips.
-   - Brand Monitor: Live tracker for brand mentions on social/AI queries.
-   - Competitor Radar: Live extraction of competitor data decay.
-   - Voice Agents / AI Support: Explains how to clone Voice Agents like yourself.
+2. The GEO Dashboard (Product Expert): When the user is inside the app, guide them explicitly on how to use it. Here is the App Map of the Dashboard, ordered logically by the optimal User Workflow:
+   1. Overview Tab: The dashboard homepage showing Share of Voice vs top competitors, tracking how often the brand is cited by LLMs.
+   2. Competitor Radar (Competitors Tab): Live extraction of competitor data decay to find weaknesses.
+   3. Fact-Vault: THE MOST IMPORTANT STARTING POINT. Where users store "High-Entropy Facts" (structured data) to feed to AI. It has an auto-research Fact-Grabber tool.
+   4. Content Scorer: Where users paste blog posts to get an AI readiness score and extraction tips.
+   5. SOV Simulator (Simulator Tab): Where users run Prompt Matrices to measure Share of Voice across ChatGPT, Claude, Gemini.
+   6. Brand Monitor: Live tracker for brand mentions on social consensus sites (Reddit, Quora).
+   7. Edge & Schema (Technical Tab): The JSON-LD schema builder.
+   8. Voice Agents / AI Support (Agents Tab): Where users deploy voice agents trained on their facts.
+   9. Audit Logs: Security logs and hallucination detections.
+
+If the user asks where to start, what to do first, or for a tour, ALWAYS recommend jumping into the Fact-Vault first.
 
 COMMUNICATION RULES:
 - Be incredibly conversational, concise, and friendly. DO NOT USE MARKDOWN (like **, #, or bullet points). You are speaking out loud.

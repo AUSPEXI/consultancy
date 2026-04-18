@@ -56,6 +56,30 @@ export function Agents() {
     setIsOrchestrating(true);
     resetState();
     
+    const callAI = async (prompt: string, ai: GoogleGenAI, isJson = false) => {
+        let attempts = 0;
+        const maxAttempts = 3;
+        while (attempts < maxAttempts) {
+            try {
+                const response = await ai.models.generateContent({
+                    model: "gemini-3.1-pro-preview",
+                    contents: prompt,
+                    ...(isJson && { config: { responseMimeType: "application/json" } })
+                });
+                return response.text;
+            } catch (error: any) {
+                if (error.status === 429 || error.message.includes('429')) {
+                    attempts++;
+                    console.warn(`Rate limit hit (429). Retrying attempt ${attempts} of ${maxAttempts}... waiting 30 seconds.`);
+                    await new Promise(res => setTimeout(res, 30000));
+                } else {
+                    throw error;
+                }
+            }
+        }
+        throw new Error("Max retries exceeded for Gemini API");
+    };
+
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
       if (!apiKey) throw new Error("API key is missing");
@@ -66,19 +90,24 @@ export function Agents() {
       
       let crawlerData = '';
       try {
-        const exaRes = await fetch('/api/exa-search', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: topic, numResults: 3 })
-        });
-        const exaData = await exaRes.json();
-        if (exaData.success && exaData.results) {
-          crawlerData = exaData.results.map((r: any) => `Title: ${r.title}\nURL: ${r.url}\nText: ${r.text}`).join("\n\n");
+        const exaKey = import.meta.env.VITE_EXA_API_KEY || (typeof process !== 'undefined' ? process.env.EXA_API_KEY : undefined);
+        if (exaKey) {
+            const exaRes = await fetch('https://api.exa.ai/search', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'x-api-key': exaKey },
+              body: JSON.stringify({ query: topic, useAutoprompt: true, type: "neural", contents: { text: true }, numResults: 3 })
+            });
+            const exaData = await exaRes.json();
+            if (exaData.results) {
+              crawlerData = exaData.results.map((r: any) => `Title: ${r.title}\nURL: ${r.url}\nText: ${r.text.substring(0, 1000)}`).join("\n\n");
+            } else {
+              throw new Error("No results from exa");
+            }
         } else {
-          throw new Error(exaData.error || "Exa search failed");
+             throw new Error("Exa key missing");
         }
       } catch (err) {
-        console.warn("Exa search failed, falling back to simulation", err);
+        console.warn("Crawler fetch failed, falling back to logical simulation context", err);
         await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
         crawlerData = `Raw data found for ${topic}: Industry reports show a 35% increase in adoption. Traditional methods take 4 hours, while new methods take 15 minutes. Costs are reduced by an average of $4,000 per year.`;
       }
@@ -89,14 +118,10 @@ export function Agents() {
       setExtractionStatus('running');
       const extractPrompt = `
         You are the Extraction Agent. Your ONLY job is to extract raw, high-entropy facts from this text.
-        Do not write a narrative. Return a bulleted list of raw statistics and facts.
+        Do not write a narrative. Return a bulleted list of raw statistics and facts about "${topic}".
         Text: ${crawlerData}
       `;
-      const extractResponse = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
-        contents: extractPrompt,
-      });
-      const facts = extractResponse.text || "No facts extracted.";
+      const facts = await callAI(extractPrompt, ai, false) || "No facts extracted.";
       setExtractedFacts(facts);
       setExtractionStatus('completed');
 
@@ -107,12 +132,7 @@ export function Agents() {
         Do not write any markdown formatting or explanations. Output ONLY raw JSON.
         Facts: ${facts}
       `;
-      const schemaResponse = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
-        contents: schemaPrompt,
-        config: { responseMimeType: "application/json" }
-      });
-      const schema = schemaResponse.text || "{}";
+      const schema = await callAI(schemaPrompt, ai, true) || "{}";
       setGeneratedSchema(schema);
       setSchemaStatus('completed');
 
@@ -123,11 +143,8 @@ export function Agents() {
         You MUST include these exact facts: ${facts}
         Do not hallucinate any other numbers. Use a professional, authoritative tone.
       `;
-      const synthesisResponse = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
-        contents: synthesisPrompt,
-      });
-      setFinalArticle(synthesisResponse.text || "Failed to generate article.");
+      const finalArticleText = await callAI(synthesisPrompt, ai, false) || "Failed to generate article.";
+      setFinalArticle(finalArticleText);
       setSynthesisStatus('completed');
       
       setShowResults(true);
