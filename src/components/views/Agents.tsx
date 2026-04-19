@@ -76,8 +76,9 @@ export function Agents() {
                                     
                 if (isRateLimit) {
                     attempts++;
-                    console.warn(`Rate limit hit (429). Retrying attempt ${attempts} of ${maxAttempts}... waiting 35 seconds.`);
-                    await new Promise(res => setTimeout(res, 35000));
+                    const waitTime = 62000; // Force wait 62 seconds to clear the Free Tier RPM sliding window
+                    console.warn(`Rate limit hit (429). Retrying attempt ${attempts} of ${maxAttempts}... waiting 62 seconds.`);
+                    await new Promise(res => setTimeout(res, waitTime));
                 } else {
                     throw error;
                 }
