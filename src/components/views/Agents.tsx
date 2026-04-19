@@ -62,7 +62,7 @@ export function Agents() {
         while (attempts < maxAttempts) {
             try {
                 const response = await ai.models.generateContent({
-                    model: "gemini-3.1-pro-preview",
+                    model: "gemini-2.5-flash",
                     contents: prompt,
                     ...(isJson && { config: { responseMimeType: "application/json" } })
                 });
