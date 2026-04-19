@@ -68,10 +68,16 @@ export function Agents() {
                 });
                 return response.text;
             } catch (error: any) {
-                if (error.status === 429 || error.message.includes('429')) {
+                // Determine if it is a rate limit error (429)
+                const isRateLimit = error?.status === 429 || 
+                                    error?.status === 'RESOURCE_EXHAUSTED' ||
+                                    (error?.message && error.message.includes('429')) ||
+                                    (error?.message && error.message.includes('quota'));
+                                    
+                if (isRateLimit) {
                     attempts++;
-                    console.warn(`Rate limit hit (429). Retrying attempt ${attempts} of ${maxAttempts}... waiting 30 seconds.`);
-                    await new Promise(res => setTimeout(res, 30000));
+                    console.warn(`Rate limit hit (429). Retrying attempt ${attempts} of ${maxAttempts}... waiting 35 seconds.`);
+                    await new Promise(res => setTimeout(res, 35000));
                 } else {
                     throw error;
                 }
@@ -124,6 +130,9 @@ export function Agents() {
       const facts = await callAI(extractPrompt, ai, false) || "No facts extracted.";
       setExtractedFacts(facts);
       setExtractionStatus('completed');
+      
+      // Mandatory hard-coded cooldown to protect strict rate limits
+      await new Promise(res => setTimeout(res, 5000));
 
       // --- STEP 3: Schema Agent ---
       setSchemaStatus('running');
@@ -135,6 +144,9 @@ export function Agents() {
       const schema = await callAI(schemaPrompt, ai, true) || "{}";
       setGeneratedSchema(schema);
       setSchemaStatus('completed');
+      
+      // Mandatory hard-coded cooldown to protect strict rate limits
+      await new Promise(res => setTimeout(res, 5000));
 
       // --- STEP 4: Synthesis Agent ---
       setSynthesisStatus('running');
