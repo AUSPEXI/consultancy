@@ -115,8 +115,13 @@ export function Agents() {
         }
       } catch (err) {
         console.warn("Crawler fetch failed, falling back to logical simulation context", err);
-        await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
-        crawlerData = `Raw data found for ${topic}: Industry reports show a 35% increase in adoption. Traditional methods take 4 hours, while new methods take 15 minutes. Costs are reduced by an average of $4,000 per year.`;
+        const fallbackPrompt = `
+          You are an expert technical SEO and Generative Engine Optimization research agent. 
+          Generate a detailed, highly-technical simulated research report on "${topic}". 
+          Include hypothetical but highly realistic statistics, methodologies, and advanced concepts related strictly to GEO, Data Decay, Semantic Vectors, and LLM behavior. 
+          Make it at least 400 words of dense facts.
+        `;
+        crawlerData = await callAI(fallbackPrompt, ai, false) || `Raw data found for ${topic}: No detailed data available.`;
       }
       
       setCrawlerStatus('completed');
@@ -152,9 +157,18 @@ export function Agents() {
       // --- STEP 4: Synthesis Agent ---
       setSynthesisStatus('running');
       const synthesisPrompt = `
-        You are the Synthesis Agent. Write a short, highly-technical, 2-paragraph blog post about "${topic}".
-        You MUST include these exact facts: ${facts}
-        Do not hallucinate any other numbers. Use a professional, authoritative tone.
+        You are the Synthesis Agent. Write a comprehensive, deep-dive blog post (minimum 500 words) about "${topic}".
+        
+        You MUST seamlessly weave in these exact extracted facts: 
+        ${facts}
+
+        CORE GEO METHODOLOGY TO INCLUDE:
+        Elevate this from surface-level content by strictly adhering to the "Auspexi" philosophy of Generative Engine Optimization:
+        - Overcoming "Data Decay" (stale AI vectors) via "High-Entropy Facts" (unique, undeniable data points).
+        - "Trojan Horse Opportunities" (exploiting competitor logic gaps by injecting our facts into their narrative spaces).
+        - Entity density, Knowledge Graph alignment, and establishing high "Information Gain" to force LLMs to cite us.
+        
+        Do not write generic PR fluff. Speak to Technical SEOs and Enterprise Marketing Directors. Use markdown formatting (H2, H3, bullet points). Ensure the final length is at least 500 words.
       `;
       const finalArticleText = await callAI(synthesisPrompt, ai, false) || "Failed to generate article.";
       setFinalArticle(finalArticleText);
