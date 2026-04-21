@@ -62,7 +62,7 @@ export function Agents() {
     
     const callAI = async (prompt: string, ai: GoogleGenAI, isJson = false) => {
         let attempts = 0;
-        const maxAttempts = 3;
+        const maxAttempts = 6;
         while (attempts < maxAttempts) {
             try {
                 const response = await ai.models.generateContent({
@@ -85,7 +85,10 @@ export function Agents() {
                                     
                 if (isRateLimit || isUnavailable) {
                     attempts++;
-                    const waitTime = isRateLimit ? 62000 : 15000; // 62s for sliding window, 15s for temporary 503 spike
+                    if (attempts >= maxAttempts) throw error;
+                    
+                    // 62s for 429 quota exhaustion, or exponential backoff for 503 (15s, 30s, 45s, 60s...)
+                    const waitTime = isRateLimit ? 62000 : (15000 * attempts); 
                     console.warn(`API Exception (${isRateLimit ? '429 Quota' : '503 High Demand'}). Retrying attempt ${attempts} of ${maxAttempts}... waiting ${waitTime / 1000} seconds.`);
                     await new Promise(res => setTimeout(res, waitTime));
                 } else {

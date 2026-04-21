@@ -220,8 +220,8 @@ export function Overview() {
             <h3 className="text-base font-semibold text-white">AI Share of Voice (vs Competitors)</h3>
             <p className="text-xs text-zinc-400 mt-1">Your brand's visibility in ChatGPT, Perplexity, and Gemini.</p>
           </div>
-          <div className="h-72" style={{ minHeight: 300 }}>
-            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorBrand" x1="0" y1="0" x2="0" y2="1">
@@ -252,8 +252,8 @@ export function Overview() {
             <h3 className="text-base font-semibold text-white">Dark AI Attribution</h3>
             <p className="text-xs text-zinc-400 mt-1">Correlating "Direct Traffic" spikes with new AI Citations.</p>
           </div>
-          <div className="h-72" style={{ minHeight: 300 }}>
-            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                 <XAxis dataKey="shortDate" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
