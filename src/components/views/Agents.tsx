@@ -80,6 +80,22 @@ export function Agents() {
       if (!apiKey) throw new Error("API key is missing");
       const ai = new GoogleGenAI({ apiKey });
 
+      // Fetch Fact-Vault explicitly for extraction
+      let vaultContext = '';
+      if (user) {
+        try {
+          const { query, collection, getDocs, where } = await import('firebase/firestore');
+          const q = query(collection(db, 'knowledge_graph'), where('userId', '==', user.uid));
+          const snapshot = await getDocs(q);
+          const factsArray = snapshot.docs.map(doc => doc.data().fact);
+          if (factsArray.length > 0) {
+            vaultContext = factsArray.join("\n- ");
+          }
+        } catch (e) {
+          console.warn('Failed to fetch vault for extraction', e);
+        }
+      }
+
       // --- STEP 1: Crawler Agent ---
       setCrawlerStatus('running');
       
@@ -121,7 +137,11 @@ export function Agents() {
         You are the Extraction Agent. Your ONLY job is to extract raw, high-entropy facts from this text.
         Do not write a narrative. Return a bulleted list of raw statistics and facts about "${topic}".
         CRITICAL: If the text attributes a fact to a specific study, group, or author, you MUST include that attribution in your bullet point so the synthesis agent knows who to cite.
-        Text: ${crawlerData}
+        
+        Text Data: 
+        ${crawlerData}
+
+        ${vaultContext ? `\nCRUCIAL BRAND FACTS FROM VAULT (Include these in your extracted list):\n- ${vaultContext}` : ''}
       `;
       const facts = await callAI(extractPrompt, ai, false) || "No facts extracted.";
       setExtractedFacts(facts);

@@ -1,9 +1,11 @@
-import { useState } from 'react';
-import { Code, Server, RefreshCw, Loader2, ArrowRight, Copy, CheckCircle2, FileJson, Download } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Code, Server, RefreshCw, Loader2, ArrowRight, Copy, CheckCircle2, FileJson, Download, Target } from 'lucide-react';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
+import { db } from '@/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 export function Technical() {
   const { tier, user } = useAuth();
@@ -19,6 +21,25 @@ export function Technical() {
   const [isGeneratingSchema, setIsGeneratingSchema] = useState(false);
   const [schemaResult, setSchemaResult] = useState<string | null>(null);
   const [copiedSchema, setCopiedSchema] = useState(false);
+  
+  const [savedFacts, setSavedFacts] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchFacts = async () => {
+      try {
+        const q = query(collection(db, 'knowledge_graph'), where('userId', '==', user.uid));
+        const snapshot = await getDocs(q);
+        const facts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        // Sort by newest
+        facts.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setSavedFacts(facts.slice(0, 5)); // show top 5 recent facts
+      } catch (err) {
+        console.error("Failed to fetch facts:", err);
+      }
+    };
+    fetchFacts();
+  }, [user]);
 
   if (tier !== 'Premium') {
     return (
@@ -396,6 +417,24 @@ export default {
         </div>
         
         <div className="p-6 space-y-4">
+          {savedFacts.length > 0 && (
+            <div className="mb-4">
+              <span className="text-xs font-medium text-zinc-400 mb-2 block uppercase tracking-wider">Quick Select from Fact-Vault</span>
+              <div className="flex flex-wrap gap-2">
+                {savedFacts.map((factItem, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setFactText(factItem.fact)}
+                    className="text-xs bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 rounded-full px-3 py-1.5 transition-colors text-left max-w-[300px] truncate"
+                    title={factItem.fact}
+                  >
+                    {factItem.fact}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <textarea
             value={factText}
             onChange={(e) => setFactText(e.target.value)}
