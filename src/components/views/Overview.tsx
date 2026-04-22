@@ -167,10 +167,25 @@ export function Overview() {
   const latest = displayData[displayData.length - 1];
   const previous = displayData.length > 1 ? displayData[displayData.length - 2] : latest;
 
-  const asovTrend = latest.aSov - previous.aSov;
-  const trafficTrend = latest.aiTraffic - previous.aiTraffic;
-  const errTrend = latest.err - previous.err;
-  const gapTrend = latest.compGap - previous.compGap;
+  // Safe fallbacks for older documents that might be missing the new metric fields
+  const safeLatest = {
+    aSov: latest.aSov || 0,
+    err: latest.err || 0,
+    compGap: latest.compGap || 0,
+    aiTraffic: latest.aiTraffic || 0,
+  };
+  
+  const safePrevious = {
+    aSov: previous.aSov || 0,
+    err: previous.err || 0,
+    compGap: previous.compGap || 0,
+    aiTraffic: previous.aiTraffic || 0,
+  };
+
+  const asovTrend = safeLatest.aSov - safePrevious.aSov;
+  const trafficTrend = safeLatest.aiTraffic - safePrevious.aiTraffic;
+  const errTrend = safeLatest.err - safePrevious.err;
+  const gapTrend = safeLatest.compGap - safePrevious.compGap;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -199,10 +214,10 @@ export function Overview() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          { label: 'Absolute SOV (A-SOV)', value: `${latest.aSov}%`, trend: `${asovTrend >= 0 ? '+' : ''}${asovTrend}%`, icon: Target, color: 'text-pink-400' },
-          { label: 'Entity Recall Rate (ERR)', value: `${latest.err}%`, trend: `${errTrend >= 0 ? '+' : ''}${errTrend}%`, icon: BrainCircuit, color: 'text-purple-400' },
-          { label: 'Competitor Gap', value: `${latest.compGap > 0 ? '+' : ''}${latest.compGap}%`, trend: `${gapTrend >= 0 ? '+' : ''}${gapTrend} pts`, icon: TrendingUp, color: 'text-blue-400' },
-          { label: 'AI Referral Clicks', value: latest.aiTraffic.toLocaleString(), trend: `${trafficTrend >= 0 ? '+' : ''}${trafficTrend}`, icon: Users, color: 'text-emerald-400' },
+          { label: 'Absolute SOV (A-SOV)', value: `${safeLatest.aSov}%`, trend: `${asovTrend >= 0 ? '+' : ''}${asovTrend}%`, icon: Target, color: 'text-pink-400' },
+          { label: 'Entity Recall Rate (ERR)', value: `${safeLatest.err}%`, trend: `${errTrend >= 0 ? '+' : ''}${errTrend}%`, icon: BrainCircuit, color: 'text-purple-400' },
+          { label: 'Competitor Gap', value: `${safeLatest.compGap > 0 ? '+' : ''}${safeLatest.compGap}%`, trend: `${gapTrend >= 0 ? '+' : ''}${gapTrend} pts`, icon: TrendingUp, color: 'text-blue-400' },
+          { label: 'AI Referral Clicks', value: safeLatest.aiTraffic.toLocaleString(), trend: `${trafficTrend >= 0 ? '+' : ''}${trafficTrend}`, icon: Users, color: 'text-emerald-400' },
         ].map((kpi, i) => (
           <div key={i} className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
             <div className="flex items-center justify-between mb-4">
