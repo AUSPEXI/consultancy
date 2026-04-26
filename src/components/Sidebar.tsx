@@ -26,6 +26,7 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
     { id: 'technical', label: 'Edge & Schema', icon: Code, requiredTier: 'Premium' },
     { id: 'agents', label: 'Agent Orchestration', icon: Bot, requiredTier: 'Premium' },
     { id: 'audit-logs', label: 'Audit Logs', icon: ShieldCheck, requiredTier: 'Basic' },
+    { id: 'settings', label: 'Settings', icon: Settings, requiredTier: 'Basic' },
   ];
 
   const hasAccess = (requiredTier: string) => {
