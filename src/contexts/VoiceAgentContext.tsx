@@ -274,7 +274,7 @@ STEP 6: Defense (Brand Monitor Tab)
 
 STEP 7: Indexing (Edge & Schema / Technical Tab)
 - Tab: "Technical".
-- Purpose: Generate rich JSON-LD code (FAQPage, Organization schemas) from their facts to inject into their website's `<head>`. This directly speaks to crawlers.
+- Purpose: Generate rich JSON-LD code (FAQPage, Organization schemas) from their facts to inject into their website's \`<head>\`. This directly speaks to crawlers.
 
 STEP 8: Creation (Multi-Agent Orchestration / Agents Tab)
 - Tab: "Agents".
@@ -293,9 +293,7 @@ COMMUNICATION RULES:
 - If they ask how to do something, use the "Step X" details above to explain it succinctly.
 - If they want to contact sales, ask for name and email, then call the sendCallLog tool.`;
       
-      const systemInstruction = knowledgeGraphRef.current 
-        ? `${baseInstruction}\n\n${knowledgeGraphRef.current}`
-        : baseInstruction;
+      const systemInstruction = baseInstruction;
 
       const sessionPromise = ai.live.connect({
         model: "gemini-2.5-flash-native-audio-preview-12-2025",
