@@ -1,5 +1,71 @@
 export const blogPosts = [
   {
+    slug: "meet-citacious-personal-geo-tutor-memory",
+    title: "Meet Citacious: Your Personal GEO Tutor with Infinite Memory",
+    category: "Product Updates",
+    date: "Apr 26, 2026",
+    image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80",
+    excerpt: "Discover how Citacious uses infinite memory and new metrics to become your personal GEO tutor and analyst. She learns your brand, remembers past actions, and crafts personalized strategies.",
+    content: `
+      <h2>The Problem with Static Analytics</h2>
+      <p>
+        In the rapidly evolving world of Generative Engine Optimization (GEO), having access to data is no longer enough. Many marketers stare at dashboards filled with numbers—AI Share of Voice (SOV), Citation Frequency, Sentiment Index, and Fact Extraction Rates—and ask themselves a simple question: <em>"What do I actually do with this information?"</em>
+      </p>
+      <p>
+        Traditional SEO tools provide static reports. They tell you where you rank today compared to yesterday. But they do not understand the nuance of your brand, the specific dynamics of your niche, or the historical context of your previous campaigns. You end up spending hours acting as your own data analyst, trying to connect the dots between a Reddit seeding campaign you ran three weeks ago and a sudden spike in Gemini citations today.
+      </p>
+      <p>
+        This manual analysis is not scalable. To truly dominate AI search, you need an analyst that never sleeps, never forgets, and understands your brand inside and out.
+      </p>
+
+      <h2>Introducing Citacious: Your Personal GEO Tutor & Analyst</h2>
+      <p>
+        Meet <strong>Citacious</strong>. More than just an AI chatbot, Citacious represents a massive leap forward in our platform: an autonomous, memory-driven GEO strategist that lives inside your Auspexi dashboard. She is designed to be your personal tutor, your dedicated analyst, and your proactive strategy partner.
+      </p>
+      <p>
+        We didn't just build an assistant to answer generic SEO questions. We built a system capable of executing deep, niche-specific analysis. Citacious looks at our newly introduced metrics—like your <strong>Brand Entity Resonance</strong> and <strong>Contextual Sentiment Score</strong>—and translates them into plain English actionable steps.
+      </p>
+
+      <h2>The Power of Infinite Memory</h2>
+      <p>
+        The true superpower of Citacious lies in her <strong>Long-Term Memory architecture</strong>. Most AI assistants suffer from "amnesia." Every time you open a new chat, you have to re-explain your brand, your target audience, and your competitors.
+      </p>
+      <p>
+        Citacious is different. She possesses infinite memory regarding your workspace. From the moment you onboard, she begins learning about your subscriber brand and your specific niche or industry. 
+      </p>
+      <p>
+        But she doesn't stop there. Citacious learns from your <strong>previous actions and previous results</strong>. 
+      </p>
+      <ul>
+        <li>She remembers that last month, you injected a JSON-LD Cite-Magnet about "latency reduction" that successfully boosted your Claude SOV by 14%.</li>
+        <li>She remembers that two weeks ago, a competitor launched a new feature, and you deployed a Trojan Horse overwrite to counter it.</li>
+        <li>She tracks the current baseline metrics against these historical actions, identifying exact correlations between what you do and how the LLMs respond.</li>
+      </ul>
+
+      <h2>A Strategy Tailored to Your Niche</h2>
+      <p>
+        Because Citacious has full access to your historical performance and understands your industry, her strategic recommendations are hyper-personalized. 
+      </p>
+      <p>
+        If you are in the B2B SaaS space, she won't suggest broad consumer marketing tactics. Instead, she might say: <em>"I noticed your AI Share of Voice on ChatGPT dropped slightly for queries related to 'enterprise compliance.' However, I remember we successfully used Quora Consensus Seeding last quarter to fix a similar drop for 'data security.' I have drafted three new high-entropy facts specifically targeting compliance. Should I push these to your Fact-Vault?"</em>
+      </p>
+      <p>
+        This is the difference between a tool and a tutor. Citacious doesn't just show you that you are losing ground; she reminds you of what worked in the past, formulates a strategy based on your unique brand context, and prepares the exact payload needed to execute the fix.
+      </p>
+
+      <h2>Continuous Learning for Continuous Growth</h2>
+      <p>
+        As the major LLMs (OpenAI, Google Gemini, Anthropic) update their training data and tweak their retrieval algorithms, the rules of GEO change. Because Citacious constantly monitors the global AI landscape and your specific dashboard metrics, she learns from the macro environment just as much as your micro actions.
+      </p>
+      <p>
+        She acts as a proactive tutor, educating you on the fly. If a new metric is introduced to the dashboard, she will proactively reach out: <em>"I see you're looking at the new Citation Frequency graph. Let's walk through how this differs from SOV, and how our recent LinkedIn distributions have directly impacted it."</em>
+      </p>
+      <p>
+        With Citacious, you aren't just buying software. You are hiring a world-class GEO analyst who knows your brand better than anyone else, who learns from every win and every loss, and who is dedicated to ensuring your facts dominate the AI era.
+      </p>
+    `
+  },
+  {
     slug: "eradicating-data-decay-cms-auto-sync",
     title: "Eradicating Data Decay: Real-Time CMS Auto-Sync for Continuous LLM Grounding",
     category: "Data Engineering & Infrastructure",
