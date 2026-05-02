@@ -66,10 +66,8 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
       )}>
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-pink-600 flex items-center justify-center font-bold text-white">
-              A
-            </div>
-            <span className="text-xl font-semibold text-white tracking-tight">Auspexi</span>
+            <img src="/auspexi-logo.png" alt="Auspexi Logo" className="w-14 h-14 object-contain shrink-0" />
+            <span className="text-2xl font-semibold text-white tracking-tight">Auspexi</span>
           </div>
           <button 
             onClick={() => setIsOpen(false)}

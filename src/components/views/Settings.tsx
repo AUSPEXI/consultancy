@@ -165,9 +165,9 @@ export function Settings() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">CMS Webhook URL (For auto-syncing facts to JSON-LD)</label>
+            <label className="text-sm font-medium text-zinc-300">Platform Webhook URL</label>
             <Input name="cmsWebhookUrl" value={formData.cmsWebhookUrl} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" placeholder="https://your-cms.com/api/webhooks/auspexi" />
-            <p className="text-xs text-zinc-500">When facts are approved in the Fact-Vault, we will push them to this webhook for automatic schema injection.</p>
+            <p className="text-xs text-zinc-500">Provide the webhook URL for your CMS or backend application. Auspexi will use this endpoint to automatically sync approved data, inject schema updates, distribute content, and push real-time platform events.</p>
           </div>
         </CardContent>
       </Card>

@@ -1,4 +1,5 @@
 import express from "express";
+import fs from "fs";
 import path from "path";
 import Stripe from "stripe";
 import cors from "cors";
@@ -124,6 +125,47 @@ app.use(express.json());
 // API routes FIRST
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok", message: "Auspexi Backend is running" });
+  });
+
+  // Mock "Customer Backend" Webhook Endpoints
+  app.post("/api/webhooks/auspexi", (req, res) => {
+    try {
+      const payload = req.body;
+      console.log("----- RECEIVED WEBHOOK FROM AUSPEXI -----");
+      console.log(JSON.stringify(payload, null, 2));
+      
+      const logsPath = path.join(process.cwd(), "src", "data", "webhookLogs.json");
+      
+      let logs = [];
+      if (fs.existsSync(logsPath)) {
+        logs = JSON.parse(fs.readFileSync(logsPath, "utf-8"));
+      }
+      
+      logs.push({
+        timestamp: new Date().toISOString(),
+        payload
+      });
+      
+      fs.writeFileSync(logsPath, JSON.stringify(logs, null, 2));
+      
+      res.json({ success: true, message: "Webhook received and logged securely." });
+    } catch (err: any) {
+      console.error("Webhook processing error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get("/api/webhooks/logs", (req, res) => {
+    try {
+      const logsPath = path.join(process.cwd(), "src", "data", "webhookLogs.json");
+      if (fs.existsSync(logsPath)) {
+        res.json(JSON.parse(fs.readFileSync(logsPath, "utf-8")));
+      } else {
+        res.json([]);
+      }
+    } catch(err: any) {
+      res.status(500).json({ error: "Failed to read logs" });
+    }
   });
 
   app.post("/api/amplify", aiLimiter, async (req, res) => {

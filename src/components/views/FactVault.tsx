@@ -20,7 +20,7 @@ interface Fact {
 }
 
 export function FactVault() {
-  const { user, tier } = useAuth();
+  const { user, tier, userData } = useAuth();
   const [facts, setFacts] = useState<Fact[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isResearchModalOpen, setIsResearchModalOpen] = useState(false);
@@ -117,16 +117,32 @@ export function FactVault() {
       
       if (extractedFacts && Array.isArray(extractedFacts)) {
         // Save extracted facts to Firestore
+        const newFactsPayloads = [];
         for (const fact of extractedFacts) {
-          await addDoc(collection(db, 'facts'), {
+          const payload = {
             userId: user.uid,
             statement: fact.statement,
             entropyScore: fact.entropyScore,
             cliffhangerActive: fact.entropyScore > 80, // Automatically gate high-entropy facts
             category: 'Extracted',
             createdAt: new Date().toISOString().split('T')[0],
-          });
+          };
+          await addDoc(collection(db, 'facts'), payload);
+          newFactsPayloads.push(payload);
         }
+        
+        if (userData?.cmsWebhookUrl && newFactsPayloads.length > 0) {
+          try {
+            await fetch(userData.cmsWebhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ type: 'fact_injection', source: 'extraction', facts: newFactsPayloads })
+            });
+          } catch(e) {
+            console.error("Webhook push failed", e);
+          }
+        }
+
         await logAuditAction(user.uid, 'Extracted Facts', { count: extractedFacts.length, source: 'Text Input' });
         setIsModalOpen(false);
         setInputText('');
@@ -191,16 +207,32 @@ export function FactVault() {
       }
       
       if (extractedFacts && Array.isArray(extractedFacts)) {
+        const newFactsPayloads = [];
         for (const fact of extractedFacts) {
-          await addDoc(collection(db, 'facts'), {
+          const payload = {
             userId: user.uid,
             statement: fact.statement,
             entropyScore: fact.entropyScore,
             cliffhangerActive: fact.entropyScore > 80,
             category: 'Auto-Researched',
             createdAt: new Date().toISOString().split('T')[0],
-          });
+          };
+          await addDoc(collection(db, 'facts'), payload);
+          newFactsPayloads.push(payload);
         }
+        
+        if (userData?.cmsWebhookUrl && newFactsPayloads.length > 0) {
+          try {
+            await fetch(userData.cmsWebhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ type: 'fact_injection', source: 'auto_research', facts: newFactsPayloads })
+            });
+          } catch(e) {
+            console.error("Webhook push failed", e);
+          }
+        }
+
         await logAuditAction(user.uid, 'Researched Facts', { count: extractedFacts.length, industry });
         setIsResearchModalOpen(false);
         setIndustry('');

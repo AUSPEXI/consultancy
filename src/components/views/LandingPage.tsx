@@ -116,7 +116,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       Icon: BarChart3,
       name: "Share of Voice Analytics",
       description: "Track your brand's visibility across Gemini, ChatGPT, and Claude in real-time. Understand exactly how often you are recommended versus your competitors.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-cyan-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
     },
     {

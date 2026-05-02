@@ -267,9 +267,9 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
           {step === 3 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
               <div className="space-y-2">
-                <h3 className="text-xl font-bold text-white">CMS Webhook Integration</h3>
+                <h3 className="text-xl font-bold text-white">Platform Webhook Integration</h3>
                 <p className="text-sm text-zinc-400">
-                  Connect your content management system (WordPress, Webflow, Shopify, Custom App, etc.) via a webhook URL to publish articles directly from Auspexi.
+                  Provide the webhook URL for your CMS or backend application. Auspexi will use this endpoint to automatically sync approved data, inject schema updates, distribute content, and push real-time platform events.
                 </p>
                 <label className="text-sm font-medium text-zinc-300 flex items-center gap-2 mt-4">
                   Webhook URL (Optional)
@@ -278,7 +278,7 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
                   name="cmsWebhookUrl"
                   value={formData.cmsWebhookUrl}
                   onChange={handleChange}
-                  placeholder="https://hooks.zapier.com/... or your custom endpoint"
+                  placeholder="https://.../api/webhooks/auspexi"
                   className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
                 />
               </div>
