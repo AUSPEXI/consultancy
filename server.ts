@@ -489,10 +489,34 @@ Format the output in clean Markdown.
         }
       })();
 
-      // Run both email sending and HubSpot sync concurrently to save time,
-      // and wait for them to finish before returning the response.
-      // This prevents Netlify from killing the function prematurely.
-      await Promise.allSettled([sendEmailPromise, syncHubspotPromise]);
+      // Prepare Lead Storage for Funnel Cron
+      const saveLeadPromise = (async () => {
+        try {
+          const leadsPath = path.join(process.cwd(), "src", "data", "leads.json");
+          let leads = [];
+          if (fs.existsSync(leadsPath)) {
+            const content = fs.readFileSync(leadsPath, "utf-8");
+            if (content) {
+              leads = JSON.parse(content);
+            }
+          }
+          if (!leads.some((l: any) => l.email === email)) {
+            leads.push({
+              email,
+              domain,
+              signupDate: Date.now(),
+              lastEmailSentIndex: 0
+            });
+            fs.writeFileSync(leadsPath, JSON.stringify(leads, null, 2));
+            console.log(`Lead saved to local JSON for funnel tracking: ${email}`);
+          }
+        } catch (err) {
+          console.error("Failed to save lead:", err);
+        }
+      })();
+
+      // Run email sending, HubSpot sync, and lead saving concurrently
+      await Promise.allSettled([sendEmailPromise, syncHubspotPromise, saveLeadPromise]);
 
       // Send the final response to the client
       res.json({ success: true, report: reportMarkdown });
@@ -600,7 +624,7 @@ Format the output in clean Markdown.
   });
 
   // Dynamic Sitemap Generator
-  app.get("/sitemap.xml", (req, res) => {
+  app.get(["/sitemap.xml", "/api/sitemap.xml"], (req, res) => {
     try {
       const appUrl = process.env.APP_URL || `https://auspexi.com`;
       const today = new Date().toISOString().split('T')[0];
@@ -609,6 +633,12 @@ Format the output in clean Markdown.
       const staticRoutes = [
         "",
         "/blog",
+        "/faq",
+        "/resources",
+        "/voice-agents",
+        "/about",
+        "/privacy",
+        "/terms",
       ];
 
       // Generate XML for static routes
@@ -706,6 +736,280 @@ ${blogUrls}
     }
   });
 
+// --- Email Funnel Cron Job ---
+function startEmailFunnelCron() {
+  // Check every hour
+  setInterval(async () => {
+    try {
+      const emailUser = process.env.EMAIL_USER;
+      const emailPass = process.env.EMAIL_APP_PASSWORD;
+      if (!emailUser || !emailPass) return;
+
+      const leadsPath = path.join(process.cwd(), "src", "data", "leads.json");
+      if (!fs.existsSync(leadsPath)) return;
+
+      const content = fs.readFileSync(leadsPath, "utf-8");
+      if (!content) return;
+      
+      let leads = JSON.parse(content);
+      const now = Date.now();
+      let updated = false;
+
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+          user: emailUser,
+          pass: emailPass,
+        },
+      });
+
+      for (const lead of leads) {
+        const hoursSinceSignup = (now - lead.signupDate) / (1000 * 60 * 60);
+
+        if (lead.lastEmailSentIndex === 0 && hoursSinceSignup >= 24) {
+          const html = `
+          <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background-color: #09090b; color: #fafafa; border-radius: 8px; overflow: hidden; border: 1px solid #27272a;">
+            <div style="padding: 32px; border-bottom: 1px solid #27272a; background: linear-gradient(to right, #18181b, #09090b);">
+              <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.05em; color: #ffffff;">Auspexi</h1>
+              <p style="margin: 8px 0 0 0; color: #a1a1aa; font-size: 14px;">Your Special Lifetime Offer</p>
+            </div>
+            <div style="padding: 32px; background-color: #09090b; color: #d4d4d8; line-height: 1.6;">
+              <p>Hi there,</p>
+              <p>Yesterday we sent over your GEO Visibility Report for <strong>${lead.domain}</strong>. I wanted to quickly follow up.</p>
+              <p>Traditional SEO focuses on blue links, but Generative Engine Optimization (GEO) focuses on citations directly in ChatGPT, Gemini, and Claude. If you aren't optimizing for AI, your competitors who are will replace you in the AI's "latent space".</p>
+              <p>As a special welcome gift, we are offering you a <strong>Once-in-a-Lifetime Deal: Full Access to our highest Business tier for just £499/month</strong> (normally £1,250/mo). This rate is locked in for the life of your subscription.</p>
+              <p><strong>This offer expires in exactly 7 days.</strong></p>
+              <p>Best,<br/>The Auspexi Team</p>
+              <div style="text-align: center; margin-top: 32px;">
+                <a href="${process.env.APP_URL || 'https://auspexi.com'}/#pricing" style="display: inline-block; background-color: #fafafa; color: #09090b; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">Claim Your Lifetime Deal</a>
+              </div>
+            </div>
+            <div style="padding: 24px; text-align: center; border-top: 1px solid #27272a; color: #71717a; font-size: 12px;">
+              © 2026 Auspexi. All rights reserved.
+            </div>
+          </div>
+          `;
+          await transporter.sendMail({
+            from: `"Auspexi" <${emailUser}>`,
+            to: lead.email,
+            subject: "Why Traditional SEO is Failing Your Brand (And a special offer)",
+            html
+          });
+          lead.lastEmailSentIndex = 1;
+          updated = true;
+          console.log(`Sent Followup 1 to ${lead.email}`);
+        } 
+        else if (lead.lastEmailSentIndex === 1 && hoursSinceSignup >= 48) {
+          const html = `
+          <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background-color: #09090b; color: #fafafa; border-radius: 8px; overflow: hidden; border: 1px solid #27272a;">
+            <div style="padding: 32px; border-bottom: 1px solid #27272a; background: linear-gradient(to right, #18181b, #09090b);">
+              <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.05em; color: #ffffff;">Auspexi</h1>
+              <p style="margin: 8px 0 0 0; color: #a1a1aa; font-size: 14px;">The Trojan Horse Strategy</p>
+            </div>
+            <div style="padding: 32px; background-color: #09090b; color: #d4d4d8; line-height: 1.6;">
+              <p>Hi again,</p>
+              <p>One of the most powerful tools in Auspexi is the <strong>Trojan Horse Strategy</strong>.</p>
+              <p>AI models have a 6-12 month training lag. 80% of your competitors' data inside AI systems is decaying right now. By structuring your newest facts in Edge JSON-LD, you can feed corrections to the AI crawlers, displacing organic competitor mentions.</p>
+              <p>Log in to Auspexi to see how Fact-Vault can automate this for <strong>${lead.domain}</strong>.</p>
+              <p>A quick reminder: Your £499/mo lifetime deal offer expires in 6 days.</p>
+              <p>Best,<br/>The Auspexi Team</p>
+              <div style="text-align: center; margin-top: 32px;">
+                <a href="${process.env.APP_URL || 'https://auspexi.com'}/#pricing" style="display: inline-block; background-color: #fafafa; color: #09090b; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">Claim Your Deal Now</a>
+              </div>
+            </div>
+            <div style="padding: 24px; text-align: center; border-top: 1px solid #27272a; color: #71717a; font-size: 12px;">
+              © 2026 Auspexi. All rights reserved.
+            </div>
+          </div>
+          `;
+          await transporter.sendMail({
+            from: `"Auspexi" <${emailUser}>`,
+            to: lead.email,
+            subject: "How to replace competitor data in generative AI",
+            html
+          });
+          lead.lastEmailSentIndex = 2;
+          updated = true;
+          console.log(`Sent Followup 2 to ${lead.email}`);
+        }
+        else if (lead.lastEmailSentIndex === 2 && hoursSinceSignup >= 72) {
+          const html = `
+          <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background-color: #09090b; color: #fafafa; border-radius: 8px; overflow: hidden; border: 1px solid #27272a;">
+            <div style="padding: 32px; border-bottom: 1px solid #27272a; background: linear-gradient(to right, #18181b, #09090b);">
+              <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.05em; color: #ffffff;">Auspexi</h1>
+              <p style="margin: 8px 0 0 0; color: #a1a1aa; font-size: 14px;">Meet Citacious, Your AI Analyst</p>
+            </div>
+            <div style="padding: 32px; background-color: #09090b; color: #d4d4d8; line-height: 1.6;">
+              <p>Hi there,</p>
+              <p>Are you tracking your Share of Voice manually? Let Citacious handle it.</p>
+              <p>Our dedicated 12-Month Citacious Context Memory analyst organically understands your dashboard tools, analyzes past results, and orchestrates intelligent future actions to ensure maximum visibility for <strong>${lead.domain}</strong>.</p>
+              <p>Combine Citacious with our Fact-Vault Extraction to automatically find your highest-entropy data points and turn them into potent cite-magnets.</p>
+              <p>Your £499/mo lifetime deal offer expires in 5 days.</p>
+              <p>Best,<br/>The Auspexi Team</p>
+              <div style="text-align: center; margin-top: 32px;">
+                <a href="${process.env.APP_URL || 'https://auspexi.com'}/#pricing" style="display: inline-block; background-color: #fafafa; color: #09090b; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">Unlock Citacious AI Today</a>
+              </div>
+            </div>
+            <div style="padding: 24px; text-align: center; border-top: 1px solid #27272a; color: #71717a; font-size: 12px;">
+              © 2026 Auspexi. All rights reserved.
+            </div>
+          </div>
+          `;
+          await transporter.sendMail({
+            from: `"Auspexi" <${emailUser}>`,
+            to: lead.email,
+            subject: "Automating your GEO strategy with AI",
+            html
+          });
+          lead.lastEmailSentIndex = 3;
+          updated = true;
+          console.log(`Sent Followup 3 to ${lead.email}`);
+        }
+        else if (lead.lastEmailSentIndex === 3 && hoursSinceSignup >= 96) {
+          const html = `
+          <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background-color: #09090b; color: #fafafa; border-radius: 8px; overflow: hidden; border: 1px solid #27272a;">
+            <div style="padding: 32px; border-bottom: 1px solid #27272a; background: linear-gradient(to right, #18181b, #09090b);">
+              <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.05em; color: #ffffff;">Auspexi</h1>
+              <p style="margin: 8px 0 0 0; color: #a1a1aa; font-size: 14px;">Visualizing Your AI Dominance</p>
+            </div>
+            <div style="padding: 32px; background-color: #09090b; color: #d4d4d8; line-height: 1.6;">
+              <p>Hi there,</p>
+              <p>If you can't measure it, you can't optimize it. That's why we built the <strong>SOV Simulator & Brand Monitor</strong>.</p>
+              <p>Track your brand's visibility across Gemini, ChatGPT, and Claude in real-time. Understand exactly how often you are recommended versus your competitors.</p>
+              <p>Join the brands using Auspexi to confidently report their AI visibility growth to stakeholders.</p>
+              <p>Your £499/mo lifetime deal offer expires in 4 days.</p>
+              <p>Best,<br/>The Auspexi Team</p>
+              <div style="text-align: center; margin-top: 32px;">
+                <a href="${process.env.APP_URL || 'https://auspexi.com'}/#pricing" style="display: inline-block; background-color: #fafafa; color: #09090b; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">Start Tracking Your SOV</a>
+              </div>
+            </div>
+            <div style="padding: 24px; text-align: center; border-top: 1px solid #27272a; color: #71717a; font-size: 12px;">
+              © 2026 Auspexi. All rights reserved.
+            </div>
+          </div>
+          `;
+          await transporter.sendMail({
+            from: `"Auspexi" <${emailUser}>`,
+            to: lead.email,
+            subject: "How visible are you in ChatGPT *really*?",
+            html
+          });
+          lead.lastEmailSentIndex = 4;
+          updated = true;
+          console.log(`Sent Followup 4 to ${lead.email}`);
+        }
+        else if (lead.lastEmailSentIndex === 4 && hoursSinceSignup >= 120) {
+          const html = `
+          <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background-color: #09090b; color: #fafafa; border-radius: 8px; overflow: hidden; border: 1px solid #27272a;">
+            <div style="padding: 32px; border-bottom: 1px solid #27272a; background: linear-gradient(to right, #18181b, #09090b);">
+              <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.05em; color: #ffffff;">Auspexi</h1>
+              <p style="margin: 8px 0 0 0; color: #a1a1aa; font-size: 14px;">The Multi-Agent Orchestration Crew</p>
+            </div>
+            <div style="padding: 32px; background-color: #09090b; color: #d4d4d8; line-height: 1.6;">
+              <p>Hi again,</p>
+              <p>To truly dominate the AI Latent Space, human effort isn't enough. You need AI to fight AI.</p>
+              <p>Our <strong>Multi-Agent Orchestration Crew</strong> deploys specialized autonomous agents that continuously crawl, analyze, and defend your brand's knowledge graphs across multiple LLMs to maintain top-tier rankings.</p>
+              <p>It's like having a 24/7 technical GEO team working on your domain while you sleep.</p>
+              <p>Your £499/mo lifetime deal offer expires in 3 days.</p>
+              <p>Best,<br/>The Auspexi Team</p>
+              <div style="text-align: center; margin-top: 32px;">
+                <a href="${process.env.APP_URL || 'https://auspexi.com'}/#pricing" style="display: inline-block; background-color: #fafafa; color: #09090b; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">Deploy Your AI Crew</a>
+              </div>
+            </div>
+            <div style="padding: 24px; text-align: center; border-top: 1px solid #27272a; color: #71717a; font-size: 12px;">
+              © 2026 Auspexi. All rights reserved.
+            </div>
+          </div>
+          `;
+          await transporter.sendMail({
+            from: `"Auspexi" <${emailUser}>`,
+            to: lead.email,
+            subject: "Why you need AI to fight AI",
+            html
+          });
+          lead.lastEmailSentIndex = 5;
+          updated = true;
+          console.log(`Sent Followup 5 to ${lead.email}`);
+        }
+        else if (lead.lastEmailSentIndex === 5 && hoursSinceSignup >= 144) {
+          const html = `
+          <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background-color: #09090b; color: #fafafa; border-radius: 8px; overflow: hidden; border: 1px solid #27272a;">
+            <div style="padding: 32px; text-align: center; border-bottom: 1px solid #27272a; background: linear-gradient(to right, #18181b, #09090b);">
+              <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.05em; color: #ffffff;">Auspexi</h1>
+              <p style="margin: 8px 0 0 0; color: #a1a1aa; font-size: 14px;">Only 48 Hours Left</p>
+            </div>
+            <div style="padding: 32px; background-color: #09090b; color: #d4d4d8; text-align: center; line-height: 1.6;">
+              <p>Hi there,</p>
+              <p>This is a quick reminder that your exclusive lifetime deal of <strong>£499/month for full Business Tier access</strong> expires in exactly 48 hours.</p>
+              <p>This includes unlimited feature access, Citacious AI Analyst support, the Trojan Horse strategies, and full Edge JSON-LD deployment capabilities.</p>
+              <p>After this, the price permanently reverts to £1,250/month.</p>
+              <div style="margin-top: 32px;">
+                <a href="${process.env.APP_URL || 'https://auspexi.com'}/#pricing" style="display: inline-block; background-color: #fafafa; color: #09090b; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">Lock In £499/mo Before It Expires</a>
+              </div>
+              <p style="margin-top: 32px; text-align: left;">Best,<br/>The Auspexi Team</p>
+            </div>
+            <div style="padding: 24px; text-align: center; border-top: 1px solid #27272a; color: #71717a; font-size: 12px;">
+              © 2026 Auspexi. All rights reserved.
+            </div>
+          </div>
+          `;
+          await transporter.sendMail({
+            from: `"Auspexi" <${emailUser}>`,
+            to: lead.email,
+            subject: "⏳ 48 Hours Left: Claim your £499/mo Lifetime Deal",
+            html
+          });
+          lead.lastEmailSentIndex = 6;
+          updated = true;
+          console.log(`Sent Followup 6 to ${lead.email}`);
+        }
+        else if (lead.lastEmailSentIndex === 6 && hoursSinceSignup >= 168) {
+          const appUrl = process.env.APP_URL || 'https://auspexi.com';
+          const html = `
+          <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background-color: #09090b; color: #fafafa; border-radius: 8px; overflow: hidden; border: 1px solid #27272a;">
+            <div style="padding: 32px; text-align: center; border-bottom: 1px solid #27272a; background: linear-gradient(to right, #ef4444, #09090b);">
+              <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.05em; color: #ffffff;">Auspexi</h1>
+              <p style="margin: 8px 0 0 0; color: #fca5a5; font-size: 14px;">Final 24 Hours</p>
+            </div>
+            <div style="padding: 32px; background-color: #09090b; color: #d4d4d8; text-align: center; line-height: 1.6;">
+              <p>Hi there,</p>
+              <p>This is it. Your exclusive lifetime deal for the Auspexi Business Tier at £499/month expires tonight.</p>
+              <p>If you are ready to claim your Share of Voice in the new era of Zero-Click Search and outmaneuver your competitors in AI models natively, this is your last chance to secure our best possible pricing forever.</p>
+              <div style="margin-top: 32px;">
+                <a href="${appUrl}/#pricing" style="display: inline-block; background-color: #fafafa; color: #09090b; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">Claim Your Lifetime Deal Now</a>
+              </div>
+              <p style="margin-top: 32px; text-align: left;">If you need any help or have questions, just reply directly to this email!</p>
+              <p style="text-align: left;">Best,<br/>The Auspexi Team</p>
+            </div>
+            <div style="padding: 24px; text-align: center; border-top: 1px solid #27272a; color: #71717a; font-size: 12px;">
+              © 2026 Auspexi. All rights reserved.
+            </div>
+          </div>
+          `;
+          await transporter.sendMail({
+            from: `"Auspexi" <${emailUser}>`,
+            to: lead.email,
+            subject: "🚨 Final Notice: Your Lifetime Deal is expiring",
+            html
+          });
+          lead.lastEmailSentIndex = 7;
+          updated = true;
+          console.log(`Sent Followup 7 to ${lead.email}`);
+        }
+      }
+
+      if (updated) {
+        fs.writeFileSync(leadsPath, JSON.stringify(leads, null, 2));
+      }
+
+    } catch (err) {
+      console.error("Funnel cron job error:", err);
+    }
+  }, 1000 * 60 * 60); // Run once an hour
+}
+
 async function setupFrontendAndStart() {
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
@@ -733,6 +1037,7 @@ async function setupFrontendAndStart() {
 }
 
 if (!process.env.VERCEL && !process.env.NETLIFY && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  startEmailFunnelCron();
   setupFrontendAndStart();
 }
 

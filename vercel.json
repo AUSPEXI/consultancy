@@ -22,6 +22,10 @@
       "dest": "/server.ts"
     },
     {
+      "src": "/sitemap.xml",
+      "dest": "/server.ts"
+    },
+    {
       "handle": "filesystem"
     },
     {
