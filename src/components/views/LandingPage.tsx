@@ -8,7 +8,7 @@ import { Footerdemo } from '@/components/ui/footer-section';
 import { TestimonialsColumn } from '@/components/ui/testimonials-columns-1';
 import { ImageZoom } from '@/components/ui/image-zoom';
 import { DottedSurface } from '@/components/ui/dotted-surface';
-import { ArrowRight, Bot, Target, Zap, Search, BarChart3, ShieldAlert, CheckCircle2, Database, Mic } from 'lucide-react';
+import { ArrowRight, Bot, Target, Zap, Search, BarChart3, ShieldAlert, CheckCircle2, Database, Mic, Brain, Blocks, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LeadCaptureModal } from '@/components/ui/lead-capture-modal';
@@ -96,35 +96,56 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       name: "Zero-Click Dominance",
       description: "Ensure your brand is the definitive answer when users query AI, completely bypassing the traditional SERP. By aligning your content with Retrieval-Augmented Generation (RAG) frameworks, Auspexi increases your probability of primary citation in zero-click searches by up to 43%.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
-      className: "lg:row-start-1 lg:row-end-4 lg:col-start-2 lg:col-end-3",
+      className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
+    },
+    {
+      Icon: Brain,
+      name: "Citacious AI Analyst",
+      description: "A dedicated 12-Month Citacious Context Memory analyst that organically understands your dashboard tools, analyzes past results, and orchestrates intelligent future actions to ensure maximum visibility.",
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-violet-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      className: "lg:col-start-2 lg:col-end-4 lg:row-start-1 lg:row-end-2",
     },
     {
       Icon: Target,
       name: "Cite-Magnet Injection",
       description: "We extract and inject High-Entropy Facts to force AI models to cite your content. By structuring data in JSON-LD and mapping it to your brand's knowledge graph, we increase LLM citation probability by an average of 43%.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-emerald-500/60 w-64 h-64 rounded-full blur-3xl" />,
-      className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
+      className: "lg:col-start-2 lg:col-end-3 lg:row-start-2 lg:row-end-3",
+    },
+    {
+      Icon: Database,
+      name: "Fact-Vault Extraction",
+      description: "Automatically find the highest-entropy data points in your whitepapers, case studies, and proprietary research, turning them into potent cite-magnets that models crave.",
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-blue-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      className: "lg:col-start-3 lg:col-end-4 lg:row-start-2 lg:row-end-3",
+    },
+    {
+      Icon: BarChart3,
+      name: "SOV Simulator & Brand Monitor",
+      description: "Track your brand's visibility across Gemini, ChatGPT, and Claude in real-time. Understand exactly how often you are recommended versus your competitors.",
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      className: "lg:col-start-1 lg:col-end-3 lg:row-start-3 lg:row-end-4",
+    },
+    {
+      Icon: Activity,
+      name: "Multi-Agent Orchestration Crew",
+      description: "Deploy specialized autonomous agents that continuously crawl, analyze, and defend your brand's knowledge graphs across multiple LLMs to maintain top-tier rankings.",
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-orange-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      className: "lg:col-start-3 lg:col-end-4 lg:row-start-3 lg:row-end-5",
     },
     {
       Icon: ShieldAlert,
       name: "Trojan Horse Strategy",
       description: "Identify competitor data decay and replace their stale answers with your fresh insights. Capitalize on the typical 6-12 month lag in LLM training data updates by feeding real-time JSON-LD corrections directly to AI crawlers.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-rose-500/60 w-64 h-64 rounded-full blur-3xl" />,
-      className: "lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4",
-    },
-    {
-      Icon: BarChart3,
-      name: "Share of Voice Analytics",
-      description: "Track your brand's visibility across Gemini, ChatGPT, and Claude in real-time. Understand exactly how often you are recommended versus your competitors.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
-      className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
+      className: "lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-5",
     },
     {
       Icon: Zap,
-      name: "Automated Schema",
+      name: "Edge & Schema Generator",
       description: "Deploy GEO-optimized JSON-LD schema directly to your site with one click. Ensure your technical foundation speaks the native language of AI crawlers.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-amber-500/60 w-64 h-64 rounded-full blur-3xl" />,
-      className: "lg:col-start-3 lg:col-end-3 lg:row-start-2 lg:row-end-4",
+      className: "lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5",
     },
   ];
 
@@ -493,14 +514,16 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <PricingCard
               tier="Basic"
-              price={currency === 'USD' ? "$89/mo" : "£75/mo"}
+              price={currency === 'USD' ? "$119/mo" : "£99/mo"}
               bestFor="For startups establishing AI presence"
               CTA="Start Basic"
               onClick={() => handleCheckout('Basic')}
               benefits={[
+                { text: "Track 1 Brand, 5 Keywords", checked: true },
+                { text: "Citacious AI Analyst (Standard)", checked: true },
                 { text: "AI SOV Overview & Fact-Vault", checked: true },
                 { text: "Content Scorer Access", checked: true },
                 { text: "30-Day Metric Analytics Storage", checked: true },
@@ -510,33 +533,50 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               ]}
             />
             <PricingCard
-              tier="Medium"
-              price={currency === 'USD' ? "$1,499/mo" : "£1,199/mo"}
-              bestFor="For growing brands dominating niches"
-              CTA="Start Medium"
-              onClick={() => handleCheckout('Medium')}
+              tier="Pro"
+              price={currency === 'USD' ? "$399/mo" : "£349/mo"}
+              bestFor="For growing teams & agencies"
+              CTA="Start Pro"
+              onClick={() => handleCheckout('Pro')}
               benefits={[
-                { text: "SOV Simulator & Brand Monitor", checked: true },
-                { text: "Competitor Radar & Data Decay Alerts", checked: true },
-                { text: "90-Day Metric Analytics Storage", checked: true },
-                { text: "Track Entity Recall Rate (ERR)", checked: true },
+                { text: "Track 3 Brands, 25 Keywords", checked: true },
+                { text: "Citacious AI Analyst (Advanced)", checked: true },
+                { text: "Competitor Radar", checked: true },
                 { text: "Basic AI Referral Tracking", checked: true },
-                { text: "12-Month Citacious Context Memory", checked: false },
+                { text: "Content Scorer Access", checked: true },
+                { text: "12-Month Citacious Context Memory", checked: true },
               ]}
             />
             <PricingCard
-              tier="Premium"
+              tier="Business"
+              price={currency === 'USD' ? "$1,499/mo" : "£1,250/mo"}
+              bestFor="For growing brands dominating niches"
+              CTA="Start Business"
+              onClick={() => handleCheckout('Business')}
+              benefits={[
+                { text: "Track Unlimited Brands", checked: true },
+                { text: "Dedicated Citacious AI Analyst", checked: true },
+                { text: "SOV Simulator & Brand Monitor", checked: true },
+                { text: "Data Decay Alerts", checked: true },
+                { text: "90-Day Metric Analytics Storage", checked: true },
+                { text: "Track Entity Recall Rate (ERR)", checked: true },
+                { text: "12-Month Citacious Context Memory", checked: true },
+              ]}
+            />
+            <PricingCard
+              tier="Enterprise"
               price={currency === 'USD' ? "$4,999/mo" : "£3,999/mo"}
               bestFor="For enterprise market leaders"
               CTA="Talk to AI Sales"
               onClick={() => window.location.href = '/voice-agents'}
               benefits={[
                 { text: "Multi-Agent Orchestration Crew", checked: true },
+                { text: "Dedicated Citacious AI Analyst", checked: true },
                 { text: "Edge & Schema Generator", checked: true },
                 { text: "Unlimited Dashboard Analytics Storage", checked: true },
                 { text: "Complete 'Prove It Works' Metric Suite", checked: true },
-                { text: "12-Month Citacious Context Memory", checked: true },
                 { text: "Vector Embeddings & Context Caching", checked: true },
+                { text: "12-Month Citacious Context Memory", checked: true },
               ]}
             />
           </div>
