@@ -222,6 +222,7 @@ export function Overview() {
     err: latest.err || 0,
     compGap: latest.compGap || 0,
     aiTraffic: latest.aiTraffic || 0,
+    compA: latest.compA || 0,
   };
   
   const safePrevious = {
@@ -229,6 +230,7 @@ export function Overview() {
     err: previous.err || 0,
     compGap: previous.compGap || 0,
     aiTraffic: previous.aiTraffic || 0,
+    compA: previous.compA || 0,
   };
 
   const asovTrend = safeLatest.aSov - safePrevious.aSov;

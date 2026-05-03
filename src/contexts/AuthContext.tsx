@@ -15,6 +15,8 @@ export interface UserData {
   competitors?: string[];
   keywords?: string[];
   cmsWebhookUrl?: string;
+  sentimentPrompts?: string[];
+  connectedSocials?: string[];
 }
 
 interface AuthContextType {

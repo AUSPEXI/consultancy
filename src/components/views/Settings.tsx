@@ -6,10 +6,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
+import { Chrome, Linkedin, Twitter, MessageCircle } from 'lucide-react';
 
 export function Settings() {
   const { user, userData } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
+  const [connectedSocials, setConnectedSocials] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     brand: '',
     domain: '',
@@ -25,6 +27,7 @@ export function Settings() {
 
   useEffect(() => {
     if (userData) {
+      setConnectedSocials(userData.connectedSocials || []);
       setFormData({
         brand: userData.brand || '',
         domain: userData.domain || '',
@@ -42,6 +45,29 @@ export function Settings() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleToggleSocial = async (platform: string) => {
+    if (!user) return;
+    const isConnected = connectedSocials.includes(platform);
+    const newSocials = isConnected 
+      ? connectedSocials.filter(p => p !== platform) 
+      : [...connectedSocials, platform];
+      
+    setConnectedSocials(newSocials);
+    
+    if (!isConnected) {
+       alert(`This would open an OAuth window to connect your ${platform} account.`);
+    }
+    
+    try {
+       const userRef = doc(db, 'users', user.uid);
+       await updateDoc(userRef, { connectedSocials: newSocials });
+    } catch (error) {
+       handleFirestoreError(error, OperationType.UPDATE, `users/${user.uid}`);
+       // Revert on error
+       setConnectedSocials(connectedSocials);
+    }
   };
 
   const handleSave = async () => {
@@ -154,6 +180,78 @@ export function Settings() {
               <label className="text-sm font-medium text-zinc-300">Competitor 4</label>
               <Input name="competitor4" value={formData.competitor4} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" />
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-zinc-900 border-zinc-800">
+        <CardHeader>
+          <CardTitle className="text-white">Linked Social Accounts</CardTitle>
+          <CardDescription className="text-zinc-400">Connect platforms to enable one-click Omnichannel publishing.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#0A66C2]/10 flex items-center justify-center">
+                  <Linkedin className="w-5 h-5 text-[#0A66C2]" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-white">LinkedIn</h4>
+                  <p className="text-xs text-zinc-500">Professional network post seeding</p>
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className={connectedSocials.includes('linkedin') ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 hover:text-emerald-300" : "border-zinc-700 text-zinc-300 bg-zinc-800 hover:bg-zinc-700 hover:text-white"}
+                onClick={() => handleToggleSocial('linkedin')}
+              >
+                {connectedSocials.includes('linkedin') ? 'Connected' : 'Connect'}
+              </Button>
+            </div>
+
+            <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#FF4500]/10 flex items-center justify-center">
+                  <MessageCircle className="w-5 h-5 text-[#FF4500]" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-white">Reddit</h4>
+                  <p className="text-xs text-zinc-500">Autonomous consensus seeding</p>
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className={connectedSocials.includes('reddit') ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 hover:text-emerald-300" : "border-zinc-700 text-zinc-300 bg-zinc-800 hover:bg-zinc-700 hover:text-white"}
+                onClick={() => handleToggleSocial('reddit')}
+              >
+                {connectedSocials.includes('reddit') ? 'Connected' : 'Connect'}
+              </Button>
+            </div>
+
+            <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-zinc-100/10 flex items-center justify-center">
+                  <Chrome className="w-5 h-5 text-zinc-100" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-white">Webform / API</h4>
+                  <p className="text-xs text-zinc-500">Custom endpoint integration</p>
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className={connectedSocials.includes('webform') ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 hover:text-emerald-300" : "border-zinc-700 text-zinc-300 bg-zinc-800 hover:bg-zinc-700 hover:text-white"}
+                onClick={() => handleToggleSocial('webform')}
+              >
+                {connectedSocials.includes('webform') ? 'Connected' : 'Connect'}
+              </Button>
+            </div>
+
           </div>
         </CardContent>
       </Card>

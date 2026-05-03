@@ -63,7 +63,7 @@ const aiLimiter = rateLimit({
 
 // Layer 1: Input Validation Schema
 const amplifyRequestSchema = z.object({
-  fact: z.string().min(5, "Fact is too short.").max(1000, "Fact is too long. Maximum 1000 characters allowed."),
+  fact: z.string().min(5, "Fact is too short.").max(50000, "Fact is too long. Maximum 50000 characters allowed."),
 });
 
 // Layer 2: Prompt Injection Detection

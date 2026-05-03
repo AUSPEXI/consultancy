@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { X, Loader2, Copy, CheckCircle2, Linkedin, Twitter, Youtube, MessageSquare, Instagram } from 'lucide-react';
 import { logAuditAction } from '@/lib/audit';
-import { auth } from '@/firebase';
+import { auth, db } from '@/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AmplifyModalProps {
   fact: string;
@@ -35,10 +37,34 @@ const TiktokIcon = ({ className }: { className?: string }) => (
 );
 
 export const AmplifyModal: React.FC<AmplifyModalProps> = ({ fact, onClose }) => {
+  const { user, userData } = useAuth();
   const [isGenerating, setIsGenerating] = useState(true);
   const [content, setContent] = useState<GeneratedContent | null>(null);
   const [copiedPlatform, setCopiedPlatform] = useState<keyof GeneratedContent | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const connectedAccounts = userData?.connectedSocials || [];
+  const [publishStatus, setPublishStatus] = useState<Record<string, 'publishing' | 'published'>>({});
+
+  const handleConnect = async (platform: string) => {
+    if (!user) return;
+    alert(`This would open an OAuth window to connect your ${platform} account.`);
+    try {
+       const newSocials = [...connectedAccounts, platform];
+       await updateDoc(doc(db, 'users', user.uid), { connectedSocials: newSocials });
+    } catch (e) {
+       console.error("Failed to update socials", e);
+    }
+  };
+
+  const handlePublish = (platform: string, text: string) => {
+    setPublishStatus((prev) => ({ ...prev, [platform]: 'publishing' }));
+    setTimeout(() => {
+      setPublishStatus((prev) => ({ ...prev, [platform]: 'published' }));
+      if (auth.currentUser) {
+        logAuditAction(auth.currentUser.uid, 'CONTENT_AUTO_PUBLISHED', { platform });
+      }
+    }, 1500);
+  };
 
   useEffect(() => {
     const generateContent = async () => {
@@ -174,6 +200,30 @@ export const AmplifyModal: React.FC<AmplifyModalProps> = ({ fact, onClose }) => 
                       value={content[key]}
                       className="w-full h-48 bg-transparent text-sm text-zinc-300 resize-none focus:outline-none custom-scrollbar"
                     />
+                  </div>
+                  <div className="px-4 py-3 border-t border-zinc-800 bg-zinc-900/50 flex justify-end">
+                    {connectedAccounts.includes(key) ? (
+                      <button
+                        onClick={() => handlePublish(key, content[key])}
+                        disabled={publishStatus[key] === 'publishing' || publishStatus[key] === 'published'}
+                        className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-medium rounded-md transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                         {publishStatus[key] === 'publishing' ? (
+                           <><Loader2 className="w-3.5 h-3.5 animate-spin"/> Publishing...</>
+                         ) : publishStatus[key] === 'published' ? (
+                           <><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400"/> Published!</>
+                         ) : (
+                           <>Auto-Publish</>
+                         )}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleConnect(key)}
+                        className="px-3 py-1.5 border border-zinc-700 hover:bg-zinc-800 text-zinc-300 text-xs font-medium rounded-md transition-colors"
+                      >
+                        Connect Account
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
