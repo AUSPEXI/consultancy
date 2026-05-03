@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Radar, Loader2, AlertOctagon, MessageSquare, TrendingDown } from 'lucide-react';
+import { Radar, Loader2, AlertOctagon, MessageSquare, TrendingDown, PenTool } from 'lucide-react';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
@@ -195,6 +195,19 @@ export function BrandMonitor() {
                   <MessageSquare className="w-4 h-4 mt-0.5 shrink-0" />
                   <p className="leading-relaxed">{thread.summary}</p>
                 </div>
+                {(thread.sentiment === 'Negative' || thread.sentiment === 'Neutral' || thread.sentiment === 'Mixed') && (
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      onClick={() => {
+                         window.dispatchEvent(new CustomEvent('set-agent-topic', { detail: { topic: `Write a counter-narrative or response addressing this consensus topic: ${thread.title}` }}));
+                         window.dispatchEvent(new CustomEvent('change-dashboard-tab', { detail: { tab: 'agents' } }));
+                      }}
+                      className="px-4 py-2 border border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 text-zinc-300 text-xs font-medium rounded-lg flex items-center gap-2 transition-colors"
+                    >
+                      <PenTool className="w-3.5 h-3.5" /> Draft Counter-Narrative (Agents)
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
             {results.threads.length === 0 && (

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Search, FileText, Code2, PenTool, CheckCircle2, Loader2, Play, ArrowRight, X, ExternalLink } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, FileText, Code2, PenTool, CheckCircle2, Loader2, Play, ArrowRight, X, ExternalLink, BrainCircuit } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
@@ -28,6 +28,16 @@ export function Agents() {
   const [generatedSchema, setGeneratedSchema] = useState<string>('');
   const [finalArticle, setFinalArticle] = useState<string>('');
   const [showResults, setShowResults] = useState(false);
+
+  useEffect(() => {
+    const handleSetTopic = (e: any) => {
+      if (e.detail?.topic) {
+        setTopic(e.detail.topic);
+      }
+    };
+    window.addEventListener('set-agent-topic', handleSetTopic);
+    return () => window.removeEventListener('set-agent-topic', handleSetTopic);
+  }, []);
 
   if (tier !== 'Premium') {
     return (
@@ -424,7 +434,16 @@ export function Agents() {
                 <div className="prose prose-invert max-w-none text-sm text-zinc-300">
                   <ReactMarkdown>{finalArticle}</ReactMarkdown>
                 </div>
-                <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-end">
+                <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-end gap-3">
+                  <button 
+                    onClick={() => {
+                      window.dispatchEvent(new CustomEvent('draft-content', { detail: { content: finalArticle, type: 'blog' } }));
+                      window.dispatchEvent(new CustomEvent('change-dashboard-tab', { detail: { tab: 'content-scorer' } }));
+                    }}
+                    className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
+                  >
+                    <BrainCircuit className="w-4 h-4" /> Verify AI Extractability
+                  </button>
                   <button 
                     onClick={handlePublishToCms}
                     disabled={isPublishing}

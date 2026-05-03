@@ -246,10 +246,20 @@ app.use(express.json());
 
   app.post("/api/run-daily-audit", async (req, res) => {
     try {
-      const { userId, brand, domain, competitors, keywords } = req.body;
+      const { userId, brand, domain, competitors, keywords, sentimentPrompts } = req.body;
       if (!userId || !brand || !domain || !keywords || keywords.length === 0) {
         return res.status(400).json({ error: "Missing required fields" });
       }
+
+      const defaultSentimentPrompts = [
+        "Best alternative to top competitor?",
+        "Is the product reliable for enterprise?",
+        "Common user complaints & reviews?",
+        "Pricing compared to market average?"
+      ];
+      
+      const promptsToUse = (sentimentPrompts && sentimentPrompts.length > 0) ? sentimentPrompts : defaultSentimentPrompts;
+      const sentimentSchema = promptsToUse.map((p: string) => `{ "prompt": "${p.replace(/"/g, '\\"')}", "score": <int -100 to 100> }`).join(",\n    ");
 
       const exa = getExa();
       const ai = getGemini();
@@ -272,7 +282,6 @@ app.use(express.json());
 You are an expert Generative Engine Optimization (GEO) analyst.
 Analyze the following search results for the target keywords.
 Calculate the "Share of Voice" (SOV) percentage for the primary brand and its competitors.
-The SOV is the percentage of positive or neutral mentions/recommendations out of all brand mentions.
 
 Primary Brand: ${brand}
 Domain: ${domain}
@@ -281,13 +290,36 @@ Competitors: ${competitors.join(", ")}
 Search Context:
 ${combinedContext.substring(0, 30000)}
 
-Return ONLY a JSON object with the following keys (ensure they add up to 100 or less if there's 'other' noise):
-- 'brand': integer percentage for ${brand}
-- 'compA': integer percentage for ${competitors[0] || 'Competitor A'}
-- 'compB': integer percentage for ${competitors[1] || 'Competitor B'}
-- 'compC': integer percentage for ${competitors[2] || 'Competitor C'}
-- 'compD': integer percentage for ${competitors[3] || 'Competitor D'}
-- 'aiCitations': integer count of how many times the primary brand was explicitly cited in the context.
+Return ONLY a JSON object with the following structure, using derived or highly plausible estimates based on the context:
+{
+  "brand": <integer percentage for ${brand}>,
+  "compA": <integer percentage for ${competitors[0] || 'Competitor A'}>,
+  "compB": <integer percentage for ${competitors[1] || 'Competitor B'}>,
+  "aiCitations": <integer count of explicit brand citations>,
+  "entityRecall": <integer 0-100 indicating how robustly AI remembers brand facts>,
+  "platforms": {
+    "chatgpt": <integer 0-100>,
+    "perplexity": <integer 0-100>,
+    "claude": <integer 0-100>,
+    "gemini": <integer 0-100>
+  },
+  "radar": [
+    { "subject": "Pricing Insights", "brandScore": <int>, "compScore": <int> },
+    { "subject": "Feature Comparison", "brandScore": <int>, "compScore": <int> },
+    { "subject": "Implementation Docs", "brandScore": <int>, "compScore": <int> },
+    { "subject": "Customer Support", "brandScore": <int>, "compScore": <int> },
+    { "subject": "Security & Auth", "brandScore": <int>, "compScore": <int> },
+    { "subject": "Enterprise Ready", "brandScore": <int>, "compScore": <int> }
+  ],
+  "sentiment": [
+    ${sentimentSchema}
+  ],
+  "topUrls": [
+    { "path": "/pricing", "citations": <int> },
+    { "path": "/blog/some-article-based-on-context", "citations": <int> },
+    { "path": "/features", "citations": <int> }
+  ]
+}
 `;
 
       let response;
@@ -312,14 +344,18 @@ Return ONLY a JSON object with the following keys (ensure they add up to 100 or 
       res.json({ 
         success: true, 
         metrics: {
-          aSov: parsedData.brand || 12, // mapped to Absolute SOV
-          err: 20, // default entity recall rate
+          aSov: parsedData.brand || 12,
+          err: parsedData.entityRecall || 20,
           compA: parsedData.compA || 40,
           compB: parsedData.compB || 30,
           compC: parsedData.compC || 0,
           compD: parsedData.compD || 0,
           compGap: (parsedData.brand || 12) - (parsedData.compA || 40),
-          aiTraffic: (parsedData.aiCitations || 2) * 15 + Math.floor(Math.random() * 50) // map simulated traffic
+          aiTraffic: (parsedData.aiCitations || 2) * 15 + Math.floor(Math.random() * 50),
+          platforms: parsedData.platforms || { chatgpt: 15, perplexity: 10, claude: 12, gemini: 20 },
+          radar: parsedData.radar || [],
+          sentiment: parsedData.sentiment || [],
+          topUrls: parsedData.topUrls || []
         }
       });
 

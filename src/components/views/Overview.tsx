@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, Cell } from 'recharts';
-import { TrendingUp, Users, Target, MousePointerClick, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit } from 'lucide-react';
+import { TrendingUp, Users, Target, MousePointerClick, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, Save } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/firebase';
 import { collection, addDoc, setDoc, doc, onSnapshot, query, where, orderBy, limit } from 'firebase/firestore';
@@ -15,6 +15,18 @@ export function Overview() {
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const [shadowUrl, setShadowUrl] = useState('');
   const [generatedShadowLink, setGeneratedShadowLink] = useState('');
+  
+  const defaultPrompts = [
+    "Best alternative to top competitor?",
+    "Is the product reliable for enterprise?",
+    "Common user complaints & reviews?",
+    "Pricing compared to market average?"
+  ];
+  const userPrompts = userData?.sentimentPrompts || defaultPrompts;
+  
+  const [isEditingPrompts, setIsEditingPrompts] = useState(false);
+  const [editPromptsState, setEditPromptsState] = useState<string[]>(userPrompts);
+  const [isSavingPrompts, setIsSavingPrompts] = useState(false);
 
   useEffect(() => {
     if (!user || tier === 'Free') return;
@@ -68,7 +80,8 @@ export function Overview() {
             brand: userData.brand,
             domain: userData.domain,
             competitors: userData.competitors || [],
-            keywords: userData.keywords
+            keywords: userData.keywords,
+            sentimentPrompts: userPrompts
           })
         });
         
@@ -106,6 +119,38 @@ export function Overview() {
         const newAsov = Math.min(100, prevAsov + Math.floor(Math.random() * 8));
         const newCompA = Math.max(0, prevCompA - Math.floor(Math.random() * 5));
 
+        const simulatedPlatforms = {
+          chatgpt: Math.min(100, newAsov + 15),
+          perplexity: Math.max(0, newAsov - 15),
+          claude: newAsov + 5,
+          gemini: newAsov + 25
+        };
+        
+        const simulatedRadar = [
+          { subject: 'Pricing Insights', brandScore: newAsov + 20, compScore: newCompA + 10 },
+          { subject: 'Feature Comparison', brandScore: Math.max(0, newAsov - 5), compScore: newCompA + 25 },
+          { subject: 'Implementation Docs', brandScore: newAsov + 10, compScore: Math.max(0, newCompA - 15) },
+          { subject: 'Customer Support', brandScore: newAsov + 30, compScore: Math.max(0, newCompA - 20) },
+          { subject: 'Security & Auth', brandScore: Math.max(0, newAsov - 15), compScore: newCompA + 20 },
+          { subject: 'Enterprise Ready', brandScore: newAsov + 5, compScore: newCompA }
+        ];
+
+        const simulatedSentiment = userPrompts.map((p: string, idx: number) => {
+          let score = 0;
+          if (idx === 0) score = newAsov + 40;
+          else if (idx === 1) score = newAsov > 20 ? 80 : 30;
+          else if (idx === 2) score = newAsov > 25 ? 20 : -40;
+          else score = -10;
+          return { prompt: p, score: Math.min(100, Math.max(-100, score)) };
+        });
+
+        const simulatedTopUrls = [
+          { path: "/blog/what-is-our-product", citations: Math.floor(newAsov * 1.5) },
+          { path: "/pricing", citations: Math.floor(newAsov * 1.2) },
+          { path: "/features", citations: newAsov },
+          { path: "/about", citations: Math.max(2, Math.floor(newAsov / 3)) }
+        ];
+
         await setDoc(doc(db, 'sovMetrics', `${user.uid}_${dateStr}`), {
           userId: user.uid,
           date: dateStr,
@@ -116,6 +161,10 @@ export function Overview() {
           compA: newCompA,
           compB: Math.max(0, (metrics.length > 0 ? metrics[metrics.length - 1].compB : 30) - Math.floor(Math.random() * 5)),
           aiTraffic: prevAiTraffic + Math.floor(Math.random() * 40) + 10,
+          platforms: simulatedPlatforms,
+          radar: simulatedRadar,
+          sentiment: simulatedSentiment,
+          topUrls: simulatedTopUrls
         }, { merge: true });
         await logAuditAction(user.uid, 'Ran Simulated SOV Audit', { date: dateStr });
       }
@@ -187,44 +236,67 @@ export function Overview() {
   const errTrend = safeLatest.err - safePrevious.err;
   const gapTrend = safeLatest.compGap - safePrevious.compGap;
 
-  const radarData = [
-    { subject: 'Pricing Insights', A: safeLatest.aSov + 20, B: safeLatest.compA + 10, fullMark: 100 },
-    { subject: 'Feature Comparison', A: safeLatest.aSov - 5, B: safeLatest.compA + 25, fullMark: 100 },
-    { subject: 'Implementation Docs', A: safeLatest.aSov + 10, B: safeLatest.compA - 15, fullMark: 100 },
-    { subject: 'Customer Support', A: safeLatest.aSov + 30, B: safeLatest.compA - 20, fullMark: 100 },
-    { subject: 'Security & Auth', A: safeLatest.aSov - 15, B: safeLatest.compA + 20, fullMark: 100 },
-    { subject: 'Enterprise Ready', A: safeLatest.aSov + 5, B: safeLatest.compA, fullMark: 100 },
-  ].map(d => ({ ...d, A: Math.min(100, Math.max(0, d.A)), B: Math.min(100, Math.max(0, d.B)) }));
+  const radarData = (latest.radar || [
+    { subject: 'Pricing Insights', brandScore: safeLatest.aSov + 20, compScore: safeLatest.compA + 10 },
+    { subject: 'Feature Comparison', brandScore: safeLatest.aSov - 5, compScore: safeLatest.compA + 25 },
+    { subject: 'Implementation Docs', brandScore: safeLatest.aSov + 10, compScore: safeLatest.compA - 15 },
+    { subject: 'Customer Support', brandScore: safeLatest.aSov + 30, compScore: safeLatest.compA - 20 },
+    { subject: 'Security & Auth', brandScore: safeLatest.aSov - 15, compScore: safeLatest.compA + 20 },
+    { subject: 'Enterprise Ready', brandScore: safeLatest.aSov + 5, compScore: safeLatest.compA }
+  ]).map((d: any) => ({
+    subject: d.subject,
+    A: Math.min(100, Math.max(0, d.brandScore)),
+    B: Math.min(100, Math.max(0, d.compScore)),
+    fullMark: 100
+  }));
+
+  const safePlatforms = latest.platforms || {
+    chatgpt: safeLatest.aSov + 15,
+    perplexity: safeLatest.aSov - 25,
+    claude: safeLatest.aSov + 5,
+    gemini: safeLatest.aSov + 25
+  };
 
   const platformData = [
-    { name: 'ChatGPT', visibility: Math.min(100, safeLatest.aSov + 15), fill: '#10a37f' },
-    { name: 'Perplexity', visibility: Math.min(100, Math.max(0, safeLatest.aSov - 25)), fill: '#22d3ee' },
-    { name: 'Claude', visibility: Math.min(100, safeLatest.aSov + 5), fill: '#d97757' },
-    { name: 'Gemini', visibility: Math.min(100, safeLatest.aSov + 25), fill: '#4285f4' },
+    { name: 'ChatGPT', visibility: Math.min(100, Math.max(0, safePlatforms.chatgpt)), fill: '#10a37f' },
+    { name: 'Perplexity', visibility: Math.min(100, Math.max(0, safePlatforms.perplexity)), fill: '#22d3ee' },
+    { name: 'Claude', visibility: Math.min(100, Math.max(0, safePlatforms.claude)), fill: '#d97757' },
+    { name: 'Gemini', visibility: Math.min(100, Math.max(0, safePlatforms.gemini)), fill: '#4285f4' },
   ];
 
   const chartData = displayData.slice(-5);
-  const sentimentData = [
-    { prompt: "Best alternative to top competitor?", base: 60, flex: 40 },
-    { prompt: "Is the product reliable for enterprise?", base: 10, flex: 30 },
-    { prompt: "Common user complaints & reviews?", base: -80, flex: -40 },
-    { prompt: "Pricing compared to market average?", base: 20, flex: -20 } // Deteriorating sentiment
-  ].map(row => ({
-    prompt: row.prompt,
-    scores: chartData.map((d, i) => {
-      // Simulate historical scores changing towards the current state
-      const progress = i / Math.max(1, chartData.length - 1);
-      const isLatest = i === chartData.length - 1;
-      
-      let finalScore = row.base + Math.floor((row.flex - row.base) * progress);
-      if (isLatest) {
-         if (row.prompt.includes("alternative")) finalScore = safeLatest.aSov + 40;
-         if (row.prompt.includes("reliable")) finalScore = safeLatest.aSov > 20 ? 80 : 30;
-         if (row.prompt.includes("complaints")) finalScore = safeLatest.aSov > 25 ? 20 : -40;
-      }
-      return finalScore;
-    })
-  }));
+  const getHistoricalSentimentScore = (d: any, defaultKey: string) => {
+    if (d.sentiment) {
+      const match = d.sentiment.find((s: any) => s.prompt.toLowerCase().includes(defaultKey));
+      if (match && typeof match.score === 'number') return match.score;
+    }
+    return null;
+  };
+
+  const sentimentData = userPrompts.map((p: string, rowIdx: number) => {
+    // Generate synthetic flex patterns to fake history if real history doesn't exist.
+    const base = rowIdx === 0 ? 60 : rowIdx === 1 ? 10 : rowIdx === 2 ? -80 : 20;
+    const flex = rowIdx === 0 ? 40 : rowIdx === 1 ? 30 : rowIdx === 2 ? -40 : -20;
+    
+    return {
+      prompt: p,
+      scores: chartData.map((d, i) => {
+        const realScore = getHistoricalSentimentScore(d, p.toLowerCase());
+        if (realScore !== null) return realScore;
+
+        const progress = i / Math.max(1, chartData.length - 1);
+        const isLatest = i === chartData.length - 1;
+        
+        let finalScore = base + Math.floor((flex - base) * progress);
+        if (isLatest) {
+           if (rowIdx === 0) finalScore = safeLatest.aSov + 40;
+           if (rowIdx === 1) finalScore = safeLatest.aSov > 20 ? 80 : 30;
+           if (rowIdx === 2) finalScore = safeLatest.aSov > 25 ? 20 : -40;
+        }
+        return finalScore;
+      })
+    };
+  });
 
   const getSentimentColor = (score: number) => {
     if (score >= 60) return 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]';
@@ -233,6 +305,61 @@ export function Overview() {
     if (score >= -60) return 'bg-rose-400/80';
     return 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.3)]';
   };
+
+  const handleSavePrompts = async () => {
+    if (!user) return;
+    setIsSavingPrompts(true);
+    try {
+      await setDoc(doc(db, 'users', user.uid), {
+        sentimentPrompts: editPromptsState.filter(p => p.trim() !== '')
+      }, { merge: true });
+      setIsEditingPrompts(false);
+    } catch (e) {
+      console.error("Failed to save custom prompts", e);
+    } finally {
+      setIsSavingPrompts(false);
+    }
+  };
+
+  const safeTopUrls = latest.topUrls || [
+    { path: '/blog/enterprise-geo-audit-logging', citations: 45 },
+    { path: '/pricing', citations: 32 },
+    { path: '/features', citations: 28 },
+    { path: '/about', citations: Math.max(2, Math.floor(safeLatest.aSov / 3)) }
+  ];
+
+  const getHistoricalCitations = (d: any, defaultPath: string) => {
+    if (d.topUrls) {
+      const match = d.topUrls.find((u: any) => u.path === defaultPath);
+      if (match && typeof match.citations === 'number') return match.citations;
+    }
+    return null;
+  };
+
+  const scorecardData = safeTopUrls.map((urlObj: any) => {
+    // Reconstruct the history
+    const historyLine = chartData.map((d, i) => {
+      const realCitation = getHistoricalCitations(d, urlObj.path);
+      if (realCitation !== null) return realCitation;
+      
+      // Fallback interpolation for older docs
+      const diff = Math.floor(urlObj.citations * 0.4); // assume grew by 40%
+      const start = Math.max(1, urlObj.citations - diff);
+      const progress = i / Math.max(1, chartData.length - 1);
+      return start + Math.floor((urlObj.citations - start) * progress);
+    });
+
+    const previousCitations = historyLine.length > 1 ? historyLine[historyLine.length - 2] : historyLine[0];
+    const trendValue = previousCitations > 0 ? Math.round(((urlObj.citations - previousCitations) / previousCitations) * 100) : 0;
+    const trendStr = `${trendValue >= 0 ? '+' : ''}${trendValue}%`;
+
+    return {
+      url: urlObj.path,
+      citations: urlObj.citations,
+      trend: trendStr,
+      metrics: historyLine
+    };
+  }).sort((a: any, b: any) => b.citations - a.citations).slice(0, 4);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -383,7 +510,7 @@ export function Overview() {
         </div>
 
         {/* Share of Sentiment Heatmap */}
-        <div className="lg:col-span-2 bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+        <div className="lg:col-span-2 bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 relative">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
             <div>
               <h3 className="text-base font-semibold text-white">"Share of Sentiment" Trace</h3>
@@ -393,9 +520,55 @@ export function Overview() {
               <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.3)]"></div> Negative</div>
               <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-zinc-600"></div> Neutral</div>
               <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]"></div> Positive</div>
+              <button onClick={() => setIsEditingPrompts(true)} className="ml-2 p-1.5 hover:bg-zinc-800 rounded-md transition-colors" title="Customize Tracked Prompts">
+                <Settings className="w-3.5 h-3.5 text-zinc-500 hover:text-zinc-300" />
+              </button>
             </div>
           </div>
           
+          {isEditingPrompts ? (
+            <div className="absolute inset-0 bg-zinc-950/95 backdrop-blur-sm z-20 rounded-xl p-6 flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-sm font-semibold text-white">Customize Reputational Prompts</h4>
+                <button onClick={() => { setIsEditingPrompts(false); setEditPromptsState(userPrompts); }} className="text-zinc-400 hover:text-white">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="space-y-3 flex-1 overflow-y-auto pr-2">
+                {editPromptsState.map((val, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                     <span className="text-zinc-500 text-xs w-4">{idx + 1}.</span>
+                     <input 
+                       className="flex-1 bg-zinc-900 border border-zinc-700 rounded p-2 text-sm text-zinc-200 focus:outline-none focus:border-emerald-500"
+                       value={val}
+                       onChange={(e) => {
+                         const n = [...editPromptsState];
+                         n[idx] = e.target.value;
+                         setEditPromptsState(n);
+                       }}
+                       placeholder={`Custom reputational prompt ${idx + 1}`}
+                     />
+                  </div>
+                ))}
+                {editPromptsState.length < 5 && (
+                  <button onClick={() => setEditPromptsState([...editPromptsState, ""])} className="text-xs text-emerald-400 hover:text-emerald-300 mt-2 flex items-center gap-1">
+                    <Plus className="w-3 h-3" /> Add Prompt
+                  </button>
+                )}
+              </div>
+              <div className="mt-4 pt-4 border-t border-zinc-800 flex justify-end">
+                <button
+                  onClick={handleSavePrompts}
+                  disabled={isSavingPrompts}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
+                >
+                  {isSavingPrompts ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  Save Configuration
+                </button>
+              </div>
+            </div>
+          ) : null}
+
           <div className="overflow-x-auto">
             <div className="min-w-[600px]">
               <div 
@@ -440,12 +613,7 @@ export function Overview() {
             <p className="text-xs text-zinc-400 mt-1">Top performing URLs driving AI citations.</p>
           </div>
           <div className="space-y-4">
-            {[
-              { url: '/blog/enterprise-geo-audit-logging', citations: 45, trend: '+12%', metrics: [12, 18, 25, 35, 45] },
-              { url: '/pricing', citations: 32, trend: '+8%', metrics: [20, 22, 24, 28, 32] },
-              { url: '/features', citations: 28, trend: '+5%', metrics: [15, 18, 22, 25, 28] },
-              { url: '/about', citations: Math.max(2, Math.floor(safeLatest.aSov / 3)), trend: (safeLatest.aSov > previous.aSov) ? '+3%' : '-2%', metrics: [18, 16, 15, 14, Math.max(2, Math.floor(safeLatest.aSov / 3))] },
-            ].map((item, idx) => (
+            {scorecardData.map((item: any, idx: number) => (
               <div key={idx} className="flex items-center justify-between border-b border-zinc-800/50 pb-4 last:border-0 last:pb-0">
                 <div className="overflow-hidden pr-4 max-w-[55%]">
                   <p className="text-sm font-medium text-zinc-200 truncate" title={item.url}>{item.url}</p>
@@ -453,8 +621,8 @@ export function Overview() {
                 </div>
                 <div className="w-24 h-10">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={item.metrics.map(v => ({ value: v }))}>
-                      <Line type="monotone" dataKey="value" stroke={item.trend.startsWith('+') ? '#10b981' : '#f43f5e'} strokeWidth={2} dot={{ r: 2, fill: item.trend.startsWith('+') ? '#10b981' : '#f43f5e', strokeWidth: 0 }} />
+                    <LineChart data={item.metrics.map((v: number) => ({ value: v }))}>
+                      <Line type="monotone" dataKey="value" stroke={item.trend.startsWith('-') ? '#f43f5e' : '#10b981'} strokeWidth={2} dot={{ r: 2, fill: item.trend.startsWith('-') ? '#f43f5e' : '#10b981', strokeWidth: 0 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>

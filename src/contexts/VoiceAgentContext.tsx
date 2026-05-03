@@ -203,10 +203,11 @@ ${conversationText}`,
       
       const snapshot = await getDocs(q);
       
-      let metricContext = `\n\nPROVE-IT-WORKS METRICS (Last 5 Logs):\nAnalyze these trend changes and cause-effect relationships. You MUST reference these exact numbers if the user asks how they are performing.\n`;
+      const metricInstruction = `\n\nPROVE-IT-WORKS METRICS (Last 5 Logs):\nIf the user asks how they are performing or for their metrics, YOU MUST reference this data. The Overview Dashboard features 4 new visualizations:\n1. Competitive Citation Gap (Radar): Compares their brand to Top Competitor across Pricing, Features, Docs, Support, Security, and Enterprise Ready.\n2. Platform-Specific Visibility: Breakdowns of A-SOV across ChatGPT, Perplexity, Claude, and Gemini.\n3. Share of Sentiment Trace: A heatmap tracking historical sentiment across 4 reputational prompts.\n4. Cite-Magnet Scorecard & LLM Referral Pipeline: Shows top URLs driving citations and the funnel from citations to clicks to signups.\n\nRecent Metric History:\n`;
+      let metricContext = metricInstruction;
       
       if (snapshot.empty) {
-        return metricContext + `Right now, the user has NO real metrics. All dashboard metrics currently state 0% Absolute SOV, 0 Entity Recall, and 0 Competitor Gap because this is their very first session. Advise them to use the Fact Vault directly to build their baseline.`;
+        return metricContext + `Right now, the user has NO real metrics. All dashboard metrics currently state 0% Absolute SOV, 0 Entity Recall, and 0 Competitor Gap because this is their very first session. Advise them to use the Competitor Radar to start.\n`;
       }
 
       const metrics = snapshot.docs.map(d => d.data());
@@ -216,7 +217,7 @@ ${conversationText}`,
         const err = m.err !== undefined ? m.err : 0;
         const aiTraffic = m.aiTraffic !== undefined ? m.aiTraffic : 0;
         const compGap = m.compGap !== undefined ? m.compGap : 0;
-        metricContext += `- Date: ${m.date || 'Today'}: Absolute SOV: ${aSov}%, Entity Recall Rate: ${err}%, Dark AI Traffic: ${aiTraffic}, Competitor Gap: ${compGap}%\n`;
+        metricContext += `- Date: ${m.date || 'Today'}: Absolute SOV: ${aSov}%, Entity Recall Rate: ${err}%, LLM Referral Traffic: ${aiTraffic}, Competitor Gap: ${compGap}%\n`;
       });
       
       return metricContext;
@@ -256,20 +257,20 @@ You MUST understand how the user is supposed to use this platform step-by-step s
 
 STEP 1: The Baseline (Overview Tab)
 - Tab: "Overview".
-- Purpose: This is the dashboard homepage. It shows your high-level Share of Voice (SOV) metrics vs top competitors over time. You don't take action here, you just measure the results of your optimizations.
+- Purpose: This is the dashboard homepage. It shows your high-level Share of Voice (SOV) metrics vs top competitors over time. It includes the Competitive Radar, Sentiment Heatmap (with customizable prompts!), and Pipeline Conversion funnels. You don't take action here, you just measure the results of your optimizations.
 
 STEP 2: Reconnaissance (Competitor Radar Tab)
 - Tab: "Competitors". 
-- Purpose: Users enter a competitor's URL here FIRST. The AI analyzes where the competitor's data is stale, decaying, or vulnerable to a "Trojan Horse" attack (meaning we can inject our facts into their narrative spaces).
+- Purpose: Users enter a competitor's URL here BEFORE doing anything else. The AI analyzes where the competitor's data is stale, decaying, or vulnerable to a "Trojan Horse" attack (meaning we can inject our facts into their narrative spaces).
 
 STEP 3: Ammunition (Fact-Vault Tab)
 - Tab: "Facts".
 - Purpose: Now that they know the enemy's weaknesses, they need facts. Tell them to click "Fact-Grabber" in the top right.
-- Action: They enter their business niche. The Fact-Grabber extracts exact "High-Entropy Facts" (unique data). They add these to the vault to serve as AI ammunition.
+- Action: They enter their business niche. The Fact-Grabber extracts exact "High-Entropy Facts" (unique data). They add these to the vault to serve as AI ammunition. They can also use the Omnichannel Amplifier to turn facts into seeded Reddit/LinkedIn posts quickly.
 
 STEP 4: Refinement (Content Scorer Tab)
 - Tab: "Scoring".
-- Purpose: Paste existing blog posts into the Content Scorer to get an Entity Density Score out of 100 with strict rewrite feedback. Ensure human narrative doesn't wash away machine readability.
+- Purpose: Paste existing blog posts into the Content Scorer to get an Entity Density Score out of 100 with strict rewrite feedback. Ensure human narrative doesn't wash away machine readability. High-scoring content (>80%) unlocks actions to push directly to the Omnichannel Amplifier or Reverse-Extract facts into the Vault.
 
 STEP 5: Testing (SOV Simulator Tab)
 - Tab: "Simulator".
@@ -278,7 +279,7 @@ STEP 5: Testing (SOV Simulator Tab)
 
 STEP 6: Defense (Brand Monitor Tab)
 - Tab: "Monitor".
-- Purpose: Tracks live Reddit and Quora social consensus to prevent "Context Poisoning Risks" (negative public narratives that LLMs pull from).
+- Purpose: Tracks live Reddit and Quora social consensus to prevent "Context Poisoning Risks" (negative public narratives that LLMs pull from). You can now click "Draft Counter-Narrative" on negative comments to automatically write a response using the Agents tab.
 
 STEP 7: Indexing (Edge & Schema / Technical Tab)
 - Tab: "Technical".
@@ -286,13 +287,11 @@ STEP 7: Indexing (Edge & Schema / Technical Tab)
 
 STEP 8: Creation (Multi-Agent Orchestration / Agents Tab)
 - Tab: "Agents".
-- Purpose: Run a specialized crew of 4 AI Agents to write content from scratch.
-- Action: Enter a topic. The Crawler grabs industry data, Extractor strips hallucinations, Schema agent formats it, and Synthesis writes a blog post using the facts FROM the Fact-Vault.
-
-(Note: There is also an Audit Logs tab that just shows a history of user actions and security alerts, which usually doesn't need to be part of the core workflow).
+- Purpose: Run a specialized crew of 4 AI Agents to write content from scratch, drafting counter-narratives to competitors, or drafting new blogs. Then immediately push the result to the Content Scorer to verify its AI extractability.
 
 CRITICAL INSTRUCTIONS:
-- If the user asks where to start, what to do first, or for a tour, ALWAYS recommend Step 1: the Competitor Radar to spot competitor weaknesses.
+- If the user asks where to start, what to do first, or for a tour, ALWAYS recommend Step 2: Reconnaissance on the Competitor Radar Tab to spot competitor weaknesses. Then mention adding facts in the Fact-Vault.
+- If the user asks to see their performance or dashboard, guide them to the Overview tab.
 - If the user asks how to use the SOV Simulator, explicitly remind them to use an organic question.
 - SYSTEM ERRORS: If the user mentions experiencing a system error, a 503 error, quota limits, or any technical failure, DO NOT try to troubleshoot or act confused. Give a standard customer service reply: "I am so sorry for the inconvenience, you likely hit a quota limit. Please let the Auspexi Support Team know so they can investigate and resolve it immediately."
 

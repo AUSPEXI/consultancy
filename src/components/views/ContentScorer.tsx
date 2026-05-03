@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
-import { PenTool, Loader2, CheckCircle2, AlertTriangle, ArrowRight, LayoutTemplate, FileText, BookOpen } from 'lucide-react';
+import { PenTool, Loader2, CheckCircle2, AlertTriangle, ArrowRight, LayoutTemplate, FileText, BookOpen, Database, Megaphone } from 'lucide-react';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
+import { AmplifyModal } from '@/components/ui/AmplifyModal';
+import { db } from '@/firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
 type ContentType = 'sales' | 'blog' | 'technical';
 
@@ -42,6 +45,9 @@ export function ContentScorer() {
   const [isPreviewingUpdate, setIsPreviewingUpdate] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishSuccess, setPublishSuccess] = useState(false);
+  const [showAmplifyModal, setShowAmplifyModal] = useState(false);
+  const [isSavingFacts, setIsSavingFacts] = useState(false);
+  const [factsSaved, setFactsSaved] = useState(false);
 
   useEffect(() => {
     const handleDraftContent = (e: Event) => {
@@ -66,6 +72,44 @@ export function ContentScorer() {
       setPublishSuccess(false);
       setIsPreviewingUpdate(false);
     }, 3000);
+  };
+
+  const handleSaveFacts = async () => {
+    if (!user || !result || !content.trim()) return;
+    setIsSavingFacts(true);
+    try {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+      if (!apiKey) throw new Error("API key is missing");
+      const ai = new GoogleGenAI({ apiKey });
+      
+      const prompt = `Extract 3 atomic facts from the following text and format as a JSON array of strings. Each string must be a concise, standalone fact.
+Text: ${content.substring(0, 5000)}`;
+
+      const res = await ai.models.generateContent({
+        model: 'gemini-3.1-pro-preview',
+        contents: prompt,
+        config: { responseMimeType: 'application/json' }
+      });
+      const facts = JSON.parse(res.text || '[]');
+      
+      for (const fact of facts) {
+          await addDoc(collection(db, 'knowledge_graph'), {
+             userId: user.uid,
+             fact: fact,
+             sourceUrl: 'Extracted from Content Scorer',
+             addedAt: new Date().toISOString()
+          });
+      }
+      
+      await logAuditAction(user.uid, 'Extracted facts to Vault', { count: facts.length });
+      setFactsSaved(true);
+      setTimeout(() => setFactsSaved(false), 3000);
+    } catch (e) {
+      console.error(e);
+      alert('Failed to save facts.');
+    } finally {
+      setIsSavingFacts(false);
+    }
   };
 
   if (tier === 'Free') {
@@ -344,9 +388,49 @@ export function ContentScorer() {
                 </div>
               )}
             </div>
+            
+            {result.overallScore > 80 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in slide-in-from-bottom-2 duration-300">
+                <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 relative overflow-hidden flex flex-col justify-between">
+                   <div className="mb-4">
+                     <h3 className="text-sm font-semibold text-white flex items-center gap-2 mb-2">
+                       <Megaphone className="w-4 h-4 text-emerald-400" />
+                       Ready for Omnichannel Distribution
+                     </h3>
+                     <p className="text-xs text-zinc-400">Because this content scored highly (&gt;{result.overallScore}%), it is extractable enough to seed into LinkedIn and Reddit without losing its core entities.</p>
+                   </div>
+                   <button
+                     onClick={() => setShowAmplifyModal(true)}
+                     className="w-full py-2.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                   >
+                     <Megaphone className="w-4 h-4" /> Push to Omnichannel Amplifier
+                   </button>
+                </div>
+                
+                <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 relative overflow-hidden flex flex-col justify-between">
+                   <div className="mb-4">
+                     <h3 className="text-sm font-semibold text-white flex items-center gap-2 mb-2">
+                       <Database className="w-4 h-4 text-blue-400" />
+                       Reverse-Extract Knowledge
+                     </h3>
+                     <p className="text-xs text-zinc-400">Automatically isolate the core statements from this text and save them back into your Fact-Vault as persistent, verifiable JSON-LD atomic facts.</p>
+                   </div>
+                   <button
+                     onClick={handleSaveFacts}
+                     disabled={isSavingFacts || factsSaved}
+                     className="w-full py-2.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                   >
+                     {isSavingFacts ? <Loader2 className="w-4 h-4 animate-spin" /> : factsSaved ? <CheckCircle2 className="w-4 h-4" /> : <Database className="w-4 h-4" />}
+                     {isSavingFacts ? 'Extracting...' : factsSaved ? 'Saved to Vault' : 'Extract into Fact-Vault'}
+                   </button>
+                </div>
+              </div>
+            )}
+            
           </div>
         )}
       </div>
+      {showAmplifyModal && <AmplifyModal fact={content} onClose={() => setShowAmplifyModal(false)} />}
     </div>
   );
 }
