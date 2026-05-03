@@ -202,13 +202,21 @@ ${conversationText}`,
       );
       
       const snapshot = await getDocs(q);
-      if (snapshot.empty) return "";
+      
+      let metricContext = `\n\nPROVE-IT-WORKS METRICS (Last 5 Logs):\nAnalyze these trend changes and cause-effect relationships. You MUST reference these exact numbers if the user asks how they are performing.\n`;
+      
+      if (snapshot.empty) {
+        return metricContext + `Right now, the user has NO real metrics. All dashboard metrics currently state 0% Absolute SOV, 0 Entity Recall, and 0 Competitor Gap because this is their very first session. Advise them to use the Fact Vault directly to build their baseline.`;
+      }
 
       const metrics = snapshot.docs.map(d => d.data());
       
-      let metricContext = `\n\nPROVE-IT-WORKS METRICS (Last 5 Logs):\nAnalyze these trend changes and cause-effect relationships. You MUST reference these numbers if the user asks how they are performing.\n`;
       metrics.forEach((m, idx) => {
-        metricContext += `- Date: ${m.date}: Absolute SOV: ${m.aSov}%, Entity Recall Rate: ${m.err}%, Dark AI Traffic: ${m.aiTraffic}, Competitor Gap: ${m.compGap}%\n`;
+        const aSov = m.aSov !== undefined ? m.aSov : 0;
+        const err = m.err !== undefined ? m.err : 0;
+        const aiTraffic = m.aiTraffic !== undefined ? m.aiTraffic : 0;
+        const compGap = m.compGap !== undefined ? m.compGap : 0;
+        metricContext += `- Date: ${m.date || 'Today'}: Absolute SOV: ${aSov}%, Entity Recall Rate: ${err}%, Dark AI Traffic: ${aiTraffic}, Competitor Gap: ${compGap}%\n`;
       });
       
       return metricContext;
