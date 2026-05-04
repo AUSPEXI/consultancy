@@ -47,7 +47,6 @@ export const AmplifyModal: React.FC<AmplifyModalProps> = ({ fact, onClose }) => 
 
   const handleConnect = async (platform: string) => {
     if (!user) return;
-    alert(`This would open an OAuth window to connect your ${platform} account.`);
     try {
        const newSocials = [...connectedAccounts, platform];
        await updateDoc(doc(db, 'users', user.uid), { connectedSocials: newSocials });
@@ -56,14 +55,54 @@ export const AmplifyModal: React.FC<AmplifyModalProps> = ({ fact, onClose }) => 
     }
   };
 
-  const handlePublish = (platform: string, text: string) => {
+  const handlePublish = async (platform: string, text: string) => {
     setPublishStatus((prev) => ({ ...prev, [platform]: 'publishing' }));
+    
+    // Wire up to actual webhook if available
+    if (userData?.cmsWebhookUrl) {
+      try {
+        const response = await fetch(userData.cmsWebhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'SOCIAL_PUBLISH',
+            timestamp: new Date().toISOString(),
+            payload: {
+              platform,
+              content: text
+            }
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Webhook rejected the request');
+        }
+      } catch (err) {
+        console.error("Failed to publish via webhook", err);
+        alert(`Failed to publish via webhook. Please check your Webhook URL in Settings.`);
+        setPublishStatus((prev) => {
+          const newState = { ...prev };
+          delete newState[platform];
+          return newState;
+        });
+        return;
+      }
+    } else {
+      alert("No Platform Webhook URL configured. Please set one in Settings to enable auto-publishing.");
+      setPublishStatus((prev) => {
+        const newState = { ...prev };
+        delete newState[platform];
+        return newState;
+      });
+      return;
+    }
+
     setTimeout(() => {
       setPublishStatus((prev) => ({ ...prev, [platform]: 'published' }));
       if (auth.currentUser) {
         logAuditAction(auth.currentUser.uid, 'CONTENT_AUTO_PUBLISHED', { platform });
       }
-    }, 1500);
+    }, 500);
   };
 
   useEffect(() => {

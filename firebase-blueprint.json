@@ -44,11 +44,17 @@
       "properties": {
         "userId": { "type": "string" },
         "name": { "type": "string" },
+        "url": { "type": "string" },
+        "decayScore": { "type": "number" },
         "decayStatus": { "type": "string", "enum": ["healthy", "decaying", "stale"] },
         "trojanHorseOpportunity": { "type": "boolean" },
+        "vulnerabilities": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
         "lastUpdated": { "type": "string", "format": "date-time" }
       },
-      "required": ["userId", "name", "decayStatus", "trojanHorseOpportunity", "lastUpdated"]
+      "required": ["userId", "name", "url", "decayScore", "decayStatus", "trojanHorseOpportunity", "lastUpdated", "vulnerabilities"]
     },
     "Lead": {
       "title": "Lead",

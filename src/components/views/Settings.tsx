@@ -56,10 +56,6 @@ export function Settings() {
       
     setConnectedSocials(newSocials);
     
-    if (!isConnected) {
-       alert(`This would open an OAuth window to connect your ${platform} account.`);
-    }
-    
     try {
        const userRef = doc(db, 'users', user.uid);
        await updateDoc(userRef, { connectedSocials: newSocials });

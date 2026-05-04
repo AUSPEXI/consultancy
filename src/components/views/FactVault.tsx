@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Database, Lock, Unlock, CheckCircle2, AlertCircle, Plus, X, Loader2, Megaphone, Sparkles, Search } from 'lucide-react';
+import { Database, Lock, Unlock, CheckCircle2, AlertCircle, Plus, X, Loader2, Megaphone, Sparkles, Search, Network } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/firebase';
 import { collection, addDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
@@ -372,12 +372,41 @@ export function FactVault() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button
-                        onClick={() => setAmplifyingFact(fact.statement)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 hover:text-pink-300 transition-colors text-xs font-medium border border-pink-500/20"
-                      >
-                        <Megaphone className="w-3.5 h-3.5" /> Amplify
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => {
+                            const ontologyData = {
+                              "@context": "https://schema.org",
+                              "@type": "Fact",
+                              "text": fact.statement,
+                              "entropyScore": fact.entropyScore,
+                              "status": fact.cliffhangerActive ? "gated" : "public",
+                              "about": {
+                                "@type": "Thing",
+                                "name": "Brand Fact"
+                              }
+                            };
+                            const blob = new Blob([JSON.stringify(ontologyData, null, 2)], { type: 'application/ld+json' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `ontology-fact-${fact.id}.json`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 transition-colors text-xs font-medium border border-indigo-500/20"
+                        >
+                          <Network className="w-3.5 h-3.5" /> Map Ontology
+                        </button>
+                        <button
+                          onClick={() => setAmplifyingFact(fact.statement)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 hover:text-pink-300 transition-colors text-xs font-medium border border-pink-500/20"
+                        >
+                          <Megaphone className="w-3.5 h-3.5" /> Amplify
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

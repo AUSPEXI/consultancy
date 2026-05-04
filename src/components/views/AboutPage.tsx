@@ -55,18 +55,18 @@ export function AboutPage() {
             viewport={{ once: true }}
             className="space-y-6 text-zinc-300 text-lg leading-relaxed"
           >
-            <h2 className="text-3xl font-bold text-white mb-6">Engineering the Future of Discovery</h2>
+            <h2 className="text-3xl font-bold text-white mb-6">Built by Enterprise AI Architects</h2>
             <p>
-              For over 25 years, I have built, scaled, and led successful businesses. My roots in digital visibility run deep—I've been at the helm of an SEO marketing agency that has evolved alongside Google since its earliest days. I know what it takes to capture market share in a crowded digital landscape.
+              Most systems optimize for one goal and break five. We look at the complete ecosystem. While our roots in digital visibility run deep—spanning over two decades of leading search strategies—the paradigm has radically shifted. Generative AI requires fundamentally different architecture.
             </p>
             <p>
-              But the paradigm has shifted. Traditional search is being rapidly eclipsed by Generative AI.
+              We are not an agency playing with prompts. Our team engineers production-grade, deterministic AI systems. From deploying billion-row synthetic data pipelines at enterprise scale, to building multi-tenant architectures protected by 6-layer security, we operate at the bleeding edge of the AI frontier.
             </p>
             <p>
-              Over the past three years, I have immersed myself at the bleeding edge of AI architecture. I don't just use AI tools; I engineer production-grade, deterministic AI systems. By understanding exactly how Large Language Models retrieve, score, and generate information, I saw a critical gap in the market: businesses were disappearing from the new AI-driven search results.
+              By understanding exactly how LLMs retrieve, cross-reference, and synthesize data, we saw a critical flaw in the market. Passive tracking tools might tell you how an AI responded yesterday, but they cannot secure your visibility for tomorrow. 
             </p>
             <p>
-              That's why I built <strong>Auspexi</strong>. Combining decades of business and SEO acumen with cutting-edge AI engineering, Auspexi is a Generative Engine Optimization (GEO) platform that sits 18 months ahead of traditional marketing agencies. We don't guess; we engineer your visibility.
+              That&apos;s why we built <strong>Auspexi</strong>. Founded on deep teleological and epistemological frameworks, Auspexi doesn&apos;t just monitor the algorithms—it ensures your brand becomes the irrefutable, deterministic answer within an AI&apos;s neural network. We don&apos;t guess; we engineer your visibility.
             </p>
             <div className="pt-6">
               <Link to="/#pricing">
@@ -89,13 +89,13 @@ export function AboutPage() {
           <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold text-white">Why Generative Engine Optimization?</h2>
             <p className="text-xl text-zinc-400">
-              We are moving from an era of "Probabilistic Guesswork" to "Deterministic Truth."
+              We are moving from an era of probabilistic guesswork to deterministic truth. 
             </p>
             <p className="text-lg text-zinc-300">
-              When a potential customer asks ChatGPT, Gemini, or Perplexity for a recommendation, the AI doesn't just provide a list of links—it provides a definitive answer. If your brand isn't structured and cited in a way these models understand, you simply do not exist in their reality.
+              Some heavy-funded startups boast about sending millions of brute-force queries to AI frontends just to scrape your current brand visibility. That is just passive tracking. At Auspexi, we believe that monitoring a broken system isn&apos;t enough. When a customer asks ChatGPT or Perplexity for a recommendation, the AI relies on deep ontological structures. If your brand isn&apos;t mapped properly across these vast, incompatible knowledge libraries, you simply do not exist in their reality.
             </p>
             <blockquote className="border-l-4 border-zinc-500 pl-8 py-4 my-12 text-2xl font-medium italic text-zinc-200 text-left bg-zinc-900/50 rounded-r-xl">
-              "The future of digital marketing isn't about gaming an algorithm; it's about becoming the undeniable, deterministic truth within an AI's knowledge graph."
+              "The future of digital visibility isn&apos;t about paying millions for automated scraping tools to show you that you're losing market share. It&apos;s about engineering the fundamental knowledge graphs to ensure you win."
             </blockquote>
           </div>
         </motion.div>
@@ -113,18 +113,18 @@ export function AboutPage() {
             {[
               {
                 icon: <Target className="w-8 h-8 text-zinc-100" />,
-                title: "Precision Targeting",
-                desc: "We analyze how LLMs process queries in your industry, identifying the exact semantic triggers needed to position your brand as the top recommendation."
+                title: "Ontological Interoperability",
+                desc: "We don't rely on simple keywords. We build sophisticated semantic frameworks, making incompatible LLM knowledge libraries recognize your brand's authority seamlessly."
               },
               {
                 icon: <BrainCircuit className="w-8 h-8 text-zinc-100" />,
-                title: "Knowledge Graph Integration",
-                desc: "We structure your brand's digital footprint so it seamlessly integrates into the knowledge graphs that power modern AI engines."
+                title: "Enterprise AI Orchestration",
+                desc: "Powered by complex multi-model routing and synthetic data pipelines, our backend engineers deep, deterministic consensus rather than just tracking it."
               },
               {
                 icon: <LineChart className="w-8 h-8 text-zinc-100" />,
-                title: "Deterministic Results",
-                desc: "Moving beyond traditional SEO guesswork, we use rigorous, data-driven methodologies to track, verify, and secure your AI citation share."
+                title: "Proactive GEO Influence",
+                desc: "While heavily funded tools charge millions to scrape and report on LLM responses, Auspexi architects the foundation required to actively secure those citations."
               }
             ].map((feature, i) => (
               <motion.div 
@@ -156,14 +156,14 @@ export function AboutPage() {
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Partner with Authority</h2>
               <p className="text-xl text-zinc-400 mb-8">
-                When you subscribe to Auspexi, you aren't just buying software. You are partnering with a team that understands the fundamental architecture of the AI revolution.
+                When you subscribe to Auspexi, you aren&apos;t just buying software. You are partnering with a dedicated engineering unit that understands the fundamental architecture of the AI revolution.
               </p>
               <ul className="space-y-6">
                 {[
-                  "25+ years of proven business and marketing leadership",
-                  "Deep expertise in AI orchestration and LLM mechanics",
-                  "Strategies built for the next decade of search",
-                  "A system engineered 18 months ahead of the curve"
+                  "Makers of billion-row synthetic data pipelines and Edge LLMs",
+                  "Enterprise environments secured by 6-layer GDPR architecture",
+                  "Pioneers of teleological and epistemological AI frameworks",
+                  "Engineers operating 18+ months ahead of traditional agencies"
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-4 text-zinc-300 text-lg">
                     <CheckCircle2 className="w-6 h-6 text-zinc-500 shrink-0 mt-1" />

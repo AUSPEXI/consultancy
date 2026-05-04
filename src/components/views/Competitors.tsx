@@ -200,8 +200,9 @@ export function Competitors() {
       } catch (fsError) {
          handleFirestoreError(fsError, OperationType.CREATE, 'competitors');
       }
-    } catch (error) {
+    } catch (error: any) {
        console.error("Unknown error:", error);
+       alert("An error occurred: " + (error?.message || "Unknown error"));
     } finally {
       setIsAnalyzing(false);
     }

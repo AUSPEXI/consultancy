@@ -88,13 +88,15 @@ service cloud.firestore {
     }
 
     function isValidCompetitor(data) {
-      return hasOnlyAllowedFields(['userId', 'name', 'url', 'decayScore', 'lastUpdated', 'vulnerabilities']) &&
+      return hasOnlyAllowedFields(['userId', 'name', 'url', 'decayScore', 'lastUpdated', 'vulnerabilities', 'decayStatus', 'trojanHorseOpportunity']) &&
              data.userId is string && data.userId.size() > 0 && data.userId.size() < 50 &&
              data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
              data.url is string && data.url.size() <= 500 &&
              data.decayScore is number && data.decayScore >= 0 && data.decayScore <= 100 &&
              data.lastUpdated is string && isValidDateString(data.lastUpdated) &&
-             data.vulnerabilities is list && data.vulnerabilities.size() <= 20;
+             data.vulnerabilities is list && data.vulnerabilities.size() <= 20 &&
+             data.decayStatus in ['healthy', 'decaying', 'stale'] &&
+             data.trojanHorseOpportunity is bool;
     }
 
     function isValidLead(data) {

@@ -524,10 +524,10 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               benefits={[
                 { text: "Track 1 Brand, 5 Keywords", checked: true },
                 { text: "Citacious AI Analyst (Standard)", checked: true },
-                { text: "AI SOV Overview & Fact-Vault", checked: true },
+                { text: "Basic Semantic Ontology Map", checked: true },
                 { text: "Content Scorer Access", checked: true },
                 { text: "30-Day Metric Analytics Storage", checked: true },
-                { text: "Track A-SOV (Absolute Share of Voice)", checked: true },
+                { text: "Epistemological Engine (Deep Truth)", checked: false },
                 { text: "Standard Audit Logging", checked: true },
                 { text: "12-Month Citacious Context Memory", checked: false },
               ]}
@@ -542,8 +542,9 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
                 { text: "Track 3 Brands, 25 Keywords", checked: true },
                 { text: "Citacious AI Analyst (Advanced)", checked: true },
                 { text: "Competitor Radar", checked: true },
-                { text: "Basic AI Referral Tracking", checked: true },
+                { text: "Advanced Semantic Ontology Mapping", checked: true },
                 { text: "Content Scorer Access", checked: true },
+                { text: "Epistemological Engine (Deep Truth)", checked: false },
                 { text: "12-Month Citacious Context Memory", checked: true },
               ]}
             />
@@ -556,10 +557,10 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               benefits={[
                 { text: "Track Unlimited Brands", checked: true },
                 { text: "Dedicated Citacious AI Analyst", checked: true },
+                { text: "Epistemological Engine (Deep Truth)", checked: true },
                 { text: "SOV Simulator & Brand Monitor", checked: true },
-                { text: "Data Decay Alerts", checked: true },
+                { text: "Ontological Interoperability Export", checked: true },
                 { text: "90-Day Metric Analytics Storage", checked: true },
-                { text: "Track Entity Recall Rate (ERR)", checked: true },
                 { text: "12-Month Citacious Context Memory", checked: true },
               ]}
             />
@@ -570,12 +571,12 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               CTA="Talk to AI Sales"
               onClick={() => window.location.href = '/voice-agents'}
               benefits={[
-                { text: "Multi-Agent Orchestration Crew", checked: true },
+                { text: "Teleological Optimization Framework", checked: true },
+                { text: "Enterprise Ontological Interoperability", checked: true },
+                { text: "Epistemological Synthesis Engine", checked: true },
                 { text: "Dedicated Citacious AI Analyst", checked: true },
                 { text: "Edge & Schema Generator", checked: true },
                 { text: "Unlimited Dashboard Analytics Storage", checked: true },
-                { text: "Complete 'Prove It Works' Metric Suite", checked: true },
-                { text: "Vector Embeddings & Context Caching", checked: true },
                 { text: "12-Month Citacious Context Memory", checked: true },
               ]}
             />
