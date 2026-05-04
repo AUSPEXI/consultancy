@@ -50,6 +50,12 @@ export function Settings() {
   const handleToggleSocial = async (platform: string) => {
     if (!user) return;
     const isConnected = connectedSocials.includes(platform);
+    
+    if (!isConnected) {
+      const result = window.prompt(`Please enter your ${platform} profile URL, ID, or Token to connect:`);
+      if (!result) return;
+    }
+
     const newSocials = isConnected 
       ? connectedSocials.filter(p => p !== platform) 
       : [...connectedSocials, platform];
@@ -59,10 +65,12 @@ export function Settings() {
     try {
        const userRef = doc(db, 'users', user.uid);
        await updateDoc(userRef, { connectedSocials: newSocials });
+       alert(`Successfully ${isConnected ? 'disconnected' : 'connected'} ${platform}!`);
     } catch (error) {
-       handleFirestoreError(error, OperationType.UPDATE, `users/${user.uid}`);
+       console.error(error);
        // Revert on error
        setConnectedSocials(connectedSocials);
+       alert("Failed to update social connections. Please ensure your Firestore rules are updated in your Firebase console.");
     }
   };
 
@@ -92,8 +100,10 @@ export function Settings() {
         keywords
       });
       console.log('Settings updated successfully');
+      alert("Settings saved successfully!");
     } catch (error) {
-      handleFirestoreError(error, OperationType.UPDATE, `users/${user.uid}`);
+      console.error(error);
+      alert("Failed to save settings. Please ensure your Firestore Security Rules match the updated code in your Firebase console.");
     } finally {
       setIsSaving(false);
     }
