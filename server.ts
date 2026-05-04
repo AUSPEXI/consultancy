@@ -147,6 +147,21 @@ app.use(express.json());
       });
       
       fs.writeFileSync(logsPath, JSON.stringify(logs, null, 2));
+
+      // Handle Ontology Injection
+      if (payload.type === 'ontology_injection' && payload.ontology) {
+        const schemaPath = path.join(process.cwd(), "src", "data", "activeSchema.json");
+        // Ensure data directory exists
+        const dir = path.dirname(schemaPath);
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        
+        let existingSchemas = [];
+        if (fs.existsSync(schemaPath)) {
+          existingSchemas = JSON.parse(fs.readFileSync(schemaPath, "utf-8"));
+        }
+        existingSchemas.push(payload.ontology);
+        fs.writeFileSync(schemaPath, JSON.stringify(existingSchemas, null, 2));
+      }
       
       res.json({ success: true, message: "Webhook received and logged securely." });
     } catch (err: any) {
@@ -165,6 +180,19 @@ app.use(express.json());
       }
     } catch(err: any) {
       res.status(500).json({ error: "Failed to read logs" });
+    }
+  });
+
+  app.get("/api/schema/active", (req, res) => {
+    try {
+      const schemaPath = path.join(process.cwd(), "src", "data", "activeSchema.json");
+      if (fs.existsSync(schemaPath)) {
+        res.json(JSON.parse(fs.readFileSync(schemaPath, "utf-8")));
+      } else {
+        res.json([]);
+      }
+    } catch(err: any) {
+      res.status(500).json({ error: "Failed to read active schemas" });
     }
   });
 

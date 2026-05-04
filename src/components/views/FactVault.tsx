@@ -374,7 +374,7 @@ export function FactVault() {
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <button
-                          onClick={() => {
+                          onClick={async () => {
                             const ontologyData = {
                               "@context": "https://schema.org",
                               "@type": "Fact",
@@ -386,15 +386,37 @@ export function FactVault() {
                                 "name": "Brand Fact"
                               }
                             };
-                            const blob = new Blob([JSON.stringify(ontologyData, null, 2)], { type: 'application/ld+json' });
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `ontology-fact-${fact.id}.json`;
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            URL.revokeObjectURL(url);
+                            
+                            const downloadFallback = () => {
+                              const blob = new Blob([JSON.stringify(ontologyData, null, 2)], { type: 'application/ld+json' });
+                              const url = URL.createObjectURL(blob);
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = `ontology-fact-${fact.id}.json`;
+                              document.body.appendChild(a);
+                              a.click();
+                              document.body.removeChild(a);
+                              URL.revokeObjectURL(url);
+                            };
+
+                            if (userData?.cmsWebhookUrl) {
+                              try {
+                                const response = await fetch(userData.cmsWebhookUrl, {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ type: 'ontology_injection', ontology: ontologyData })
+                                });
+                                if (!response.ok) throw new Error('Webhook rejected');
+                                alert("Successfully injected ontology schema via your CMS Webhook.");
+                              } catch (e) {
+                                console.error(e);
+                                alert("Failed to push ontology to Webhook. Downloading fallback ontology file instead.");
+                                downloadFallback();
+                              }
+                            } else {
+                              downloadFallback();
+                              alert("Ontology JSON-LD downloaded! To automatically inject schema directly to your CMS, configure a Webhook URL in Settings.");
+                            }
                           }}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 transition-colors text-xs font-medium border border-indigo-500/20"
                         >

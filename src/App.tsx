@@ -28,6 +28,37 @@ function AppContent() {
   const location = useLocation();
 
   useEffect(() => {
+    // Fetch embedded schemas injected via Webhook
+    const fetchActiveSchema = async () => {
+      try {
+        const res = await fetch('/api/schema/active');
+        if (res.ok) {
+          const schemas = await res.json();
+          if (schemas && schemas.length > 0) {
+            // Remove any previously injected schema tags
+            document.querySelectorAll('script[data-auspexi-schema="true"]').forEach(e => e.remove());
+            
+            // Inject new combined schemas
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.setAttribute('data-auspexi-schema', 'true');
+            // Using Graph structure for multiple schemas
+            const graphSchema = {
+              "@context": "https://schema.org",
+              "@graph": schemas
+            };
+            script.innerHTML = JSON.stringify(graphSchema);
+            document.head.appendChild(script);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load active schemas", err);
+      }
+    };
+    fetchActiveSchema();
+  }, [location.pathname]); // Re-run when navigation happens if needed
+
+  useEffect(() => {
     const handleStripeRedirect = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const success = urlParams.get('success');
