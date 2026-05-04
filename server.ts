@@ -134,7 +134,7 @@ app.use(express.json());
       console.log("----- RECEIVED WEBHOOK FROM AUSPEXI -----");
       console.log(JSON.stringify(payload, null, 2));
       
-      const logsPath = path.join(process.cwd(), "src", "data", "webhookLogs.json");
+      const logsPath = path.join("/tmp", "webhookLogs.json");
       
       let logs = [];
       if (fs.existsSync(logsPath)) {
@@ -150,7 +150,7 @@ app.use(express.json());
 
       // Handle Ontology Injection
       if (payload.type === 'ontology_injection' && payload.ontology) {
-        const schemaPath = path.join(process.cwd(), "src", "data", "activeSchema.json");
+        const schemaPath = path.join("/tmp", "activeSchema.json");
         // Ensure data directory exists
         const dir = path.dirname(schemaPath);
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -172,7 +172,7 @@ app.use(express.json());
 
   app.get("/api/webhooks/logs", (req, res) => {
     try {
-      const logsPath = path.join(process.cwd(), "src", "data", "webhookLogs.json");
+      const logsPath = path.join("/tmp", "webhookLogs.json");
       if (fs.existsSync(logsPath)) {
         res.json(JSON.parse(fs.readFileSync(logsPath, "utf-8")));
       } else {
@@ -185,7 +185,7 @@ app.use(express.json());
 
   app.get("/api/schema/active", (req, res) => {
     try {
-      const schemaPath = path.join(process.cwd(), "src", "data", "activeSchema.json");
+      const schemaPath = path.join("/tmp", "activeSchema.json");
       if (fs.existsSync(schemaPath)) {
         res.json(JSON.parse(fs.readFileSync(schemaPath, "utf-8")));
       } else {
@@ -557,7 +557,7 @@ Format the output in clean Markdown.
       // Prepare Lead Storage for Funnel Cron
       const saveLeadPromise = (async () => {
         try {
-          const leadsPath = path.join(process.cwd(), "src", "data", "leads.json");
+          const leadsPath = path.join("/tmp", "leads.json");
           let leads = [];
           if (fs.existsSync(leadsPath)) {
             const content = fs.readFileSync(leadsPath, "utf-8");
