@@ -66,7 +66,7 @@ export function AboutPage() {
               By understanding exactly how LLMs retrieve, cross-reference, and synthesize data, we saw a critical flaw in the market. Passive tracking tools might tell you how an AI responded yesterday, but they cannot secure your visibility for tomorrow. 
             </p>
             <p>
-              That&apos;s why we built <strong>Auspexi</strong>. Founded on deep teleological and epistemological frameworks, Auspexi doesn&apos;t just monitor the algorithms—it ensures your brand becomes the irrefutable, deterministic answer within an AI&apos;s neural network. We don&apos;t guess; we engineer your visibility.
+              That&apos;s why we built <strong>Auspexi</strong>. Founded on deep data-science and strategic schema frameworks, Auspexi doesn&apos;t just monitor the algorithms—it ensures your brand becomes the irrefutable, deterministic answer within an AI&apos;s neural network. We don&apos;t guess; we engineer your visibility.
             </p>
             <div className="pt-6">
               <Link to="/#pricing">
@@ -162,7 +162,7 @@ export function AboutPage() {
                 {[
                   "Makers of billion-row synthetic data pipelines and Edge LLMs",
                   "Enterprise environments secured by 6-layer GDPR architecture",
-                  "Pioneers of teleological and epistemological AI frameworks",
+                  "Pioneers of semantic mapping and structured entity data",
                   "Engineers operating 18+ months ahead of traditional agencies"
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-4 text-zinc-300 text-lg">

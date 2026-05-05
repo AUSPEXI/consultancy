@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Link, useLocation } from 'react-router-dom';
 import { blogPosts } from '@/data/blogPosts';
+import { BlogHero } from '@/components/BlogHero';
 import { cn } from '@/lib/utils';
 
 export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
@@ -523,11 +524,11 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               onClick={() => handleCheckout('Basic')}
               benefits={[
                 { text: "Track 1 Brand, 5 Keywords", checked: true },
-                { text: "Citacious AI Analyst (Standard)", checked: true },
-                { text: "Basic Semantic Ontology Map", checked: true },
+                { text: "Citacious AI Copilot (Standard)", checked: true },
+                { text: "Fact-Vault Access", checked: true },
                 { text: "Content Scorer Access", checked: true },
                 { text: "30-Day Metric Analytics Storage", checked: true },
-                { text: "Epistemological Engine (Deep Truth)", checked: false },
+                { text: "Basic Semantic Ontology Map", checked: true },
                 { text: "Standard Audit Logging", checked: true },
                 { text: "12-Month Citacious Context Memory", checked: false },
               ]}
@@ -540,11 +541,11 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               onClick={() => handleCheckout('Pro')}
               benefits={[
                 { text: "Track 3 Brands, 25 Keywords", checked: true },
-                { text: "Citacious AI Analyst (Advanced)", checked: true },
+                { text: "Citacious AI Copilot (Advanced)", checked: true },
                 { text: "Competitor Radar", checked: true },
-                { text: "Advanced Semantic Ontology Mapping", checked: true },
+                { text: "Fact-Vault Auto-Research", checked: true },
+                { text: "Omnichannel Amplifier", checked: true },
                 { text: "Content Scorer Access", checked: true },
-                { text: "Epistemological Engine (Deep Truth)", checked: false },
                 { text: "12-Month Citacious Context Memory", checked: true },
               ]}
             />
@@ -556,10 +557,10 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               onClick={() => handleCheckout('Business')}
               benefits={[
                 { text: "Track Unlimited Brands", checked: true },
-                { text: "Dedicated Citacious AI Analyst", checked: true },
-                { text: "Epistemological Engine (Deep Truth)", checked: true },
-                { text: "SOV Simulator & Brand Monitor", checked: true },
-                { text: "Ontological Interoperability Export", checked: true },
+                { text: "Dedicated Citacious AI Copilot", checked: true },
+                { text: "SOV Simulator Matrix", checked: true },
+                { text: "Brand Monitor & Counter-Narratives", checked: true },
+                { text: "Edge Schema (JSON-LD) Generator", checked: true },
                 { text: "90-Day Metric Analytics Storage", checked: true },
                 { text: "12-Month Citacious Context Memory", checked: true },
               ]}
@@ -571,11 +572,11 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               CTA="Talk to AI Sales"
               onClick={() => window.location.href = '/voice-agents'}
               benefits={[
-                { text: "Teleological Optimization Framework", checked: true },
-                { text: "Enterprise Ontological Interoperability", checked: true },
-                { text: "Epistemological Synthesis Engine", checked: true },
-                { text: "Dedicated Citacious AI Analyst", checked: true },
-                { text: "Edge & Schema Generator", checked: true },
+                { text: "Custom Brand & Keyword Tracking", checked: true },
+                { text: "Dedicated Citacious AI Copilot", checked: true },
+                { text: "SOV Simulator Matrix & API Access", checked: true },
+                { text: "Brand Monitor & Counter-Narratives", checked: true },
+                { text: "Edge Schema (JSON-LD) Generator", checked: true },
                 { text: "Unlimited Dashboard Analytics Storage", checked: true },
                 { text: "12-Month Citacious Context Memory", checked: true },
               ]}
@@ -611,8 +612,8 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {blogPosts.slice(0, 3).map((post, i) => (
               <Link to={`/blog/${post.slug}`} key={i} className="group cursor-pointer flex flex-col">
-                <div className="aspect-[16/9] rounded-xl overflow-hidden mb-4 border border-zinc-800">
-                  <img src={post.image} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                <div className="w-full flex min-h-[220px] rounded-xl overflow-hidden mb-4 border border-zinc-800 relative bg-[#0B0E14]">
+                  <BlogHero title={post.title} category={post.category} compact={true} />
                 </div>
                 <div className="flex items-center gap-3 text-xs font-medium text-zinc-500 mb-2">
                   <span className="text-pink-400 bg-pink-400/10 px-2 py-1 rounded-md">{post.category}</span>

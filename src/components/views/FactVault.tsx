@@ -401,16 +401,24 @@ export function FactVault() {
 
                             if (userData?.cmsWebhookUrl) {
                               try {
-                                const response = await fetch(userData.cmsWebhookUrl, {
+                                let webhookUrl = userData.cmsWebhookUrl.trim();
+                                // If the user provided the frontend URL but they are on a different environment, 
+                                // it may fail due to CORS. 
+                                // To make testing easier, use a local URL if it seems they want the current app backend:
+                                if (webhookUrl.includes('/api/webhooks/auspexi')) {
+                                   webhookUrl = '/api/webhooks/auspexi';
+                                }
+
+                                const response = await fetch(webhookUrl, {
                                   method: 'POST',
                                   headers: { 'Content-Type': 'application/json' },
                                   body: JSON.stringify({ type: 'ontology_injection', ontology: ontologyData })
                                 });
                                 if (!response.ok) throw new Error('Webhook rejected');
                                 alert("Successfully injected ontology schema via your CMS Webhook.");
-                              } catch (e) {
+                              } catch (e: any) {
                                 console.error(e);
-                                alert("Failed to push ontology to Webhook. Downloading fallback ontology file instead.");
+                                alert("Failed to push ontology to Webhook. If you see 'Failed to fetch', ensure the Webhook URL is correct, or if using the Shared App URL, ensure you click 'Share' again to deploy the latest backend changes. Falling back to download.");
                                 downloadFallback();
                               }
                             } else {
