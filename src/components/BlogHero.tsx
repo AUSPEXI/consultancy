@@ -11,7 +11,7 @@ interface BlogHeroProps {
 export function BlogHero({ title, category, className = '', compact = false }: BlogHeroProps) {
   
   return (
-    <div className={`relative w-full h-full bg-[#0B0E14] overflow-hidden flex items-center justify-center ${compact ? 'p-4' : 'p-8'} ${className}`}>
+    <div className={`relative w-full min-h-full bg-[#0B0E14] overflow-hidden flex items-center justify-center ${compact ? 'p-4' : 'p-8'} ${className}`}>
       {/* Subtle vector grid */}
       <div 
         className="absolute inset-0 opacity-[0.15] pointer-events-none"
@@ -26,7 +26,7 @@ export function BlogHero({ title, category, className = '', compact = false }: B
       <div className="absolute bottom-[20%] right-[20%] w-[50%] h-[50%] bg-[#DB2777]/20 rounded-full blur-[80px] mix-blend-screen pointer-events-none" />
       
       {/* Glassmorphism card overlay */}
-      <div className={`relative z-10 w-full h-full flex ${compact ? 'flex-col md:flex-row items-start md:items-center p-4 gap-4' : 'flex-col sm:flex-row items-center p-6 sm:p-8 gap-6 sm:gap-8'} rounded-xl border border-pink-500/20 bg-zinc-950/40 backdrop-blur-md shadow-[0_0_30px_-5px_rgba(236,72,153,0.15)]`}>
+      <div className={`relative z-10 w-full min-h-full flex ${compact ? 'flex-col md:flex-row items-start md:items-center p-4 gap-4' : 'flex-col sm:flex-row items-center p-6 sm:p-8 gap-6 sm:gap-8'} rounded-xl border border-pink-500/20 bg-zinc-900/60 backdrop-blur-md shadow-[0_0_30px_-5px_rgba(236,72,153,0.15)]`}>
         
         {/* Stylized Logo / Data-Viz Element */}
         <div className={`flex-shrink-0 flex items-center justify-center rounded-full border border-pink-500/30 ${compact ? 'w-12 h-12 md:w-16 md:h-16' : 'w-20 h-20 sm:w-28 sm:h-28'} bg-zinc-900/50 relative overflow-hidden group`}>
