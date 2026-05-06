@@ -123,7 +123,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
     {
       Icon: BarChart3,
       name: "SOV Simulator & Brand Monitor",
-      description: "Track your brand's visibility across Gemini, ChatGPT, and Claude in real-time. Understand exactly how often you are recommended versus your competitors.",
+      description: "Track your brand's visibility across Gemini, ChatGPT, and Claude in real-time. Understand exactly how often you are recommended for high-intent industry queries.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-3 lg:row-start-3 lg:row-end-4",
     },
@@ -136,8 +136,8 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
     },
     {
       Icon: ShieldAlert,
-      name: "Trojan Horse Strategy",
-      description: "Identify competitor data decay and replace their stale answers with your fresh insights. Capitalize on the typical 6-12 month lag in LLM training data updates by feeding real-time JSON-LD corrections directly to AI crawlers.",
+      name: "Continuous Relevance Tracking",
+      description: "Identify where your brand's data is decaying in AI memory and replace stale answers with your fresh insights. Capitalize on the typical 6-12 month lag in LLM training data updates by feeding real-time JSON-LD corrections directly to AI crawlers.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-rose-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-5",
     },
@@ -158,7 +158,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       role: "CMO, TechFlow",
     },
     {
-      text: "The Trojan Horse feature is incredible. We identified exactly where our biggest competitor was decaying in ChatGPT's memory and replaced them within weeks.",
+      text: "The Content Scorer is incredible. We found exactly why our engineering blog wasn't being cited by ChatGPT, fixed our semantic structure, and saw an immediate jump in brand recommendations.",
       image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
       name: "Marcus Chen",
       role: "VP Growth, DataSync",
@@ -403,8 +403,8 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
                     <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
                       <Search className="w-5 h-5 text-zinc-300" />
                     </div>
-                    <h3 className="text-xl font-semibold text-white">Competitor Decay Tracking</h3>
-                    <p className="text-zinc-400 text-sm">Monitor your competitors' outdated information in AI models and replace it with your fresh insights.</p>
+                    <h3 className="text-xl font-semibold text-white">Knowledge Decay Tracking</h3>
+                    <p className="text-zinc-400 text-sm">Monitor your historical context in AI models and replace outdated information with your fresh insights.</p>
                   </div>
                 </div>
               </div>
@@ -542,7 +542,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               benefits={[
                 { text: "Track 3 Brands, 25 Keywords", checked: true },
                 { text: "Citacious AI Copilot (Advanced)", checked: true },
-                { text: "Competitor Radar", checked: true },
+                { text: "Context Visibility Radar", checked: true },
                 { text: "Fact-Vault Auto-Research", checked: true },
                 { text: "Omnichannel Amplifier", checked: true },
                 { text: "Content Scorer Access", checked: true },
@@ -559,7 +559,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
                 { text: "Track Unlimited Brands", checked: true },
                 { text: "Dedicated Citacious AI Copilot", checked: true },
                 { text: "SOV Simulator Matrix", checked: true },
-                { text: "Brand Monitor & Counter-Narratives", checked: true },
+                { text: "Real-time Brand Monitor", checked: true },
                 { text: "Edge Schema (JSON-LD) Generator", checked: true },
                 { text: "90-Day Metric Analytics Storage", checked: true },
                 { text: "12-Month Citacious Context Memory", checked: true },
@@ -575,7 +575,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
                 { text: "Custom Brand & Keyword Tracking", checked: true },
                 { text: "Dedicated Citacious AI Copilot", checked: true },
                 { text: "SOV Simulator Matrix & API Access", checked: true },
-                { text: "Brand Monitor & Counter-Narratives", checked: true },
+                { text: "Real-time Brand Monitor", checked: true },
                 { text: "Edge Schema (JSON-LD) Generator", checked: true },
                 { text: "Unlimited Dashboard Analytics Storage", checked: true },
                 { text: "12-Month Citacious Context Memory", checked: true },

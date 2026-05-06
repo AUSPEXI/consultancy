@@ -63,7 +63,7 @@ export function AboutPage() {
               We are not an agency playing with prompts. Our team engineers production-grade, deterministic AI systems. From deploying billion-row synthetic data pipelines at enterprise scale, to building multi-tenant architectures protected by 6-layer security, we operate at the bleeding edge of the AI frontier.
             </p>
             <p>
-              By understanding exactly how LLMs retrieve, cross-reference, and synthesize data, we saw a critical flaw in the market. Passive tracking tools might tell you how an AI responded yesterday, but they cannot secure your visibility for tomorrow. 
+              By understanding exactly how LLMs retrieve, cross-reference, and synthesize data, we focus on engineering your future outcomes. Instead of measuring past responses, our architecture actively secures your visibility for tomorrow's queries.
             </p>
             <p>
               That&apos;s why we built <strong>Auspexi</strong>. Founded on deep data-science and strategic schema frameworks, Auspexi doesn&apos;t just monitor the algorithms—it ensures your brand becomes the irrefutable, deterministic answer within an AI&apos;s neural network. We don&apos;t guess; we engineer your visibility.
@@ -92,10 +92,10 @@ export function AboutPage() {
               We are moving from an era of probabilistic guesswork to deterministic truth. 
             </p>
             <p className="text-lg text-zinc-300">
-              Some heavy-funded startups boast about sending millions of brute-force queries to AI frontends just to scrape your current brand visibility. That is just passive tracking. At Auspexi, we believe that monitoring a broken system isn&apos;t enough. When a customer asks ChatGPT or Perplexity for a recommendation, the AI relies on deep ontological structures. If your brand isn&apos;t mapped properly across these vast, incompatible knowledge libraries, you simply do not exist in their reality.
+              At Auspexi, we believe that true visibility requires proactive engineering. When a customer asks ChatGPT or Perplexity for a recommendation, the AI relies on deep structured data. By mapping your brand seamlessly across these vast knowledge libraries, we ensure you become the deterministic answer.
             </p>
             <blockquote className="border-l-4 border-zinc-500 pl-8 py-4 my-12 text-2xl font-medium italic text-zinc-200 text-left bg-zinc-900/50 rounded-r-xl">
-              "The future of digital visibility isn&apos;t about paying millions for automated scraping tools to show you that you're losing market share. It&apos;s about engineering the fundamental knowledge graphs to ensure you win."
+              "The future of digital visibility is engineering the fundamental knowledge graphs to ensure your brand becomes the irrefutable truth in the AI era."
             </blockquote>
           </div>
         </motion.div>
@@ -124,7 +124,7 @@ export function AboutPage() {
               {
                 icon: <LineChart className="w-8 h-8 text-zinc-100" />,
                 title: "Proactive GEO Influence",
-                desc: "While heavily funded tools charge millions to scrape and report on LLM responses, Auspexi architects the foundation required to actively secure those citations."
+                desc: "Auspexi architects the foundational data layer required to actively secure citations, turning passive visibility into a verifiable, deterministic outcome."
               }
             ].map((feature, i) => (
               <motion.div 
@@ -183,7 +183,7 @@ export function AboutPage() {
             <ShieldCheck className="w-12 h-12 text-zinc-100 mb-8" />
             <h3 className="text-3xl font-bold text-white mb-6">Don't Get Left Behind</h3>
             <p className="text-zinc-400 text-lg mb-10 leading-relaxed">
-              The transition to Agentic AI and Generative Search is happening now. Secure your brand's position as the authoritative answer before your competitors do.
+              The transition to Agentic AI and Generative Search is happening now. Secure your brand's position as the authoritative answer for years to come.
             </p>
             <Link to="/#pricing">
               <Button className="w-full bg-white text-black hover:bg-zinc-200 rounded-xl py-6 text-lg font-medium">
