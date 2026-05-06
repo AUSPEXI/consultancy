@@ -11,14 +11,26 @@ interface BlogHeroProps {
 export function BlogHero({ title, category, className = '', compact = false }: BlogHeroProps) {
   
   return (
-    <div className={`relative w-full h-full min-h-full flex flex-col justify-between overflow-hidden bg-[#0B0E14] ${compact ? 'p-4' : 'p-6 md:p-8'} ${className}`}>
+    <div className={`relative w-full h-full min-h-full flex flex-col justify-between overflow-hidden bg-[#0B0E14] ${compact ? 'p-5' : 'p-6 md:p-10'} ${className}`}>
       
       {/* Subtle vector grid in the OUTER frame */}
       <div 
         className="absolute inset-0 opacity-[0.25] pointer-events-none"
         style={{
           backgroundImage: `linear-gradient(to right, #EC4899 1px, transparent 1px), linear-gradient(to bottom, #EC4899 1px, transparent 1px)`,
-          backgroundSize: compact ? '20px 20px' : '40px 40px'
+          backgroundSize: compact ? '20px 20px' : '40px 40px',
+          backgroundPosition: 'center center',
+          WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+          maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+        }}
+      />
+      {/* Horizontal Mask for Grid (to fade top and bottom) */}
+      <div 
+        className="absolute inset-0 pointer-events-none bg-[#0B0E14]"
+        style={{
+          opacity: 0.9,
+          maskImage: 'linear-gradient(to bottom, black 0%, transparent 10%, transparent 90%, black 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 10%, transparent 90%, black 100%)',
         }}
       />
       
