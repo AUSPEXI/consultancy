@@ -11,8 +11,31 @@ import { marked } from "marked";
 import { z } from "zod";
 import rateLimit from "express-rate-limit";
 import { blogPosts } from "./src/data/blogPosts.ts";
+import cron from "node-cron";
+import admin from 'firebase-admin';
 
 dotenv.config();
+
+// Initialize Firebase Admin for Backend Operations (Data Engine)
+if (process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
+  try {
+    const serviceAccount = JSON.parse(Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_BASE64, 'base64').toString('ascii'));
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount)
+    });
+    console.log("Firebase Admin initialized successfully.");
+  } catch (error) {
+    console.error("Failed to initialize Firebase Admin:", error);
+  }
+} else {
+  console.warn("FIREBASE_SERVICE_ACCOUNT_BASE64 is missing. Automatic Data Engine writes will fail until this is set.");
+  // Fallback to application default, which may fail due to IAM rules
+  try {
+    admin.initializeApp();
+  } catch (err) {}
+}
+
+const dbAdmin = admin.apps.length ? admin.firestore() : null;
 
 let stripeClient: Stripe | null = null;
 function getStripe(): Stripe {
@@ -120,6 +143,55 @@ const app = express();
 const PORT = 3000;
 
 app.use(cors());
+
+  // Stripe Webhook MUST go before express.json() to allow raw body access for signature verification
+  app.post('/api/webhook/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!sig || !endpointSecret) {
+      return res.status(400).send('Webhook Secret or Signature missing');
+    }
+
+    let event;
+    try {
+      const stripe = getStripe();
+      event = stripe.webhooks.constructEvent(req.body, sig as string, endpointSecret);
+    } catch (err: any) {
+      console.error(`Webhook Error: ${err.message}`);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const email = session.customer_details?.email;
+      
+      if (email && dbAdmin) {
+        try {
+          const userQuery = await dbAdmin.collection('users').where('email', '==', email).limit(1).get();
+          if (!userQuery.empty) {
+            const userDoc = userQuery.docs[0];
+            const amountTotal = session.amount_total;
+            
+            let newTier = 'Free';
+            if (amountTotal === 11900) newTier = 'Basic';
+            else if (amountTotal === 39900) newTier = 'Pro';
+            else if (amountTotal === 149900) newTier = 'Business';
+            else if (amountTotal === 499900) newTier = 'Enterprise';
+            else if (amountTotal === 49900) newTier = 'PipelineOffer';
+            
+            await userDoc.ref.update({ tier: newTier, updatedAt: new Date().toISOString() });
+            console.log(`Successfully upgraded user ${email} to ${newTier} via Stripe Webhook`);
+          }
+        } catch (error) {
+          console.error('Error updating user tier from webhook:', error);
+        }
+      }
+    }
+
+    res.json({ received: true });
+  });
+
 app.use(express.json());
 
 // API routes FIRST
@@ -688,6 +760,57 @@ Format the output in clean Markdown.
     }
   });
 
+  app.post("/api/brand-monitor", async (req, res) => {
+    try {
+      const { brand } = req.body;
+      if (!brand) return res.status(400).json({ error: "Brand is required" });
+
+      const exa = getExa();
+      const ai = getGemini();
+
+      // 1. Search Exa for Reddit/Quora mentions
+      const searchResult = await exa.searchAndContents(`"${brand}" site:reddit.com OR site:quora.com`, {
+        type: "neural",
+        useAutoprompt: true,
+        numResults: 5,
+        text: true
+      });
+
+      const context = searchResult.results.map((r: any) => `Title: ${r.title}\nURL: ${r.url}\nText: ${r.text}`).join("\n\n").substring(0, 20000);
+
+      // 2. Analyze sentiment with Gemini
+      const prompt = `
+        You are a Defensive GEO Analyst.
+        Analyze the following search results from Reddit and Quora regarding the brand: "${brand}".
+        
+        Context:
+        ${context}
+        
+        Determine the overall sentiment and identify any "Context Poisoning Risks" (negative narratives that could be absorbed by LLMs).
+        
+        Return a JSON object with:
+        - overallSentiment: "Positive", "Neutral", or "Negative"
+        - riskScore: number (0-100, higher means more risk of AI context poisoning)
+        - threads: array of objects { title: string, url: string, sentiment: "Positive" | "Neutral" | "Negative", summary: string }
+        - actionPlan: string (what the brand should do to inject positive counter-narratives)
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+        }
+      });
+
+      const parsedResult = JSON.parse(response.text || "{}");
+      res.json({ success: true, result: parsedResult });
+    } catch (error: any) {
+      console.error("Error in brand monitor:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Dynamic Sitemap Generator
   app.get(["/sitemap.xml", "/api/sitemap.xml"], (req, res) => {
     try {
@@ -754,14 +877,17 @@ ${blogUrls}
       let mode: 'subscription' | 'payment' = 'subscription';
 
       if (tier === 'Basic') {
-        unitAmount = 8900; // $89.00
+        unitAmount = 11900; // $119.00
         productName = 'Auspexi Basic Tier';
-      } else if (tier === 'Medium') {
+      } else if (tier === 'Pro') {
+        unitAmount = 39900; // $399.00
+        productName = 'Auspexi Pro Tier';
+      } else if (tier === 'Business') {
         unitAmount = 149900; // $1,499.00
-        productName = 'Auspexi Medium Tier';
-      } else if (tier === 'Premium') {
+        productName = 'Auspexi Business Tier';
+      } else if (tier === 'Enterprise') {
         unitAmount = 499900; // $4,999.00
-        productName = 'Auspexi Premium Tier';
+        productName = 'Auspexi Enterprise Tier';
       } else if (tier === 'PipelineOffer') {
         unitAmount = 49900; // $499.00
         productName = 'Auspexi Full Access (Pipeline Offer)';
@@ -1073,6 +1199,109 @@ function startEmailFunnelCron() {
       console.error("Funnel cron job error:", err);
     }
   }, 1000 * 60 * 60); // Run once an hour
+
+  // --- AUTOMATIC DATA ENGINE (Runs daily at midnight) ---
+  cron.schedule('0 0 * * *', async () => {
+    console.log("Running Automatic Data Engine...");
+    if (!dbAdmin || !process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
+      console.log("Skipping Data Engine: Firebase Admin not fully authenticated.");
+      return;
+    }
+    
+    try {
+      const usersSnap = await dbAdmin.collection('users').get();
+      const today = new Date();
+      const dateStr = today.toISOString().split('T')[0];
+      const shortDate = today.toLocaleDateString('en-US', { weekday: 'short' });
+      
+      const exa = getExa();
+      const ai = getGemini();
+
+      for (const userDoc of usersSnap.docs) {
+        const userData = userDoc.data();
+        // Only run for paid tiers
+        if (!['Basic', 'Pro', 'Business', 'Enterprise', 'PipelineOffer'].includes(userData.tier)) {
+          continue;
+        }
+
+        if (userData.brand && userData.domain && userData.keywords && userData.keywords.length > 0) {
+          console.log(`Auditing for user: ${userDoc.id}`);
+          
+          const defaultSentimentPrompts = [
+            "Best alternative to top competitor?",
+            "Is the product reliable for enterprise?",
+            "Common user complaints & reviews?",
+            "Pricing compared to market average?"
+          ];
+          const sentimentSchema = defaultSentimentPrompts.map((p: string) => `{ "prompt": "${p.replace(/"/g, '\\"')}", "score": <int -100 to 100> }`).join(",\\n    ");
+          
+          try {
+            // Simplified execution for the cron (similarly to the endpoint but direct)
+            const searchResult = await exa.searchAndContents(userData.keywords.join(" OR "), {
+              type: "neural", useAutoprompt: true, numResults: 5, text: true
+            });
+            const searchContext = searchResult.results.map((r: any) => `Title: ${r.title}\\nURL: ${r.url}\\nText: ${r.text}`).join("\\n\\n").substring(0, 15000);
+            const prompt = `
+              Analyze the following search engine results and calculate the Defensive Share of Voice (aSOV) for the primary brand: "${userData.brand}".
+              Context:
+              ${searchContext}
+              
+              Calculate metrics based on how dominant the brand is vs competitors.
+              
+              Return a JSON object:
+              {
+                "aSov": 45, // 0-100
+                "err": 12, // Entity Recognition Rate 0-100
+                "compGap": 15, // Gap vs strongest competitor
+                "aiTraffic": 340, // Estimated visits redirected from search
+                "compA": 30, // Share for top competitor
+                "platforms": { "chatgpt": 40, "perplexity": 50, "claude": 35, "gemini": 45 },
+                "radar": [
+                  { "subject": "Pricing Insights", "brandScore": 80, "compScore": 60 },
+                  { "subject": "Feature Comparison", "brandScore": 50, "compScore": 70 },
+                  { "subject": "Implementation Docs", "brandScore": 90, "compScore": 40 },
+                  { "subject": "Customer Support", "brandScore": 60, "compScore": 60 },
+                  { "subject": "Security & Auth", "brandScore": 85, "compScore": 90 },
+                  { "subject": "Enterprise Ready", "brandScore": 75, "compScore": 80 }
+                ],
+                "sentiment": [
+                  ${sentimentSchema}
+                ],
+                "topUrls": [
+                  { "url": "https://example.com/review", "relevance": 95, "sentiment": "Positive" }
+                ]
+              }
+            `;
+
+            const modelRes = await ai.models.generateContent({
+              model: "gemini-2.5-flash",
+              contents: prompt,
+              config: { responseMimeType: "application/json" }
+            });
+            
+            const aiData = JSON.parse(modelRes.text || "{}");
+            
+            // Save to Firestore using Admin SDK
+            await dbAdmin.collection('sovMetrics').doc(`${userDoc.id}_${dateStr}`).set({
+              userId: userDoc.id,
+              date: dateStr,
+              shortDate: shortDate,
+              ...aiData
+            }, { merge: true });
+            
+            console.log(`Saved metrics for ${userDoc.id}`);
+            
+            // Small delay to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          } catch (e) {
+            console.error(`Failed audit for ${userDoc.id}:`, e);
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Data Engine cron error:", e);
+    }
+  });
 }
 
 async function setupFrontendAndStart() {

@@ -92,12 +92,16 @@ Text: ${content.substring(0, 5000)}`;
       });
       const facts = JSON.parse(res.text || '[]');
       
+      const dateStr = new Date().toISOString().split('T')[0];
+      
       for (const fact of facts) {
-          await addDoc(collection(db, 'knowledge_graph'), {
+          await addDoc(collection(db, 'facts'), {
              userId: user.uid,
-             fact: fact,
-             sourceUrl: 'Extracted from Content Scorer',
-             addedAt: new Date().toISOString()
+             statement: typeof fact === 'string' ? fact.substring(0, 1000) : JSON.stringify(fact).substring(0, 1000),
+             entropyScore: Math.floor(Math.random() * 40) + 60, // Mock entropy score for content extracted fact
+             cliffhangerActive: false,
+             category: contentType,
+             createdAt: dateStr
           });
       }
       

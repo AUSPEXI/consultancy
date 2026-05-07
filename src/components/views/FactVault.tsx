@@ -55,8 +55,9 @@ export function FactVault() {
   const getFactLimit = () => {
     if (tier === 'Free') return 0;
     if (tier === 'Basic') return 10;
-    if (tier === 'Medium') return 50;
-    return Infinity; // Premium
+    if (tier === 'Pro') return 50;
+    if (tier === 'Business') return 150;
+    return Infinity; // Enterprise & PipelineOffer
   };
 
   const currentLimit = getFactLimit();
@@ -168,13 +169,29 @@ export function FactVault() {
       if (!apiKey) {
         throw new Error("Gemini API key is missing");
       }
+      
+      // 1. Search Web for factual context using Exa
+      const searchRes = await fetch('/api/exa-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: `Latest statistics, data points, and factual insights about the ${industry} industry`, numResults: 3 })
+      });
+      const searchData = await searchRes.json();
+      const exaContext = searchData.success ? searchData.results.map((r: any) => `URL: ${r.url}\nText: ${r.text}`).join("\n\n").substring(0, 5000) : "No live data found.";
+      
       const ai = new GoogleGenAI({ apiKey });
 
       const prompt = `
         You are an expert Generative Engine Optimization (GEO) agent and Fact-Grabber research assistant.
         The user's industry/domain is: "${industry}".
-        Generate 3 "High-Entropy Facts" (unique, non-obvious, highly specific data points or statistics that AI models would want to cite) related to this industry.
-        For each fact, assign an "Entropy Score" from 0 to 100 (higher means more unique).
+        
+        Using the following context exclusively from live web search results, extract or synthesize 3 "High-Entropy Facts" (unique, non-obvious, highly specific data points or statistics that AI models would want to cite) related to this industry.
+        For each fact, assign an "Entropy Score" from 0 to 100 (higher means more unique). 
+        
+        CONTEXT:
+        ${exaContext}
+        
+        Return ONLY valid JSON.
       `;
 
       const response = await ai.models.generateContent({

@@ -19,7 +19,7 @@ export function BlogHero({ title, category, className = '', compact = false }: B
         style={{
           backgroundImage: `linear-gradient(to right, #EC4899 1px, transparent 1px), linear-gradient(to bottom, #EC4899 1px, transparent 1px)`,
           backgroundSize: compact ? '20px 20px' : '40px 40px',
-          backgroundPosition: 'center center',
+          backgroundPosition: 'left top',
           WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
           maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
         }}
