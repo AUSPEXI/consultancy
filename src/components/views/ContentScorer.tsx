@@ -78,19 +78,15 @@ export function ContentScorer() {
     if (!user || !result || !content.trim()) return;
     setIsSavingFacts(true);
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-      if (!apiKey) throw new Error("API key is missing");
-      const ai = new GoogleGenAI({ apiKey });
-      
-      const prompt = `Extract 3 atomic facts from the following text and format as a JSON array of strings. Each string must be a concise, standalone fact.
-Text: ${content.substring(0, 5000)}`;
-
-      const res = await ai.models.generateContent({
-        model: 'gemini-3.1-pro-preview',
-        contents: prompt,
-        config: { responseMimeType: 'application/json' }
+      const response = await fetch('/api/extract-facts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, contentType, userId: user.uid })
       });
-      const facts = JSON.parse(res.text || '[]');
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error);
+
+      const facts = data.facts || [];
       
       const dateStr = new Date().toISOString().split('T')[0];
       
@@ -138,57 +134,18 @@ Text: ${content.substring(0, 5000)}`;
     setResult(null);
 
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-      if (!apiKey) throw new Error("API key is missing");
-      const ai = new GoogleGenAI({ apiKey });
+      if (!user) throw new Error("User required");
 
-      const prompt = `
-        You are an expert Generative Engine Optimization (GEO) agent.
-        Analyze the following content for "Machine Readability" and its likelihood to be cited by LLMs (ChatGPT, Claude, Gemini).
-        
-        CRITICAL CONTEXT: The user has specified this content is intended for: "${contentType}".
-        ${contentType === 'sales' ? 'Do NOT penalize the content for having marketing hooks, persuasive copy, or human-centric storytelling. Instead, evaluate how well they have WEAVED machine-readable facts, entities, and statistical anchors INTO the sales copy without destroying the human conversion rate. Suggest ways to add "Cite-Magnets" without ruining the sales pitch.' : ''}
-        ${contentType === 'technical' ? 'This is technical documentation. It should be ruthlessly optimized for machine readability, high entity density, and direct answers. Penalize fluff heavily.' : ''}
-        ${contentType === 'blog' ? 'This is a blog post. It should balance engaging human narrative with clear, extractable facts and inverted pyramid structures for key takeaways. Suggest adding summary bullet points or bolded data points.' : ''}
-        
-        Content:
-        ${content}
-        
-        Score the content out of 100 based on:
-        1. Entity Density (Are key entities clearly defined? BE EXTREMELY RIGOROUS. A short paragraph with a few entities should score low (e.g., 30-50). Only comprehensive, highly technical content with dense, interconnected entities should score above 80. If the content is short or lacks specific nouns and technical terms, penalize the score heavily.)
-        2. Statistical Anchors (Are there hard numbers/facts instead of qualitative fluff?)
-        3. Inverted Pyramid of Synthesis (Is the direct answer accessible, even if wrapped in a narrative?)
-        
-        Return a JSON object with:
-        - overallScore (number 0-100)
-        - entityDensityScore (number 0-100)
-        - statisticalAnchorsScore (number 0-100)
-        - invertedPyramidScore (number 0-100)
-        - feedback (array of strings, specific actionable advice on what to change, respecting the content type)
-        - rewrittenSnippet (string, a suggested rewrite of a weak paragraph to make it more machine-readable while maintaining the appropriate tone for a ${contentType})
-      `;
-
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              overallScore: { type: Type.NUMBER },
-              entityDensityScore: { type: Type.NUMBER },
-              statisticalAnchorsScore: { type: Type.NUMBER },
-              invertedPyramidScore: { type: Type.NUMBER },
-              feedback: { type: Type.ARRAY, items: { type: Type.STRING } },
-              rewrittenSnippet: { type: Type.STRING }
-            },
-            required: ["overallScore", "entityDensityScore", "statisticalAnchorsScore", "invertedPyramidScore", "feedback", "rewrittenSnippet"]
-          }
-        }
+      const res = await fetch('/api/content-scorer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, contentType, userId: user.uid })
       });
+      
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || "Analysis failed");
 
-      const parsedResult = JSON.parse(response.text || "{}");
+      const parsedResult = data.result;
       setResult(parsedResult);
       if (user) {
         await logAuditAction(user.uid, 'Scored Content', { contentType, score: parsedResult.overallScore });

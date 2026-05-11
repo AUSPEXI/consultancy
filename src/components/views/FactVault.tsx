@@ -55,9 +55,9 @@ export function FactVault() {
   const getFactLimit = () => {
     if (tier === 'Free') return 0;
     if (tier === 'Basic') return 10;
-    if (tier === 'Pro') return 50;
-    if (tier === 'Business') return 150;
-    return Infinity; // Enterprise & PipelineOffer
+    if (tier === 'Medium') return 50;
+    if (tier === 'Premium') return 150;
+    return Infinity; // PipelineOffer
   };
 
   const currentLimit = getFactLimit();
@@ -89,32 +89,15 @@ export function FactVault() {
 
     setIsExtracting(true);
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-      if (!apiKey) {
-        throw new Error("Gemini API key is missing");
-      }
-      const ai = new GoogleGenAI({ apiKey });
-
-      const prompt = `
-        You are an expert Generative Engine Optimization (GEO) agent.
-        Analyze the following text and extract 3 "High-Entropy Facts" (unique, non-obvious data points that AI models would want to cite).
-        For each fact, assign an "Entropy Score" from 0 to 100 (higher means more unique).
-        
-        Text to analyze:
-        ${inputText}
-        
-        Return ONLY a JSON array of objects with 'statement' (string) and 'entropyScore' (number).
-      `;
-
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-        }
+      const response = await fetch('/api/extract-high-entropy-facts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: inputText })
       });
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error);
 
-      const extractedFacts = JSON.parse(response.text || "[]");
+      const extractedFacts = data.facts || [];
       
       if (extractedFacts && Array.isArray(extractedFacts)) {
         // Save extracted facts to Firestore
@@ -165,63 +148,15 @@ export function FactVault() {
 
     setIsResearching(true);
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-      if (!apiKey) {
-        throw new Error("Gemini API key is missing");
-      }
-      
-      // 1. Search Web for factual context using Exa
-      const searchRes = await fetch('/api/exa-search', {
+      const res = await fetch('/api/research-facts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: `Latest statistics, data points, and factual insights about the ${industry} industry`, numResults: 3 })
+        body: JSON.stringify({ industry })
       });
-      const searchData = await searchRes.json();
-      const exaContext = searchData.success ? searchData.results.map((r: any) => `URL: ${r.url}\nText: ${r.text}`).join("\n\n").substring(0, 5000) : "No live data found.";
-      
-      const ai = new GoogleGenAI({ apiKey });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
 
-      const prompt = `
-        You are an expert Generative Engine Optimization (GEO) agent and Fact-Grabber research assistant.
-        The user's industry/domain is: "${industry}".
-        
-        Using the following context exclusively from live web search results, extract or synthesize 3 "High-Entropy Facts" (unique, non-obvious, highly specific data points or statistics that AI models would want to cite) related to this industry.
-        For each fact, assign an "Entropy Score" from 0 to 100 (higher means more unique). 
-        
-        CONTEXT:
-        ${exaContext}
-        
-        Return ONLY valid JSON.
-      `;
-
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                statement: { type: Type.STRING },
-                entropyScore: { type: Type.NUMBER }
-              },
-              required: ["statement", "entropyScore"]
-            }
-          }
-        }
-      });
-
-      let extractedFacts = [];
-      try {
-        let text = response.text || "[]";
-        text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-        extractedFacts = JSON.parse(text);
-      } catch (e) {
-        console.error("Failed to parse Gemini response:", e);
-        extractedFacts = [];
-      }
+      let extractedFacts = data.facts || [];
       
       if (extractedFacts && Array.isArray(extractedFacts)) {
         const newFactsPayloads = [];

@@ -101,11 +101,6 @@ export function Competitors() {
 
     setIsAnalyzing(true);
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-      if (!apiKey) {
-        throw new Error("API key is missing");
-      }
-      
       let hostname = inputUrl;
       try {
         hostname = new URL(inputUrl.startsWith('http') ? inputUrl : `https://${inputUrl}`).hostname;
@@ -113,74 +108,21 @@ export function Competitors() {
         // Fallback to raw input
       }
 
-      // 1. Pull real data from the competitor's URL/domain via Exa
-      const exaRes = await fetch('/api/exa-search', {
+      const res = await fetch('/api/analyze-competitor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: `site:${hostname}`, numResults: 3 })
+        body: JSON.stringify({ hostname })
       });
-      const exaData = await exaRes.json();
+      const data = await res.json();
       
-      const contextText = exaData.success && exaData.results.length > 0
-        ? exaData.results.map((r: any) => `Title: ${r.title}\nText: ${r.text}`).join("\n\n")
-        : "No direct scraping data available. Analyze the domain logically based on typical corporate decay patterns.";
-
-      // AI processing block 
-      let analysis = { name: hostname, decayStatus: 'healthy', trojanHorseOpportunity: false, vulnerabilities: ['Needs deeper analysis'] };
-      
-      try {
-        const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-        if (!apiKey) {
-            throw new Error("API key is missing");
+      if (!data.success) {
+        if (data.error && data.error.includes('429')) {
+             throw new Error("Google Cloud API Rate Limit Exceeded (429). Please wait a minute and try again.");
         }
-        
-        const ai = new GoogleGenAI({ apiKey });
-
-        const prompt = `
-          You are an expert Generative Engine Optimization (GEO) agent.
-          Analyze the competitor at the following domain: ${hostname}
-          
-          Recent Scraped Context:
-          ${contextText}
-          
-          Determine if their content is showing signs of "Data Decay" (outdated information, lack of detail, generic PR speak).
-          Also determine if there is a "Trojan Horse Opportunity" (a gap where we can inject our own high-entropy facts to steal their AI citations).
-          Provide 1 to 2 specific vulnerabilities if you find them.
-        `;
-
-        const response = await ai.models.generateContent({
-          model: "gemini-2.5-flash",
-          contents: prompt,
-          config: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.OBJECT,
-              properties: {
-                name: { type: Type.STRING },
-                decayStatus: { type: Type.STRING, enum: ["healthy", "decaying", "stale"] },
-                trojanHorseOpportunity: { type: Type.BOOLEAN },
-                vulnerabilities: { type: Type.ARRAY, items: { type: Type.STRING } }
-              },
-              required: ["name", "decayStatus", "trojanHorseOpportunity"]
-            }
-          }
-        });
-
-        let text = response.text || "{}";
-        text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-        analysis = JSON.parse(text);
-      } catch (aiError: any) {
-        console.error("AI Analysis failed:", aiError);
-        const isRateLimit = aiError?.status === 429 || aiError?.status === 'RESOURCE_EXHAUSTED' || (aiError?.message && aiError.message.includes('429'));
-        if (isRateLimit) {
-            alert("Google Cloud API Rate Limit Exceeded (429). Please wait a minute and try again.");
-            setIsAnalyzing(false);
-            return;
-        } else {
-            alert("Failed to analyze competitor context.");
-            // We'll proceed with the fallback mock 'analysis' object just so they can track the domain
-        }
+        throw new Error(data.error || "Analysis failed");
       }
+
+      const analysis = data.result;
       
       // Firestore block
       try {
@@ -188,7 +130,7 @@ export function Competitors() {
           userId: user.uid,
           name: analysis.name || hostname,
           url: hostname,
-          decayScore: analysis.decayStatus === 'stale' ? 85 : analysis.decayStatus === 'decaying' ? 60 : 30,
+          decayScore: analysis.decayStatus === 'stale' ? 85 : analysis.decayStatus === 'decaying' || analysis.decayStatus === 'vulnerable' ? 60 : 30,
           decayStatus: analysis.decayStatus || 'healthy',
           trojanHorseOpportunity: analysis.trojanHorseOpportunity || false,
           vulnerabilities: analysis.vulnerabilities || [],

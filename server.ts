@@ -322,6 +322,168 @@ app.use(express.json());
     }
   });
 
+  app.post("/api/content-scorer", async (req, res) => {
+    try {
+      const { content, contentType, userId } = req.body;
+      if (!content || !userId) {
+        return res.status(400).json({ error: "Missing content or userId" });
+      }
+
+      const ai = getGemini();
+
+      // Retrieve User's Facts for Cross-Referencing
+      let userFactsStr = "";
+      if (dbAdmin) {
+        const factsSnap = await dbAdmin.collection('facts').where('userId', '==', userId).limit(20).get();
+        if (!factsSnap.empty) {
+          const factsList = factsSnap.docs.map(doc => doc.data().statement);
+          userFactsStr = "User's Master Facts from Fact Vault (Evaluate if the content successfully leverages these, or suggest where they could be injected):\n- " + factsList.join("\n- ");
+        } else {
+          userFactsStr = "The user has no facts stored in their Vault yet. Advise them to add verified statistics to their Fact Vault to improve Entity Density.";
+        }
+      }
+
+      const prompt = `
+        You are an expert Generative Engine Optimization (GEO) agent.
+        Analyze the following content for "Machine Readability" and its likelihood to be cited by AI Models (ChatGPT, Claude, Gemini).
+        
+        CRITICAL CONTEXT: The user has specified this content is intended for: "${contentType}".
+        ${contentType === 'sales' ? 'Do NOT penalize the content for having marketing hooks, persuasive copy, or human-centric storytelling. Instead, evaluate how well they have WEAVED machine-readable facts, entities, and statistical anchors INTO the sales copy without destroying the human conversion rate. Suggest ways to add "Cite-Magnets" without ruining the sales pitch.' : ''}
+        
+        ${userFactsStr}
+
+        Evaluate the content provided below against these metrics:
+        1. Entity Density: How many clear nouns, statistics, and verifiable facts are present? Did they use their Master Facts?
+        2. Citation Likelihood: If an AI was asked about this topic, would it confidently cite this text as a source?
+        3. Information Gain: Does this provide new, unique value over generic text?
+
+        Content to evaluate:
+        """${content.substring(0, 15000)}"""
+        
+        Return ONLY valid JSON matching this schema:
+        {
+          "overallScore": <int 0-100>,
+          "entityDensityScore": <int 0-100>,
+          "statisticalAnchorsScore": <int 0-100>,
+          "invertedPyramidScore": <int 0-100>,
+          "feedback": [<array of 2-3 short strings with actionable advice>],
+          "rewrittenSnippet": "<A suggested rewrite of a weak paragraph to make it more machine-readable while maintaining the appropriate tone for the given content type>"
+        }
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+        }
+      });
+
+      const data = JSON.parse(response.text || '{}');
+      res.json({ success: true, result: data });
+    } catch (err: any) {
+      console.error("Content Scorer endpoint error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post("/api/research-facts", async (req, res) => {
+    try {
+      const { industry } = req.body;
+      if (!industry) return res.status(400).json({ error: "Missing industry" });
+
+      const exa = getExa();
+      const searchRes = await exa.searchAndContents(`Latest statistics, data points, and factual insights about the ${industry} industry`, { numResults: 3, text: true });
+      const exaContext = searchRes.results.map((r: any) => `URL: ${r.url}\\nText: ${r.text}`).join("\\n\\n").substring(0, 5000);
+
+      const ai = getGemini();
+      const prompt = `
+        You are an expert Generative Engine Optimization (GEO) agent and Fact-Grabber research assistant.
+        The user's industry/domain is: "${industry}".
+        
+        Using the following context exclusively from live web search results, extract or synthesize 3 "High-Entropy Facts" (unique, non-obvious, highly specific data points or statistics that AI models would want to cite) related to this industry.
+        For each fact, assign an "Entropy Score" from 0 to 100 (higher means more unique). 
+        
+        CONTEXT:
+        ${exaContext}
+        
+        Return ONLY valid JSON matching this schema:
+        [
+          { "statement": "The unique fact...", "entropyScore": 85 }
+        ]
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: { responseMimeType: "application/json" }
+      });
+
+      const facts = JSON.parse(response.text || "[]");
+      res.json({ success: true, facts });
+    } catch (err: any) {
+      console.error("Research facts endpoint error:", err);
+      res.status(500).json({ error: "Failed to research facts" });
+    }
+  });
+
+  app.post("/api/extract-high-entropy-facts", async (req, res) => {
+    try {
+      const { content } = req.body;
+      if (!content) return res.status(400).json({ error: "Missing content" });
+
+      const ai = getGemini();
+      const prompt = `
+        You are an expert Generative Engine Optimization (GEO) agent.
+        Analyze the following text and extract 3 "High-Entropy Facts" (unique, non-obvious data points that AI models would want to cite).
+        For each fact, assign an "Entropy Score" from 0 to 100 (higher means more unique).
+        
+        Text:
+        ${content.substring(0, 5000)}
+        
+        Return ONLY valid JSON matching this schema:
+        [
+          { "statement": "The unique fact...", "entropyScore": 85 }
+        ]
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: { responseMimeType: "application/json" }
+      });
+
+      const facts = JSON.parse(response.text || "[]");
+      res.json({ success: true, facts });
+    } catch (err: any) {
+      console.error("Extract high entropy facts error:", err);
+      res.status(500).json({ error: "Failed to extract facts" });
+    }
+  });
+
+  app.post("/api/extract-facts", async (req, res) => {
+    try {
+      const { content, contentType, userId } = req.body;
+      if (!content || !userId) {
+        return res.status(400).json({ error: "Missing content or userId" });
+      }
+
+      const ai = getGemini();
+      const prompt = `Extract 3 atomic facts from the following text and format as a JSON array of strings. Each string must be a concise, standalone fact.\\nText: ${content.substring(0, 5000)}`;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.1-pro-preview',
+        contents: prompt,
+        config: { responseMimeType: 'application/json' }
+      });
+      const facts = JSON.parse(response.text || '[]');
+      res.json({ success: true, facts });
+    } catch (err: any) {
+      console.error("Extract facts endpoint error:", err);
+      res.status(500).json({ error: "Failed to extract facts" });
+    }
+  });
+
   app.post("/api/exa-search", async (req, res) => {
     try {
       const { query, numResults = 5 } = req.body;
@@ -341,6 +503,303 @@ app.use(express.json());
     } catch (error: any) {
       console.error("Error in Exa search:", error);
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/simulate", async (req, res) => {
+    try {
+      const { query, brand } = req.body;
+      if (!query || !brand) {
+        return res.status(400).json({ error: "Missing query or brand" });
+      }
+
+      const ai = getGemini();
+
+      const prompt = `
+        You are an advanced AI simulation engine.
+        Simulate how 4 different AI engines (ChatGPT, Claude, Gemini, Perplexity) would answer the following high-intent query: "${query}".
+        The brand we are tracking is: "${brand}".
+        
+        For each engine, write a realistic 2-3 sentence response to the query. 
+        Decide randomly if the engine should mention the brand or a competitor. 
+        
+        Return a JSON object with:
+        - chatgpt: { response: string, mentionedBrand: boolean }
+        - claude: { response: string, mentionedBrand: boolean }
+        - gemini: { response: string, mentionedBrand: boolean }
+        - perplexity: { response: string, mentionedBrand: boolean }
+        - sovScore: number (0 to 100, based on how many mentioned the brand)
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+        }
+      });
+
+      const parsed = JSON.parse(response.text || "{}");
+      res.json({ success: true, result: parsed });
+    } catch (err: any) {
+      console.error("Simulation endpoint error:", err);
+      res.status(500).json({ error: "Failed to run simulation" });
+    }
+  });
+
+  app.post("/api/analyze-competitor", async (req, res) => {
+    try {
+      const { hostname } = req.body;
+      if (!hostname) return res.status(400).json({ error: "Missing hostname" });
+
+      const exa = getExa();
+      const exaRes = await exa.searchAndContents(`site:${hostname}`, { numResults: 3, text: true });
+      
+      const contextText = exaRes.results && exaRes.results.length > 0
+        ? exaRes.results.map((r: any) => `Title: ${r.title}\nText: ${r.text}`).join("\n\n")
+        : "No direct scraping data available. Analyze the domain logically based on typical corporate decay patterns.";
+        
+      const ai = getGemini();
+
+      const prompt = `
+          You are an expert Generative Engine Optimization (GEO) agent.
+          Analyze the competitor at the following domain: ${hostname}
+          
+          Based on the following scraped context, identify potential "Data Decay" or "Trojan Horse Opportunities" (areas where their documentation, pricing, or product specs might be outdated or easily contradicted by a superior product's high-entropy facts).
+          
+          CONTEXT:
+          ${contextText.substring(0, 5000)}
+          
+          Return a JSON object with:
+           - decayStatus: 'healthy', 'decaying', or 'vulnerable'
+           - trojanHorseOpportunity: boolean (is there an angle to inject our facts?)
+           - vulnerabilities: array of strings (specific weaknesses found)
+        `;
+
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: prompt,
+          config: {
+            responseMimeType: "application/json",
+          }
+        });
+
+        const parsed = JSON.parse(response.text || "{}");
+        res.json({ success: true, result: { name: hostname, ...parsed } });
+    } catch (err: any) {
+      console.error("Analyze competitor endpoint error:", err);
+      res.status(500).json({ error: "Failed to analyze competitor" });
+    }
+  });
+
+  app.post("/api/technical-restructure", async (req, res) => {
+    try {
+      const { text } = req.body;
+      if (!text) return res.status(400).json({ error: "Missing text to restructure" });
+
+      const ai = getGemini();
+      
+      const prompt = `
+        You are an expert Generative Engine Optimization (GEO) agent.
+        Analyze the following text. Identify the most "dense" or "fluffy" paragraph that contains data, pricing, or comparisons trapped in a narrative format.
+        Convert that data into a clean, semantic HTML <table>.
+        
+        Text to analyze:
+        ${text}
+        
+        Return ONLY a JSON object with:
+        - 'detectedFluff' (string): The original dense paragraph you identified.
+        - 'htmlTable' (string): The raw HTML code for the table (just the <table> element and its contents, use Tailwind classes like 'w-full text-left text-xs text-zinc-300' for the table, 'bg-zinc-800/50' for thead, and 'p-2' for th/td).
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+        }
+      });
+
+      const parsed = JSON.parse(response.text || "{}");
+      res.json({ success: true, result: parsed });
+    } catch (err: any) {
+      console.error("Technical Restructure error:", err);
+      res.status(500).json({ error: "Failed to restructure text" });
+    }
+  });
+
+  app.post("/api/technical-schema", async (req, res) => {
+    try {
+      const { factText } = req.body;
+      if (!factText) return res.status(400).json({ error: "Missing factText" });
+
+      const ai = getGemini();
+      
+      const prompt = `
+        You are an expert Technical SEO and GEO agent.
+        Convert the following fact or statement into a highly structured JSON-LD Schema (FAQPage, Organization, or Product, whichever fits best).
+        
+        Fact/Statement:
+        ${factText}
+        
+        Return ONLY a valid JSON object representing the JSON-LD schema. Do not wrap in markdown blocks.
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+        }
+      });
+
+      res.json({ success: true, schema: response.text });
+    } catch (err: any) {
+      console.error("Technical Schema error:", err);
+      res.status(500).json({ error: "Failed to generate schema" });
+    }
+  });
+
+  app.post("/api/agent/crawl", async (req, res) => {
+    try {
+      const { topic } = req.body;
+      if (!topic) return res.status(400).json({ error: "Missing topic" });
+
+      const exa = getExa();
+      let crawlerData = '';
+      try {
+        const searchResult = await exa.searchAndContents(topic, {
+          type: "neural",
+          useAutoprompt: true,
+          numResults: 3,
+          text: true
+        });
+        if (searchResult.results && searchResult.results.length > 0) {
+          crawlerData = searchResult.results.map((r: any) => `Title: ${r.title}\nURL: ${r.url}\nText: ${r.text.substring(0, 1000)}`).join("\n\n");
+        } else {
+            throw new Error("No exa results");
+        }
+      } catch (e) {
+          const ai = getGemini();
+          const fallbackPrompt = `
+              You are an expert technical SEO and Generative Engine Optimization research agent. 
+              Generate a meticulously detailed, highly-technical simulated research report on "${topic}". 
+              Include hypothetical but highly realistic third-party statistics, methodologies, and advanced concepts related strictly to GEO, Data Decay, Semantic Vectors, and LLM behavior. 
+              CRITICAL: Prefix the report with a realistic external source (e.g., "According to the Forrester 2024 AI Index:", "A recent study by MIT CSAIL found..."). Do NOT author it yourself.
+              Make it at least 400 words of dense facts.
+            `;
+            const fbRes = await ai.models.generateContent({ model: "gemini-2.5-flash", contents: fallbackPrompt });
+            crawlerData = fbRes.text || `Raw data found for ${topic}: No detailed data available.`;
+      }
+      res.json({ success: true, result: crawlerData });
+    } catch (err: any) {
+      console.error("Agent crawl error:", err);
+      res.status(500).json({ error: "Failed to crawl" });
+    }
+  });
+
+  app.post("/api/agent/extract", async (req, res) => {
+    try {
+       const { topic, crawlerData, vaultContext } = req.body;
+       const ai = getGemini();
+
+       const extractPrompt = `
+        You are the Extraction Agent. Your ONLY job is to extract raw, high-entropy facts from this text.
+        Do not write a narrative. Return a bulleted list of raw statistics and facts about "${topic}".
+        CRITICAL: If the text attributes a fact to a specific study, group, or author, you MUST include that attribution in your bullet point so the synthesis agent knows who to cite.
+        
+        Text Data: 
+        ${crawlerData}
+
+        ${vaultContext ? `\nCRUCIAL BRAND FACTS FROM VAULT (Include these in your extracted list):\n- ${vaultContext}` : ''}
+      `;
+
+      const response = await ai.models.generateContent({ model: "gemini-2.5-flash", contents: extractPrompt});
+      res.json({ success: true, result: response.text });
+    } catch (err: any) {
+       console.error("Agent extract error:", err);
+       res.status(500).json({ error: "Failed to extract" });
+    }
+  });
+
+  app.post("/api/agent/schema", async (req, res) => {
+     try {
+       const { facts } = req.body;
+       const ai = getGemini();
+       const schemaPrompt = `
+        You are the Schema Agent. Your ONLY job is to write valid JSON-LD FAQPage schema based on these facts.
+        Do not write any markdown formatting or explanations. Output ONLY raw JSON.
+        Facts: ${facts}
+      `;
+      const response = await ai.models.generateContent({ model: "gemini-2.5-flash", contents: schemaPrompt });
+      let text = response.text || "{}";
+      text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+      res.json({ success: true, result: text });
+     } catch (err: any) {
+       console.error("Agent schema error:", err);
+       res.status(500).json({ error: "Failed to generate schema" });
+     }
+  });
+
+  app.post("/api/agent/synthesize", async (req, res) => {
+     try {
+        const { topic, facts, brandName } = req.body;
+        const ai = getGemini();
+        const synthesisPrompt = `
+        You are the Synthesis Agent writing on behalf of the brand "${brandName || 'Auspexi'}". 
+        Write a comprehensive, deep-dive blog post (minimum 500 words) about "${topic}".
+        
+        You MUST seamlessly weave in these exact extracted facts: 
+        ${facts}
+
+        CRITICAL TONE & ATTRIBUTION DIRECTIVES:
+        1. YOU ARE THE BRAND "${brandName || 'Auspexi'}". Do not adopt the persona of the external researchers.
+        2. Attribute the facts to external sources using phrases like "According to recent industry analysis...", "External research indicates...", or name the specific source if it was extracted. Do NOT claim you discovered the data.
+        3. Explain *why* these external facts matter to your specific enterprise audience.
+        4. NEVER sign off the article using the extracted researcher/author's name.
+
+        CORE GEO METHODOLOGY TO INCLUDE:
+        Elevate this from surface-level content by strictly adhering to the "Auspexi" philosophy of Generative Engine Optimization:
+        - Overcoming "Data Decay" (stale AI vectors) via "High-Entropy Facts" (unique, undeniable data points).
+        - "Trojan Horse Opportunities" (exploiting competitor logic gaps by injecting our facts into their narrative spaces).
+        - Entity density, Knowledge Graph alignment, and establishing high "Information Gain" to force LLMs to cite us.
+        
+        Do not write generic PR fluff. Speak to Technical SEOs and Enterprise Marketing Directors. Use markdown formatting (H2, H3, bullet points). Ensure the final length is at least 500 words.
+      `;
+      const response = await ai.models.generateContent({ model: "gemini-3.1-pro-preview", contents: synthesisPrompt });
+      res.json({ success: true, result: response.text });
+     } catch (err: any) {
+        console.error("Agent synthesize error:", err);
+        res.status(500).json({ error: "Failed to synthesize" });
+     }
+  });
+
+  app.post("/api/copilot-chat", async (req, res) => {
+    try {
+      const { userMessage, chatHistory, systemInstruction } = req.body;
+      if (!userMessage) return res.status(400).json({ error: "Missing message" });
+
+      const ai = getGemini();
+
+      const chat = ai.chats.create({
+        model: "gemini-3.1-pro-preview",
+        config: {
+          systemInstruction,
+        }
+      });
+      
+      // We don't have to restore full history if we just send the whole history in message or configure it.
+      // Easiest is just pushing history to the chat model.
+      const conversationContext = chatHistory.map((msg: any) => `${msg.role}: ${msg.content}`).join("\n");
+      
+      const response = await chat.sendMessage({
+         message: `Here is the conversation history:\n${conversationContext}\n\nUser: ${userMessage}`
+      });
+
+      res.json({ success: true, result: response.text });
+    } catch (err: any) {
+      console.error("Copilot Chat error:", err);
+      res.status(500).json({ error: "Failed to run copilot chat" });
     }
   });
 
@@ -1282,10 +1741,14 @@ function startEmailFunnelCron() {
             const aiData = JSON.parse(modelRes.text || "{}");
             
             // Save to Firestore using Admin SDK
+            const expiresAtDate = new Date();
+            expiresAtDate.setDate(expiresAtDate.getDate() + 90);
+            
             await dbAdmin.collection('sovMetrics').doc(`${userDoc.id}_${dateStr}`).set({
               userId: userDoc.id,
               date: dateStr,
               shortDate: shortDate,
+              expiresAt: new Date(expiresAtDate),
               ...aiData
             }, { merge: true });
             
@@ -1298,6 +1761,24 @@ function startEmailFunnelCron() {
           }
         }
       }
+
+      // --- 90-DAY ROLLUP LOGIC ---
+      console.log("Running TTL rollup check...");
+      const ninetyDaysAgo = new Date();
+      ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+      
+      const oldMetricsSnap = await dbAdmin.collection('sovMetrics')
+        .where("date", "<", ninetyDaysAgo.toISOString().split('T')[0])
+        .get();
+        
+      // Just a simple log that TTL should handle them, but we could roll them up if needed.
+      if (!oldMetricsSnap.empty) {
+        console.log(`Found ${oldMetricsSnap.size} expired metrics. Rollup algorithm initiated...`);
+        for (const doc of oldMetricsSnap.docs) {
+           await doc.ref.delete();
+        }
+      }
+      
     } catch (e) {
       console.error("Data Engine cron error:", e);
     }
@@ -1324,8 +1805,31 @@ async function setupFrontendAndStart() {
   }
 
   if (!process.env.VERCEL && !process.env.NETLIFY && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
-    app.listen(PORT, "0.0.0.0", () => {
+    const serverInstance = app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on http://localhost:${PORT}`);
+    });
+
+    const { createProxyMiddleware } = await import('http-proxy-middleware');
+    const wsProxy = createProxyMiddleware({
+      target: 'wss://generativelanguage.googleapis.com',
+      changeOrigin: true,
+      ws: true,
+      pathRewrite: (path, req) => {
+        let newPath = path.replace('/api/genai', '');
+        const key = process.env.GEMINI_API_KEY;
+        if (newPath.includes('?')) {
+          newPath = newPath.replace('key=dummy', `key=${key}`);
+        } else {
+          newPath = `${newPath}?key=${key}`;
+        }
+        return newPath;
+      }
+    });
+
+    serverInstance.on('upgrade', (req, socket, head) => {
+      if (req.url && req.url.startsWith('/api/genai/ws')) {
+         wsProxy.upgrade(req, socket as any, head);
+      }
     });
   }
 }

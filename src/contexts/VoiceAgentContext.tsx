@@ -236,12 +236,11 @@ ${conversationText}`,
       await fetchKnowledgeGraph();
       const weeklyMetricsContext = await fetchWeeklyMetrics();
 
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-      if (!apiKey) {
-        throw new Error("Gemini API key is required. Please add VITE_GEMINI_API_KEY to your .env file.");
-      }
-
-      const ai = new GoogleGenAI({ apiKey });
+      const baseUrl = `${window.location.protocol}//${window.location.host}/api/genai`;
+      const ai = new GoogleGenAI({ 
+        apiKey: "dummy", 
+        httpOptions: { baseUrl }
+      });
 
       const customerContext = userData?.brand 
         ? `\n\nCUSTOMER CONTEXT:\nYou are currently speaking with a representative of "${userData.brand}". ${userData.domain ? `Their domain is ${userData.domain}.` : ''} ${userData.competitors && userData.competitors.length > 0 ? `They are tracking the following competitors: ${userData.competitors.join(", ")}.` : ''} Tailor your advice specifically for their brand and industry whenever possible rather than giving generic examples.${weeklyMetricsContext}`

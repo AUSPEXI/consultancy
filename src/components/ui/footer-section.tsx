@@ -87,14 +87,20 @@ function Footerdemo() {
               <Link to="/about" className="block transition-colors hover:text-white text-zinc-400">
                 About
               </Link>
+              <Link to="/roadmap" className="block transition-colors hover:text-white text-zinc-400">
+                Roadmap
+              </Link>
+              <Link to="/investors" className="block transition-colors hover:text-white text-zinc-400">
+                Investors
+              </Link>
               <Link to="/#features" className="block transition-colors hover:text-white text-zinc-400">
                 Features
               </Link>
               <Link to="/#pricing" className="block transition-colors hover:text-white text-zinc-400">
                 Pricing
               </Link>
-              <Link to="/#roadmap" className="block transition-colors hover:text-white text-zinc-400">
-                GEO Roadmap
+              <Link to="/#strategy" className="block transition-colors hover:text-white text-zinc-400">
+                GEO Strategy
               </Link>
               <Link to="/voice-agents" className="block transition-colors hover:text-white text-zinc-400">
                 Voice Agents

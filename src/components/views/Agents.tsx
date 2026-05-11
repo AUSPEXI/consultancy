@@ -73,23 +73,7 @@ export function Agents() {
     setIsOrchestrating(true);
     resetState();
     
-    // Legacy callAI wrapper (deprecated, calling the new lib internally)
-    const callAI = async (prompt: string, ai: GoogleGenAI, isJson = false) => {
-       try {
-           return await generateContentWithRetry(ai, prompt, { isJson });
-       } catch (error: any) {
-           if (error.isRateLimit) {
-               setRateLimitWarning(error.message);
-           }
-           throw error;
-       }
-    };
-
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-      if (!apiKey) throw new Error("API key is missing");
-      const ai = new GoogleGenAI({ apiKey });
-
       // Fetch Fact-Vault explicitly for extraction
       let vaultContext = '';
       if (user) {
@@ -106,54 +90,30 @@ export function Agents() {
         }
       }
 
+      const dbUrl = typeof window !== 'undefined' ? '' : 'http://localhost:3000';
+
       // --- STEP 1: Crawler Agent ---
       setCrawlerStatus('running');
-      
-      let crawlerData = '';
-      try {
-        const exaKey = import.meta.env.VITE_EXA_API_KEY || (typeof process !== 'undefined' ? process.env.EXA_API_KEY : undefined);
-        if (exaKey) {
-            const exaRes = await fetch('https://api.exa.ai/search', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'x-api-key': exaKey },
-              body: JSON.stringify({ query: topic, useAutoprompt: true, type: "neural", contents: { text: true }, numResults: 3 })
-            });
-            const exaData = await exaRes.json();
-            if (exaData.results) {
-              crawlerData = exaData.results.map((r: any) => `Title: ${r.title}\nURL: ${r.url}\nText: ${r.text.substring(0, 1000)}`).join("\n\n");
-            } else {
-              throw new Error("No results from exa");
-            }
-        } else {
-             throw new Error("Exa key missing");
-        }
-      } catch (err) {
-        console.warn("Crawler fetch failed, falling back to logical simulation context", err);
-        const fallbackPrompt = `
-          You are an expert technical SEO and Generative Engine Optimization research agent. 
-          Generate a meticulously detailed, highly-technical simulated research report on "${topic}". 
-          Include hypothetical but highly realistic third-party statistics, methodologies, and advanced concepts related strictly to GEO, Data Decay, Semantic Vectors, and LLM behavior. 
-          CRITICAL: Prefix the report with a realistic external source (e.g., "According to the Forrester 2024 AI Index:", "A recent study by MIT CSAIL found..."). Do NOT author it yourself.
-          Make it at least 400 words of dense facts.
-        `;
-        crawlerData = await callAI(fallbackPrompt, ai, false) || `Raw data found for ${topic}: No detailed data available.`;
-      }
-      
+      const crawlRes = await fetch(`${dbUrl}/api/agent/crawl`, {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ topic })
+      });
+      const crawlData = await crawlRes.json();
+      if (!crawlData.success) throw new Error(crawlData.error);
+      const crawlerDataText = crawlData.result;
       setCrawlerStatus('completed');
 
       // --- STEP 2: Extraction Agent ---
       setExtractionStatus('running');
-      const extractPrompt = `
-        You are the Extraction Agent. Your ONLY job is to extract raw, high-entropy facts from this text.
-        Do not write a narrative. Return a bulleted list of raw statistics and facts about "${topic}".
-        CRITICAL: If the text attributes a fact to a specific study, group, or author, you MUST include that attribution in your bullet point so the synthesis agent knows who to cite.
-        
-        Text Data: 
-        ${crawlerData}
-
-        ${vaultContext ? `\nCRUCIAL BRAND FACTS FROM VAULT (Include these in your extracted list):\n- ${vaultContext}` : ''}
-      `;
-      const facts = await callAI(extractPrompt, ai, false) || "No facts extracted.";
+      const extractRes = await fetch(`${dbUrl}/api/agent/extract`, {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ topic, crawlerData: crawlerDataText, vaultContext })
+      });
+      const extractData = await extractRes.json();
+      if (!extractData.success) throw new Error(extractData.error);
+      const facts = extractData.result || "No facts extracted.";
       setExtractedFacts(facts);
       setExtractionStatus('completed');
       
@@ -162,12 +122,14 @@ export function Agents() {
 
       // --- STEP 3: Schema Agent ---
       setSchemaStatus('running');
-      const schemaPrompt = `
-        You are the Schema Agent. Your ONLY job is to write valid JSON-LD FAQPage schema based on these facts.
-        Do not write any markdown formatting or explanations. Output ONLY raw JSON.
-        Facts: ${facts}
-      `;
-      const schema = await callAI(schemaPrompt, ai, true) || "{}";
+      const schemaRes = await fetch(`${dbUrl}/api/agent/schema`, {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ facts })
+      });
+      const schemaData = await schemaRes.json();
+      if (!schemaData.success) throw new Error(schemaData.error);
+      const schema = schemaData.result || "{}";
       setGeneratedSchema(schema);
       setSchemaStatus('completed');
       
@@ -176,35 +138,24 @@ export function Agents() {
 
       // --- STEP 4: Synthesis Agent ---
       setSynthesisStatus('running');
-      const synthesisPrompt = `
-        You are the Synthesis Agent writing on behalf of the brand "${userData?.brand || 'Auspexi'}". 
-        Write a comprehensive, deep-dive blog post (minimum 500 words) about "${topic}".
-        
-        You MUST seamlessly weave in these exact extracted facts: 
-        ${facts}
-
-        CRITICAL TONE & ATTRIBUTION DIRECTIVES:
-        1. YOU ARE THE BRAND "${userData?.brand || 'Auspexi'}". Do not adopt the persona of the external researchers.
-        2. Attribute the facts to external sources using phrases like "According to recent industry analysis...", "External research indicates...", or name the specific source if it was extracted. Do NOT claim you discovered the data.
-        3. Explain *why* these external facts matter to your specific enterprise audience.
-        4. NEVER sign off the article using the extracted researcher/author's name.
-
-        CORE GEO METHODOLOGY TO INCLUDE:
-        Elevate this from surface-level content by strictly adhering to the "Auspexi" philosophy of Generative Engine Optimization:
-        - Overcoming "Data Decay" (stale AI vectors) via "High-Entropy Facts" (unique, undeniable data points).
-        - "Trojan Horse Opportunities" (exploiting competitor logic gaps by injecting our facts into their narrative spaces).
-        - Entity density, Knowledge Graph alignment, and establishing high "Information Gain" to force LLMs to cite us.
-        
-        Do not write generic PR fluff. Speak to Technical SEOs and Enterprise Marketing Directors. Use markdown formatting (H2, H3, bullet points). Ensure the final length is at least 500 words.
-      `;
-      const finalArticleText = await callAI(synthesisPrompt, ai, false) || "Failed to generate article.";
+      const synthRes = await fetch(`${dbUrl}/api/agent/synthesize`, {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ topic, facts, brandName: userData?.brand || '' })
+      });
+      const synthData = await synthRes.json();
+      if (!synthData.success) throw new Error(synthData.error);
+      const finalArticleText = synthData.result || "Failed to generate article.";
       setFinalArticle(finalArticleText);
       setSynthesisStatus('completed');
       
       setShowResults(true);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Orchestration failed:", error);
+      if (error?.message && error.message.includes('429')) {
+         setRateLimitWarning("Google API rate limit exceeded. Please wait a bit.");
+      }
       setCrawlerStatus(prev => prev === 'running' ? 'error' : prev);
       setExtractionStatus(prev => prev === 'running' ? 'error' : prev);
       setSchemaStatus(prev => prev === 'running' ? 'error' : prev);

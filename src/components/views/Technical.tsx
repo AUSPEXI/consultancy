@@ -62,33 +62,17 @@ export function Technical() {
     
     setIsProcessing(true);
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-      if (!apiKey) throw new Error("API key is missing");
-      
-      const ai = new GoogleGenAI({ apiKey });
-      
-      const prompt = `
-        You are an expert Generative Engine Optimization (GEO) agent.
-        Analyze the following text. Identify the most "dense" or "fluffy" paragraph that contains data, pricing, or comparisons trapped in a narrative format.
-        Convert that data into a clean, semantic HTML <table>.
-        
-        Text to analyze:
-        ${inputText}
-        
-        Return ONLY a JSON object with:
-        - 'detectedFluff' (string): The original dense paragraph you identified.
-        - 'htmlTable' (string): The raw HTML code for the table (just the <table> element and its contents, use Tailwind classes like 'w-full text-left text-xs text-zinc-300' for the table, 'bg-zinc-800/50' for thead, and 'p-2' for th/td).
-      `;
-
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-        }
+      const dbUrl = typeof window !== 'undefined' ? '' : 'http://localhost:3000';
+      const searchRes = await fetch(`${dbUrl}/api/technical-restructure`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: inputText })
       });
+      const data = await searchRes.json();
+      
+      if (!data.success) throw new Error(data.error);
 
-      const parsed = JSON.parse(response.text || "{}");
+      const parsed = data.result;
       if (parsed.detectedFluff && parsed.htmlTable) {
         setResult({
           fluff: parsed.detectedFluff,
@@ -111,30 +95,17 @@ export function Technical() {
     
     setIsGeneratingSchema(true);
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-      if (!apiKey) throw new Error("API key is missing");
-      
-      const ai = new GoogleGenAI({ apiKey });
-      
-      const prompt = `
-        You are an expert Technical SEO and GEO agent.
-        Convert the following fact or statement into a highly structured JSON-LD Schema (FAQPage, Organization, or Product, whichever fits best).
-        
-        Fact/Statement:
-        ${factText}
-        
-        Return ONLY a valid JSON object representing the JSON-LD schema. Do not wrap in markdown blocks.
-      `;
-
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-        }
+      const dbUrl = typeof window !== 'undefined' ? '' : 'http://localhost:3000';
+      const searchRes = await fetch(`${dbUrl}/api/technical-schema`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ factText })
       });
+      const data = await searchRes.json();
+      
+      if (!data.success) throw new Error(data.error);
 
-      setSchemaResult(response.text);
+      setSchemaResult(data.schema);
       if (user) {
         await logAuditAction(user.uid, 'Generated JSON-LD Schema', { factLength: factText.length });
       }

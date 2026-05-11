@@ -47,17 +47,17 @@ export function BlogHero({ title, category, className = '', compact = false }: B
       </div>
 
       {/* BOX WITH TITLE - Centered container */}
-      <div className={`relative z-10 w-full flex-1 flex ${compact ? 'flex-col md:flex-row items-start md:items-center p-4 gap-4' : 'flex-col sm:flex-row items-center p-6 md:p-8 gap-6 md:gap-8'} rounded-2xl border border-pink-500/20 bg-zinc-950/60 shadow-[0_0_30px_-5px_rgba(236,72,153,0.15)] backdrop-blur-md`}>
+      <div className={`relative z-10 w-full flex-1 flex ${compact ? 'flex-col items-center justify-center p-4 sm:p-5 gap-3' : 'flex-col sm:flex-row items-center p-6 md:p-8 gap-6 md:gap-8'} rounded-2xl border border-pink-500/20 bg-zinc-950/60 shadow-[0_0_30px_-5px_rgba(236,72,153,0.15)] backdrop-blur-md`}>
         
         {/* Stylized Logo / Data-Viz Element */}
-        <div className={`flex-shrink-0 flex items-center justify-center rounded-full border border-pink-500/30 ${compact ? 'w-16 h-16' : 'w-20 h-20 md:w-28 md:h-28'} bg-zinc-900/50 relative overflow-hidden group mx-auto sm:mx-0`}>
+        <div className={`flex-shrink-0 flex items-center justify-center rounded-full border border-pink-500/30 ${compact ? 'w-12 h-12 sm:w-14 sm:h-14' : 'w-20 h-20 md:w-28 md:h-28'} bg-zinc-900/50 relative overflow-hidden group mx-auto ${!compact ? 'sm:mx-0' : ''}`}>
            <div className="absolute inset-0 bg-pink-500/10 animate-pulse" style={{ animationDuration: '4s' }} />
-           <img src="/auspexi-logo.png" alt="Auspexi" className={`relative z-10 object-contain drop-shadow-[0_0_12px_rgba(236,72,153,0.8)] animate-pulse ${compact ? 'w-10 h-10' : 'w-12 h-12 md:w-16 md:h-16'}`} style={{ animationDuration: '4s' }} />
+           <img src="/auspexi-logo.png" alt="Auspexi" className={`relative z-10 object-contain drop-shadow-[0_0_12px_rgba(236,72,153,0.8)] animate-pulse ${compact ? 'w-6 h-6 sm:w-8 sm:h-8' : 'w-12 h-12 md:w-16 md:h-16'}`} style={{ animationDuration: '4s' }} />
         </div>
 
         {/* Title Content */}
-        <div className="flex-1 min-w-0 flex flex-col items-center sm:items-start text-center sm:text-left">
-           <h3 className={`font-heading font-bold text-white leading-tight text-balance ${compact ? 'text-lg md:text-xl' : 'text-3xl md:text-4xl lg:text-5xl'} drop-shadow-md`}>
+        <div className={`flex-1 min-w-0 flex flex-col items-center ${!compact ? 'sm:items-start' : ''} text-center ${!compact ? 'sm:text-left' : ''}`}>
+           <h3 className={`font-heading font-bold text-white leading-tight text-balance ${compact ? 'text-center text-sm sm:text-base md:text-lg line-clamp-3' : 'text-3xl md:text-4xl lg:text-5xl'} drop-shadow-md`}>
              {/* Highlight important words with pink */}
              {title.split(' ').map((word, i) => {
                const isHighlighted = i % 4 === 1 || word.length > 7 || ['AI', 'GEO', 'LLM', 'Search', 'Brand'].includes(word.replace(/[^a-zA-Z]/g, ''));

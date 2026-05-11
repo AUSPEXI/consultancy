@@ -10,11 +10,11 @@ let aiClient: GoogleGenAI | null = null;
 
 function getAIClient(): GoogleGenAI {
   if (!aiClient) {
-    const key = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-    if (!key) {
-      throw new Error('GEMINI_API_KEY environment variable is required');
-    }
-    aiClient = new GoogleGenAI({ apiKey: key });
+    const baseUrl = `${window.location.protocol}//${window.location.host}/api/genai`;
+    aiClient = new GoogleGenAI({ 
+      apiKey: 'dummy',
+      httpOptions: { baseUrl }
+    });
   }
   return aiClient;
 }
@@ -434,141 +434,29 @@ ${knowledgeContext}`;
         timestamp: new Date().toISOString()
       });
 
-      const ai = getAIClient();
-      if (!chatRef.current) {
-        // Build history from existing messages, skipping the initial greeting if it's the only one, 
-        // or just pass them all. The Gemini API expects alternating user/model turns, starting with user.
-        // Actually, it's safer to just let the model see the history.
-        const history = messages
-          .filter(m => m && typeof m.content === 'string' && m.content.trim() !== '') // Ensure no empty messages
-          .map(m => ({
-            role: m.role === 'user' ? 'user' : 'model',
-            parts: [{ text: m.content }]
-          }));
+      const history = messages
+        .filter(m => m && typeof m.content === 'string' && m.content.trim() !== '')
+        .map(m => ({
+          role: m.role === 'user' ? 'user' : 'model',
+          content: m.content
+        }));
 
-        // Gemini history must start with 'user' and strictly alternate between 'user' and 'model'.
-        const normalizedHistory: any[] = [];
-        let expectedRole = 'user';
-        
-        for (const msg of history) {
-          if (msg.role === expectedRole) {
-            normalizedHistory.push(msg);
-            expectedRole = expectedRole === 'user' ? 'model' : 'user';
-          } else {
-            normalizedHistory.push({
-              role: expectedRole,
-              parts: [{ text: expectedRole === 'user' ? '...' : 'Understood.' }]
-            });
-            normalizedHistory.push(msg);
-            // After pushing the expected role, the actual role was pushed.
-            // The actual role is the opposite of expectedRole.
-            // So the NEXT expected role should be the original expectedRole.
-          }
-        }
+      const res = await fetch('/api/copilot-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userMessage,
+          chatHistory: history,
+          systemInstruction: systemInstruction
+        })
+      });
 
-        // The history must end with a 'model' message because we are about to send a 'user' message via sendMessage.
-        if (normalizedHistory.length > 0 && normalizedHistory[normalizedHistory.length - 1].role === 'user') {
-          normalizedHistory.push({
-            role: 'model',
-            parts: [{ text: 'Understood.' }]
-          });
-        }
-
-        chatRef.current = ai.chats.create({
-          model: 'gemini-2.5-flash',
-          history: normalizedHistory,
-          config: {
-            systemInstruction,
-            tools: [{
-              functionDeclarations: [
-                {
-                  name: 'navigateToTab',
-                  description: 'Navigates the user to a specific tab in the dashboard.',
-                  parameters: {
-                    type: Type.OBJECT,
-                    properties: {
-                      tabId: {
-                        type: Type.STRING,
-                        description: 'The ID of the tab to navigate to (e.g., fact-vault, competitors, simulator)',
-                      }
-                    },
-                    required: ['tabId']
-                  }
-                },
-                {
-                  name: 'draftContent',
-                  description: 'Drafts content (like a blog post, sales copy, or technical doc) incorporating facts and sends it to the Content Analyst.',
-                  parameters: {
-                    type: Type.OBJECT,
-                    properties: {
-                      content: {
-                        type: Type.STRING,
-                        description: 'The drafted content (e.g., the full blog post text).',
-                      },
-                      contentType: {
-                        type: Type.STRING,
-                        description: 'The type of content (sales, blog, or technical).',
-                        enum: ['sales', 'blog', 'technical']
-                      }
-                    },
-                    required: ['content', 'contentType']
-                  }
-                }
-              ]
-            }]
-          }
-        });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || "Failed to chat.");
       }
       
-      const response = await chatRef.current.sendMessage({ message: userMessage });
-      
-      let responseText = '';
-      
-      if (response.functionCalls && response.functionCalls.length > 0) {
-        for (const call of response.functionCalls) {
-          if (call.name === 'navigateToTab') {
-            const args = call.args as { tabId: string };
-            setActiveTab(args.tabId);
-            responseText += `I have navigated you to the ${args.tabId} tab. `;
-            
-            // Simulate Nerve Center Telemetry for action
-            console.log("[Nerve Center Telemetry] Executed Action:", {
-              action: 'navigateToTab',
-              target: args.tabId,
-              timestamp: new Date().toISOString()
-            });
-          } else if (call.name === 'draftContent') {
-            const args = call.args as any;
-            setActiveTab('content-scorer');
-            setTimeout(() => {
-              window.dispatchEvent(new CustomEvent('draft-content', { detail: { content: args.content, type: args.contentType } }));
-            }, 100);
-            responseText += `I have drafted the ${args.contentType} and navigated you to the Content Analyst tab. `;
-            
-            console.log("[Nerve Center Telemetry] Executed Action:", {
-              action: 'draftContent',
-              target: 'content-scorer',
-              timestamp: new Date().toISOString()
-            });
-          }
-        }
-        
-        // Send the function response back to get the final text
-        const followUp = await chatRef.current.sendMessage({
-          message: [{
-            functionResponse: {
-              name: response.functionCalls[0].name,
-              response: { success: true }
-            }
-          }]
-        });
-        
-        if (followUp.text) {
-          responseText += followUp.text;
-        }
-      } else if (response.text) {
-        responseText = response.text;
-      }
+      let responseText = data.result;
 
       setMessages(prev => [...prev, { role: 'model', content: responseText }]);
 

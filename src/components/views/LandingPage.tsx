@@ -312,10 +312,10 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       </section>
 
       {/* Infographic Zoom Section */}
-      <section id="roadmap" className="py-24 bg-zinc-900/30 border-y border-zinc-900">
+      <section id="strategy" className="py-24 bg-zinc-900/30 border-y border-zinc-900">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">The GEO Roadmap</h2>
+            <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">The GEO Strategy</h2>
             <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
               Hover over the infographic to explore the exact strategies we use to optimize your brand for AI models.
             </p>

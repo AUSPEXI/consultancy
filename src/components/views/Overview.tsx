@@ -89,10 +89,14 @@ export function Overview() {
         if (data.success && data.metrics) {
           const today = new Date();
           const dateStr = today.toISOString().split('T')[0];
+          const expiresAtDate = new Date();
+          expiresAtDate.setDate(expiresAtDate.getDate() + 90);
+          
           await setDoc(doc(db, 'sovMetrics', `${user.uid}_${dateStr}`), {
             userId: user.uid,
             date: dateStr,
             shortDate: today.toLocaleDateString('en-US', { weekday: 'short' }),
+            expiresAt: expiresAtDate,
             ...data.metrics
           }, { merge: true });
           await logAuditAction(user.uid, 'Ran Real SOV Audit', { date: dateStr });

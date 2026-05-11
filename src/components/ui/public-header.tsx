@@ -43,6 +43,8 @@ export function PublicHeader({ onLoginClick }: { onLoginClick: () => void }) {
           <Link to="/#features" onClick={(e) => handleNavClick(e, '#features')} className="hover:text-white transition-colors">Features</Link>
           <Link to="/#pricing" onClick={(e) => handleNavClick(e, '#pricing')} className="hover:text-white transition-colors">Pricing</Link>
           <Link to="/about" className="hover:text-white transition-colors">About</Link>
+          <Link to="/roadmap" className="hover:text-white transition-colors">Roadmap</Link>
+          <Link to="/investors" className="hover:text-white transition-colors">Investors</Link>
           <Link to="/blog" className="hover:text-white transition-colors">Blog</Link>
           <Link to="/faq" className="hover:text-white transition-colors">FAQ</Link>
         </div>
@@ -73,6 +75,8 @@ export function PublicHeader({ onLoginClick }: { onLoginClick: () => void }) {
           <Link to="/#features" onClick={(e) => handleNavClick(e, '#features')} className="text-zinc-300 hover:text-white font-medium">Features</Link>
           <Link to="/#pricing" onClick={(e) => handleNavClick(e, '#pricing')} className="text-zinc-300 hover:text-white font-medium">Pricing</Link>
           <Link to="/about" onClick={() => setIsMenuOpen(false)} className="text-zinc-300 hover:text-white font-medium">About</Link>
+          <Link to="/roadmap" onClick={() => setIsMenuOpen(false)} className="text-zinc-300 hover:text-white font-medium">Roadmap</Link>
+          <Link to="/investors" onClick={() => setIsMenuOpen(false)} className="text-zinc-300 hover:text-white font-medium">Investors</Link>
           <Link to="/blog" onClick={() => setIsMenuOpen(false)} className="text-zinc-300 hover:text-white font-medium">Blog</Link>
           <Link to="/faq" onClick={() => setIsMenuOpen(false)} className="text-zinc-300 hover:text-white font-medium">FAQ</Link>
           {!user && (
