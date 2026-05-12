@@ -17,11 +17,11 @@ export function GeoPulse() {
             <h1 className="text-3xl font-bold font-heading">GEO Pulse Index</h1>
             <span className="px-2 py-1 text-xs font-semibold rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30">Beta Test</span>
           </div>
-          <p className="text-zinc-400">Automated Brand Sentiment Prober. Query GPT-4, Gemini Pro, and Claude 3.5 across intent-based keywords to extract "Share of Voice" (SoV).</p>
+          <p className="text-zinc-400">First-Party Data Analytics. Aggregates Search Intent, Public Data, and User Behavior to extract legal "Share of Voice" (SoV).</p>
         </div>
         <UpgradePrompt 
           title="GEO Pulse Index Locked" 
-          description="Upgrade to the Premium tier to access real-time automated brand sentiment probing across major LLMs."
+          description="Upgrade to the Premium tier to access real-time brand sentiment benchmarking using our proprietary, compliant data lake."
           requiredTier="Premium"
         />
       </div>
@@ -61,7 +61,7 @@ export function GeoPulse() {
             <h1 className="text-2xl font-bold text-white tracking-tight">GEO Pulse Index</h1>
             <span className="px-2 py-1 text-xs font-semibold rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30">Beta Test</span>
           </div>
-          <p className="text-sm text-zinc-400 mt-1">High-velocity Automated Brand Sentiment Prober.</p>
+          <p className="text-sm text-zinc-400 mt-1">Legitimate First-Party Brand Sentiment Aggregator.</p>
         </div>
       </div>
 
@@ -86,7 +86,7 @@ export function GeoPulse() {
               {isProbing ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Probing LLMs...
+                  Analyzing Data...
                 </>
               ) : (
                 <>
@@ -106,9 +106,9 @@ export function GeoPulse() {
               <div className="absolute inset-0 border-4 border-pink-500 rounded-full border-t-transparent animate-spin"></div>
               <Network className="absolute inset-0 m-auto w-6 h-6 text-pink-400 animate-pulse" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Executing Asynchronous Probing Engine</h3>
+            <h3 className="text-lg font-semibold text-white mb-2">Querying Proprietary Data Lake</h3>
             <p className="text-sm text-zinc-400 max-w-md mx-auto">
-              Querying multiple foundational models in parallel, extracting semantic associations, and analyzing response vectors.
+              Aggregating first-party search intent patterns, analyzing public semantic associations, and mapping vector distributions.
             </p>
           </div>
         )}

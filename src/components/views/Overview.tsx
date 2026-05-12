@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, Cell } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, Cell, ReferenceArea } from 'recharts';
 import { TrendingUp, Users, Target, MousePointerClick, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, Save } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/firebase';
@@ -7,9 +7,12 @@ import { collection, addDoc, setDoc, doc, onSnapshot, query, where, orderBy, lim
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
+import { useGeoAnalytics } from '@/hooks/useGeoAnalytics';
 
 export function Overview() {
   const { user, tier, userData } = useAuth();
+  const { pulseData, mapPoints, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(userData?.brand || '');
+  
   const [metrics, setMetrics] = useState<any[]>([]);
   const [isAuditing, setIsAuditing] = useState(false);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
@@ -256,6 +259,13 @@ export function Overview() {
     fullMark: 100
   }));
 
+  const computedRadarData = mapPoints.length > 0 ? mapPoints.slice(0, 6).map((point: any) => ({
+    subject: point.type || point.content?.substring(0, 15) || 'General',
+    A: Math.min(100, Math.max(0, 100 - (point.distance || 0.1) * 100)),
+    B: Math.min(100, Math.max(0, 80 - (point.distance || 0.2) * 100)),
+    fullMark: 100
+  })) : radarData;
+
   const safePlatforms = latest.platforms || {
     chatgpt: safeLatest.aSov + 15,
     perplexity: safeLatest.aSov - 25,
@@ -371,8 +381,8 @@ export function Overview() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Prove-It-Works Dashboard</h1>
-          <p className="text-sm text-zinc-400 mt-1">Track Absolute SOV, Entity Recall, and AI Referral Traffic.</p>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Executive Performance Hub</h1>
+          <p className="text-sm text-zinc-400 mt-1">Track Absolute SOV, Entity Recall, and the growth of your Proprietary Neural Moat.</p>
         </div>
         <div className="flex gap-3">
           {metrics.length === 0 && (
@@ -473,7 +483,7 @@ export function Overview() {
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+              <RadarChart cx="50%" cy="50%" outerRadius="70%" data={computedRadarData}>
                 <PolarGrid stroke="#3f3f46" />
                 <PolarAngleAxis dataKey="subject" tick={{ fill: '#a1a1aa', fontSize: 12 }} />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#71717a', fontSize: 10 }} />
@@ -512,6 +522,49 @@ export function Overview() {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Sentiment Pulse */}
+        <div className="lg:col-span-2 bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h3 className="text-base font-semibold text-white">Brand Sentiment Pulse (Anomaly Detection)</h3>
+              <p className="text-xs text-zinc-400 mt-1">Rolling Z-Score analysis tracking generative noise vs significant drift from baseline.</p>
+            </div>
+            {geoLoading && <Loader2 className="w-4 h-4 animate-spin text-pink-500" />}
+          </div>
+          <div className="h-[300px] w-full">
+            {pulseData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={pulseData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+                  <XAxis dataKey="date" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(str) => new Date(str).toLocaleDateString()} />
+                  <YAxis domain={[-5, 5]} stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} label={{ value: 'Drift (Z-Score)', angle: -90, position: 'insideLeft', fill: '#52525b', fontSize: 12 }} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7' }}
+                  />
+                  <ReferenceArea y1={-2.5} y2={2.5} fill="#10b981" fillOpacity={0.05} /> 
+                  <Line 
+                    type="monotone" 
+                    dataKey="zScore" 
+                    stroke="#ec4899" 
+                    strokeWidth={2}
+                    dot={(props: any) => {
+                      const { cx, cy, payload } = props;
+                      if (!cx || !cy) return <circle />;
+                      return <circle cx={cx} cy={cy} r={payload.isAnomaly ? 6 : 2} fill={payload.isAnomaly ? '#f43f5e' : '#ec4899'} />;
+                    }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center border border-dashed border-zinc-700/50 rounded-lg">
+                <BrainCircuit className="w-8 h-8 text-zinc-600 mb-2" />
+                <p className="text-zinc-500 text-sm">Insufficient data points to model generative noise.</p>
+                <p className="text-zinc-600 text-xs mt-1">Run continuous audits to populate the vector space.</p>
+              </div>
+            )}
           </div>
         </div>
 

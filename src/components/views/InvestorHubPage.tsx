@@ -38,9 +38,9 @@ const STRATEGIC_INITIATIVES = [
   },
   {
     phase: "Phase II: Infrastructure",
-    title: "Semantic Tracking & Probing",
-    status: "In Development",
-    description: "We are investing capital into deploying resilient probing infrastructure and real-time semantic tracking. This transition elevates our platform from diagnostic software to an indispensable, real-time intelligence network."
+    title: "Semantic Tracking & First-Party Data Moat",
+    status: "Operational",
+    description: "We have fully deployed our 768-dimensional Latent Space Engine backed by pgvector, creating an insurmountable, real-time proprietary data moat for anomaly detection and sentiment drift modeling."
   },
   {
     phase: "Phase III: Automation",

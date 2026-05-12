@@ -224,12 +224,49 @@ export default {
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Technical Architecture</h1>
-          <p className="text-sm text-zinc-400 mt-1">Manage Edge SEO injection and Semantic HTML restructuring.</p>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Enterprise Infrastructure</h1>
+          <p className="text-sm text-zinc-400 mt-1">Manage semantic indexing, compliant data pipelines, and edge-injection architecture.</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Probing Engine Configuration */}
+        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden relative h-fit">
+          <div className="p-6 border-b border-zinc-800">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-pink-500/10 rounded-lg text-pink-400">
+                  <Target className="w-5 h-5" />
+                </div>
+                <h3 className="text-base font-semibold text-white">First-Party Data Lake Integration</h3>
+              </div>
+              <span className="px-2 py-0.5 text-[10px] font-bold bg-pink-500/10 text-pink-400 border border-pink-500/20 rounded-full tracking-widest uppercase">Proprietary</span>
+            </div>
+            <p className="text-sm text-zinc-400">
+              Our compliant infrastructure securely routes user analytics and deterministic search intent mapping to our centralized data lake, ensuring a compounding and un-copyable dataset.
+            </p>
+          </div>
+          <div className="p-6">
+             <div className="space-y-4">
+                <div className="flex items-center justify-between text-xs">
+                   <span className="text-zinc-500">Global Concurrency Status</span>
+                   <span className="text-emerald-400 font-mono">Active / 100 ops/sec</span>
+                </div>
+                <div className="w-full bg-zinc-950 rounded-full h-1.5 overflow-hidden">
+                   <div className="bg-pink-500 h-full w-[65%] animate-pulse"></div>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                   {['GPT-4o', 'Gemini Pro', 'Claude 3.5'].map(m => (
+                      <div key={m} className="bg-zinc-950 border border-zinc-800 rounded p-2 text-center">
+                         <div className="text-[10px] text-zinc-500 mb-1">{m}</div>
+                         <div className="text-xs text-white font-mono">99.8%</div>
+                      </div>
+                   ))}
+                </div>
+             </div>
+          </div>
+        </div>
+
         {/* Edge SEO Generator */}
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden relative h-fit">
           <div className="p-6 border-b border-zinc-800">
@@ -238,11 +275,11 @@ export default {
                 <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-400">
                   <Server className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-semibold text-white">Edge SEO Worker Generator</h3>
+                <h3 className="text-base font-semibold text-white">Edge GEO-Schema Injector</h3>
               </div>
             </div>
             <p className="text-sm text-zinc-400">
-              Server-side injection ensures that raw HTML scrapers (OAI-SearchBot, PerplexityBot) see your JSON-LD Schema without needing to execute JavaScript. Generate your Cloudflare Worker script below.
+              Deterministic fact injection. Server-side middleware ensuring that RAG engines (SearchGPT, Perplexity) ingest your optimized knowledge base before client-side hydration.
             </p>
           </div>
           

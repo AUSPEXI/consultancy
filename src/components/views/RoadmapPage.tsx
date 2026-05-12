@@ -7,27 +7,27 @@ import { useAuth } from '@/contexts/AuthContext';
 const ROADMAP_ITEMS = [
   {
     title: "Global Share of Voice (SoV) Tracking",
-    status: "In Development",
+    status: "Completed",
     icon: Globe,
-    description: "Building resilient infrastructure to continuously query major LLMs across discrete industry verticals. Extracting reliable metrics to quantify brand mention frequency against competitors."
+    description: "Built resilient infrastructure to continuously query major LLMs across discrete industry verticals. Extracting reliable metrics to quantify brand mention frequency against competitors."
   },
   {
-    title: "Semantic Affinity Tracking",
-    status: "Q4 2026",
+    title: "Semantic Affinity Tracking & pgvector Moat",
+    status: "Completed",
     icon: BrainCircuit,
-    description: "Utilizing NLP and vector embeddings to measure semantic proximity. Discovering exactly how closely leading language models associate your brand with subjective attributes like 'trust', 'quality', or 'innovation'."
+    description: "Developed our proprietary 768-dimensional Latent Space Engine utilizing Gemini's text-embedding-004 and a robust pgvector backend. Discovered exactly how closely leading language models associate your brand with core themes."
+  },
+  {
+    title: "Sentiment Drift Detection (Z-Score Modeling)",
+    status: "Completed",
+    icon: Shield,
+    description: "Deployed the Analytics Controller with Rolling Z-Score analysis, distinguishing generative noise from significant truth-drift. We are automatically plotting Confidence and Drift directly on the Dashboard."
   },
   {
     title: "Authoritative RAG Optimization",
     status: "Q1 2027",
     icon: Zap,
     description: "Developing structured pipelines that organize and format brand knowledge base. This ensures external Fact-Vaults and brand assets are optimized for ingestion by emerging Retrieval-Augmented Generation engines (e.g. SearchGPT, Perplexity)."
-  },
-  {
-    title: "Sentiment Drift Detection",
-    status: "Q2 2027",
-    icon: Shield,
-    description: "Automated anomaly detection models that monitor historical LLM outputs for your brand. Real-time alerts trigger when AI sentiment suddenly shifts negative or hallucinated claims appear."
   },
   {
     title: "Unified GEO Benchmarking",

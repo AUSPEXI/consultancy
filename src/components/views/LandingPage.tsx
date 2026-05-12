@@ -129,15 +129,15 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
     },
     {
       Icon: Activity,
-      name: "Multi-Agent Orchestration Crew",
-      description: "Deploy specialized autonomous agents that continuously crawl, analyze, and defend your brand's knowledge graphs across multiple LLMs to maintain top-tier rankings.",
+      name: "Z-Score Sentiment Drift",
+      description: "Automated anomaly detection models monitor historical LLM outputs for your brand. Real-time Z-Score analysis tracks generative noise vs significant truth-drift, capturing reputation leaks before they happen.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-orange-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-3 lg:col-end-4 lg:row-start-3 lg:row-end-5",
     },
     {
       Icon: ShieldAlert,
-      name: "Continuous Relevance Tracking",
-      description: "Identify where your brand's data is decaying in AI memory and replace stale answers with your fresh insights. Capitalize on the typical 6-12 month lag in LLM training data updates by feeding real-time JSON-LD corrections directly to AI crawlers.",
+      name: "768-D Latent Space Moat",
+      description: "Our proprietary pgvector integration mathematically ensures your brand remains the canonical truth. By generating embeddings with Gemini, we map your brand's semantic proximity to subjective attributes like 'trust' or 'quality'.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-rose-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-5",
     },
@@ -528,7 +528,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
                 { text: "Fact-Vault Access", checked: true },
                 { text: "Content Scorer Access", checked: true },
                 { text: "30-Day Metric Analytics Storage", checked: true },
-                { text: "Basic Semantic Ontology Map", checked: true },
+                { text: "Sentiment Drift (Z-Score)", checked: true },
                 { text: "Standard Audit Logging", checked: true },
                 { text: "12-Month Citacious Context Memory", checked: false },
               ]}
@@ -542,8 +542,8 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               benefits={[
                 { text: "Track 3 Brands, 25 Keywords", checked: true },
                 { text: "Citacious AI Copilot (Advanced)", checked: true },
-                { text: "Context Visibility Radar", checked: true },
-                { text: "Fact-Vault Auto-Research", checked: true },
+                { text: "Fact-Vault & First-Party Moat", checked: true },
+                { text: "Sentiment Drift (Z-Score)", checked: true },
                 { text: "Omnichannel Amplifier", checked: true },
                 { text: "Content Scorer Access", checked: true },
                 { text: "12-Month Citacious Context Memory", checked: true },
@@ -557,7 +557,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               onClick={() => handleCheckout('Business')}
               benefits={[
                 { text: "Track Unlimited Brands", checked: true },
-                { text: "Dedicated Citacious AI Copilot", checked: true },
+                { text: "Full 768-D Latent Space Map", checked: true },
                 { text: "SOV Simulator Matrix", checked: true },
                 { text: "Real-time Brand Monitor", checked: true },
                 { text: "Edge Schema (JSON-LD) Generator", checked: true },
@@ -573,7 +573,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               onClick={() => window.location.href = '/voice-agents'}
               benefits={[
                 { text: "Custom Brand & Keyword Tracking", checked: true },
-                { text: "Dedicated Citacious AI Copilot", checked: true },
+                { text: "768-D Latent Space Map via pgvector", checked: true },
                 { text: "SOV Simulator Matrix & API Access", checked: true },
                 { text: "Real-time Brand Monitor", checked: true },
                 { text: "Edge Schema (JSON-LD) Generator", checked: true },

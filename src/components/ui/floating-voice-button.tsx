@@ -6,7 +6,7 @@ import { useVoiceAgent } from '@/contexts/VoiceAgentContext';
 
 export function FloatingVoiceButton() {
   const [isVisible, setIsVisible] = useState(false);
-  const [isCardDismissed, setIsCardDismissed] = useState(false);
+  const [isCardDismissed, setIsCardDismissed] = useState(true);
   const location = useLocation();
   const { isConnected, isSpeaking, disconnect } = useVoiceAgent();
 
@@ -88,12 +88,12 @@ export function FloatingVoiceButton() {
                   Ask AI
                 </button>
               )}
-              <Link 
-                to="/voice-agents"
+              <button 
+                onClick={() => setIsCardDismissed(false)}
                 className="w-14 h-14 bg-zinc-700 hover:bg-zinc-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-zinc-900/50 transition-transform hover:scale-105"
               >
                 <Mic className="w-6 h-6" />
-              </Link>
+              </button>
             </div>
           )}
         </motion.div>

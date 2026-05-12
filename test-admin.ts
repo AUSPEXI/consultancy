@@ -1,4 +1,5 @@
 import admin from 'firebase-admin';
+// @ts-ignore
 import config from './firebase-applet-config.json' assert { type: 'json' };
 
 const app = admin.initializeApp({
