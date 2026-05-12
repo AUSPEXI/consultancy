@@ -14,6 +14,7 @@ import { Settings } from '@/components/views/Settings';
 import { Copilot } from '@/components/Copilot';
 import { OnboardingModal } from '@/components/ui/onboarding-modal';
 import { useAuth } from '@/contexts/AuthContext';
+import { GeoPulse } from '@/components/views/GeoPulse';
 
 export function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -40,6 +41,7 @@ export function Dashboard() {
       case 'audit-logs': return <AuditLogs />;
       case 'simulator': return <Simulator />;
       case 'brand-monitor': return <BrandMonitor />;
+      case 'geo-pulse': return <GeoPulse />;
       case 'competitors': return <Competitors />;
       case 'technical': return <Technical />;
       case 'agents': return <Agents />;

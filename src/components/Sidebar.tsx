@@ -1,4 +1,4 @@
-import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, Wrench, PenTool, MonitorPlay, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, Wrench, PenTool, MonitorPlay, ShieldCheck, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { doc, setDoc } from 'firebase/firestore';
@@ -18,6 +18,7 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
   
   const navItems = [
     { id: 'overview', label: 'AI SOV Overview', icon: LayoutDashboard, requiredTier: 'Basic' },
+    { id: 'geo-pulse', label: 'GEO Pulse Index (Beta)', icon: Activity, requiredTier: 'Premium' },
     { id: 'competitors', label: 'Competitor Radar', icon: Radar, requiredTier: 'Medium' },
     { id: 'fact-vault', label: 'Fact-Vault', icon: Database, requiredTier: 'Basic' },
     { id: 'content-scorer', label: 'Content Scorer', icon: PenTool, requiredTier: 'Basic' },

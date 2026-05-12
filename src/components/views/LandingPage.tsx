@@ -299,7 +299,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">The Auspexi Arsenal</h2>
             <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
-              Everything you need to dominate the AI latent space and secure your Share of Voice.
+              Everything you need to dominate AI Answer Engines and secure your Share of Voice.
             </p>
           </div>
           
@@ -445,7 +445,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-white mb-2">What is Generative Engine Optimization (GEO)?</h3>
               <p className="text-zinc-400">
-                GEO is the evolution of SEO. Instead of optimizing for blue links on Google, GEO optimizes your brand to be the definitive answer inside AI models like ChatGPT, Claude, Gemini, and Perplexity. It's about securing your "Share of Voice" in the AI latent space.
+                GEO is the evolution of SEO. Instead of optimizing for blue links on Google, GEO optimizes your brand to be the definitive answer inside AI models like ChatGPT, Claude, Gemini, and Perplexity. It's about securing your "Share of Voice" across AI Answer Engines.
               </p>
             </div>
 

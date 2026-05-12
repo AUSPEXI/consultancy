@@ -15,7 +15,7 @@ const INVESTMENT_HIGHLIGHTS = [
   {
     title: "Proprietary Infrastructure",
     icon: Globe,
-    description: "We are advancing beyond foundational AI integrations to build the core infrastructure of GEO. Our upcoming proprietary LLM probe models and Real-time Global Neural Indexing will create an insurmountable data moat."
+    description: "We are advancing beyond foundational AI integrations to build the analytical infrastructure of GEO. Our upcoming semantic affinity tracking and robust probe models will create an insurmountable data moat."
   },
   {
     title: "High-Margin Recurring Revenue",
@@ -25,7 +25,7 @@ const INVESTMENT_HIGHLIGHTS = [
   {
     title: "Defensible IP & Architecture",
     icon: ShieldCheck,
-    description: "Our roadmap introduces Agentic Market Manipulation Defense (AMMD) and Synthetic Benchmarking, establishing Auspexi not just as a tool, but as the industry-standard arbiter of AI visibility."
+    description: "Our roadmap introduces Sentiment Drift Detection and Unified GEO Benchmarking, establishing Auspexi not just as a tool, but as the industry-standard arbiter of AI visibility."
   }
 ];
 
@@ -38,15 +38,15 @@ const STRATEGIC_INITIATIVES = [
   },
   {
     phase: "Phase II: Infrastructure",
-    title: "Neural Indexing & Probing",
+    title: "Semantic Tracking & Probing",
     status: "In Development",
-    description: "We are investing capital into deploying custom, heavily quantized probing models and real-time mapping infrastructure. This transition elevates our platform from diagnostic software to an indispensable, real-time intelligence network."
+    description: "We are investing capital into deploying resilient probing infrastructure and real-time semantic tracking. This transition elevates our platform from diagnostic software to an indispensable, real-time intelligence network."
   },
   {
     phase: "Phase III: Automation",
-    title: "Autonomous Fact Seeding",
+    title: "Authoritative RAG Optimization",
     status: "Q1 2027",
-    description: "Deployment of autonomous agents that inject high-entropy factual data directly into the indexable corpus of future model training runs, establishing deterministic control over AI outputs for our enterprise clients."
+    description: "Deployment of structured pipelines that optimize brand knowledge for Retrieval-Augmented Generation engines, establishing authoritative control over how AI models cite our enterprise clients."
   }
 ];
 

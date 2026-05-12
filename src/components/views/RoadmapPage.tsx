@@ -6,40 +6,40 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const ROADMAP_ITEMS = [
   {
-    title: "Real-time Global Neural Indexing",
+    title: "Global Share of Voice (SoV) Tracking",
     status: "In Development",
     icon: Globe,
-    description: "Moving beyond passive daily crawls. We are building infrastructure to maintain a live index of how LLMs perceive entities in real-time, mapping the shifting weights of AI neural networks globally as they happen."
+    description: "Building resilient infrastructure to continuously query major LLMs across discrete industry verticals. Extracting reliable metrics to quantify brand mention frequency against competitors."
   },
   {
-    title: "Proprietary LLM Probe Models",
+    title: "Semantic Affinity Tracking",
     status: "Q4 2026",
     icon: BrainCircuit,
-    description: "Instead of just using generalized third-party APIs, we are training custom, heavily quantized probing models that run at massive scale. These probes reverse-engineer and predict how major foundational models will respond to specific entities before human users even form their queries."
+    description: "Utilizing NLP and vector embeddings to measure semantic proximity. Discovering exactly how closely leading language models associate your brand with subjective attributes like 'trust', 'quality', or 'innovation'."
   },
   {
-    title: "Automated AI-Native Fact Seeding (AIFS)",
+    title: "Authoritative RAG Optimization",
     status: "Q1 2027",
     icon: Zap,
-    description: "Autonomous agents that automatically inject high-entropy facts from the Fact-Vault into targeted, high-authority AI training corpora (like Wikipedia, Reddit, StackOverflow). We ensure your brand is integrated into the model's base knowledge during their next pre-training or fine-tuning run."
+    description: "Developing structured pipelines that organize and format brand knowledge base. This ensures external Fact-Vaults and brand assets are optimized for ingestion by emerging Retrieval-Augmented Generation engines (e.g. SearchGPT, Perplexity)."
   },
   {
-    title: "Agentic Market Manipulation Defense (AMMD)",
+    title: "Sentiment Drift Detection",
     status: "Q2 2027",
     icon: Shield,
-    description: "Detecting and defending against malicious competitor bots attempting to poison the AI's context window. Auspexi will act as a digital immune system, automatically neutralizing negative sentiment attacks on your brand."
+    description: "Automated anomaly detection models that monitor historical LLM outputs for your brand. Real-time alerts trigger when AI sentiment suddenly shifts negative or hallucinated claims appear."
   },
   {
-    title: "Cross-Model Synthetic Benchmarking",
+    title: "Unified GEO Benchmarking",
     status: "Q3 2027",
     icon: Target,
-    description: "The 'FICO score' for AI presence. A unified, universally recognized metric that VCs, CMOs, and analysts use to evaluate a brand's deterministic strength across ChatGPT, Gemini, Claude, and Perplexity."
+    description: "A centralized, reliable composite score for your brand's AI presence. Creating a standard metric that marketing leaders can use to evaluate deterministic visibility across various foundation models."
   },
   {
-    title: "Predictive Trend Hacking",
+    title: "Generative Query Prediction",
     status: "Q4 2027",
     icon: TrendingUp,
-    description: "Using predictive AI to forecast emerging generative queries and automatically generating optimized Fact-Vault content days before human SEOs even realize a trend is forming."
+    description: "Analyzing search intent shifts and zero-click answer patterns to identify emerging AI query trends. This allows you to produce targeted PR and content to secure citations before competitors do."
   }
 ];
 
