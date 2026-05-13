@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { SparklesCore } from '@/components/ui/sparkles';
 import { SplineScene } from '@/components/ui/splite';
 import { BentoGrid, BentoCard } from '@/components/ui/bento-grid';
@@ -8,7 +9,7 @@ import { Footerdemo } from '@/components/ui/footer-section';
 import { TestimonialsColumn } from '@/components/ui/testimonials-columns-1';
 import { ImageZoom } from '@/components/ui/image-zoom';
 import { DottedSurface } from '@/components/ui/dotted-surface';
-import { ArrowRight, Bot, Target, Zap, Search, BarChart3, ShieldAlert, CheckCircle2, Database, Mic, Brain, Blocks, Activity } from 'lucide-react';
+import { ArrowRight, Bot, Target, Zap, Search, BarChart3, ShieldAlert, CheckCircle2, Database, Mic, Brain, Blocks, Activity, Hash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LeadCaptureModal } from '@/components/ui/lead-capture-modal';
@@ -28,6 +29,16 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
   const [modalSource, setModalSource] = useState('trial');
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [currency, setCurrency] = useState<'GBP' | 'USD'>('GBP');
+
+  // Latent Space Node Labels for Hero Section
+  const latentNodes = [
+    { label: 'RENDER_NODE:TRUST', x: '10%', y: '20%', delay: 0 },
+    { label: 'SYS_LATENT_OK', x: '85%', y: '15%', delay: 0.5 },
+    { label: 'VECTOR_768_D', x: '15%', y: '80%', delay: 1 },
+    { label: 'GEO_CANONICAL', x: '80%', y: '75%', delay: 1.5 },
+    { label: 'NODE_P1856', x: '45%', y: '10%', delay: 2 },
+    { label: 'EMBED_V3_MAP', x: '60%', y: '85%', delay: 2.5 }
+  ];
 
   useEffect(() => {
     // Auto-detect IP for currency
@@ -96,14 +107,14 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       Icon: Search,
       name: "Zero-Click Dominance",
       description: "Ensure your brand is the definitive answer when users query AI, completely bypassing the traditional SERP. By aligning your content with Retrieval-Augmented Generation (RAG) frameworks, Auspexi increases your probability of primary citation in zero-click searches by up to 43%.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-amber-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
     },
     {
       Icon: Brain,
       name: "Citacious AI Analyst",
       description: "A dedicated 12-Month Citacious Context Memory analyst that organically understands your dashboard tools, analyzes past results, and orchestrates intelligent future actions to ensure maximum visibility.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-zinc-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-sky-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-2 lg:col-end-4 lg:row-start-1 lg:row-end-2",
     },
     {
@@ -117,35 +128,35 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       Icon: Database,
       name: "Fact-Vault Extraction",
       description: "Automatically find the highest-entropy data points in your whitepapers, case studies, and proprietary research, turning them into potent cite-magnets that models crave.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-zinc-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-emerald-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-3 lg:col-end-4 lg:row-start-2 lg:row-end-3",
     },
     {
       Icon: BarChart3,
       name: "SOV Simulator & Brand Monitor",
       description: "Track your brand's visibility across Gemini, ChatGPT, and Claude in real-time. Understand exactly how often you are recommended for high-intent industry queries.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-violet-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-3 lg:row-start-3 lg:row-end-4",
     },
     {
       Icon: Activity,
       name: "Z-Score Sentiment Drift",
       description: "Automated anomaly detection models monitor historical LLM outputs for your brand. Real-time Z-Score analysis tracks generative noise vs significant truth-drift, capturing reputation leaks before they happen.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-zinc-700/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-orange-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-3 lg:col-end-4 lg:row-start-3 lg:row-end-5",
     },
     {
       Icon: ShieldAlert,
       name: "768-D Latent Space Moat",
       description: "Our proprietary pgvector integration mathematically ensures your brand remains the canonical truth. By generating embeddings with Gemini, we map your brand's semantic proximity to subjective attributes like 'trust' or 'quality'.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-700/50 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-fuchsia-700/50 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-5",
     },
     {
       Icon: Zap,
       name: "Edge & Schema Generator",
       description: "Deploy GEO-optimized JSON-LD schema directly to your site with one click. Ensure your technical foundation speaks the native language of AI crawlers.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-zinc-600/50 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-yellow-500/50 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5",
     },
   ];
@@ -195,8 +206,20 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       <PublicHeader onLoginClick={onLoginClick} />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        <div className="absolute inset-0 w-full h-full z-0">
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-black">
+        {/* Subtle pink vector grid overlay like on the blog */}
+        <div 
+          className="absolute inset-0 opacity-[0.15] pointer-events-none z-[1]"
+          style={{
+            backgroundImage: `linear-gradient(to right, #EC4899 1px, transparent 1px), linear-gradient(to bottom, #EC4899 1px, transparent 1px)`,
+            backgroundSize: '40px 40px',
+            backgroundPosition: 'left top',
+            WebkitMaskImage: 'radial-gradient(circle at center, black 10%, transparent 80%)',
+            maskImage: 'radial-gradient(circle at center, black 10%, transparent 80%)',
+          }}
+        />
+
+        <div className="absolute inset-0 w-full h-full z-0 opacity-40">
           <SparklesCore
             id="tsparticlesfullpage"
             background="transparent"
@@ -207,20 +230,23 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
             particleColor="#ffffff"
             speed={1}
           />
-          <div className="absolute inset-0 bg-zinc-950 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Column */}
             <div className="text-left md:col-span-5">
-              <div className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-zinc-800/50 border border-zinc-700 text-zinc-300 text-sm font-medium mb-6">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20 text-pink-400 text-sm font-medium mb-6"
+              >
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zinc-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-zinc-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
                 </span>
                 The New Era of Search is Here
-              </div>
+              </motion.div>
               <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-heading tracking-tight mb-6 leading-[1.1]">
                 Don't let AI leave your <span className="text-white">brand behind.</span>
               </h1>
@@ -228,48 +254,80 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
                 Traditional SEO is dying. Auspexi is the premier Generative Engine Optimization (GEO) platform that ensures your brand is cited, recommended, and prioritized by AI models like Gemini, ChatGPT, and Claude.
               </p>
               
-              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 mb-8">
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 mb-8 backdrop-blur-sm">
                 <h3 className="text-white font-semibold mb-2">What is Generative Engine Optimization (GEO)?</h3>
                 <p className="text-sm text-zinc-300 leading-relaxed">
-                  Generative Engine Optimization (GEO) is the process of optimizing your brand's content so that it is cited as the primary source of truth by AI models like ChatGPT, Google Gemini, Claude, and Perplexity. Unlike traditional SEO which focuses on ranking links on a search engine results page, GEO focuses on ensuring your facts and data are the ones the AI chooses to synthesize into its direct answers.
+                  Generative Engine Optimization (GEO) is the process of optimizing your brand's content so that it is cited as the primary source of truth by AI models like ChatGPT, Google Gemini, Claude, and Perplexity.
                 </p>
               </div>
               
-              <div className="flex flex-col gap-3 w-full max-w-md">
+              <div className="flex flex-col gap-3 w-full max-w-md relative z-20">
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Input 
                     type="email" 
                     placeholder="Enter your work email" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-zinc-900/50 border-zinc-800 focus-visible:ring-zinc-700 text-white placeholder:text-zinc-500 h-12"
+                    className="bg-zinc-900/80 border-zinc-800 focus-visible:ring-pink-700 text-white placeholder:text-zinc-500 h-12"
                   />
                   <Input 
                     type="text" 
                     placeholder="Company domain" 
                     value={domain}
                     onChange={(e) => setDomain(e.target.value)}
-                    className="bg-zinc-900/50 border-zinc-800 focus-visible:ring-zinc-700 text-white placeholder:text-zinc-500 h-12"
+                    className="bg-zinc-900/80 border-zinc-800 focus-visible:ring-pink-700 text-white placeholder:text-zinc-500 h-12"
                   />
                 </div>
-                <Button onClick={() => handleOpenModal('report')} className="bg-white hover:bg-zinc-200 text-black h-12 w-full rounded-xl font-medium text-lg">
+                <Button onClick={() => handleOpenModal('report')} className="bg-white hover:bg-zinc-200 text-black h-12 w-full rounded-xl font-medium text-lg shadow-[0_0_20px_-5px_white]">
                   Get Free Report
                 </Button>
               </div>
             </div>
 
-            {/* Right Column */}
+            {/* Right Column - LATENT SPACE VIZ */}
             <div className="md:col-span-7 relative h-[400px] md:h-[600px] w-full flex items-center justify-end">
-              <div className="absolute inset-0 w-[120%] -right-[10%] h-full">
+              <div className="absolute inset-0 w-[120%] -right-[10%] h-full z-10">
                 <SplineScene 
                   scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
                   className="w-full h-full"
                 />
               </div>
+              
+              {/* Floating Latent Space Node Annotations */}
+              <div className="absolute inset-0 z-30 pointer-events-none overflow-hidden">
+                {latentNodes.map((node, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ 
+                      opacity: [0.3, 0.6, 0.3],
+                      y: [0, -10, 0],
+                      x: [0, 5, 0],
+                    }}
+                    transition={{
+                      duration: 4 + Math.random() * 2,
+                      repeat: Infinity,
+                      delay: node.delay,
+                      ease: "easeInOut"
+                    }}
+                    style={{ left: node.x, top: node.y }}
+                    className="absolute flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-pink-500 shadow-[0_0_8px_#EC4899]" />
+                    <span className="text-[10px] font-mono tracking-widest text-[#F472B6]/70 uppercase">
+                      {node.label}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+              
+              {/* Radial Fade Overlay */}
+              <div className="absolute inset-0 bg-transparent z-[20] pointer-events-none [mask-image:radial-gradient(circle_at_center,transparent_30%,black_100%)]" />
             </div>
           </div>
         </div>
       </section>
+
 
       {/* Video Section */}
       <section className="py-24 bg-zinc-950 border-y border-zinc-900 relative">

@@ -199,6 +199,33 @@ app.use(express.json());
     res.json({ status: "ok", message: "Auspexi Backend is running" });
   });
 
+  app.get("/api/analytics/map", (req, res) => {
+    const { brandId } = req.query;
+    // Generate simulated geographic SOV data
+    const points = [
+      { id: 1, lat: 51.5074, lng: -0.1278, city: "London", sov: 85, trend: "+12%" },
+      { id: 2, lat: 40.7128, lng: -74.0060, city: "New York", sov: 72, trend: "+5%" },
+      { id: 3, lat: 34.0522, lng: -118.2437, city: "Los Angeles", sov: 64, trend: "-2%" },
+      { id: 4, lat: 48.8566, lng: 2.3522, city: "Paris", sov: 91, trend: "+18%" },
+      { id: 5, lat: 35.6762, lng: 139.6503, city: "Tokyo", sov: 45, trend: "-8%" },
+      { id: 6, lat: -33.8688, lng: 151.2093, city: "Sydney", sov: 58, trend: "+3%" },
+      { id: 7, lat: 1.3521, lng: 103.8198, city: "Singapore", sov: 77, trend: "+9%" },
+      { id: 8, lat: 25.2048, lng: 55.2708, city: "Dubai", sov: 82, trend: "+15%" },
+    ];
+    res.json({ success: true, points });
+  });
+
+  app.get("/api/analytics/pulse", (req, res) => {
+    const { brandId } = req.query;
+    // Generate simulated real-time ingestion pulse
+    const pulse = Array.from({ length: 24 }, (_, i) => ({
+      time: `${i}:00`,
+      mentions: Math.floor(Math.random() * 50) + 10,
+      citations: Math.floor(Math.random() * 20) + 5,
+    }));
+    res.json({ success: true, pulse });
+  });
+
   // Mock "Customer Backend" Webhook Endpoints
   app.post("/api/webhooks/auspexi", (req, res) => {
     try {

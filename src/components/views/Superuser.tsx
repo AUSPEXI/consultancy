@@ -13,11 +13,16 @@ export function Superuser() {
 
   const collectionsToClear = [
     'sovMetrics',
+    'audit_logs',
     'auditLogs',
     'facts',
     'competitorScans',
     'contentScans',
-    'latent_space'
+    'latent_space',
+    'articles',
+    'knowledge_graph',
+    'mentions',
+    'scrapes'
   ];
 
   const hardReset = async () => {
@@ -27,26 +32,39 @@ export function Superuser() {
     setStatus(null);
     
     try {
+      console.log("Starting hard reset for user:", user.uid);
+      
       for (const collName of collectionsToClear) {
-        const q = query(collection(db, collName), where('userId', '==', user.uid));
-        const snapshot = await getDocs(q);
-        
-        const batchSize = 100;
-        let processed = 0;
-        
-        while (processed < snapshot.size) {
-          const batch = writeBatch(db);
-          snapshot.docs.slice(processed, processed + batchSize).forEach(d => {
-            batch.delete(d.ref);
-          });
-          await batch.commit();
-          processed += batchSize;
+        try {
+          const q = query(collection(db, collName), where('userId', '==', user.uid));
+          const snapshot = await getDocs(q);
+          
+          if (snapshot.empty) continue;
+          
+          console.log(`Clearing ${snapshot.size} documents from ${collName}...`);
+          
+          const batchSize = 100;
+          let processed = 0;
+          
+          while (processed < snapshot.size) {
+            const batch = writeBatch(db);
+            snapshot.docs.slice(processed, processed + batchSize).forEach(d => {
+              batch.delete(d.ref);
+            });
+            await batch.commit();
+            processed += batchSize;
+          }
+        } catch (err) {
+          console.error(`Failed to clear collection ${collName}:`, err);
+          // Continue with next collection
         }
       }
 
       // Reset user profile onboarding - use setDoc WITHOUT merge: true to effectively clear old fields
       const userRef = doc(db, 'users', user.uid);
       await setDoc(userRef, {
+        uid: user.uid,
+        email: user.email,
         onboardingCompleted: false,
         brand: '',
         domain: '',
@@ -54,7 +72,10 @@ export function Superuser() {
         competitors: [],
         connectedSocials: [],
         cmsWebhookUrl: '',
-        sentimentPrompts: []
+        sentimentPrompts: [],
+        tier: 'Free', // Reset to free tier
+        role: 'user',
+        createdAt: new Date().toISOString().split('T')[0]
       });
 
       // Clear local storage and session storage
@@ -64,8 +85,9 @@ export function Superuser() {
       setStatus({ type: 'success', message: 'Hard reset complete. All data purged. Reinitializing platform...' });
       setTimeout(() => window.location.reload(), 2000);
     } catch (error) {
+      console.error("Critical failure during hard reset:", error);
       handleFirestoreError(error, OperationType.WRITE, 'multi-collection-reset');
-      setStatus({ type: 'error', message: 'Reset failed. Check logs.' });
+      setStatus({ type: 'error', message: 'Reset encountered critical errors. Check console for details.' });
     } finally {
       setIsResetting(false);
     }
@@ -95,6 +117,7 @@ export function Superuser() {
           shortDate: date.toLocaleDateString('en-US', { weekday: 'short' }),
           aSov: baseSov + Math.sin(i) * 5,
           err: 40 + (i * 3),
+          compGap: 5 + (i * 1.5),
           compA: 40 - (i * 1.5),
           aiTraffic: 100 + (i * 50) + Math.random() * 20,
           platforms: {

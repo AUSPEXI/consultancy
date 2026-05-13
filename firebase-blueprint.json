@@ -85,12 +85,41 @@
       "description": "Learned facts and questions from voice agent conversations.",
       "type": "object",
       "properties": {
+        "userId": { "type": "string" },
         "topic": { "type": "string" },
         "fact": { "type": "string" },
         "source": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["topic", "fact", "source", "createdAt"]
+      "required": ["userId", "topic", "fact", "source", "createdAt"]
+    },
+    "Article": {
+      "title": "Article",
+      "description": "Synthesized GEO content.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "topic": { "type": "string" },
+        "article": { "type": "string" },
+        "facts": { "type": "string" },
+        "schema": { "type": "string" },
+        "brand": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "topic", "article", "timestamp"]
+    },
+    "LatentSpace": {
+      "title": "Latent Space Map",
+      "description": "Vector embeddings projection for visualization.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "points": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      },
+      "required": ["userId", "points"]
     }
   },
   "firestore": {
@@ -121,6 +150,14 @@
     "/knowledge_graph/{nodeId}": {
       "schema": { "$ref": "#/entities/KnowledgeGraphNode" },
       "description": "Learned facts from voice agent conversations."
+    },
+    "/articles/{articleId}": {
+      "schema": { "$ref": "#/entities/Article" },
+      "description": "Generated GEO content."
+    },
+    "/latent_space/{mapId}": {
+      "schema": { "$ref": "#/entities/LatentSpace" },
+      "description": "Visualization data."
     }
   }
 }
