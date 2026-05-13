@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { Chrome, Linkedin, Twitter, MessageCircle } from 'lucide-react';
@@ -82,7 +82,7 @@ export function Settings() {
     
     try {
        const userRef = doc(db, 'users', user.uid);
-       await updateDoc(userRef, { connectedSocials: newSocials });
+       await setDoc(userRef, { connectedSocials: newSocials }, { merge: true });
        alert(`Successfully ${isConnected ? 'disconnected' : 'connected'} ${platform}!`);
     } catch (error) {
        console.error(error);
@@ -119,13 +119,13 @@ export function Settings() {
         formData.keyword10
       ].filter(Boolean);
 
-      await updateDoc(userRef, {
+      await setDoc(userRef, {
         brand: formData.brand,
         domain: formData.domain,
         cmsWebhookUrl: formData.cmsWebhookUrl,
         competitors,
         keywords
-      });
+      }, { merge: true });
       console.log('Settings updated successfully');
       alert("Settings saved successfully!");
     } catch (error) {

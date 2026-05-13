@@ -44,9 +44,9 @@ export function Superuser() {
         }
       }
 
-      // Reset user profile onboarding - more explicit update
+      // Reset user profile onboarding - use setDoc WITHOUT merge: true to effectively clear old fields
       const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, {
+      await setDoc(userRef, {
         onboardingCompleted: false,
         brand: '',
         domain: '',
@@ -57,7 +57,7 @@ export function Superuser() {
         sentimentPrompts: []
       });
 
-      // Clear local storage
+      // Clear local storage and session storage
       localStorage.clear();
       sessionStorage.clear();
       

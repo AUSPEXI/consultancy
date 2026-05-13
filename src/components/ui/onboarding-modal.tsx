@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/firebase';
-import { doc, updateDoc, collection, addDoc } from 'firebase/firestore';
+import { doc, setDoc, collection, addDoc } from 'firebase/firestore';
 import { Loader2, Target, Globe, Building2, Search } from 'lucide-react';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 
@@ -64,14 +64,14 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
 
       // 1. Update user document
       const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, {
+      await setDoc(userRef, {
         brand: formData.brand,
         domain: formData.domain,
         competitors,
         keywords,
         cmsWebhookUrl: formData.cmsWebhookUrl,
         onboardingCompleted: true
-      }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `users/${user.uid}`));
+      }, { merge: true }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `users/${user.uid}`));
 
       // 1.5 Add competitors to the competitors collection
       for (const compName of competitors) {
