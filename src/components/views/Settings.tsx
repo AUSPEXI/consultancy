@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
-import { Chrome, Linkedin, Twitter, MessageCircle } from 'lucide-react';
+import { Chrome, Linkedin, Twitter, MessageCircle, Instagram, Music2 } from 'lucide-react';
 
 export function Settings() {
   const { user, userData } = useAuth();
@@ -236,6 +236,66 @@ export function Settings() {
                 onClick={() => handleToggleSocial('linkedin')}
               >
                 {connectedSocials.includes('linkedin') ? 'Connected' : 'Connect'}
+              </Button>
+            </div>
+
+            <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                  <Twitter className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-white">X / Twitter</h4>
+                  <p className="text-xs text-zinc-500">Real-time narrative seeding</p>
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className={connectedSocials.includes('twitter') ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 hover:text-emerald-300" : "border-zinc-700 text-zinc-300 bg-zinc-800 hover:bg-zinc-700 hover:text-white"}
+                onClick={() => handleToggleSocial('twitter')}
+              >
+                {connectedSocials.includes('twitter') ? 'Connected' : 'Connect'}
+              </Button>
+            </div>
+
+            <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-pink-500/10 flex items-center justify-center">
+                  <Instagram className="w-5 h-5 text-pink-500" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-white">Instagram</h4>
+                  <p className="text-xs text-zinc-500">Visual brand authority</p>
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className={connectedSocials.includes('instagram') ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 hover:text-emerald-300" : "border-zinc-700 text-zinc-300 bg-zinc-800 hover:bg-zinc-700 hover:text-white"}
+                onClick={() => handleToggleSocial('instagram')}
+              >
+                {connectedSocials.includes('instagram') ? 'Connected' : 'Connect'}
+              </Button>
+            </div>
+
+            <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center">
+                  <Music2 className="w-5 h-5 text-cyan-400" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-white">TikTok</h4>
+                  <p className="text-xs text-zinc-500">Short-form viral seeding</p>
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className={connectedSocials.includes('tiktok') ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 hover:text-emerald-300" : "border-zinc-700 text-zinc-300 bg-zinc-800 hover:bg-zinc-700 hover:text-white"}
+                onClick={() => handleToggleSocial('tiktok')}
+              >
+                {connectedSocials.includes('tiktok') ? 'Connected' : 'Connect'}
               </Button>
             </div>
 
