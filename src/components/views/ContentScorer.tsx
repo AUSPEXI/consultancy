@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { PenTool, Loader2, CheckCircle2, AlertTriangle, ArrowRight, LayoutTemplate, FileText, BookOpen, Database, Megaphone } from 'lucide-react';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
+import { checkTierAccess } from '@/constants/tiers';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
 import { AmplifyModal } from '@/components/ui/AmplifyModal';
@@ -112,7 +113,7 @@ export function ContentScorer() {
     }
   };
 
-  if (role !== 'admin' && tier === 'Free') {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Basic')) {
     return (
       <div className="space-y-6">
         <div>

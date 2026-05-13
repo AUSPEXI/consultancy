@@ -35,20 +35,31 @@ export function Dashboard() {
   }, []);
 
   const renderContent = () => {
-    switch (activeTab) {
-      case 'overview': return <Overview />;
-      case 'fact-vault': return <FactVault />;
-      case 'content-scorer': return <ContentScorer />;
-      case 'audit-logs': return <AuditLogs />;
-      case 'simulator': return <Simulator />;
-      case 'brand-monitor': return <BrandMonitor />;
-      case 'geo-pulse': return <GeoPulse />;
-      case 'competitors': return <Competitors />;
-      case 'technical': return <Technical />;
-      case 'agents': return <Agents />;
-      case 'superuser': return <Superuser />;
-      case 'settings': return <Settings />;
-      default: return <Overview />;
+    try {
+      switch (activeTab) {
+        case 'overview': return <Overview />;
+        case 'fact-vault': return <FactVault />;
+        case 'content-scorer': return <ContentScorer />;
+        case 'audit-logs': return <AuditLogs />;
+        case 'simulator': return <Simulator />;
+        case 'brand-monitor': return <BrandMonitor />;
+        case 'geo-pulse': return <GeoPulse />;
+        case 'competitors': return <Competitors />;
+        case 'technical': return <Technical />;
+        case 'agents': return <Agents />;
+        case 'superuser': return <Superuser />;
+        case 'settings': return <Settings />;
+        default: return <Overview />;
+      }
+    } catch (err) {
+      console.error("Dashboard render error:", err);
+      return (
+        <div className="p-8 bg-red-950/20 border border-red-500/20 rounded-xl text-center">
+          <h2 className="text-xl font-bold text-red-400 mb-2">View Crashed</h2>
+          <p className="text-sm text-red-300">The component failed to render. This might be due to missing data or a runtime error.</p>
+          <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg">Reload App</button>
+        </div>
+      );
     }
   };
 

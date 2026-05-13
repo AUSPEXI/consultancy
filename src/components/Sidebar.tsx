@@ -28,7 +28,7 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
     { id: 'simulator', label: 'SOV Simulator', icon: MonitorPlay, requiredTier: 'Medium' as UserTier },
     { id: 'brand-monitor', label: 'Brand Monitor', icon: Radar, requiredTier: 'Medium' as UserTier },
     { id: 'technical', label: 'Edge & Schema', icon: Code, requiredTier: 'Premium' as UserTier },
-    { id: 'agents', label: 'Agent Orchestration', icon: Bot, requiredTier: 'Premium' as UserTier },
+    { id: 'agents', label: 'Multi-Agent Crawler', icon: Bot, requiredTier: 'Premium' as UserTier },
     { id: 'audit-logs', label: 'Audit Logs', icon: ShieldCheck, requiredTier: 'Basic' as UserTier },
     { id: 'settings', label: 'Settings', icon: Settings, requiredTier: 'Basic' as UserTier },
   ];
@@ -103,30 +103,38 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
             </button>
           );
         })}
-
-        {isAdmin && (
-          <div className="mt-8 pt-4 border-t border-zinc-800">
-            <div className="px-3 mb-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
-              <Wrench className="w-3.5 h-3.5" />
-              Admin Tools
-            </div>
-            <div className="space-y-1 grid grid-cols-1 gap-1">
-              {TIERS.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => handleTestUpgrade(t)}
-                  className="w-full text-left px-3 py-1.5 rounded-md text-[10px] text-zinc-500 hover:bg-zinc-800/50 hover:text-zinc-200 transition-colors truncate"
-                  title={`Set Tier to ${t}`}
-                >
-                  Set: {t}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </nav>
 
-      <div className="p-4 border-t border-zinc-800 space-y-1">
+      <div className="p-4 border-t border-zinc-800 space-y-3">
+        {/* Tier Status Indicator / Switcher for Admins */}
+        <div className="px-3 py-2 bg-zinc-900 rounded-lg border border-zinc-800">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Active Tier</span>
+            {isAdmin && <span className="text-[10px] font-bold text-pink-500 uppercase tracking-widest">Admin Mode</span>}
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {isAdmin ? (
+               <div className="grid grid-cols-2 gap-1 w-full mt-1">
+                 {TIERS.map((t) => (
+                   <button
+                     key={t}
+                     onClick={() => handleTestUpgrade(t)}
+                     className={cn(
+                       "px-2 py-1 rounded text-[9px] font-bold uppercase transition-all",
+                       tier === t 
+                         ? "bg-pink-600 text-white" 
+                         : "bg-zinc-800 text-zinc-500 hover:text-zinc-300"
+                     )}
+                   >
+                     {t}
+                   </button>
+                 ))}
+               </div>
+            ) : (
+              <span className="text-sm font-bold text-white">{tier}</span>
+            )}
+          </div>
+        </div>
         <Link 
           to="/"
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-colors"

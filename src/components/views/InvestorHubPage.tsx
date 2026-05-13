@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, BarChart3, Globe, ShieldCheck, Zap, ArrowRight, FileText, Lock, CheckCircle2, Layout, Database, Eye, PieChart, Users, Wallet, Rocket } from 'lucide-react';
+import { TrendingUp, BarChart3, Globe, ShieldCheck, Zap, ArrowRight, FileText, Lock, CheckCircle2, Layout, Database, Eye, PieChart, Users, Wallet, Rocket, Cpu } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, Cell } from 'recharts';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
@@ -46,18 +46,25 @@ const STRATEGIC_INITIATIVES = [
     description: "We have fully deployed our 768-dimensional Latent Space Engine backed by pgvector, creating an insurmountable, real-time proprietary data moat for anomaly detection and sentiment drift modeling."
   },
   {
-    phase: "Phase III: Automation",
-    title: "Authoritative RAG Optimization",
-    status: "Q1 2027",
-    description: "Deployment of structured pipelines that optimize brand knowledge for Retrieval-Augmented Generation engines, establishing authoritative control over how AI models cite our enterprise clients."
+    phase: "Phase III: Proprietary SLM",
+    title: "The SLM Moat & Margin Expansion",
+    status: "Q4 2026",
+    description: "Transitioning from third-party APIs to our own self-hosted 8B parameter 'GEO-Specialist' model. Utilizing Nvidia B200 efficiency to reduce inference costs by 85% and reclaim structural gross margins."
   }
 ];
 
 const DATA_ROOM_METRICS = [
   { label: "TAM (Global)", value: "$124B", sub: "By 2028" },
   { label: "Target NRR", value: "135%+", sub: "Premium Tier" },
-  { label: "LTV / CAC", value: "4.2x", sub: "Projected" },
+  { label: "LTV / CAC", value: "16x", sub: "3-Year Lifecycle" },
   { label: "Gross Margin", value: "84%", sub: "Efficiency Moat" }
+];
+
+const UNIT_ECONOMICS = [
+  { metric: "CAC (Acquisition)", current: "$800", target: "$450", trend: "decreasing" },
+  { metric: "LTV (3-Year)", current: "$12,800", target: "$16,000", trend: "increasing" },
+  { metric: "Payback Period", current: "4 Months", target: "2.5 Months", trend: "decreasing" },
+  { metric: "Gross Margin", current: "84%", target: "88%", trend: "increasing" },
 ];
 
 const REVENUE_DATA = [
@@ -67,9 +74,30 @@ const REVENUE_DATA = [
 ];
 
 const USE_OF_FUNDS = [
-  { name: 'Engineering', value: 45, color: '#ec4899', description: 'Phase III RAG Optimization & Phase IV Query Prediction' },
-  { name: 'Sales & Marketing', value: 35, color: '#f472b6', description: 'UK & US Market Capture' },
-  { name: 'Ops & Infra', value: 20, color: '#3f3f46', description: 'pgvector Cluster Scaling' },
+  { name: 'Engineering', value: 45, color: '#ec4899', description: 'Phase III SLM Development & RAG Optimization' },
+  { name: 'Sales & Growth', value: 35, color: '#f472b6', description: '2 AE Hires + $30k/mo Media Spend' },
+  { name: 'Ops & Infra', value: 20, color: '#3f3f46', description: '50M Vector Cluster & 12mo Runway' },
+];
+
+const MARGIN_EXPANSION_DATA = [
+  { quarter: 'Q2 2026', strategy: '100% Third-Party', cost: 18, margin: 72 },
+  { quarter: 'Q3 2026', strategy: 'Hybrid Approach', cost: 15, margin: 76 },
+  { quarter: 'Q4 2026', strategy: 'Local pgvector', cost: 12, margin: 80 },
+  { quarter: 'Q1 2027', strategy: 'SLM Beta', cost: 7, margin: 86 },
+  { quarter: 'Q2 2027', strategy: 'Proprietary SLM', cost: 3, margin: 92 },
+];
+
+const SLM_BUDGET = [
+  { item: 'Data Engineering', amount: '$150,000', detail: 'Auto-labeling systems for pgvector logs' },
+  { item: 'Human Labeling', amount: '$50,000', detail: 'Specialized SEO/Legal analyst verification' },
+  { item: 'Compute (B200 Cloud)', amount: '$5,000', detail: 'Hires thousands of QLoRA training runs' },
+];
+
+const B200_BENCHMARKS = [
+  { metric: "Inference Throughput", value: "4x", baseline: "vs H100 Instance" },
+  { metric: "Cost per 1M Tokens", value: "$0.02", baseline: "vs $0.14 Third-Party" },
+  { metric: "Fine-tuning Cost", value: "<$15", baseline: "Per 8B Parameter Run" },
+  { metric: "Compute Rent", value: "$2.65/hr", baseline: "Spot Price (Series A Projection)" }
 ];
 
 const STRATEGIC_PILLARS = [
@@ -97,6 +125,13 @@ const REVENUE_LOGIC_METRICS = [
   { label: "CAGR Target", value: "50.5%", sub: "GEO Market Growth" }
 ];
 
+const EMAIL_SEQUENCE = [
+  { day: 1, title: "The Audit", focus: "768-D Visibility Map / Gap Analysis" },
+  { day: 3, title: "Competitor Jab", focus: "Semantic Gap Exploitation" },
+  { day: 5, title: "The Cure", focus: "High-Entropy Fact Injection" },
+  { day: 7, title: "The Conversion", focus: "Z-Score Drift FOMO / Pro Trial" },
+];
+
 const PROPRIETARY_STACK = [
   {
     title: "768-D Latent Space Engine",
@@ -114,6 +149,236 @@ const PROPRIETARY_STACK = [
     metric: "0.01ms Latency"
   }
 ];
+
+import { cn } from '@/lib/utils';
+import { AreaChart as RechartsAreaChart, Area as RechartsArea, LineChart as RechartsLineChart, Line as RechartsLine, XAxis as RechartsXAxis, YAxis as RechartsYAxis, Tooltip as RechartsTooltip, CartesianGrid as RechartsCartesianGrid } from 'recharts';
+
+function MarginExpansionChart() {
+  return (
+    <div className="p-8 bg-zinc-900 border border-zinc-800 rounded-3xl">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h3 className="text-xl font-bold text-white mb-1">Margin Expansion Trajectory</h3>
+          <p className="text-xs text-zinc-500 uppercase tracking-widest text-emerald-500">Recapturing the "Inference Tax"</p>
+        </div>
+        <div className="flex gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-pink-500" />
+            <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Gross Margin</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-zinc-600" />
+            <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Inference Cost</span>
+          </div>
+        </div>
+      </div>
+      
+      <div className="h-[250px] w-full mb-8">
+        <ResponsiveContainer width="100%" height="100%">
+          <RechartsAreaChart data={MARGIN_EXPANSION_DATA}>
+            <defs>
+              <linearGradient id="marginGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#ec4899" stopOpacity={0.2}/>
+                <stop offset="95%" stopColor="#ec4899" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <RechartsCartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+            <RechartsXAxis 
+              dataKey="quarter" 
+              fontSize={10} 
+              axisLine={false} 
+              tickLine={false} 
+              tick={{ fill: '#71717a' }}
+            />
+            <RechartsYAxis 
+              fontSize={10} 
+              axisLine={false} 
+              tickLine={false} 
+              tick={{ fill: '#71717a' }}
+              tickFormatter={(v) => `${v}%`}
+            />
+            <RechartsTooltip 
+              contentStyle={{ backgroundColor: '#09090b', border: '1px solid #27272a' }}
+              labelStyle={{ fontWeight: 'bold', color: 'white', marginBottom: '4px' }}
+            />
+            <RechartsArea 
+              type="monotone" 
+              dataKey="margin" 
+              stroke="#ec4899" 
+              strokeWidth={3} 
+              fill="url(#marginGrad)" 
+              name="Gross Margin"
+            />
+            <RechartsArea 
+              type="monotone" 
+              dataKey="cost" 
+              stroke="#52525b" 
+              strokeWidth={2} 
+              fill="transparent" 
+              name="Inference Cost"
+            />
+          </RechartsAreaChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+         <div className="p-4 bg-zinc-950/50 border border-zinc-800 rounded-xl">
+            <p className="text-[10px] font-bold text-zinc-500 mb-1">Q2 2026 Strategy</p>
+            <p className="text-sm font-bold text-white">Third-Party APIs</p>
+            <p className="text-[10px] text-zinc-500">High operational overhead</p>
+         </div>
+         <div className="p-4 bg-zinc-950/50 border border-zinc-800 rounded-xl">
+            <p className="text-[10px] font-bold text-zinc-500 mb-1">Q2 2027 Strategy</p>
+            <p className="text-sm font-bold text-emerald-400">Proprietary SLM</p>
+            <p className="text-[10px] text-emerald-500/70">Structural Gross Margin Reset</p>
+         </div>
+         <div className="p-4 bg-pink-500/10 border border-pink-500/20 rounded-xl flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-bold text-pink-400 uppercase">Margin Gain</p>
+              <p className="text-xl font-bold text-white">+20%</p>
+            </div>
+            <TrendingUp className="w-5 h-5 text-pink-500" />
+         </div>
+      </div>
+    </div>
+  );
+}
+
+function TechnicalAppendix() {
+  return (
+    <div className="p-8 bg-zinc-950 border border-zinc-800 rounded-3xl">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
+          <Cpu className="w-5 h-5 text-blue-400" />
+        </div>
+        <div>
+          <h3 className="text-xl font-bold text-white">B200 Efficiency Appendix</h3>
+          <p className="text-xs text-zinc-500 uppercase tracking-widest">Blackwell Generation Benchmarks</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {B200_BENCHMARKS.map((b, i) => (
+          <div key={i} className="p-6 bg-zinc-900 border border-zinc-800 rounded-2xl">
+            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">{b.metric}</p>
+            <p className="text-2xl font-bold text-white mb-1">{b.value}</p>
+            <p className="text-[10px] text-zinc-600 italic">{b.baseline}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="p-6 bg-blue-500/5 border border-blue-500/20 rounded-2xl">
+        <div className="flex items-center gap-2 mb-4">
+          <CheckCircle2 className="w-4 h-4 text-blue-400" />
+          <h4 className="text-sm font-bold text-white uppercase tracking-widest">Phase III SLM Cost allocation</h4>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {SLM_BUDGET.map((s, i) => (
+            <div key={i}>
+              <p className="text-xs font-bold text-white mb-1">{s.item}</p>
+              <p className="text-lg font-bold text-blue-400 mb-1">{s.amount}</p>
+              <p className="text-[10px] text-zinc-500 leading-relaxed">{s.detail}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function InvestorCalculator() {
+  const [funding, setFunding] = useState(3000000);
+  const [growthRate, setGrowthRate] = useState(15); // Monthly %
+
+  const calculateReturn = () => {
+    // Basic projection logic: 3 years, compound growth
+    const months = 36;
+    const initialUsers = 100;
+    const avgArpu = 350; // Weighted average of tiers
+    const margin = 0.84;
+    
+    let users = initialUsers;
+    for (let i = 0; i < months; i++) {
+       users = users * (1 + (growthRate / 100));
+    }
+    
+    const year3ARR = users * avgArpu * 12;
+    const valuation = year3ARR * 12.5; // SaaS multiple
+    const returnOnInvestment = (valuation / (funding / 0.2)) * 10; // Simple ROI multiplier
+    
+    return {
+      arr: year3ARR,
+      valuation: valuation,
+      roi: returnOnInvestment.toFixed(1)
+    };
+  };
+
+  const results = calculateReturn();
+
+  return (
+    <div className="p-8 bg-zinc-900 border border-zinc-800 rounded-3xl">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h3 className="text-xl font-bold text-white mb-1">Series A Returns Calculator</h3>
+          <p className="text-xs text-zinc-500 uppercase tracking-widest">Model your 10x scenario</p>
+        </div>
+        <PieChart className="w-6 h-6 text-pink-500" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="space-y-8">
+          <div className="space-y-4">
+            <div className="flex justify-between">
+              <label className="text-sm font-medium text-zinc-300">Investment Amount</label>
+              <span className="text-sm font-bold text-white">${(funding / 1000000).toFixed(1)}M</span>
+            </div>
+            <input 
+              type="range" 
+              min="1000000" 
+              max="10000000" 
+              step="500000"
+              value={funding}
+              onChange={(e) => setFunding(Number(e.target.value))}
+              className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-pink-500"
+            />
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex justify-between">
+              <label className="text-sm font-medium text-zinc-300">Monthly Growth Rate</label>
+              <span className="text-sm font-bold text-white">{growthRate}%</span>
+            </div>
+            <input 
+              type="range" 
+              min="5" 
+              max="25" 
+              step="1"
+              value={growthRate}
+              onChange={(e) => setGrowthRate(Number(e.target.value))}
+              className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-pink-500"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-6 bg-zinc-950 border border-zinc-800 rounded-2xl flex flex-col justify-center text-center">
+            <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Year 3 ARR</p>
+            <p className="text-2xl font-bold text-white">${(results.arr / 1000000).toFixed(1)}M</p>
+          </div>
+          <div className="p-6 bg-zinc-950 border border-zinc-800 rounded-2xl flex flex-col justify-center text-center">
+            <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Exit Valuation</p>
+            <p className="text-2xl font-bold text-white">${(results.valuation / 1000000).toFixed(1)}M</p>
+          </div>
+          <div className="p-6 col-span-2 bg-pink-500/10 border border-pink-500/30 rounded-2xl flex flex-col justify-center text-center">
+            <p className="text-[10px] font-bold text-pink-400 tracking-widest uppercase mb-1">Projected Multiple</p>
+            <p className="text-4xl font-bold text-pink-500">{results.roi}x</p>
+            <p className="text-[10px] text-pink-500/70 mt-1">Based on Series A 20% Post-Money Stake</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function InvestorHubPage() {
   const { signInWithGoogle, user } = useAuth();
@@ -358,9 +623,132 @@ export function InvestorHubPage() {
                     </div>
                     <div className="p-6 bg-zinc-900 border border-zinc-800 rounded-2xl">
                       <Rocket className="w-5 h-5 text-pink-500 mb-4" />
-                      <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Pre-Money Val</p>
-                      <h4 className="text-2xl font-bold text-white">$15.0M</h4>
-                      <p className="text-xs text-zinc-500 mt-1">10x ARR + Tech Multiplier</p>
+                      <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Exit Multiple</p>
+                      <h4 className="text-2xl font-bold text-white">10x - 15x</h4>
+                      <p className="text-xs text-zinc-500 mt-1">SaaS Infrastructure Premium</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Live Unit Economics Section */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {UNIT_ECONOMICS.map((item, i) => (
+                    <div key={i} className="p-6 bg-zinc-900/50 border border-zinc-800 rounded-2xl">
+                      <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-2">{item.metric}</p>
+                      <div className="flex items-end justify-between">
+                        <div>
+                          <p className="text-2xl font-bold text-white">{item.current}</p>
+                          <p className="text-[10px] text-zinc-500">Target: {item.target}</p>
+                        </div>
+                        <div className={cn(
+                          "px-1.5 py-0.5 rounded text-[10px] font-bold uppercase",
+                          item.trend === 'increasing' ? "bg-emerald-500/10 text-emerald-400" : "bg-blue-500/10 text-blue-400"
+                        )}>
+                          {item.trend}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Automated Growth Loop Section */}
+                <div className="p-8 bg-zinc-900 border border-zinc-800 rounded-3xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-8 opacity-10">
+                    <Rocket className="w-48 h-48 text-pink-500 -rotate-12" />
+                  </div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-pink-500/10 rounded-lg flex items-center justify-center">
+                        <Zap className="w-5 h-5 text-pink-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-white">The "Trojan Horse" Growth Loop</h3>
+                        <p className="text-xs text-zinc-500 uppercase tracking-widest">Automated PLG Customer Acquisition</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-12 items-center">
+                      <div className="space-y-6">
+                        <div className="p-5 bg-zinc-950 border border-zinc-800 rounded-xl">
+                          <h4 className="font-bold text-white mb-2 flex items-center gap-2">
+                             <span className="w-5 h-5 rounded-full bg-pink-500/20 text-pink-400 text-[10px] flex items-center justify-center">1</span>
+                             Value-In-Advance Audit
+                          </h4>
+                          <p className="text-sm text-zinc-400 leading-relaxed">
+                            Prospects enter URL + Email on Landing Page. Exa AI generates a real-time GEO report, showing their semantic distance from target clusters.
+                          </p>
+                        </div>
+                        <div className="p-5 bg-zinc-950 border border-zinc-800 rounded-xl">
+                          <h4 className="font-bold text-white mb-2 flex items-center gap-2">
+                             <span className="w-5 h-5 rounded-full bg-pink-500/20 text-pink-400 text-[10px] flex items-center justify-center {">2</span>
+                             7-Day Automated Nurture
+                          </h4>
+                          <p className="text-sm text-zinc-400 leading-relaxed">
+                            A sequenced educational drip-campaign converts high-intent data into paying Pro/Business subscribers by amplifying the "Semantic Gap" pain.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">Sequence Visualization</h4>
+                        <div className="space-y-3">
+                          {EMAIL_SEQUENCE.map((email, i) => (
+                            <div key={i} className="flex items-center gap-4 group">
+                              <div className="text-xs font-mono text-pink-500 w-12 shrink-0">DAY {email.day}</div>
+                              <div className="h-px bg-zinc-800 flex-grow group-hover:bg-pink-500/30 transition-colors"></div>
+                              <div className="p-3 bg-zinc-950 border border-zinc-800 rounded-lg text-[11px] min-w-[180px]">
+                                <span className="font-bold text-white block mb-0.5">{email.title}</span>
+                                <span className="text-zinc-500 italic">{email.focus}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Investor Calculator Component */}
+                <InvestorCalculator />
+
+                {/* Margin Expansion Chart */}
+                <MarginExpansionChart />
+
+                {/* SLM / Phase III Section */}
+                <div className="p-8 bg-zinc-900 border border-zinc-800 rounded-3xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+                     <Cpu className="w-64 h-64 text-emerald-500 -rotate-12" />
+                  </div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-8">
+                      <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                        <Zap className="w-5 h-5 text-emerald-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-white">Phase III: Proprietary SLM Moat</h3>
+                        <p className="text-xs text-zinc-500 uppercase tracking-widest">Reclaiming the Inference Tax</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      <div className="space-y-4">
+                         <h4 className="font-bold text-white">The Compute Crash</h4>
+                         <p className="text-sm text-zinc-400 leading-relaxed">
+                           Nvidia Blackwell B200 rollout has dropped fine-tuning costs by 90%. We can now re-train our GEO-Specialist model weekly for under $15 per run.
+                         </p>
+                      </div>
+                      <div className="space-y-4">
+                         <h4 className="font-bold text-white">Proprietary Scaling</h4>
+                         <p className="text-sm text-zinc-400 leading-relaxed">
+                           Replacing third-party APIs with our self-hosted 8B model reduces inference overhead by 85%, reclaiming 15% of ARR directly into EBIDTA.
+                         </p>
+                      </div>
+                      <div className="space-y-4">
+                         <h4 className="font-bold text-white">Data &gt; Model</h4>
+                         <p className="text-sm text-zinc-400 leading-relaxed">
+                           In 2026, compute is a commodity. Our moat is the "Golden Dataset" of 50M interactions we've curated, which foundational models cannot access.
+                         </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -402,6 +790,55 @@ export function InvestorHubPage() {
                     </div>
                   </div>
 
+                  {/* 10x Path Table */}
+                  <div className="bg-zinc-950 border border-zinc-800 rounded-3xl overflow-hidden">
+                    <div className="p-8 border-b border-zinc-800 bg-zinc-900/30">
+                      <h4 className="text-lg font-bold text-white mb-1">The 10x Capital Efficiency Roadmap</h4>
+                      <p className="text-xs text-zinc-500 uppercase tracking-widest">Bridging Series A to Series B ($100M+ Valuation)</p>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="border-b border-zinc-800">
+                            <th className="p-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Growth Phase</th>
+                            <th className="p-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Key Lever</th>
+                            <th className="p-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Capital Efficiency</th>
+                            <th className="p-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Valuation Impact</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-800">
+                          <tr className="hover:bg-zinc-900/30 transition-colors">
+                            <td className="p-6">
+                               <p className="text-sm font-bold text-white">Seed Bridge</p>
+                               <p className="text-[10px] text-zinc-500">Current - Q3 2026</p>
+                            </td>
+                            <td className="p-6 text-sm text-zinc-400">PLG Loop Optimization</td>
+                            <td className="p-6 text-sm text-emerald-400 font-medium">1:3.2 (Burn-to-ARR)</td>
+                            <td className="p-6 text-sm text-white">$15M - $25M</td>
+                          </tr>
+                          <tr className="hover:bg-zinc-900/30 transition-colors">
+                            <td className="p-6">
+                               <p className="text-sm font-bold text-white">Series A Deployment</p>
+                               <p className="text-[10px] text-zinc-500">Q4 2026 - Q2 2027</p>
+                            </td>
+                            <td className="p-6 text-sm text-zinc-400">Enterprise High-Touch</td>
+                            <td className="p-6 text-sm text-emerald-400 font-medium">1:4.4 (Burn-to-ARR)</td>
+                            <td className="p-6 text-sm text-white">$45M - $60M</td>
+                          </tr>
+                          <tr className="hover:bg-zinc-900/30 transition-colors">
+                            <td className="p-6">
+                               <p className="text-sm font-bold text-white">Scale-Up / 10x Goal</p>
+                               <p className="text-[10px] text-zinc-500">Q3 2027+</p>
+                            </td>
+                            <td className="p-6 text-sm text-zinc-400">Proprietary SLM Infrastructure</td>
+                            <td className="p-6 text-sm text-emerald-400 font-medium">1:6.1 (Margin Efficiency)</td>
+                            <td className="p-6 text-sm text-pink-500 font-bold">$125M+</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
                   <div className="grid md:grid-cols-3 gap-6">
                     {STRATEGIC_PILLARS.map((pillar, i) => (
                       <div key={i} className="p-8 bg-zinc-900 border border-zinc-800 rounded-2xl relative group overflow-hidden">
@@ -427,6 +864,9 @@ export function InvestorHubPage() {
                     ))}
                   </div>
                 </div>
+
+                {/* Technical Appendix */}
+                <TechnicalAppendix />
 
                 {/* Capital Allocation */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

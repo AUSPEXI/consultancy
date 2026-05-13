@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, Cell, ReferenceArea } from 'recharts';
 import { TrendingUp, Users, Target, MousePointerClick, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, Save } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
 import { collection, addDoc, setDoc, doc, onSnapshot, query, where, orderBy, limit } from 'firebase/firestore';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
@@ -10,7 +11,7 @@ import { logAuditAction } from '@/lib/audit';
 import { useGeoAnalytics } from '@/hooks/useGeoAnalytics';
 
 export function Overview() {
-  const { user, tier, userData } = useAuth();
+  const { user, tier, userData, role } = useAuth();
   const { pulseData, mapPoints, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(userData?.brand || '');
   
   const [metrics, setMetrics] = useState<any[]>([]);
@@ -32,7 +33,7 @@ export function Overview() {
   const [isSavingPrompts, setIsSavingPrompts] = useState(false);
 
   useEffect(() => {
-    if (!user || tier === 'Free') return;
+    if (!user || !checkTierAccess(tier, 'Basic')) return;
     const q = query(
       collection(db, 'sovMetrics'),
       where('userId', '==', user.uid),
@@ -53,7 +54,7 @@ export function Overview() {
     return () => unsubscribe();
   }, [user, tier]);
 
-  if (tier === 'Free') {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Basic')) {
     return (
       <div className="space-y-6">
         <div>

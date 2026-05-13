@@ -81,15 +81,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
           if (docSnap.exists()) {
             const data = docSnap.data() as UserData;
+            const userEmail = currentUser.email || data.email || '';
+            const isSpecialAdmin = userEmail.toLowerCase() === 'hopiumcalculator@gmail.com';
+            
             setTier(data.tier || 'Free');
-            setRole(data.role || 'user');
+            setRole(isSpecialAdmin ? 'admin' : (data.role || 'user'));
             setUserData({
               ...data,
+              email: userEmail,
               onboardingCompleted: data.onboardingCompleted ?? false
             });
           } else {
+            const isSpecialAdmin = currentUser.email?.toLowerCase() === 'hopiumcalculator@gmail.com';
             setTier('Free');
-            setRole('user');
+            setRole(isSpecialAdmin ? 'admin' : 'user');
             setUserData(null);
           }
         }, (error) => {

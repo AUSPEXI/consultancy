@@ -512,68 +512,62 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <PricingCard
-              tier="Basic"
-              price={currency === 'USD' ? "$119/mo" : "£99/mo"}
-              bestFor="For startups establishing AI presence"
-              CTA="Start Basic"
+              tier="Starter"
+              price={currency === 'USD' ? "$99/mo" : "£79/mo"}
+              bestFor="For individuals exploring AI visibility"
+              CTA="Start Now"
               onClick={() => handleCheckout('Basic')}
               benefits={[
                 { text: "Track 1 Brand, 5 Keywords", checked: true },
                 { text: "Citacious AI Copilot (Standard)", checked: true },
                 { text: "Fact-Vault Access", checked: true },
-                { text: "Content Scorer Access", checked: true },
-                { text: "30-Day Metric Analytics Storage", checked: true },
-                { text: "Sentiment Drift (Z-Score)", checked: true },
-                { text: "Standard Audit Logging", checked: true },
-                { text: "12-Month Citacious Context Memory", checked: false },
+                { text: "Basic GEO Sentiment Analysis", checked: true },
+                { text: "Weekly Brand Pulse", checked: true },
               ]}
             />
             <PricingCard
               tier="Pro"
-              price={currency === 'USD' ? "$399/mo" : "£349/mo"}
-              bestFor="For growing teams & agencies"
+              price={currency === 'USD' ? "$199/mo" : "£159/mo"}
+              bestFor="For lean marketing teams"
               CTA="Start Pro"
               onClick={() => handleCheckout('Pro')}
               benefits={[
-                { text: "Track 3 Brands, 25 Keywords", checked: true },
-                { text: "Citacious AI Copilot (Advanced)", checked: true },
-                { text: "Fact-Vault & First-Party Moat", checked: true },
-                { text: "Sentiment Drift (Z-Score)", checked: true },
-                { text: "Omnichannel Amplifier", checked: true },
-                { text: "Content Scorer Access", checked: true },
-                { text: "12-Month Citacious Context Memory", checked: true },
+                { text: "Track 3 Brands, 10 Keywords", checked: true },
+                { text: "Full 768-D Latent Map Preview", checked: true },
+                { text: "6 Competitor Tracking", checked: true },
+                { text: "Z-Score Anomaly Alerts", checked: true },
+                { text: "Content Scorer Advanced", checked: true },
+                { text: "12-Month Citacious Memory", checked: true },
               ]}
             />
             <PricingCard
               tier="Business"
-              price={currency === 'USD' ? "$1,499/mo" : "£1,250/mo"}
-              bestFor="For growing brands dominating niches"
+              price={currency === 'USD' ? "$499/mo" : "£399/mo"}
+              bestFor="For mid-market SaaS & brands"
               CTA="Start Business"
               onClick={() => handleCheckout('Business')}
               benefits={[
-                { text: "Track Unlimited Brands", checked: true },
-                { text: "Full 768-D Latent Space Map", checked: true },
-                { text: "SOV Simulator Matrix", checked: true },
-                { text: "Real-time Brand Monitor", checked: true },
-                { text: "Edge Schema (JSON-LD) Generator", checked: true },
-                { text: "90-Day Metric Analytics Storage", checked: true },
-                { text: "12-Month Citacious Context Memory", checked: true },
+                { text: "Track 50 Keywords", checked: true },
+                { text: "Autonomous Social Seeding", checked: true },
+                { text: "Z-Score Predictive Alerts", checked: true },
+                { text: "Reddit & LinkedIn Automation", checked: true },
+                { text: "Unlimited Brand Tracking", checked: true },
+                { text: "Full API Access (Beta)", checked: true },
               ]}
             />
             <PricingCard
               tier="Enterprise"
-              price={currency === 'USD' ? "$4,999/mo" : "£3,999/mo"}
-              bestFor="For enterprise market leaders"
+              price={currency === 'USD' ? "$2,500+/mo" : "£2,000+/mo"}
+              bestFor="For Fortune 500 market leaders"
               CTA="Talk to AI Sales"
               onClick={() => window.location.href = '/voice-agents'}
               benefits={[
-                { text: "Custom Brand & Keyword Tracking", checked: true },
-                { text: "768-D Latent Space Map via pgvector", checked: true },
-                { text: "SOV Simulator Matrix & API Access", checked: true },
-                { text: "Real-time Brand Monitor", checked: true },
-                { text: "Edge Schema (JSON-LD) Generator", checked: true },
-                { text: "Unlimited Dashboard Analytics Storage", checked: true },
-                { text: "12-Month Citacious Context Memory", checked: true },
+                { text: "Unlimited Keywords & Competitors", checked: true },
+                { text: "Custom SLM Fine-tuning", checked: true },
+                { text: "Full 768-D Latent Map Access", checked: true },
+                { text: "Dedicated ML Engineer (Retainer)", checked: true },
+                { text: "SOC2 Compliance Integration", checked: true },
+                { text: "Private pgvector Instance", checked: true },
               ]}
             />
           </div>

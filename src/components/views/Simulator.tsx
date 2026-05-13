@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { MonitorPlay, Loader2, Bot, Sparkles } from 'lucide-react';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
+import { checkTierAccess } from '@/constants/tiers';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
 import { logSimulatorResult } from '@/lib/metrics';
@@ -13,7 +14,7 @@ export function Simulator() {
   const [isSimulating, setIsSimulating] = useState(false);
   const [results, setResults] = useState<any>(null);
 
-  if (role !== 'admin' && (tier === 'Free' || tier === 'Basic')) {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Medium')) {
     return (
       <div className="space-y-6">
         <div>
