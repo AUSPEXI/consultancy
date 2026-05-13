@@ -72,10 +72,35 @@ const USE_OF_FUNDS = [
   { name: 'Ops & Infra', value: 20, color: '#3f3f46', description: 'pgvector Cluster Scaling' },
 ];
 
+const STRATEGIC_PILLARS = [
+  {
+    title: "The 'Citation Neighborhood'",
+    description: "LLMs use Cosine Similarity to retrieve info. If your embedding is outside the 'High-Confidence Cluster', you don't exist. We move you into the neighborhood.",
+    icon: Globe
+  },
+  {
+    title: "Fact-Vault Engine ROI",
+    description: "Adding specific 'High-Entropy' statistics increases AI citation probability by 37%. Quotations increase visibility by 30%.",
+    icon: Database
+  },
+  {
+    title: "Defensible Attribution",
+    description: "Z-Score Anomaly Detection acts as 'Pre-emptive SEO,' detecting lead-indicator Semantic Drift weeks before traffic drops.",
+    icon: ShieldCheck
+  }
+];
+
+const REVENUE_LOGIC_METRICS = [
+  { label: "AI-Search Conversion", value: "4.4x", sub: "Higher than Traditional" },
+  { label: "Avg Engagement", value: "8-10m", sub: "vs 2-3m Google refers" },
+  { label: "Computational Gain", value: "40%", sub: "Reduction vs 1536-D" },
+  { label: "CAGR Target", value: "50.5%", sub: "GEO Market Growth" }
+];
+
 const PROPRIETARY_STACK = [
   {
     title: "768-D Latent Space Engine",
-    description: "Utilizing Gemini’s text-embedding-004 for the perfect balance of semantic fidelity and sub-millisecond query speed.",
+    description: "Utilizing Gemini’s text-embedding-004 for the perfect balance of semantic fidelity and 40% lower computational overhead.",
     metric: "768 Dimensions"
   },
   {
@@ -85,7 +110,7 @@ const PROPRIETARY_STACK = [
   },
   {
     title: "Z-Score Anomaly Detection",
-    description: "Our 'Sentiment Pulse' watchdog that separates Generative Noise from true Brand Drift.",
+    description: "Our 'Sentiment Pulse' watchdog that separates Generative Noise from true Brand Drift—a leading indicator.",
     metric: "0.01ms Latency"
   }
 ];
@@ -358,6 +383,48 @@ export function InvestorHubPage() {
                         </div>
                       ))}
                     </div>
+                  </div>
+                </div>
+
+                {/* ROI & Attribution Section */}
+                <div className="space-y-8">
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div>
+                      <h3 className="text-2xl font-bold text-white mb-2">Revenue & Citation Logic</h3>
+                      <p className="text-zinc-400 max-w-2xl">
+                        Translating latent space vectors into enterprise value. The map is the diagnostic; the Fact-Vault is the cure.
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="px-3 py-1 bg-pink-500/10 text-pink-400 text-xs font-bold rounded-full border border-pink-500/20 uppercase tracking-widest">
+                        4.4x Conv. Advantage
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-3 gap-6">
+                    {STRATEGIC_PILLARS.map((pillar, i) => (
+                      <div key={i} className="p-8 bg-zinc-900 border border-zinc-800 rounded-2xl relative group overflow-hidden">
+                        <div className="absolute -right-8 -bottom-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">
+                          <pillar.icon className="w-32 h-32" />
+                        </div>
+                        <h4 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                          <pillar.icon className="w-5 h-5 text-pink-500" />
+                          {pillar.title}
+                        </h4>
+                        <p className="text-sm text-zinc-400 leading-relaxed relative z-10">{pillar.description}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {REVENUE_LOGIC_METRICS.map((metric, i) => (
+                      <div key={i} className="p-6 bg-zinc-950 border border-zinc-800 rounded-2xl text-center border-b-4 border-b-pink-500/50">
+                        <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">{metric.label}</p>
+                        <p className="text-3xl font-bold text-white">{metric.value}</p>
+                        <p className="text-[10px] text-zinc-500 mt-1">{metric.sub}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
 

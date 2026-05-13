@@ -19,10 +19,19 @@ export function Settings() {
     keyword1: '',
     keyword2: '',
     keyword3: '',
+    keyword4: '',
+    keyword5: '',
+    keyword6: '',
+    keyword7: '',
+    keyword8: '',
+    keyword9: '',
+    keyword10: '',
     competitor1: '',
     competitor2: '',
     competitor3: '',
-    competitor4: ''
+    competitor4: '',
+    competitor5: '',
+    competitor6: ''
   });
 
   useEffect(() => {
@@ -35,10 +44,19 @@ export function Settings() {
         keyword1: userData.keywords?.[0] || '',
         keyword2: userData.keywords?.[1] || '',
         keyword3: userData.keywords?.[2] || '',
+        keyword4: userData.keywords?.[3] || '',
+        keyword5: userData.keywords?.[4] || '',
+        keyword6: userData.keywords?.[5] || '',
+        keyword7: userData.keywords?.[6] || '',
+        keyword8: userData.keywords?.[7] || '',
+        keyword9: userData.keywords?.[8] || '',
+        keyword10: userData.keywords?.[9] || '',
         competitor1: userData.competitors?.[0] || '',
         competitor2: userData.competitors?.[1] || '',
         competitor3: userData.competitors?.[2] || '',
         competitor4: userData.competitors?.[3] || '',
+        competitor5: userData.competitors?.[4] || '',
+        competitor6: userData.competitors?.[5] || '',
       });
     }
   }, [userData]);
@@ -83,13 +101,22 @@ export function Settings() {
         formData.competitor1,
         formData.competitor2,
         formData.competitor3,
-        formData.competitor4
+        formData.competitor4,
+        formData.competitor5,
+        formData.competitor6
       ].filter(Boolean);
       
       const keywords = [
         formData.keyword1,
         formData.keyword2,
-        formData.keyword3
+        formData.keyword3,
+        formData.keyword4,
+        formData.keyword5,
+        formData.keyword6,
+        formData.keyword7,
+        formData.keyword8,
+        formData.keyword9,
+        formData.keyword10
       ].filter(Boolean);
 
       await updateDoc(userRef, {
@@ -146,19 +173,18 @@ export function Settings() {
           <CardDescription className="text-zinc-400">The primary topics we track for AI citations.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300">Keyword 1</label>
-              <Input name="keyword1" value={formData.keyword1} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" />
-            </div>
-             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300">Keyword 2</label>
-              <Input name="keyword2" value={formData.keyword2} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" />
-            </div>
-             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300">Keyword 3</label>
-              <Input name="keyword3" value={formData.keyword3} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" />
-            </div>
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+              <div key={num} className="space-y-2">
+                <label className="text-sm font-medium text-zinc-300">Keyword {num}</label>
+                <Input 
+                  name={`keyword${num}`} 
+                  value={(formData as any)[`keyword${num}`]} 
+                  onChange={handleChange} 
+                  className="bg-zinc-950 border-zinc-800 text-white text-sm" 
+                />
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -169,23 +195,18 @@ export function Settings() {
           <CardDescription className="text-zinc-400">Identify who you are racing against for LLM consensus.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300">Competitor 1</label>
-              <Input name="competitor1" value={formData.competitor1} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" />
-            </div>
-             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300">Competitor 2</label>
-              <Input name="competitor2" value={formData.competitor2} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" />
-            </div>
-             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300">Competitor 3</label>
-              <Input name="competitor3" value={formData.competitor3} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300">Competitor 4</label>
-              <Input name="competitor4" value={formData.competitor4} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" />
-            </div>
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[1, 2, 3, 4, 5, 6].map(num => (
+              <div key={num} className="space-y-2">
+                <label className="text-sm font-medium text-zinc-300">Competitor {num}</label>
+                <Input 
+                  name={`competitor${num}`} 
+                  value={(formData as any)[`competitor${num}`]} 
+                  onChange={handleChange} 
+                  className="bg-zinc-950 border-zinc-800 text-white text-sm" 
+                />
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
