@@ -103,7 +103,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       Icon: Brain,
       name: "Citacious AI Analyst",
       description: "A dedicated 12-Month Citacious Context Memory analyst that organically understands your dashboard tools, analyzes past results, and orchestrates intelligent future actions to ensure maximum visibility.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-violet-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-zinc-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-2 lg:col-end-4 lg:row-start-1 lg:row-end-2",
     },
     {
@@ -117,7 +117,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       Icon: Database,
       name: "Fact-Vault Extraction",
       description: "Automatically find the highest-entropy data points in your whitepapers, case studies, and proprietary research, turning them into potent cite-magnets that models crave.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-blue-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-zinc-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-3 lg:col-end-4 lg:row-start-2 lg:row-end-3",
     },
     {

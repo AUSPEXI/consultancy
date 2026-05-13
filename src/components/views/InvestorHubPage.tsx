@@ -101,7 +101,7 @@ export function InvestorHubPage() {
             className="text-5xl md:text-7xl font-bold tracking-tight mb-8 font-heading"
           >
             Building the Infrastructure for the <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-500">AI Search Economy</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-pink-300">AI Search Economy</span>
           </motion.h1>
           
           <motion.p 

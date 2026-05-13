@@ -68,7 +68,7 @@ export function RoadmapPage() {
             The Future of GEO
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tight mb-6 font-heading">
-            Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-500">Master Plan</span>
+            Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-pink-300">Master Plan</span>
           </h1>
           <p className="text-lg md:text-xl text-zinc-400 max-w-3xl mx-auto">
             We aren't just building a generative dashboard. We are building the deterministic operating system for the next generation of search. Here is how we dominate the AI Share of Voice (SoV) game.

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, Wrench, PenTool, MonitorPlay, ShieldCheck, Activity, Globe } from 'lucide-react';
+import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, Wrench, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
@@ -133,6 +133,20 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
           <Globe className="w-5 h-5 text-pink-500" />
           Back to Website
         </Link>
+        {user?.email === 'hopiumcalculator@gmail.com' && (
+          <button 
+            onClick={() => setActiveTab('superuser')}
+            className={cn(
+              "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+              activeTab === 'superuser' 
+                ? "bg-pink-500/10 text-pink-400 border border-pink-500/20" 
+                : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+            )}
+          >
+            <ShieldAlert className="w-5 h-5" />
+            Superuser Control
+          </button>
+        )}
         <button 
           onClick={() => setActiveTab('settings')}
           className={cn(
