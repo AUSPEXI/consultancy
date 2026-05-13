@@ -38,8 +38,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     let unsubscribeUserDoc: (() => void) | undefined;
+    
+    // Safety timeout: stop loading after 5 seconds even if Firebase hasn't responded
+    const safetyTimeout = setTimeout(() => {
+      if (loading) {
+        console.warn("Auth initialization timed out. Forcing loading to false.");
+        setLoading(false);
+      }
+    }, 5000);
 
     const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
+      console.log("Auth state changed:", currentUser?.uid || "no user");
+      clearTimeout(safetyTimeout);
       setUser(currentUser);
       if (currentUser) {
         const userDocRef = doc(db, 'users', currentUser.uid);
