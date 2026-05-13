@@ -11,7 +11,7 @@ import { collection, addDoc } from 'firebase/firestore';
 type ContentType = 'sales' | 'blog' | 'technical';
 
 export function ContentScorer() {
-  const { tier, user } = useAuth();
+  const { tier, role, user } = useAuth();
   const [content, setContent] = useState(() => localStorage.getItem('contentScorer_content') || '');
   const [contentType, setContentType] = useState<ContentType>(() => (localStorage.getItem('contentScorer_contentType') as ContentType) || 'sales');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -112,7 +112,7 @@ export function ContentScorer() {
     }
   };
 
-  if (tier === 'Free') {
+  if (role !== 'admin' && tier === 'Free') {
     return (
       <div className="space-y-6">
         <div>

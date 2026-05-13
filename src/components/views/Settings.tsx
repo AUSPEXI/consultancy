@@ -288,9 +288,21 @@ export function Settings() {
           <CardTitle className="text-white">Integrations</CardTitle>
           <CardDescription className="text-zinc-400">Connect Auspexi to your existing infrastructure.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">Platform Webhook URL</label>
+            <label className="text-sm font-medium text-zinc-300">Inbound Auspexi Webhook URL</label>
+            <div className="flex gap-2">
+               <Input readOnly value={`${window.location.origin}/api/webhooks/auspexi`} className="bg-zinc-950 border-zinc-800 text-zinc-400 font-mono text-xs" />
+               <Button variant="outline" size="sm" onClick={() => {
+                 navigator.clipboard.writeText(`${window.location.origin}/api/webhooks/auspexi`);
+                 alert("Inbound Webhook URL copied!");
+               }}>Copy</Button>
+            </div>
+            <p className="text-xs text-zinc-500">Use this URL in your internal CMS or backend to push content directly to Auspexi. We support JSON payloads for ontology updates and fact-seeding.</p>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-zinc-300">Outbound Platform Webhook URL (Your CMS)</label>
             <Input name="cmsWebhookUrl" value={formData.cmsWebhookUrl} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" placeholder="https://your-cms.com/api/webhooks/auspexi" />
             <p className="text-xs text-zinc-500">Provide the webhook URL for your CMS or backend application. Auspexi will use this endpoint to automatically sync approved data, inject schema updates, distribute content, and push real-time platform events.</p>
           </div>

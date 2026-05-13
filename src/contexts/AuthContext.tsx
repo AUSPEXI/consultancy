@@ -4,10 +4,12 @@ import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { auth, signInWithGoogle, logout, db } from '../firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 
-export type UserTier = 'Free' | 'Basic' | 'Medium' | 'Premium' | 'PipelineOffer';
+import { UserTier } from '@/constants/tiers';
+export type { UserTier };
 
 export interface UserData {
   tier: UserTier;
+  role: 'admin' | 'user';
   email?: string | null;
   onboardingCompleted?: boolean;
   brand?: string;
@@ -22,6 +24,7 @@ export interface UserData {
 interface AuthContextType {
   user: User | null;
   tier: UserTier;
+  role: 'admin' | 'user';
   userData: UserData | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
@@ -33,6 +36,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [tier, setTier] = useState<UserTier>('Free');
+  const [role, setRole] = useState<'admin' | 'user'>('user');
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -58,26 +62,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           const userDoc = await getDoc(userDocRef);
           if (!userDoc.exists()) {
-            const initialData: UserData = { tier: 'Free', email: currentUser.email, onboardingCompleted: false };
+            const initialData: UserData = { 
+              tier: 'Free', 
+              role: 'user', 
+              email: currentUser.email, 
+              onboardingCompleted: false 
+            };
             await setDoc(userDocRef, initialData);
             setTier('Free');
+            setRole('user');
             setUserData(initialData);
           }
         } catch (error) {
           handleFirestoreError(error, OperationType.GET, `users/${currentUser.uid}`);
         }
 
-        // Listen for real-time tier changes
+        // Listen for real-time tier/role changes
         unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
           if (docSnap.exists()) {
             const data = docSnap.data() as UserData;
             setTier(data.tier || 'Free');
+            setRole(data.role || 'user');
             setUserData({
               ...data,
               onboardingCompleted: data.onboardingCompleted ?? false
             });
           } else {
             setTier('Free');
+            setRole('user');
             setUserData(null);
           }
         }, (error) => {
@@ -86,6 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       } else {
         setTier('Free');
+        setRole('user');
         setUserData(null);
         if (unsubscribeUserDoc) {
           unsubscribeUserDoc();
@@ -103,7 +116,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, tier, userData, loading, signInWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, tier, role, userData, loading, signInWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );

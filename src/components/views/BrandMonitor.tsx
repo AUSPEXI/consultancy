@@ -6,12 +6,12 @@ import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
 
 export function BrandMonitor() {
-  const { tier, user } = useAuth();
+  const { tier, role, user } = useAuth();
   const [brand, setBrand] = useState('');
   const [isMonitoring, setIsMonitoring] = useState(false);
   const [results, setResults] = useState<any>(null);
 
-  if (tier === 'Free' || tier === 'Basic') {
+  if (role !== 'admin' && (tier === 'Free' || tier === 'Basic')) {
     return (
       <div className="space-y-6">
         <div>

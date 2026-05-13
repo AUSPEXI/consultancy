@@ -20,7 +20,7 @@ interface Competitor {
 }
 
 export function Competitors() {
-  const { user, tier } = useAuth();
+  const { user, tier, role } = useAuth();
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [inputUrl, setInputUrl] = useState('');
@@ -28,7 +28,8 @@ export function Competitors() {
   const [pushingFact, setPushingFact] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user || tier === 'Free' || tier === 'Basic') return;
+    if (!user) return;
+    if (role !== 'admin' && (tier === 'Free' || tier === 'Basic')) return;
 
     const q = query(
       collection(db, 'competitors'),
@@ -47,9 +48,9 @@ export function Competitors() {
     });
 
     return () => unsubscribe();
-  }, [user, tier]);
+  }, [user, tier, role]);
 
-  if (tier === 'Free' || tier === 'Basic') {
+  if (role !== 'admin' && (tier === 'Free' || tier === 'Basic')) {
     return (
       <div className="space-y-6">
         <div>

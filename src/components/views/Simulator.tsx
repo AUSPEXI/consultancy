@@ -7,13 +7,13 @@ import { logAuditAction } from '@/lib/audit';
 import { logSimulatorResult } from '@/lib/metrics';
 
 export function Simulator() {
-  const { tier, user } = useAuth();
+  const { tier, role, user } = useAuth();
   const [query, setQuery] = useState('');
   const [brand, setBrand] = useState('');
   const [isSimulating, setIsSimulating] = useState(false);
   const [results, setResults] = useState<any>(null);
 
-  if (tier === 'Free' || tier === 'Basic') {
+  if (role !== 'admin' && (tier === 'Free' || tier === 'Basic')) {
     return (
       <div className="space-y-6">
         <div>

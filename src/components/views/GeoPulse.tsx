@@ -4,12 +4,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 
 export function GeoPulse() {
-  const { tier } = useAuth();
+  const { tier, role } = useAuth();
   const [keyword, setKeyword] = useState('');
   const [isProbing, setIsProbing] = useState(false);
   const [results, setResults] = useState<any>(null);
 
-  if (tier !== 'Premium') {
+  if (role !== 'admin' && tier !== 'Premium') {
     return (
       <div className="space-y-6">
         <div>

@@ -157,8 +157,21 @@ export function Superuser() {
     }
   };
 
+  const updateAccountAttribute = async (attr: 'tier' | 'role', value: string) => {
+    if (!user) return;
+    setStatus(null);
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, { [attr]: value });
+      setStatus({ type: 'success', message: `Account ${attr} updated to ${value}.` });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `users/${user.uid}`);
+      setStatus({ type: 'error', message: `Failed to update ${attr}.` });
+    }
+  };
+
   return (
-    <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 md:p-12 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
           <ShieldAlert className="w-32 h-32 text-pink-500" />
@@ -182,7 +195,7 @@ export function Superuser() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <button
               onClick={seedHistoricalData}
               disabled={isSeeding || isResetting}
@@ -210,6 +223,43 @@ export function Superuser() {
                 Deletes all audits, scans, and facts. Resets onboarding status and clears local chat memory.
               </p>
             </button>
+          </div>
+
+          <div className="space-y-6">
+            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <Zap className="w-5 h-5 text-yellow-500" />
+              Quick Tier Override
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {['Free', 'Basic', 'Pro', 'Business', 'Enterprise', 'PipelineOffer'].map((t) => (
+                <button
+                  key={t}
+                  onClick={() => updateAccountAttribute('tier', t)}
+                  className="px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300 text-sm hover:bg-zinc-700 hover:text-white transition-colors"
+                >
+                  Set to {t}
+                </button>
+              ))}
+            </div>
+
+            <h3 className="text-xl font-bold text-white flex items-center gap-2 mt-8">
+              <ShieldAlert className="w-5 h-5 text-blue-500" />
+              Role Management
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => updateAccountAttribute('role', 'user')}
+                className="px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300 text-sm hover:bg-zinc-700 hover:text-white transition-colors"
+              >
+                Set as Standard User
+              </button>
+              <button
+                onClick={() => updateAccountAttribute('role', 'admin')}
+                className="px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/50 text-blue-400 text-sm hover:bg-blue-500/20 transition-colors font-bold"
+              >
+                Promote to Admin
+              </button>
+            </div>
           </div>
         </div>
       </div>
