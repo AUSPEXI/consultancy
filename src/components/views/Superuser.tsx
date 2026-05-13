@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ShieldAlert, Trash2, Database, Zap, Loader2, CheckCircle2, History } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/firebase';
-import { collection, query, where, getDocs, deleteDoc, doc, setDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, where, getDocs, deleteDoc, doc, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 
 export function Superuser() {
@@ -44,19 +44,24 @@ export function Superuser() {
         }
       }
 
-      // Reset user profile onboarding
-      await setDoc(doc(db, 'users', user.uid), {
+      // Reset user profile onboarding - more explicit update
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
         onboardingCompleted: false,
         brand: '',
         domain: '',
         keywords: [],
-        competitors: []
-      }, { merge: true });
+        competitors: [],
+        connectedSocials: [],
+        cmsWebhookUrl: '',
+        sentimentPrompts: []
+      });
 
       // Clear local storage
       localStorage.clear();
+      sessionStorage.clear();
       
-      setStatus({ type: 'success', message: 'Hard reset complete. Local data purged. Redirecting...' });
+      setStatus({ type: 'success', message: 'Hard reset complete. All data purged. Reinitializing platform...' });
       setTimeout(() => window.location.reload(), 2000);
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'multi-collection-reset');

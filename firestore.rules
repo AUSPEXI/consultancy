@@ -54,7 +54,7 @@ service cloud.firestore {
              (!('brand' in data) || (data.brand is string && data.brand.size() <= 100)) &&
              (!('domain' in data) || (data.domain is string && data.domain.size() <= 100)) &&
              (!('cmsWebhookUrl' in data) || (data.cmsWebhookUrl is string && data.cmsWebhookUrl.size() <= 500)) &&
-             (!('competitors' in data) || (data.competitors is list && data.competitors.size() <= 5)) &&
+             (!('competitors' in data) || (data.competitors is list && data.competitors.size() <= 6)) &&
              (!('keywords' in data) || (data.keywords is list && data.keywords.size() <= 10)) &&
              (!('connectedSocials' in data) || (data.connectedSocials is list && data.connectedSocials.size() <= 10)) &&
              (!('onboardingCompleted' in data) || data.onboardingCompleted is bool);
