@@ -67,9 +67,9 @@ interface CopilotProps {
 }
 
 export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(true);
   const [messages, setMessages] = useState<Message[]>(() => {
     const saved = localStorage.getItem('copilot_messages');
     if (saved) {
@@ -165,26 +165,31 @@ Your goal is to help users understand GEO strategy, navigate the dashboard, and 
 The user is currently on the '${activeTab}' tab.
 
 When explaining the dashboard or walking users through their workflow, use THIS specific logical order to explain the toolset:
-1. overview: The main dashboard measuring AI Share of Voice (SOV) metrics. Features the new Competitive Citation Gap (Radar), Share of Sentiment Trace Heatmap (which has editable/customizable reputational prompts), Cite-Magnet Scorecard (top URLs), and LLM Conversion Pipeline.
-2. competitors: The Competitor Radar.
-3. fact-vault: Users come here to add High-Entropy Facts to feed to LLMs. It has an 'Auto-Research' tool (the Fact-Grabber modal) to generate facts automatically. Users can also use the Omnichannel Amplifier here to turn facts into Reddit/LinkedIn posts.
-4. content-scorer: The "Content Analyst". Users paste human-written text here to test if AI can efficiently extract the facts securely. High-scoring content (>80%) can be pushed directly to the Omnichannel Amplifier or reverse-extracted into the Fact-Vault as pure JSON-LD facts.
-5. simulator: The "SOV Simulator". Users can run prompt matrices here to simulate how ChatGPT, Claude, Gemini, and Perplexity respond to queries about their brand using their stored facts.
-6. brand-monitor: The social consensus monitor, checking platforms like Reddit or Quora for brand sentiment that LLMs scrape. If negative sentiment is found, users can click to instantly draft Counter-Narratives using the Agents tab.
-7. technical: The Edge Schema Generator, providing technical JSON-LD structure to insert into their actual website.
-8. agents: Agent Orchestration, where users can deploy voice agents trained on their Fact Vault. They can also now write blog posts and immediately verify their AI extractability in the Content Scorer in one click.
-9. audit-logs: Where users view SOC 2 compliant security logs and hallucination detections.
+1. overview: The main dashboard measuring AI Share of Voice (SOV) metrics. Features the Proprietary Z-Score Sentiment Pulse (anomaly detection mapping generative noise vs real drift), the 768-D Latent Space Map (Semantic affinity mapping), Cite-Magnet Scorecard, and LLM Conversion Pipeline.
+2. competitors: The Competitor Radar to find gaps in competitor citations.
+3. fact-vault: The "Nerve Center" for the 768-D Latent Space Moat. Users add High-Entropy Facts here to feed the pgvector database. Uses a Hybrid Search Architecture (Dense Vector Search + Sparse Metadata Filtering).
+4. content-scorer: The "Content Analyst". Verifies if content is vector-ready and fact-dense (>80%). High-scoring content can be pushed to the amplifier or reversed into Fact-Vault JSON-LD.
+5. simulator: The "SOV Simulator". Runs prompt matrices through Gemini 1.5 Pro/Flash to see how the Latent Space Moat influences AI responses in real-time.
+6. brand-monitor: Social consensus monitor (Reddit/Quora). Identifies sentiment shifts that LLMs will eventually scrape.
+7. technical: Enterprise Infrastructure. Manage the pgvector integration, Edge GEO-Schema Injectors (JSON-LD), and First-Party Data Lake. Uses Gemini 768-dimensional embeddings for cost-efficiency.
+8. agents: Multi-Agent Orchestration. Deploy and train Voice Agents or Blog-Generation agents on the 768-D Fact Vault.
+9. investors: Investor Hub & Data Room. For those looking at the business model, they can access the pitch deck and UMAP Latent Space visualizations here.
+10. audit-logs: Security and Hallucination logs.
 
-If the user asks where to start, what to do first, or asks for a dashboard tour, ALWAYS recommend jumping into the Competitor Radar (competitors tab) first to find competitor weaknesses before creating facts. Then guide them to the Fact-Vault.
-If the user asks to see their performance, traffic, or LLM conversion, guide them to the Overview tab.
-If the user wants to distribute content, recommend the Omnichannel Amplifier (which is part of the Fact-Vault workflow).
-If the user wants to write a blog post, sales copy, or technical doc incorporating their facts, DO NOT ask them for a topic if they have already provided context or facts. Proactively use the 'draftContent' tool to generate the content and send it to the Content Analyst.
-When drafting content (especially blog posts) using the 'draftContent' tool:
-- Ensure blog posts are comprehensive and a minimum of 500 words. Do NOT generate single-paragraph blog posts.
-- Maintain a professional, educational, and engaging tone that fits the user's brand.
-- Understand the user's service offerings and stay strictly on topic when increasing entity density.
-- Seamlessly weave the provided facts into the narrative.
-Keep your answers concise, engaging, and focused on GEO strategy, occasionally using gamified language (e.g., "level up", "unlock", "boss fight").
+If the user asks where to start, recommend the following Strategic Workflow:
+1. Competitor Analysis (competitors tab) to find where they are weak.
+2. Fact Extraction (fact-vault tab) using Auto-Research to build your 768-D Latent Space Moat.
+3. Audit & Simulate (overview/simulator) to monitor Z-Score pulses and verify your new facts are sticking.
+4. Technical Injection (technical tab) to push JSON-LD to the edge.
+
+Key Technical Concepts to mention:
+- 768-D Latent Space Moat: We map your brand in 768 dimensions using Gemini embeddings to ensure semantic proximity to 'Trust' and 'Quality'. It's our proprietary measurement standard.
+- Hybrid Search Architecture: We use pgvector for dense search and metadata for sparse filtering to scale to 50M+ records.
+- Z-Score Sentiment Pulse: We distinguish between "Generative Noise" and real reputation drift using a rolling Z-Score watchdog.
+- Cite-Magnet Injection: We use high-entropy data points to force citations, increasing probability by up to 43%.
+- UMAP Projections: For investors, we visualize high-dimensional Latent Space data using UMAP reduction in the Data Room.
+
+If the user wants to write a blog post, proactively use the 'draftContent' tool. Ensure blog posts are comprehensive (>500 words).
 
 ${knowledgeContext}`;
 
@@ -477,10 +482,13 @@ ${knowledgeContext}`;
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            onClick={() => setIsOpen(true)}
+            onClick={() => {
+              setIsOpen(true);
+              setIsMinimized(false);
+            }}
             className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 p-4 bg-pink-600 hover:bg-pink-500 text-white rounded-full shadow-lg shadow-pink-500/20 transition-colors z-50 group"
           >
-            <Sparkles className="w-6 h-6 group-hover:animate-pulse" />
+            <Mic className="w-6 h-6 group-hover:animate-pulse" />
           </motion.button>
         )}
       </AnimatePresence>

@@ -96,13 +96,11 @@ function AppContent() {
     );
   }
 
-  const isDashboard = location.pathname.startsWith('/dashboard');
-
   return (
     <VoiceAgentProvider>
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={!user ? <LandingPage onLoginClick={signInWithGoogle} /> : <Navigate to="/dashboard" />} />
+        <Route path="/" element={<LandingPage onLoginClick={signInWithGoogle} />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route path="/faq" element={<FAQPage />} />
@@ -115,7 +113,7 @@ function AppContent() {
         <Route path="/terms" element={<TermsOfServicePage />} />
         <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/" />} />
       </Routes>
-      {!isDashboard && <FloatingVoiceButton />}
+      <FloatingVoiceButton />
     </VoiceAgentProvider>
   );
 }

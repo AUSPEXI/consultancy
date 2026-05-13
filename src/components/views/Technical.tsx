@@ -230,7 +230,7 @@ export default {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Probing Engine Configuration */}
+        {/* 768-D Latent Space Infrastructure */}
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden relative h-fit">
           <div className="p-6 border-b border-zinc-800">
             <div className="flex items-center justify-between mb-4">
@@ -238,12 +238,12 @@ export default {
                 <div className="p-2 bg-pink-500/10 rounded-lg text-pink-400">
                   <Target className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-semibold text-white">First-Party Data Lake Integration</h3>
+                <h3 className="text-base font-semibold text-white">768-D Latent Space Moat (pgvector)</h3>
               </div>
               <span className="px-2 py-0.5 text-[10px] font-bold bg-pink-500/10 text-pink-400 border border-pink-500/20 rounded-full tracking-widest uppercase">Proprietary</span>
             </div>
             <p className="text-sm text-zinc-400">
-              Our compliant infrastructure securely routes user analytics and deterministic search intent mapping to our centralized data lake, ensuring a compounding and un-copyable dataset.
+              High-scale vector indexing ensures your brand's semantic proximity to 'Trust' remains irrefutable. Our pgvector database routes billions of data points to maintain your proprietary moat.
             </p>
           </div>
           <div className="p-6">

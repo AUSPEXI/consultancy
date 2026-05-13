@@ -1,6 +1,7 @@
-import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, Wrench, PenTool, MonitorPlay, ShieldCheck, Activity } from 'lucide-react';
+import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, Wrench, PenTool, MonitorPlay, ShieldCheck, Activity, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { Link } from 'react-router-dom';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
@@ -125,7 +126,22 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
       </nav>
 
       <div className="p-4 border-t border-zinc-800 space-y-1">
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-colors">
+        <Link 
+          to="/"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-colors"
+        >
+          <Globe className="w-5 h-5 text-pink-500" />
+          Back to Website
+        </Link>
+        <button 
+          onClick={() => setActiveTab('settings')}
+          className={cn(
+            "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+            activeTab === 'settings' 
+              ? "bg-zinc-800 text-white" 
+              : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+          )}
+        >
           <Settings className="w-5 h-5" />
           Settings
         </button>

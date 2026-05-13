@@ -24,6 +24,12 @@ const ROADMAP_ITEMS = [
     description: "Deployed the Analytics Controller with Rolling Z-Score analysis, distinguishing generative noise from significant truth-drift. We are automatically plotting Confidence and Drift directly on the Dashboard."
   },
   {
+    title: "Citacious Analyst (12-Month Context Memory)",
+    status: "Completed",
+    icon: BrainCircuit,
+    description: "Successfully trained our dedicated AI Analyst on the full GEO toolset. Citacious now maintains long-term memory of brand history, dashboard outcomes, and strategic pivots to automate future growth."
+  },
+  {
     title: "Authoritative RAG Optimization",
     status: "Q1 2027",
     icon: Zap,

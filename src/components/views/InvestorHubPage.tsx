@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, BarChart3, Globe, ShieldCheck, Zap, ArrowRight, FileText, Lock, CheckCircle2 } from 'lucide-react';
+import { TrendingUp, BarChart3, Globe, ShieldCheck, Zap, ArrowRight, FileText, Lock, CheckCircle2, Layout, Database, Eye } from 'lucide-react';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
+import { PitchDeckViewer } from '@/components/ui/PitchDeckViewer';
+import { UmapVisualization } from '@/components/ui/UmapVisualization';
 
 const INVESTMENT_HIGHLIGHTS = [
   {
@@ -15,7 +17,7 @@ const INVESTMENT_HIGHLIGHTS = [
   {
     title: "Proprietary Infrastructure",
     icon: Globe,
-    description: "We are advancing beyond foundational AI integrations to build the analytical infrastructure of GEO. Our upcoming semantic affinity tracking and robust probe models will create an insurmountable data moat."
+    description: "We are advancing beyond foundational AI integrations to build the analytical infrastructure of GEO. Our fully deployed 768-dimensional Latent Space Engine and robust pgvector backend create an insurmountable proprietary data moat."
   },
   {
     title: "High-Margin Recurring Revenue",
@@ -50,9 +52,24 @@ const STRATEGIC_INITIATIVES = [
   }
 ];
 
+const DATA_ROOM_METRICS = [
+  { label: "TAM (Global)", value: "$124B", sub: "By 2028" },
+  { label: "Target NRR", value: "135%+", sub: "Premium Tier" },
+  { label: "LTV / CAC", value: "4.2x", sub: "Projected" },
+  { label: "Gross Margin", value: "84%", sub: "SaaS Layer" }
+];
+
 export function InvestorHubPage() {
-  const { signInWithGoogle } = useAuth();
+  const { signInWithGoogle, user } = useAuth();
   const [hasDownloaded, setHasDownloaded] = useState(false);
+  const [showDataRoom, setShowDataRoom] = useState(false);
+
+  const isSuperUser = user?.email === 'hopiumcalculator@gmail.com';
+
+  // Automatically show data room for super user
+  if (isSuperUser && !showDataRoom) {
+    setShowDataRoom(true);
+  }
 
   const handleDownload = () => {
     setHasDownloaded(true);
@@ -102,26 +119,12 @@ export function InvestorHubPage() {
             transition={{ delay: 0.3 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <a 
-              href="/deck.pdf" 
-              download="deck.pdf"
-              onClick={handleDownload}
-              className={`px-8 py-4 font-semibold rounded-full transition-colors flex items-center gap-2 w-full sm:w-auto justify-center ${
-                hasDownloaded 
-                  ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
-                  : 'bg-white text-black hover:bg-zinc-200'
-              }`}
+            <button 
+              onClick={() => setShowDataRoom(true)}
+              className="px-8 py-4 bg-white text-black font-semibold rounded-full hover:bg-zinc-200 transition-colors flex items-center gap-2 w-full sm:w-auto justify-center"
             >
-              {hasDownloaded ? (
-                <>
-                  <CheckCircle2 className="w-5 h-5" /> Download Started
-                </>
-              ) : (
-                <>
-                  Request Investor Deck <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </a>
+              <Eye className="w-4 h-4" /> Access Data Room Preview
+            </button>
             <a 
               href="mailto:sales@auspexi.com"
               className="px-8 py-4 bg-zinc-900 text-white font-semibold rounded-full hover:bg-zinc-800 border border-zinc-800 transition-colors hidden sm:flex items-center gap-2 w-full sm:w-auto justify-center"
@@ -131,6 +134,122 @@ export function InvestorHubPage() {
           </motion.div>
         </div>
       </section>
+
+      {/* Data Room Preview Section */}
+      {showDataRoom && (
+        <section className="py-24 px-6 relative overflow-hidden" id="data-room">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-12">
+              <div className="max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-2 py-0.5 text-[10px] font-bold bg-pink-500/10 text-pink-400 border border-pink-500/20 rounded-full tracking-widest uppercase mb-4">
+                  Confidential
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold font-heading text-white">The Data Room</h2>
+                <p className="text-zinc-400 mt-4">
+                  A comprehensive overview of our market positioning, technical architecture, and proprietary datasets. Accessing the full Data Room requires an active NDA.
+                </p>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="text-right hidden sm:block">
+                  <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase">Encryption Status</p>
+                  <p className="text-xs font-mono text-emerald-500">AES-256_ACTIVE</p>
+                </div>
+                <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl">
+                  <ShieldCheck className="w-6 h-6 text-emerald-500" />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Pitch Deck Preview */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <FileText className="w-5 h-5 text-pink-500" />
+                  <h3 className="text-lg font-semibold text-white">Investment Pitch Deck</h3>
+                </div>
+                <PitchDeckViewer />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+                    <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Last Update</p>
+                    <p className="text-sm font-medium text-white">May 2026</p>
+                  </div>
+                  <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+                    <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Version</p>
+                    <p className="text-sm font-medium text-white">v4.1.2_BETA</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* UMAP Visualization */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Layout className="w-5 h-5 text-pink-500" />
+                  <h3 className="text-lg font-semibold text-white">Latent Space Visualization (UMAP)</h3>
+                </div>
+                <UmapVisualization />
+                <div className="p-6 bg-zinc-900/30 border border-zinc-800 rounded-2xl">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Database className="w-5 h-5 text-zinc-500" />
+                    <h4 className="font-bold text-white uppercase text-xs tracking-widest">Projection Logic</h4>
+                  </div>
+                  <p className="text-sm text-zinc-400 leading-relaxed italic">
+                    "This UMAP reduction represents our proprietary Latent Space Map. We use hierarchical density-based clustering (HDBSCAN) to identify how brand entities are clustered within model weights, ensuring deterministic SOV modeling."
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+              {DATA_ROOM_METRICS.map((metric, i) => (
+                <div key={i} className="p-6 bg-zinc-900 border border-zinc-800 rounded-2xl text-center group hover:border-pink-500/30 transition-colors">
+                  <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">{metric.label}</p>
+                  <p className="text-2xl font-bold text-white group-hover:text-pink-400 transition-colors">{metric.value}</p>
+                  <p className="text-[10px] text-zinc-600 mt-1">{metric.sub}</p>
+                </div>
+              ))}
+            </div>
+            
+            {isSuperUser ? (
+              <div className="mt-12 flex flex-col items-center justify-center p-8 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl text-center">
+                <ShieldCheck className="w-8 h-8 text-emerald-400 mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">Partner Access Granted</h3>
+                <p className="text-zinc-400 text-sm mb-6 max-w-md mx-auto">
+                  Welcome, Gwylym. You have full administrative visibility of the Data Room. You can now download the complete investor archive directly.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <a 
+                    href="/deck.pdf" 
+                    download="auspexi_full_prospectus_v4.pdf"
+                    className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-full transition-colors flex items-center gap-2"
+                  >
+                    <FileText className="w-4 h-4" /> Download Full Prospectus
+                  </a>
+                  <button 
+                    onClick={() => alert("UMAP high-res export triggered for super-user.")}
+                    className="px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-bold rounded-full transition-colors flex items-center gap-2"
+                  >
+                    <Layout className="w-4 h-4" /> Export Latent Clusters
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-12 flex flex-col items-center justify-center p-8 bg-pink-500/5 border border-pink-500/10 rounded-2xl text-center">
+                <Lock className="w-8 h-8 text-pink-400 mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">Want the full Data Room access?</h3>
+                <p className="text-zinc-400 text-sm mb-6 max-w-md mx-auto">
+                  Request access to our P&L statements, CAP table, and complete technical specifications via our investor relations team.
+                </p>
+                <a 
+                  href="mailto:sales@auspexi.com?subject=Full Data Room Request"
+                  className="px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-bold rounded-full transition-colors flex items-center gap-2"
+                >
+                  <FileText className="w-4 h-4" /> Request Full Prospectus
+                </a>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Value Proposition Grid */}
       <section className="py-24 bg-zinc-900/50 border-y border-zinc-900">

@@ -11,13 +11,7 @@ export function FloatingVoiceButton() {
   const { isConnected, isSpeaking, disconnect } = useVoiceAgent();
 
   useEffect(() => {
-    // Show the button after a short delay, but not on the voice-agents page itself
-    if (location.pathname === '/voice-agents') {
-      setIsVisible(false);
-      return;
-    }
-
-    // Always show if connected
+    // Show the button after a short delay
     if (isConnected) {
       setIsVisible(true);
       return;
@@ -28,7 +22,10 @@ export function FloatingVoiceButton() {
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [location.pathname, isConnected]);
+  }, [isConnected]);
+
+  // Use VoiceAgentContext's connect method
+  const { connect } = useVoiceAgent();
 
   return (
     <AnimatePresence>
@@ -55,16 +52,18 @@ export function FloatingVoiceButton() {
                 </p>
               </div>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-3">
-                Have questions? Talk to our AI Sales Agent right now.
+                Have questions about your SOV or Fact-Vault? Talk to Citaticious now.
               </p>
-              <Link 
-                to="/voice-agents"
-                onClick={() => setIsCardDismissed(true)}
+              <button 
+                onClick={() => {
+                  connect();
+                  setIsCardDismissed(true);
+                }}
                 className="flex items-center justify-center gap-2 w-full bg-zinc-700 hover:bg-zinc-600 text-white text-sm font-medium py-2 px-4 rounded-xl transition-colors"
               >
                 <Mic className="w-4 h-4" />
-                Start Voice Chat
-              </Link>
+                Start Voice Analysis
+              </button>
             </div>
           )}
           
