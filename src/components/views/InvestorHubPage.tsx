@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, BarChart3, Globe, ShieldCheck, Zap, ArrowRight, FileText, Lock, CheckCircle2, Layout, Database, Eye } from 'lucide-react';
+import { TrendingUp, BarChart3, Globe, ShieldCheck, Zap, ArrowRight, FileText, Lock, CheckCircle2, Layout, Database, Eye, PieChart, Users, Wallet, Rocket } from 'lucide-react';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, Cell } from 'recharts';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
 import { useAuth } from '@/contexts/AuthContext';
@@ -56,7 +57,37 @@ const DATA_ROOM_METRICS = [
   { label: "TAM (Global)", value: "$124B", sub: "By 2028" },
   { label: "Target NRR", value: "135%+", sub: "Premium Tier" },
   { label: "LTV / CAC", value: "4.2x", sub: "Projected" },
-  { label: "Gross Margin", value: "84%", sub: "SaaS Layer" }
+  { label: "Gross Margin", value: "84%", sub: "Efficiency Moat" }
+];
+
+const REVENUE_DATA = [
+  { year: 'Year 1 (Actual)', arr: 1.2, customers: 45 },
+  { year: 'Year 2 (Proj)', arr: 4.8, customers: 180 },
+  { year: 'Year 3 (Proj)', arr: 14.5, customers: 520 },
+];
+
+const USE_OF_FUNDS = [
+  { name: 'Engineering', value: 45, color: '#ec4899', description: 'Phase III RAG Optimization & Phase IV Query Prediction' },
+  { name: 'Sales & Marketing', value: 35, color: '#f472b6', description: 'UK & US Market Capture' },
+  { name: 'Ops & Infra', value: 20, color: '#3f3f46', description: 'pgvector Cluster Scaling' },
+];
+
+const PROPRIETARY_STACK = [
+  {
+    title: "768-D Latent Space Engine",
+    description: "Utilizing Gemini’s text-embedding-004 for the perfect balance of semantic fidelity and sub-millisecond query speed.",
+    metric: "768 Dimensions"
+  },
+  {
+    title: "pgvector Infrastructure",
+    description: "Robust, high-scale vector database capable of indexing 50M+ brand interactions using HNSW indexing.",
+    metric: "50M+ Embeddings"
+  },
+  {
+    title: "Z-Score Anomaly Detection",
+    description: "Our 'Sentiment Pulse' watchdog that separates Generative Noise from true Brand Drift.",
+    metric: "0.01ms Latency"
+  }
 ];
 
 export function InvestorHubPage() {
@@ -210,26 +241,187 @@ export function InvestorHubPage() {
             </div>
             
             {isSuperUser ? (
-              <div className="mt-12 flex flex-col items-center justify-center p-8 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl text-center">
-                <ShieldCheck className="w-8 h-8 text-emerald-400 mb-4" />
-                <h3 className="text-xl font-bold text-white mb-2">Partner Access Granted</h3>
-                <p className="text-zinc-400 text-sm mb-6 max-w-md mx-auto">
-                  Welcome, Gwylym. You have full administrative visibility of the Data Room. You can now download the complete investor archive directly.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <a 
-                    href="/deck.pdf" 
-                    download="auspexi_full_prospectus_v4.pdf"
-                    className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-full transition-colors flex items-center gap-2"
-                  >
-                    <FileText className="w-4 h-4" /> Download Full Prospectus
-                  </a>
-                  <button 
-                    onClick={() => alert("UMAP high-res export triggered for super-user.")}
-                    className="px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-bold rounded-full transition-colors flex items-center gap-2"
-                  >
-                    <Layout className="w-4 h-4" /> Export Latent Clusters
-                  </button>
+              <div className="mt-12 space-y-12">
+                {/* Partner Header */}
+                <div className="p-8 bg-pink-500/5 border border-pink-500/10 rounded-2xl text-center">
+                  <ShieldCheck className="w-8 h-8 text-pink-400 mb-4 mx-auto" />
+                  <h3 className="text-xl font-bold text-white mb-2">Partner Access Granted</h3>
+                  <p className="text-zinc-400 text-sm mb-6 max-w-md mx-auto">
+                    Welcome, Gwylym. You have full administrative visibility of the Data Room. All financial modeling and proprietary stack details are unlocked.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a 
+                      href="/deck.pdf" 
+                      download="auspexi_seriesA_prospectus_v4.2.pdf"
+                      className="px-6 py-2.5 bg-pink-600 hover:bg-pink-500 text-white text-sm font-bold rounded-full transition-colors flex items-center gap-2"
+                    >
+                      <FileText className="w-4 h-4" /> Download Full Prospectus
+                    </a>
+                    <button 
+                      onClick={() => alert("HNSW Index Performance logs exported.")}
+                      className="px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-bold rounded-full transition-colors flex items-center gap-2"
+                    >
+                      <Layout className="w-4 h-4" /> Export Latent Clusters
+                    </button>
+                  </div>
+                </div>
+
+                {/* Financial Modeling Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  <div className="lg:col-span-2 p-8 bg-zinc-900 border border-zinc-800 rounded-3xl">
+                    <div className="flex items-center justify-between mb-8">
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-1">Growth Trajectory</h3>
+                        <p className="text-xs text-zinc-500 uppercase tracking-widest">Projected ARR (Millions USD)</p>
+                      </div>
+                      <TrendingUp className="w-6 h-6 text-pink-500" />
+                    </div>
+                    
+                    <div className="h-[300px] w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={REVENUE_DATA}>
+                          <defs>
+                            <linearGradient id="colorArr" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#ec4899" stopOpacity={0.3}/>
+                              <stop offset="95%" stopColor="#ec4899" stopOpacity={0}/>
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+                          <XAxis 
+                            dataKey="year" 
+                            stroke="#52525b" 
+                            fontSize={12} 
+                            tickLine={false} 
+                            axisLine={false} 
+                          />
+                          <YAxis 
+                            stroke="#52525b" 
+                            fontSize={12} 
+                            tickLine={false} 
+                            axisLine={false} 
+                            tickFormatter={(value) => `$${value}M`}
+                          />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '12px' }}
+                            itemStyle={{ color: '#ec4899' }}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="arr" 
+                            stroke="#ec4899" 
+                            strokeWidth={3}
+                            fillOpacity={1} 
+                            fill="url(#colorArr)" 
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="p-6 bg-zinc-900 border border-zinc-800 rounded-2xl">
+                      <Users className="w-5 h-5 text-pink-500 mb-4" />
+                      <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Customer Expansion</p>
+                      <h4 className="text-2xl font-bold text-white">520+ Nodes</h4>
+                      <p className="text-xs text-zinc-500 mt-1">Projected by Year 3 End</p>
+                    </div>
+                    <div className="p-6 bg-zinc-900 border border-zinc-800 rounded-2xl">
+                      <Wallet className="w-5 h-5 text-emerald-500 mb-4" />
+                      <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Target Raise</p>
+                      <h4 className="text-2xl font-bold text-white">$3,000,000</h4>
+                      <p className="text-xs text-zinc-500 mt-1">Series A Equity Round</p>
+                    </div>
+                    <div className="p-6 bg-zinc-900 border border-zinc-800 rounded-2xl">
+                      <Rocket className="w-5 h-5 text-pink-500 mb-4" />
+                      <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Pre-Money Val</p>
+                      <h4 className="text-2xl font-bold text-white">$15.0M</h4>
+                      <p className="text-xs text-zinc-500 mt-1">10x ARR + Tech Multiplier</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Neural Moat Section */}
+                <div className="p-8 bg-zinc-950 border border-zinc-800 rounded-3xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-8 opacity-5">
+                    <Database className="w-64 h-64 text-pink-500 rotate-12" />
+                  </div>
+                  <div className="relative z-10">
+                    <h3 className="text-2xl font-bold text-white mb-8">The Proprietary "Neural Moat"</h3>
+                    <div className="grid md:grid-cols-3 gap-6">
+                      {PROPRIETARY_STACK.map((stack, i) => (
+                        <div key={i} className="p-6 bg-zinc-900/50 border border-zinc-800 rounded-2xl hover:border-pink-500/30 transition-colors">
+                          <h4 className="font-bold text-white mb-2">{stack.title}</h4>
+                          <p className="text-sm text-zinc-400 mb-4 leading-relaxed">{stack.description}</p>
+                          <div className="text-xs font-mono text-pink-400 bg-pink-500/10 px-2 py-1 rounded inline-block">
+                            {stack.metric}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Capital Allocation */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="p-8 bg-zinc-900 border border-zinc-800 rounded-3xl">
+                    <h3 className="text-xl font-bold text-white mb-6">Use of Funds</h3>
+                    <div className="h-[200px] mb-8">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart layout="vertical" data={USE_OF_FUNDS} margin={{ left: 80 }}>
+                          <XAxis type="number" hide />
+                          <YAxis 
+                            dataKey="name" 
+                            type="category" 
+                            stroke="#a1a1aa" 
+                            fontSize={12} 
+                            tickLine={false} 
+                            axisLine={false} 
+                          />
+                          <Tooltip 
+                            cursor={{ fill: 'transparent' }}
+                            contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '12px' }}
+                          />
+                          <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                            {USE_OF_FUNDS.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="space-y-4">
+                      {USE_OF_FUNDS.map((fund, i) => (
+                        <div key={i} className="flex gap-4">
+                          <div className="w-1 px-1 rounded-full" style={{ backgroundColor: fund.color }} />
+                          <div>
+                            <p className="text-sm font-bold text-white">{fund.name} ({fund.value}%)</p>
+                            <p className="text-xs text-zinc-500">{fund.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-8 bg-zinc-900 border border-zinc-800 rounded-3xl">
+                    <h3 className="text-xl font-bold text-white mb-6">TAM / SAM / SOM</h3>
+                    <div className="space-y-6">
+                      <div className="p-5 bg-zinc-950 border border-zinc-800 rounded-2xl border-l-4 border-l-pink-500">
+                        <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Total Addressable Market</p>
+                        <h4 className="text-3xl font-bold text-white">$124B</h4>
+                        <p className="text-xs text-zinc-500 mt-1">Global AI Search Economy by 2028</p>
+                      </div>
+                      <div className="p-5 bg-zinc-950 border border-zinc-800 rounded-2xl border-l-4 border-l-pink-400">
+                        <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Serviceable Addressable Market</p>
+                        <h4 className="text-2xl font-bold text-white">$17.2B</h4>
+                        <p className="text-xs text-zinc-500 mt-1">Enterprise GEO & Brand Visibility Shift</p>
+                      </div>
+                      <div className="p-5 bg-zinc-950 border border-zinc-800 rounded-2xl border-l-4 border-l-pink-300">
+                        <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Serviceable Obtainable Market</p>
+                        <h4 className="text-xl font-bold text-white">$450M</h4>
+                        <p className="text-xs text-zinc-500 mt-1">Focusing on Tier-1 Enterprise Verticals</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (

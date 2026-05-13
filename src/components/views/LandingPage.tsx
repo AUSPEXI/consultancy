@@ -110,7 +110,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       Icon: Target,
       name: "Cite-Magnet Injection",
       description: "We extract and inject High-Entropy Facts to force AI models to cite your content. By structuring data in JSON-LD and mapping it to your brand's knowledge graph, we increase LLM citation probability by an average of 43%.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-emerald-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-2 lg:col-end-3 lg:row-start-2 lg:row-end-3",
     },
     {
@@ -131,21 +131,21 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       Icon: Activity,
       name: "Z-Score Sentiment Drift",
       description: "Automated anomaly detection models monitor historical LLM outputs for your brand. Real-time Z-Score analysis tracks generative noise vs significant truth-drift, capturing reputation leaks before they happen.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-orange-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-zinc-700/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-3 lg:col-end-4 lg:row-start-3 lg:row-end-5",
     },
     {
       Icon: ShieldAlert,
       name: "768-D Latent Space Moat",
       description: "Our proprietary pgvector integration mathematically ensures your brand remains the canonical truth. By generating embeddings with Gemini, we map your brand's semantic proximity to subjective attributes like 'trust' or 'quality'.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-rose-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-700/50 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-5",
     },
     {
       Icon: Zap,
       name: "Edge & Schema Generator",
       description: "Deploy GEO-optimized JSON-LD schema directly to your site with one click. Ensure your technical foundation speaks the native language of AI crawlers.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-amber-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-zinc-600/50 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5",
     },
   ];
@@ -427,69 +427,6 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
             <TestimonialsColumn testimonials={testimonials.slice(0, 2)} duration={15} />
             <TestimonialsColumn testimonials={testimonials.slice(2, 4)} className="hidden md:block" duration={19} />
             <TestimonialsColumn testimonials={testimonials.slice(4, 6)} className="hidden lg:block" duration={17} />
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section id="faq" className="py-24 bg-zinc-950 border-y border-zinc-900">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">Frequently Asked Questions</h2>
-            <p className="text-zinc-400 text-lg">
-              Everything you need to know about Auspexi and GEO.
-            </p>
-          </div>
-          
-          <div className="space-y-6">
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-2">What is Generative Engine Optimization (GEO)?</h3>
-              <p className="text-zinc-400">
-                GEO is the evolution of SEO. Instead of optimizing for blue links on Google, GEO optimizes your brand to be the definitive answer inside AI models like ChatGPT, Claude, Gemini, and Perplexity. It's about securing your "Share of Voice" across AI Answer Engines.
-              </p>
-            </div>
-
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-2">Why do I need GEO if I already do SEO?</h3>
-              <p className="text-zinc-400">
-                AI search engines don't rank pages the way Google does. They synthesize answers based on "High-Entropy Facts" and semantic relevance. Traditional SEO tactics (like keyword stuffing or backlinks) don't guarantee AI citations. Auspexi bridges this gap by structuring your data exactly how LLMs prefer to consume it.
-              </p>
-            </div>
-
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-2">What exactly am I buying?</h3>
-              <p className="text-zinc-400">
-                You are getting access to a proprietary suite of Generative Engine Optimization (GEO) tools. This includes our Multi-Engine SOV Simulator to track your brand across AI models, our Content Scorer to ensure your text is AI-readable, our JSON-LD Cite-Magnet Generator to inject high-entropy facts into your site's code, and our Consensus Platform Monitor to defend your brand against negative AI context poisoning.
-              </p>
-            </div>
-            
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-2">How does the billing work? Can I cancel?</h3>
-              <p className="text-zinc-400">
-                Yes, our subscriptions are month-to-month. You can cancel anytime after your first month's subscription. There are no long-term lock-ins unless you choose an annual plan.
-              </p>
-            </div>
-
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-2">What happens if I cancel a special or one-time deal?</h3>
-              <p className="text-zinc-400">
-                If you secure a discounted rate, lifetime deal, or special promotional pricing, that rate is locked in for as long as your subscription remains active. If you decide to cancel and sign back up later, you will be subject to the standard, full subscription pricing available at that time.
-              </p>
-            </div>
-
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-2">How quickly will I see results?</h3>
-              <p className="text-zinc-400">
-                Unlike traditional SEO which can take 6-12 months, GEO results can often be seen much faster. When you inject Cite-Magnets and update your JSON-LD schema, AI models can pick up these high-entropy facts during their next crawl or training run, often resulting in increased Share of Voice within weeks.
-              </p>
-            </div>
-            
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-2">Do I need technical knowledge to use this?</h3>
-              <p className="text-zinc-400">
-                No. We've abstracted the complex AI engineering into simple, actionable tools. Our JSON-LD generator creates the exact code you need to copy-paste into your website, and our Content Scorer tells you exactly what to change in plain English.
-              </p>
-            </div>
           </div>
         </div>
       </section>
