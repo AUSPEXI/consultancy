@@ -217,12 +217,20 @@ app.use(express.json());
 
   app.get("/api/analytics/pulse", (req, res) => {
     const { brandId } = req.query;
-    // Generate simulated real-time ingestion pulse
-    const pulse = Array.from({ length: 24 }, (_, i) => ({
-      time: `${i}:00`,
-      mentions: Math.floor(Math.random() * 50) + 10,
-      citations: Math.floor(Math.random() * 20) + 5,
-    }));
+    // Generate simulated real-time ingestion pulse with date and zScore
+    const now = new Date();
+    const pulse = Array.from({ length: 24 }, (_, i) => {
+      const date = new Date(now);
+      date.setHours(now.getHours() - (23 - i));
+      const zScore = (Math.random() * 4) - 2; // Simulated Z-score between -2 and 2
+      return {
+        date: date.toISOString(),
+        zScore: parseFloat(zScore.toFixed(2)),
+        isAnomaly: Math.abs(zScore) > 1.8,
+        mentions: Math.floor(Math.random() * 50) + 10,
+        citations: Math.floor(Math.random() * 20) + 5,
+      };
+    });
     res.json({ success: true, pulse });
   });
 
@@ -1834,29 +1842,31 @@ async function setupFrontendAndStart() {
         const title = `${post.title} | Auspexi`;
         const description = post.excerpt;
         const image = post.image;
-        const url = `https://auspexi.com/blog/${slug}`;
+        const url = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
 
         // Update basic tags
-        html = html.replace(/<title>.*?<\/title>/, `<title>${title}</title>`);
-        html = html.replace(/<meta name="description" content=".*?" \/>/, `<meta name="description" content="${description}" />`);
+        html = html.replace(/<title>.*?<\/title>/i, `<title>${title}</title>`);
+        html = html.replace(/<meta name="description" content=".*?" \/?>/i, `<meta name="description" content="${description}" />`);
         
-        // Update OG tags (using global matching to ensure all instances are replaced if any)
-        html = html.replace(/<meta property="og:title" content=".*?" \/>/g, `<meta property="og:title" content="${title}" />`);
-        html = html.replace(/<meta property="og:description" content=".*?" \/>/g, `<meta property="og:description" content="${description}" />`);
-        html = html.replace(/<meta property="og:image" content=".*?" \/>/g, `<meta property="og:image" content="${image}" />`);
-        html = html.replace(/<meta property="og:url" content=".*?" \/>/g, `<meta property="og:url" content="${url}" />`);
+        // Update OG tags (using global matching and case-insensitive)
+        html = html.replace(/<meta property="og:title" content=".*?" \/?>/gi, `<meta property="og:title" content="${title}" />`);
+        html = html.replace(/<meta property="og:description" content=".*?" \/?>/gi, `<meta property="og:description" content="${description}" />`);
+        html = html.replace(/<meta property="og:image" content=".*?" \/?>/gi, `<meta property="og:image" content="${image}" />`);
+        html = html.replace(/<meta property="og:url" content=".*?" \/?>/gi, `<meta property="og:url" content="${url}" />`);
 
         // Update Twitter tags
-        html = html.replace(/<meta property="twitter:title" content=".*?" \/>/g, `<meta property="twitter:title" content="${title}" />`);
-        html = html.replace(/<meta property="twitter:description" content=".*?" \/>/g, `<meta property="twitter:description" content="${description}" />`);
-        html = html.replace(/<meta property="twitter:image" content=".*?" \/>/g, `<meta property="twitter:image" content="${image}" />`);
-        // handle both twitter:url and twitter:url (consistency)
-        html = html.replace(/<meta property="twitter:url" content=".*?" \/>/g, `<meta property="twitter:url" content="${url}" />`);
-        html = html.replace(/<meta name="twitter:url" content=".*?" \/>/g, `<meta name="twitter:url" content="${url}" />`);
-        html = html.replace(/<meta name="twitter:title" content=".*?" \/>/g, `<meta name="twitter:title" content="${title}" />`);
-        html = html.replace(/<meta name="twitter:description" content=".*?" \/>/g, `<meta name="twitter:description" content="${description}" />`);
-        html = html.replace(/<meta name="twitter:image" content=".*?" \/>/g, `<meta name="twitter:image" content="${image}" />`);
+        html = html.replace(/<meta property="(twitter|twitter:title)" content=".*?" \/?>/gi, `<meta property="twitter:title" content="${title}" />`);
+        html = html.replace(/<meta property="(twitter:description)" content=".*?" \/?>/gi, `<meta property="twitter:description" content="${description}" />`);
+        html = html.replace(/<meta property="(twitter:image)" content=".*?" \/?>/gi, `<meta property="twitter:image" content="${image}" />`);
+        html = html.replace(/<meta property="(twitter:url)" content=".*?" \/?>/gi, `<meta property="twitter:url" content="${url}" />`);
+        
+        // Handle name= variant for twitter
+        html = html.replace(/<meta name="twitter:.*?" content=".*?" \/?>/gi, ""); // Clear existing name-based twitter tags to avoid duplication
+        html += `\n    <meta name="twitter:title" content="${title}" />`;
+        html += `\n    <meta name="twitter:description" content="${description}" />`;
+        html += `\n    <meta name="twitter:image" content="${image}" />`;
 
+        res.set('Content-Type', 'text/html');
         return res.send(html);
       } catch (err) {
         console.error("Error injecting blog meta tags:", err);
@@ -1879,23 +1889,26 @@ async function setupFrontendAndStart() {
         let html = fs.readFileSync(indexPath, 'utf-8');
         
         const title = "Auspexi | Master Brand Visibility in the Era of AI Search";
-        const description = "The only defensive GEO platform designed to monitor, protect, and amplify your brand's presence across generative AI models.";
+        const description = "Leading defensive GEO platform for enterprise brand protection and AI Share of Voice dominance. Auspexi protects and amplifies your brand across Generative Engines.";
         const image = "https://auspexi.com/auspexi-logo.png"; 
-        const url = "https://auspexi.com/";
+        const url = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
 
-        html = html.replace(/<title>.*?<\/title>/, `<title>${title}</title>`);
-        html = html.replace(/<meta name="description" content=".*?" \/>/, `<meta name="description" content="${description}" />`);
+        // Update basic tags
+        html = html.replace(/<title>.*?<\/title>/i, `<title>${title}</title>`);
+        html = html.replace(/<meta name="description" content=".*?" \/?>/i, `<meta name="description" content="${description}" />`);
         
-        html = html.replace(/<meta property="og:title" content=".*?" \/>/g, `<meta property="og:title" content="${title}" />`);
-        html = html.replace(/<meta property="og:description" content=".*?" \/>/g, `<meta property="og:description" content="${description}" />`);
-        html = html.replace(/<meta property="og:image" content=".*?" \/>/g, `<meta property="og:image" content="${image}" />`);
-        html = html.replace(/<meta property="og:url" content=".*?" \/>/g, `<meta property="og:url" content="${url}" />`);
+        // Update OG tags
+        html = html.replace(/<meta property="og:title" content=".*?" \/?>/gi, `<meta property="og:title" content="${title}" />`);
+        html = html.replace(/<meta property="og:description" content=".*?" \/?>/gi, `<meta property="og:description" content="${description}" />`);
+        html = html.replace(/<meta property="og:image" content=".*?" \/?>/gi, `<meta property="og:image" content="${image}" />`);
+        html = html.replace(/<meta property="og:url" content=".*?" \/?>/gi, `<meta property="og:url" content="${url}" />`);
 
-        html = html.replace(/<meta property="twitter:title" content=".*?" \/>/g, `<meta property="twitter:title" content="${title}" />`);
-        html = html.replace(/<meta property="twitter:description" content=".*?" \/>/g, `<meta property="twitter:description" content="${description}" />`);
-        html = html.replace(/<meta property="twitter:image" content=".*?" \/>/g, `<meta property="twitter:image" content="${image}" />`);
-        html = html.replace(/<meta name="twitter:image" content=".*?" \/>/g, `<meta name="twitter:image" content="${image}" />`);
+        // Update Twitter tags
+        html = html.replace(/<meta property="(twitter|twitter:title)" content=".*?" \/?>/gi, `<meta property="twitter:title" content="${title}" />`);
+        html = html.replace(/<meta property="(twitter:description)" content=".*?" \/?>/gi, `<meta property="twitter:description" content="${description}" />`);
+        html = html.replace(/<meta property="(twitter:image)" content=".*?" \/?>/gi, `<meta property="twitter:image" content="${image}" />`);
 
+        res.set('Content-Type', 'text/html');
         return res.send(html);
       } catch (err) {
         console.error("Error injecting homepage meta tags:", err);
