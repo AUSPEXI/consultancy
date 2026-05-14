@@ -201,17 +201,23 @@ app.use(express.json());
 
   app.get("/api/analytics/map", (req, res) => {
     const { brandId } = req.query;
-    // Generate simulated geographic SOV data
-    const points = [
-      { id: 1, lat: 51.5074, lng: -0.1278, city: "London", sov: 85, trend: "+12%" },
-      { id: 2, lat: 40.7128, lng: -74.0060, city: "New York", sov: 72, trend: "+5%" },
-      { id: 3, lat: 34.0522, lng: -118.2437, city: "Los Angeles", sov: 64, trend: "-2%" },
-      { id: 4, lat: 48.8566, lng: 2.3522, city: "Paris", sov: 91, trend: "+18%" },
-      { id: 5, lat: 35.6762, lng: 139.6503, city: "Tokyo", sov: 45, trend: "-8%" },
-      { id: 6, lat: -33.8688, lng: 151.2093, city: "Sydney", sov: 58, trend: "+3%" },
-      { id: 7, lat: 1.3521, lng: 103.8198, city: "Singapore", sov: 77, trend: "+9%" },
-      { id: 8, lat: 25.2048, lng: 55.2708, city: "Dubai", sov: 82, trend: "+15%" },
-    ];
+    // Generate simulated latent space data (nodes in 768-D space compressed to 2D)
+    // Points represent content clusters in the brand's knowledge graph
+    const points = Array.from({ length: 15 }, (_, i) => ({
+      id: i,
+      x: (Math.random() * 200) - 100, // Normalized latent space X
+      y: (Math.random() * 200) - 100, // Normalized latent space Y
+      size: Math.floor(Math.random() * 15) + 5,
+      type: i % 3 === 0 ? 'Reputational Anchor' : i % 3 === 1 ? 'Technical Fact' : 'Sentiment Drift',
+      label: [
+        "Brand Reliability", "Pricing Structure", "API Performance", 
+        "Security Protocol", "CEO Statement", "User Complaint 812",
+        "Benchmark Result", "Investor Pitch", "Competitor Comparison",
+        "Legacy Tech Node", "Neural Moat Layer 4", "Entity Resolution"
+      ][i % 12],
+      distance: Math.random(),
+      sentiment: Math.random() > 0.5 ? 'positive' : 'negative'
+    }));
     res.json({ success: true, points });
   });
 
@@ -219,16 +225,22 @@ app.use(express.json());
     const { brandId } = req.query;
     // Generate simulated real-time ingestion pulse with date and zScore
     const now = new Date();
-    const pulse = Array.from({ length: 24 }, (_, i) => {
+    const pulse = Array.from({ length: 30 }, (_, i) => {
       const date = new Date(now);
-      date.setHours(now.getHours() - (23 - i));
-      const zScore = (Math.random() * 4) - 2; // Simulated Z-score between -2 and 2
+      date.setMinutes(now.getMinutes() - (29 - i) * 30); // 30 min intervals
+      
+      // We want a "drift" pulse - usually calm, with occasional spikes (anomalies)
+      const baseNoise = (Math.random() * 0.5) - 0.25;
+      const spike = (i === 15 || i === 25) ? (Math.random() > 0.5 ? 3.5 : -3.5) : 0;
+      const zScore = parseFloat((baseNoise + spike).toFixed(2));
+      
       return {
         date: date.toISOString(),
-        zScore: parseFloat(zScore.toFixed(2)),
-        isAnomaly: Math.abs(zScore) > 1.8,
-        mentions: Math.floor(Math.random() * 50) + 10,
-        citations: Math.floor(Math.random() * 20) + 5,
+        zScore: zScore,
+        isAnomaly: Math.abs(zScore) > 2.5,
+        mentions: Math.floor(Math.random() * 100) + 20,
+        citations: Math.floor(Math.random() * 40) + 10,
+        nodeShift: Math.abs(zScore * 10) // Visual indicator for node movement
       };
     });
     res.json({ success: true, pulse });
