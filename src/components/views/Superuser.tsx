@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { ShieldAlert, Trash2, Database, Loader2, CheckCircle2, History, TrendingUp, PieChart, Eye, Rocket } from 'lucide-react';
+import { ShieldAlert, Trash2, Database, Loader2, CheckCircle2, History, TrendingUp, PieChart, Eye, Rocket, Share2, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/firebase';
 import { collection, query, where, getDocs, deleteDoc, doc, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { Button } from '@/components/ui/button';
+import { blogPosts } from '@/data/blogPosts';
 
 export function Superuser() {
   const { user } = useAuth();
@@ -267,6 +268,36 @@ export function Superuser() {
               <span className="text-sm font-bold text-emerald-500">8.4%</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-8 h-8 bg-pink-500/10 rounded-lg flex items-center justify-center">
+            <Share2 className="w-5 h-5 text-pink-500" />
+          </div>
+          <h3 className="text-xl font-bold text-white">Blog Social Preview Manager</h3>
+        </div>
+        <p className="text-zinc-400 text-sm mb-6">
+          We've automated the generation of "Hot Pink Latent Space" social preview images. Visit any post's preview URL below and take a screenshot, or use an automated service to fetch these URLs.
+        </p>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+          {blogPosts.map(post => (
+            <div key={post.slug} className="p-4 bg-zinc-950 border border-zinc-800 rounded-xl flex items-center justify-between group hover:border-pink-500/30 transition-colors">
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-white truncate">{post.title}</p>
+                <p className="text-[10px] text-zinc-500 font-mono">/og-preview/{post.slug}</p>
+              </div>
+              <button 
+                onClick={() => window.open(`/og-preview/${post.slug}`, '_blank')}
+                className="p-2 text-zinc-500 hover:text-pink-400 hover:bg-zinc-900 rounded-lg transition-all"
+                title="Open Social Preview"
+              >
+                <ExternalLink className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
         </div>
       </div>
 

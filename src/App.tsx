@@ -9,6 +9,7 @@ import { LandingPage } from '@/components/views/LandingPage';
 import { Dashboard } from '@/components/views/Dashboard';
 import { BlogPage } from '@/components/views/BlogPage';
 import { BlogPostPage } from '@/components/views/BlogPostPage';
+import OGPreviewPage from '@/components/views/OGPreviewPage';
 import { FAQPage } from '@/components/views/FAQPage';
 import { VoiceAgentsPage } from '@/components/views/VoiceAgentsPage';
 import { AboutPage } from '@/components/views/AboutPage';
@@ -111,6 +112,7 @@ function AppContent() {
         <Route path="/investors" element={<InvestorHubPage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/terms" element={<TermsOfServicePage />} />
+        <Route path="/og-preview/:slug" element={<OGPreviewPage />} />
         <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/" />} />
       </Routes>
       <FloatingVoiceButton />
