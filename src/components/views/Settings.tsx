@@ -70,7 +70,11 @@ export function Settings() {
     const isConnected = connectedSocials.includes(platform);
     
     if (!isConnected) {
-      const result = window.prompt(`Please enter your ${platform} profile URL, ID, or Token to connect:`);
+      let promptMsg = `Please enter your ${platform} profile URL, ID, or Token to connect:`;
+      if (platform === 'linkedin') {
+        promptMsg = `Connect LinkedIn for automated seeding.\n\nFor "Amplify" (posting) features, paste your LinkedIn OAuth Access Token.\nFor "Pulse" (monitoring) features, enter your Profile ID or URL.\n\nHow to get a token: Developers can generate a "Share on LinkedIn" token in the LinkedIn Developer Portal.`;
+      }
+      const result = window.prompt(promptMsg);
       if (!result) return;
     }
 
