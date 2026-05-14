@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, Cell, ReferenceArea } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, Cell, ReferenceArea, ScatterChart, Scatter, ZAxis } from 'recharts';
 import { TrendingUp, Users, Target, MousePointerClick, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, Save } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
@@ -247,16 +247,17 @@ export function Overview() {
   const gapTrend = safeLatest.compGap - safePrevious.compGap;
 
   const radarData = (latest.radar || [
-    { subject: 'Pricing Insights', brandScore: safeLatest.aSov + 20, compScore: safeLatest.compA + 10 },
-    { subject: 'Feature Comparison', brandScore: safeLatest.aSov - 5, compScore: safeLatest.compA + 25 },
-    { subject: 'Implementation Docs', brandScore: safeLatest.aSov + 10, compScore: safeLatest.compA - 15 },
-    { subject: 'Customer Support', brandScore: safeLatest.aSov + 30, compScore: safeLatest.compA - 20 },
-    { subject: 'Security & Auth', brandScore: safeLatest.aSov - 15, compScore: safeLatest.compA + 20 },
-    { subject: 'Enterprise Ready', brandScore: safeLatest.aSov + 5, compScore: safeLatest.compA }
+    { subject: 'Brand Trust', brandScore: safeLatest.aSov + 20, compScore: safeLatest.compA + 10 },
+    { subject: 'Technical Moat', brandScore: safeLatest.aSov - 5, compScore: safeLatest.compA + 25 },
+    { subject: 'Citation Depth', brandScore: safeLatest.aSov + 10, compScore: safeLatest.compA - 15 },
+    { subject: 'Fact Veracity', brandScore: safeLatest.aSov + 30, compScore: safeLatest.compA - 20 },
+    { subject: 'Neural Sync', brandScore: safeLatest.aSov - 15, compScore: safeLatest.compA + 20 },
+    { subject: 'Market Dominance', brandScore: safeLatest.aSov + 5, compScore: safeLatest.compA }
   ]).map((d: any) => ({
     subject: d.subject,
     A: Math.min(100, Math.max(0, d.brandScore)),
     B: Math.min(100, Math.max(0, d.compScore)),
+    diff: Math.abs((d.brandScore || 0) - (d.compScore || 0)),
     fullMark: 100
   }));
 
@@ -480,18 +481,21 @@ export function Overview() {
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
           <div className="mb-6">
             <h3 className="text-base font-semibold text-white">Competitive Citation Gap</h3>
-            <p className="text-xs text-zinc-400 mt-1">Topics where AI prefers your brand vs. Top Competitor.</p>
+            <p className="text-xs text-zinc-400 mt-1">Relative neural dominance by topic (Brand vs Top Competitor).</p>
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart cx="50%" cy="50%" outerRadius="70%" data={computedRadarData}>
                 <PolarGrid stroke="#3f3f46" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: '#a1a1aa', fontSize: 12 }} />
+                <PolarAngleAxis dataKey="subject" tick={{ fill: '#a1a1aa', fontSize: 10 }} />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#71717a', fontSize: 10 }} />
                 <Radar name="Your Brand" dataKey="A" stroke="#ec4899" fill="#ec4899" fillOpacity={0.4} />
                 <Radar name="Top Competitor" dataKey="B" stroke="#52525b" fill="#52525b" fillOpacity={0.4} />
-                <Tooltip contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7' }} />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7' }} 
+                  formatter={(value, name) => [`${value}% Dominance`, name]}
+                />
+                <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
               </RadarChart>
             </ResponsiveContainer>
           </div>
@@ -530,42 +534,70 @@ export function Overview() {
         <div className="lg:col-span-2 bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h3 className="text-base font-semibold text-white">Brand Sentiment Pulse (Anomaly Detection)</h3>
-              <p className="text-xs text-zinc-400 mt-1">Rolling Z-Score analysis tracking generative noise vs significant drift from baseline.</p>
+              <h3 className="text-base font-semibold text-white">Brand Sentiment Map (768-D Latent Space)</h3>
+              <p className="text-xs text-zinc-400 mt-1">Normalized vector clusters tracking reputational anchors vs significant generative noise pulsars.</p>
             </div>
             {geoLoading && <Loader2 className="w-4 h-4 animate-spin text-pink-500" />}
           </div>
-          <div className="h-[300px] w-full">
-            {pulseData.length > 0 ? (
+          <div className="h-[300px] w-full relative">
+            {/* Latent Space Background Grid */}
+            <div className="absolute inset-0 grid grid-cols-8 grid-rows-8 opacity-5 pointer-events-none">
+              {Array.from({ length: 64 }).map((_, i) => (
+                <div key={i} className="border border-zinc-500/20" />
+              ))}
+            </div>
+            
+            {mapPoints.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={pulseData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-                  <XAxis dataKey="date" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(str) => new Date(str).toLocaleDateString()} />
-                  <YAxis domain={[-5, 5]} stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} label={{ value: 'Drift (Z-Score)', angle: -90, position: 'insideLeft', fill: '#52525b', fontSize: 12 }} />
+                <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                  <XAxis type="number" dataKey="x" hide domain={[-120, 120]} />
+                  <YAxis type="number" dataKey="y" hide domain={[-120, 120]} />
+                  <ZAxis type="number" dataKey="size" range={[50, 400]} />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7' }}
-                  />
-                  <ReferenceArea y1={-2.5} y2={2.5} fill="#10b981" fillOpacity={0.05} /> 
-                  <Line 
-                    type="monotone" 
-                    dataKey="zScore" 
-                    stroke="#ec4899" 
-                    strokeWidth={2}
-                    dot={(props: any) => {
-                      const { cx, cy, payload } = props;
-                      if (!cx || !cy) return <circle />;
-                      return <circle cx={cx} cy={cy} r={payload.isAnomaly ? 6 : 2} fill={payload.isAnomaly ? '#f43f5e' : '#ec4899'} />;
+                    cursor={{ strokeDasharray: '3 3', stroke: '#ec4899', strokeOpacity: 0.3 }}
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload;
+                        return (
+                          <div className="bg-zinc-900 border border-zinc-800 p-3 rounded-lg shadow-xl">
+                            <p className="text-xs font-bold text-pink-400 uppercase tracking-tighter mb-1">{data.type}</p>
+                            <p className="text-sm font-semibold text-white">{data.label}</p>
+                            <p className="text-[10px] text-zinc-500 mt-2 font-mono">Vector Distance: {data.distance.toFixed(4)}</p>
+                            <div className={`mt-2 inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${data.sentiment === 'positive' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                              {data.sentiment}
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
                     }}
                   />
-                </LineChart>
+                  <Scatter name="Latent Nodes" data={mapPoints}>
+                    {mapPoints.map((entry: any, index: number) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={entry.sentiment === 'positive' ? '#10b981' : '#ec4899'} 
+                        fillOpacity={0.6}
+                        stroke={entry.sentiment === 'positive' ? '#10b981' : '#ec4899'}
+                        className="animate-pulse"
+                        style={{ animationDuration: `${2 + Math.random() * 3}s` }}
+                      />
+                    ))}
+                  </Scatter>
+                </ScatterChart>
               </ResponsiveContainer>
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center border border-dashed border-zinc-700/50 rounded-lg">
                 <BrainCircuit className="w-8 h-8 text-zinc-600 mb-2" />
-                <p className="text-zinc-500 text-sm">Insufficient data points to model generative noise.</p>
-                <p className="text-zinc-600 text-xs mt-1">Run continuous audits to populate the vector space.</p>
+                <p className="text-zinc-500 text-sm">Insufficient node data to map latent space clusters.</p>
+                <p className="text-zinc-600 text-xs mt-1">Continuous brand monitoring required to establish rep-anchor baselines.</p>
               </div>
             )}
+            
+            {/* Visual Center Overlay */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 border border-pink-500/20 rounded-full flex items-center justify-center pointer-events-none">
+               <div className="w-1 h-1 bg-pink-500 rounded-full animate-ping" />
+            </div>
           </div>
         </div>
 
