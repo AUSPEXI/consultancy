@@ -1813,6 +1813,98 @@ function startEmailFunnelCron() {
 }
 
 async function setupFrontendAndStart() {
+  // --- Dynamic Social Meta Tags Injection ---
+  // This middleware intercepts blog and homepage requests to inject branded meta tags
+  // before the static index.html is served. This ensures social platforms (LinkedIn, X)
+  // see the correct title, description, and branded hero images.
+
+  app.get('/blog/:slug', (req, res, next) => {
+    const { slug } = req.params;
+    const post = blogPosts.find(p => p.slug === slug);
+    if (!post) return next();
+
+    const indexPath = process.env.NODE_ENV === "production" 
+      ? path.join(process.cwd(), 'dist', 'index.html')
+      : path.join(process.cwd(), 'index.html');
+
+    if (fs.existsSync(indexPath)) {
+      try {
+        let html = fs.readFileSync(indexPath, 'utf-8');
+        
+        const title = `${post.title} | Auspexi`;
+        const description = post.excerpt;
+        const image = post.image;
+        const url = `https://auspexi.com/blog/${slug}`;
+
+        // Update basic tags
+        html = html.replace(/<title>.*?<\/title>/, `<title>${title}</title>`);
+        html = html.replace(/<meta name="description" content=".*?" \/>/, `<meta name="description" content="${description}" />`);
+        
+        // Update OG tags (using global matching to ensure all instances are replaced if any)
+        html = html.replace(/<meta property="og:title" content=".*?" \/>/g, `<meta property="og:title" content="${title}" />`);
+        html = html.replace(/<meta property="og:description" content=".*?" \/>/g, `<meta property="og:description" content="${description}" />`);
+        html = html.replace(/<meta property="og:image" content=".*?" \/>/g, `<meta property="og:image" content="${image}" />`);
+        html = html.replace(/<meta property="og:url" content=".*?" \/>/g, `<meta property="og:url" content="${url}" />`);
+
+        // Update Twitter tags
+        html = html.replace(/<meta property="twitter:title" content=".*?" \/>/g, `<meta property="twitter:title" content="${title}" />`);
+        html = html.replace(/<meta property="twitter:description" content=".*?" \/>/g, `<meta property="twitter:description" content="${description}" />`);
+        html = html.replace(/<meta property="twitter:image" content=".*?" \/>/g, `<meta property="twitter:image" content="${image}" />`);
+        // handle both twitter:url and twitter:url (consistency)
+        html = html.replace(/<meta property="twitter:url" content=".*?" \/>/g, `<meta property="twitter:url" content="${url}" />`);
+        html = html.replace(/<meta name="twitter:url" content=".*?" \/>/g, `<meta name="twitter:url" content="${url}" />`);
+        html = html.replace(/<meta name="twitter:title" content=".*?" \/>/g, `<meta name="twitter:title" content="${title}" />`);
+        html = html.replace(/<meta name="twitter:description" content=".*?" \/>/g, `<meta name="twitter:description" content="${description}" />`);
+        html = html.replace(/<meta name="twitter:image" content=".*?" \/>/g, `<meta name="twitter:image" content="${image}" />`);
+
+        return res.send(html);
+      } catch (err) {
+        console.error("Error injecting blog meta tags:", err);
+        return next();
+      }
+    }
+    next();
+  });
+
+  app.get('/', (req, res, next) => {
+    // Only handle precise root path to avoid interfering with other assets
+    if (req.path !== '/') return next();
+
+    const indexPath = process.env.NODE_ENV === "production" 
+      ? path.join(process.cwd(), 'dist', 'index.html')
+      : path.join(process.cwd(), 'index.html');
+
+    if (fs.existsSync(indexPath)) {
+      try {
+        let html = fs.readFileSync(indexPath, 'utf-8');
+        
+        const title = "Auspexi | Master Brand Visibility in the Era of AI Search";
+        const description = "The only defensive GEO platform designed to monitor, protect, and amplify your brand's presence across generative AI models.";
+        const image = "https://auspexi.com/auspexi-logo.png"; 
+        const url = "https://auspexi.com/";
+
+        html = html.replace(/<title>.*?<\/title>/, `<title>${title}</title>`);
+        html = html.replace(/<meta name="description" content=".*?" \/>/, `<meta name="description" content="${description}" />`);
+        
+        html = html.replace(/<meta property="og:title" content=".*?" \/>/g, `<meta property="og:title" content="${title}" />`);
+        html = html.replace(/<meta property="og:description" content=".*?" \/>/g, `<meta property="og:description" content="${description}" />`);
+        html = html.replace(/<meta property="og:image" content=".*?" \/>/g, `<meta property="og:image" content="${image}" />`);
+        html = html.replace(/<meta property="og:url" content=".*?" \/>/g, `<meta property="og:url" content="${url}" />`);
+
+        html = html.replace(/<meta property="twitter:title" content=".*?" \/>/g, `<meta property="twitter:title" content="${title}" />`);
+        html = html.replace(/<meta property="twitter:description" content=".*?" \/>/g, `<meta property="twitter:description" content="${description}" />`);
+        html = html.replace(/<meta property="twitter:image" content=".*?" \/>/g, `<meta property="twitter:image" content="${image}" />`);
+        html = html.replace(/<meta name="twitter:image" content=".*?" \/>/g, `<meta name="twitter:image" content="${image}" />`);
+
+        return res.send(html);
+      } catch (err) {
+        console.error("Error injecting homepage meta tags:", err);
+        return next();
+      }
+    }
+    next();
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const { createServer: createViteServer } = await import("vite");
