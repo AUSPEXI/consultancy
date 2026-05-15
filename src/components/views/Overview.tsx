@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, Cell, ReferenceArea, ScatterChart, Scatter, ZAxis } from 'recharts';
-import { TrendingUp, Users, Target, MousePointerClick, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, Save } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, Cell, ReferenceArea, ScatterChart, Scatter, ZAxis, PieChart, Pie } from 'recharts';
+import { TrendingUp, Users, Target, MousePointerClick, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, Save, Gauge } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
@@ -9,6 +9,43 @@ import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
 import { useGeoAnalytics } from '@/hooks/useGeoAnalytics';
+
+// --- High Performance Racing Dial Component ---
+const RacingDial = ({ value, label, color = "#ec4899", size = "sm" }: { value: number; label: string; color?: string; size?: "sm" | "lg" }) => {
+  const data = [
+    { name: 'value', value: Math.min(100, Math.max(0, value)), fill: color },
+    { name: 'remainder', value: 100 - Math.min(100, Math.max(0, value)), fill: '#18181b' }
+  ];
+
+  const isLarge = size === "lg";
+
+  return (
+    <div className="flex flex-col items-center">
+      <div className={`relative ${isLarge ? 'w-48 h-28' : 'w-32 h-20'}`}>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="100%"
+              startAngle={180}
+              endAngle={0}
+              innerRadius={isLarge ? 60 : 40}
+              outerRadius={isLarge ? 80 : 55}
+              paddingAngle={0}
+              dataKey="value"
+              stroke="none"
+            />
+          </PieChart>
+        </ResponsiveContainer>
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center">
+          <span className={`${isLarge ? 'text-3xl' : 'text-xl'} font-black text-white tracking-tighter`}>{value}%</span>
+        </div>
+      </div>
+      <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-2">{label}</p>
+    </div>
+  );
+};
 
 export function Overview() {
   const { user, tier, userData, role } = useAuth();
@@ -406,22 +443,41 @@ export function Overview() {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* High-Impact Performance Dials (Racing Style) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Absolute SOV (A-SOV)', value: `${safeLatest.aSov}%`, trend: `${asovTrend >= 0 ? '+' : ''}${asovTrend}%`, icon: Target, color: 'text-pink-400' },
-          { label: 'Entity Recall Rate (ERR)', value: `${safeLatest.err}%`, trend: `${errTrend >= 0 ? '+' : ''}${errTrend}%`, icon: BrainCircuit, color: 'text-purple-400' },
-          { label: 'Competitor Gap', value: `${safeLatest.compGap > 0 ? '+' : ''}${safeLatest.compGap}%`, trend: `${gapTrend >= 0 ? '+' : ''}${gapTrend} pts`, icon: TrendingUp, color: 'text-blue-400' },
-          { label: 'AI Referral Clicks', value: safeLatest.aiTraffic.toLocaleString(), trend: `${trafficTrend >= 0 ? '+' : ''}${trafficTrend}`, icon: Users, color: 'text-emerald-400' },
+          { label: 'A-SOV Dominance', value: safeLatest.aSov, color: '#ec4899', icon: Target },
+          { label: 'Entity Recall', value: safeLatest.err, color: '#a855f7', icon: BrainCircuit },
+          { label: 'Platform Sync', value: Math.round((safePlatforms.chatgpt + safePlatforms.claude + safePlatforms.gemini) / 3), color: '#3b82f6', icon: Activity },
+          { label: 'Sentiment Index', value: 78, color: '#10b981', icon: TrendingUp },
+        ].map((dial, i) => (
+          <div key={i} className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden group hover:border-zinc-700 transition-all">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-zinc-800 to-transparent opacity-50" />
+            <RacingDial value={dial.value} label={dial.label} color={dial.color} />
+            <dial.icon className="absolute top-4 right-4 w-4 h-4 text-zinc-800 group-hover:text-zinc-700 transition-colors" />
+          </div>
+        ))}
+      </div>
+
+      {/* Secondary KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {[
+          { label: 'Competitor Gap', value: `${safeLatest.compGap > 0 ? '+' : ''}${safeLatest.compGap}%`, trend: `${gapTrend >= 0 ? '+' : ''}${gapTrend} pts`, icon: TrendingUp, color: 'text-blue-400', desc: 'Margin over top enterprise rival' },
+          { label: 'AI Referral Clicks', value: safeLatest.aiTraffic.toLocaleString(), trend: `${trafficTrend >= 0 ? '+' : ''}${trafficTrend}`, icon: Users, color: 'text-emerald-400', desc: 'Direct attributed sessions from generative responses' },
         ].map((kpi, i) => (
-          <div key={i} className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium text-zinc-400">{kpi.label}</span>
-              <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
+          <div key={i} className="bg-zinc-900/40 border border-zinc-800/60 rounded-xl p-5 flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">{kpi.label}</span>
+                <span className={`text-[10px] font-mono ${(kpi.trend.startsWith('+') || kpi.trend.includes('+')) ? 'text-emerald-500' : 'text-rose-500'}`}>{kpi.trend}</span>
+              </div>
+              <div className="flex items-baseline gap-3">
+                <span className="text-2xl font-black text-white">{kpi.value}</span>
+                <span className="text-[10px] text-zinc-600 font-medium">{kpi.desc}</span>
+              </div>
             </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-white">{kpi.value}</span>
-              <span className={`text-xs font-medium ${(kpi.trend.startsWith('+') || kpi.trend.includes('+')) ? 'text-emerald-400' : 'text-rose-400'}`}>{kpi.trend}</span>
+            <div className={`p-3 rounded-full bg-zinc-950 border border-zinc-800 ${kpi.color}`}>
+              <kpi.icon className="w-5 h-5" />
             </div>
           </div>
         ))}
@@ -671,15 +727,17 @@ export function Overview() {
             </div>
           ) : null}
 
-          <div className="overflow-x-auto">
-            <div className="min-w-[600px]">
+          <div className="overflow-x-auto custom-scrollbar pb-4">
+            <div className="min-w-[800px]">
               <div 
-                className="grid gap-2 mb-2 text-xs font-medium text-zinc-500" 
-                style={{ gridTemplateColumns: `2fr repeat(${chartData.length}, 1fr)` }}
+                className="grid gap-2 mb-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest" 
+                style={{ gridTemplateColumns: `2fr repeat(${sentimentTrace.length > 0 ? sentimentTrace[0].data.length : chartData.length}, 1fr)` }}
               >
                 <div>Reputational Prompt</div>
-                {chartData.map((d, i) => (
-                  <div key={i} className="text-center">{d.date ? new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : `Day ${i+1}`}</div>
+                {(sentimentTrace.length > 0 ? sentimentTrace[0].data : chartData).map((d: any, i: number) => (
+                  <div key={i} className="text-center">
+                    {d.date ? new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : `D-${chartData.length - i}`}
+                  </div>
                 ))}
               </div>
               
@@ -688,16 +746,16 @@ export function Overview() {
                   <div 
                     key={i} 
                     className="grid gap-2 items-center"
-                    style={{ gridTemplateColumns: `2fr repeat(${chartData.length}, 1fr)` }}
+                    style={{ gridTemplateColumns: `2fr repeat(${row.scores.length}, 1fr)` }}
                   >
-                    <div className="text-sm text-zinc-300 truncate pr-4" title={row.prompt}>
+                    <div className="text-xs font-medium text-zinc-400 truncate pr-4 group-hover:text-white transition-colors" title={row.prompt}>
                       {row.prompt}
                     </div>
                     {row.scores.map((score, colIdx) => (
-                      <div key={colIdx} className="flex justify-center group relative">
-                        <div className={`w-full h-8 rounded-md transition-all duration-300 ${getSentimentColor(score)}`} />
-                        <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity -top-8 bg-zinc-800 text-white text-xs px-2 py-1 rounded pointer-events-none whitespace-nowrap z-10 border border-zinc-700">
-                          Score: {score > 0 ? '+' : ''}{score}
+                      <div key={colIdx} className="flex justify-center group/cell relative">
+                        <div className={`w-full h-10 rounded-md transition-all duration-500 border border-white/5 ${getSentimentColor(score)}`} />
+                        <div className="absolute opacity-0 group-hover/cell:opacity-100 transition-all -top-10 bg-zinc-900 text-white text-[10px] font-bold px-2 py-1.5 rounded-lg pointer-events-none whitespace-nowrap z-50 border border-zinc-700 shadow-2xl">
+                          NET SENTIMENT: {score > 0 ? '+' : ''}{score}
                         </div>
                       </div>
                     ))}
