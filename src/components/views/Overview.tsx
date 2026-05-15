@@ -12,7 +12,7 @@ import { useGeoAnalytics } from '@/hooks/useGeoAnalytics';
 
 export function Overview() {
   const { user, tier, userData, role } = useAuth();
-  const { pulseData, mapPoints, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(userData?.brand || '');
+  const { pulseData, mapPoints, sentimentTrace, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(userData?.brand || '');
   
   const [metrics, setMetrics] = useState<any[]>([]);
   const [isAuditing, setIsAuditing] = useState(false);
@@ -291,7 +291,10 @@ export function Overview() {
     return null;
   };
 
-  const sentimentData = userPrompts.map((p: string, rowIdx: number) => {
+  const sentimentData = sentimentTrace.length > 0 ? sentimentTrace.map(t => ({
+    prompt: t.prompt,
+    scores: t.data.map((d: any) => d.positive - d.negative)
+  })) : userPrompts.map((p: string, rowIdx: number) => {
     // Generate synthetic flex patterns to fake history if real history doesn't exist.
     const base = rowIdx === 0 ? 60 : rowIdx === 1 ? 10 : rowIdx === 2 ? -80 : 20;
     const flex = rowIdx === 0 ? 40 : rowIdx === 1 ? 30 : rowIdx === 2 ? -40 : -20;
@@ -531,40 +534,44 @@ export function Overview() {
         </div>
 
         {/* Sentiment Pulse */}
-        <div className="lg:col-span-2 bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-          <div className="flex justify-between items-start mb-6">
+        <div className="lg:col-span-2 bg-black border border-zinc-800 rounded-xl p-6 relative overflow-hidden">
+          {/* Subtle Neural Background */}
+          <div className="absolute inset-0 opacity-20 pointer-events-none">
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,#ec48991a_0,transparent_50%)]" />
+          </div>
+
+          <div className="flex justify-between items-start mb-6 relative z-10">
             <div>
-              <h3 className="text-base font-semibold text-white">Brand Sentiment Map (768-D Latent Space)</h3>
-              <p className="text-xs text-zinc-400 mt-1">Normalized vector clusters tracking reputational anchors vs significant generative noise pulsars.</p>
+              <h3 className="text-base font-semibold text-white">Neural Cluster Distribution</h3>
+              <p className="text-xs text-zinc-400 mt-1">Real-time mapping of your brand's presence in the LLM latent space.</p>
             </div>
             {geoLoading && <Loader2 className="w-4 h-4 animate-spin text-pink-500" />}
           </div>
-          <div className="h-[300px] w-full relative">
-            {/* Latent Space Background Grid */}
-            <div className="absolute inset-0 grid grid-cols-8 grid-rows-8 opacity-5 pointer-events-none">
-              {Array.from({ length: 64 }).map((_, i) => (
-                <div key={i} className="border border-zinc-500/20" />
-              ))}
-            </div>
-            
+          
+          <div className="h-[300px] w-full relative z-10">
             {mapPoints.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
                   <XAxis type="number" dataKey="x" hide domain={[-120, 120]} />
                   <YAxis type="number" dataKey="y" hide domain={[-120, 120]} />
-                  <ZAxis type="number" dataKey="size" range={[50, 400]} />
+                  <ZAxis type="number" dataKey="size" range={[80, 600]} />
                   <Tooltip 
                     cursor={{ strokeDasharray: '3 3', stroke: '#ec4899', strokeOpacity: 0.3 }}
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
                         return (
-                          <div className="bg-zinc-900 border border-zinc-800 p-3 rounded-lg shadow-xl">
-                            <p className="text-xs font-bold text-pink-400 uppercase tracking-tighter mb-1">{data.type}</p>
+                          <div className="bg-zinc-900/95 border border-zinc-800 p-3 rounded-lg shadow-2xl backdrop-blur-md">
+                            <p className="text-[10px] font-bold text-pink-500 uppercase tracking-widest mb-1">{data.type}</p>
                             <p className="text-sm font-semibold text-white">{data.label}</p>
-                            <p className="text-[10px] text-zinc-500 mt-2 font-mono">Vector Distance: {data.distance.toFixed(4)}</p>
-                            <div className={`mt-2 inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${data.sentiment === 'positive' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
-                              {data.sentiment}
+                            <div className="mt-2 h-0.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+                               <div className="h-full bg-pink-500" style={{ width: `${(1 - data.distance) * 100}%` }} />
+                            </div>
+                            <div className="flex justify-between items-center mt-2">
+                               <span className="text-[9px] text-zinc-500 font-mono">STRENGTH: {Math.round((1 - data.distance) * 100)}%</span>
+                               <span className={`text-[9px] font-bold uppercase ${data.sentiment === 'positive' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                 {data.sentiment}
+                               </span>
                             </div>
                           </div>
                         );
@@ -577,26 +584,29 @@ export function Overview() {
                       <Cell 
                         key={`cell-${index}`} 
                         fill={entry.sentiment === 'positive' ? '#10b981' : '#ec4899'} 
-                        fillOpacity={0.6}
+                        fillOpacity={0.4}
                         stroke={entry.sentiment === 'positive' ? '#10b981' : '#ec4899'}
+                        strokeWidth={1}
                         className="animate-pulse"
-                        style={{ animationDuration: `${2 + Math.random() * 3}s` }}
+                        style={{ 
+                          animationDuration: `${3 + Math.random() * 4}s`,
+                          filter: `drop-shadow(0 0 8px ${entry.sentiment === 'positive' ? '#10b98144' : '#ec489944'})`
+                        }}
                       />
                     ))}
                   </Scatter>
                 </ScatterChart>
               </ResponsiveContainer>
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center border border-dashed border-zinc-700/50 rounded-lg">
-                <BrainCircuit className="w-8 h-8 text-zinc-600 mb-2" />
-                <p className="text-zinc-500 text-sm">Insufficient node data to map latent space clusters.</p>
-                <p className="text-zinc-600 text-xs mt-1">Continuous brand monitoring required to establish rep-anchor baselines.</p>
+              <div className="w-full h-full flex flex-col items-center justify-center border border-dashed border-zinc-800 rounded-lg">
+                <BrainCircuit className="w-8 h-8 text-zinc-700 mb-2" />
+                <p className="text-zinc-500 text-sm">Synchronizing with Neural Grid...</p>
               </div>
             )}
             
-            {/* Visual Center Overlay */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 border border-pink-500/20 rounded-full flex items-center justify-center pointer-events-none">
-               <div className="w-1 h-1 bg-pink-500 rounded-full animate-ping" />
+            {/* Visual Center Crosshair */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 border border-pink-500/10 rounded-full flex items-center justify-center pointer-events-none">
+               <div className="w-0.5 h-0.5 bg-pink-500/40 rounded-full" />
             </div>
           </div>
         </div>
@@ -720,6 +730,45 @@ export function Overview() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Monitoring Objectives (Agency) */}
+        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h3 className="text-base font-semibold text-white">Monitoring Objectives</h3>
+              <p className="text-xs text-zinc-400 mt-1">Define the reputational anchors and risk vectors the AI monitors.</p>
+            </div>
+            <button 
+              onClick={() => setIsEditingPrompts(true)}
+              className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-pink-400 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="space-y-3">
+            {userPrompts.map((prompt: string, i: number) => (
+              <div key={i} className="flex items-center justify-between p-3 bg-zinc-950 border border-zinc-800/50 rounded-lg group">
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <div className={`w-1.5 h-1.5 rounded-full ${i % 2 === 0 ? 'bg-pink-500' : 'bg-cyan-500'}`} />
+                  <span className="text-sm text-zinc-300 truncate">{prompt}</span>
+                </div>
+                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                   <div className="px-1.5 py-0.5 rounded bg-zinc-800 text-[10px] text-zinc-500 font-mono">ACTIVE</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 pt-6 border-t border-zinc-800/50">
+            <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-2">Automated Discovery</p>
+            <div className="flex flex-wrap gap-2">
+              {['CEO Reliability', 'Technical Moat', 'Pricing Fairness', 'Open Source Sync'].map(tag => (
+                <span key={tag} className="px-2 py-1 rounded bg-zinc-800/50 text-[10px] text-zinc-400 border border-zinc-800 cursor-help hover:border-zinc-700 transition-colors">
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 
