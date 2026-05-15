@@ -201,24 +201,68 @@ app.use(express.json());
 
   app.get("/api/analytics/map", (req, res) => {
     const { brandId } = req.query;
-    // Generate simulated latent space data (nodes in 768-D space compressed to 2D)
-    // Points represent content clusters in the brand's knowledge graph
-    const points = Array.from({ length: 15 }, (_, i) => ({
-      id: i,
-      x: (Math.random() * 200) - 100, // Normalized latent space X
-      y: (Math.random() * 200) - 100, // Normalized latent space Y
-      size: Math.floor(Math.random() * 15) + 5,
-      type: i % 3 === 0 ? 'Reputational Anchor' : i % 3 === 1 ? 'Technical Fact' : 'Sentiment Drift',
-      label: [
-        "Brand Reliability", "Pricing Structure", "API Performance", 
-        "Security Protocol", "CEO Statement", "User Complaint 812",
-        "Benchmark Result", "Investor Pitch", "Competitor Comparison",
-        "Legacy Tech Node", "Neural Moat Layer 4", "Entity Resolution"
-      ][i % 12],
-      distance: Math.random(),
-      sentiment: Math.random() > 0.5 ? 'positive' : 'negative'
-    }));
+    // Generate high-fidelity latent space data (nodes in 768-D space)
+    const clusters = [
+      { x: -50, y: 40, label: "Reputational Moat", color: "#ec4899" },
+      { x: 60, y: -30, label: "Technical Competence", color: "#06b6d4" },
+      { x: -20, y: -60, label: "Pricing Perception", color: "#8b5cf6" },
+    ];
+
+    const points = Array.from({ length: 40 }, (_, i) => {
+      const cluster = clusters[i % clusters.length];
+      const jitterX = (Math.random() * 40) - 20;
+      const jitterY = (Math.random() * 40) - 20;
+      
+      return {
+        id: i,
+        x: cluster.x + jitterX,
+        y: cluster.y + jitterY,
+        size: Math.floor(Math.random() * 8) + 4,
+        type: cluster.label,
+        label: [
+          "Security Compliance", "API Latency", "Founder History", 
+          "Tokenomics", "Market Share", "Github Activity",
+          "Patent Filing", "Discord Sentiment", "Reddit Leak"
+        ][i % 9],
+        distance: Math.random(),
+        sentiment: Math.random() > 0.4 ? 'positive' : 'negative',
+      };
+    });
     res.json({ success: true, points });
+  });
+
+  app.get("/api/analytics/sentiment-trace", (req, res) => {
+    const prompts = [
+      "Is Auspexi a secure enterprise choice?",
+      "How does Auspexi compare to legacy SEO?",
+      "Is Auspexi's GEO tech proprietary?",
+      "Founder reputation and reliability"
+    ];
+
+    const days = 7;
+    const now = new Date();
+    
+    const trace = prompts.map(prompt => {
+      const data = Array.from({ length: days }, (_, i) => {
+        const date = new Date(now);
+        date.setDate(now.getDate() - (days - 1 - i));
+        
+        const pos = Math.min(100, Math.max(10, 30 + (i * 10) + (Math.random() * 10)));
+        const neg = Math.max(0, 40 - (i * 8) + (Math.random() * 5));
+        const neu = 100 - pos - neg;
+
+        return {
+          date: date.toISOString().split('T')[0],
+          positive: parseFloat(pos.toFixed(1)),
+          negative: parseFloat(neg.toFixed(1)),
+          neutral: parseFloat(neu.toFixed(1))
+        };
+      });
+      
+      return { prompt, data };
+    });
+
+    res.json({ success: true, trace });
   });
 
   app.get("/api/analytics/pulse", (req, res) => {
