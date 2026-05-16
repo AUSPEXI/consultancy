@@ -944,6 +944,44 @@ app.use(express.json());
      }
   });
 
+  app.post("/api/suggest-anchors", async (req, res) => {
+    try {
+      const { userId, brand, domain, domainContext } = req.body;
+      if (!brand || !domain) return res.status(400).json({ error: "Brand and domain required" });
+
+      const ai = getGemini();
+      const prompt = `
+        You are an expert Generative Engine Optimization (GEO) strategist.
+        Analyze the following brand and domain data to suggest 3-5 "Semantic Anchors" for their Latent Space Map.
+        
+        Brand: ${brand}
+        Domain: ${domain}
+        Context (if available): ${domainContext || 'No additional context provided.'}
+        
+        Semantic Anchors are the primary concepts LLMs associate with a brand. They represent stable, high-confidence clusters of information.
+        
+        Suggest 3-5 anchors. Each should have:
+        - label: A short (1-3 words) name for the anchor (e.g., "Technical Reliability", "Premium Pricing", "Customer Ease").
+        - color: A hex code representing the "vibe" (use: #ec4899 for positive/moat, #06b6d4 for signals, #8b5cf6 for trends, #f59e0b for risks).
+        - baseType: "Systemic Anchor", "Signal Point", "Emergent Trend", or "Risk Vector".
+        
+        Return ONLY a JSON array of anchor objects.
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: prompt,
+        config: { responseMimeType: "application/json" }
+      });
+
+      const anchors = JSON.parse(response.text || "[]");
+      res.json({ success: true, anchors });
+    } catch (err: any) {
+      console.error("Suggest anchors error:", err);
+      res.status(500).json({ error: "Failed to suggest anchors" });
+    }
+  });
+
   app.post("/api/copilot-chat", async (req, res) => {
     try {
       const { userMessage, chatHistory, systemInstruction } = req.body;
