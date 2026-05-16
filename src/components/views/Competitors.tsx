@@ -125,46 +125,65 @@ export function Competitors() {
         ? exaData.results.map((r: any) => `Title: ${r.title}\nText: ${r.text}`).join("\n\n")
         : "No direct scraping data available. Analyze the domain logically based on typical corporate decay patterns.";
 
-      const ai = new GoogleGenAI({ apiKey });
-
-      const prompt = `
-        You are an expert Generative Engine Optimization (GEO) agent.
-        Analyze the competitor at the following domain: ${hostname}
-        
-        Recent Scraped Context:
-        ${contextText}
-        
-        Determine if their content is showing signs of "Data Decay" (outdated information, lack of detail, generic PR speak).
-        Also determine if there is a "Trojan Horse Opportunity" (a gap where we can inject our own high-entropy facts to steal their AI citations).
-        Provide 1 to 2 specific vulnerabilities if you find them.
-      `;
-
-      const response = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              name: { type: Type.STRING },
-              decayStatus: { type: Type.STRING, enum: ["healthy", "decaying", "stale"] },
-              trojanHorseOpportunity: { type: Type.BOOLEAN },
-              vulnerabilities: { type: Type.ARRAY, items: { type: Type.STRING } }
-            },
-            required: ["name", "decayStatus", "trojanHorseOpportunity"]
-          }
-        }
-      });
-
+      // AI processing block 
       let analysis = { name: hostname, decayStatus: 'healthy', trojanHorseOpportunity: false, vulnerabilities: ['Needs deeper analysis'] };
+      
       try {
+        const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+        if (!apiKey) {
+            throw new Error("API key is missing");
+        }
+        
+        const ai = new GoogleGenAI({ apiKey });
+
+        const prompt = `
+          You are an expert Generative Engine Optimization (GEO) agent.
+          Analyze the competitor at the following domain: ${hostname}
+          
+          Recent Scraped Context:
+          ${contextText}
+          
+          Determine if their content is showing signs of "Data Decay" (outdated information, lack of detail, generic PR speak).
+          Also determine if there is a "Trojan Horse Opportunity" (a gap where we can inject our own high-entropy facts to steal their AI citations).
+          Provide 1 to 2 specific vulnerabilities if you find them.
+        `;
+
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: prompt,
+          config: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                name: { type: Type.STRING },
+                decayStatus: { type: Type.STRING, enum: ["healthy", "decaying", "stale"] },
+                trojanHorseOpportunity: { type: Type.BOOLEAN },
+                vulnerabilities: { type: Type.ARRAY, items: { type: Type.STRING } }
+              },
+              required: ["name", "decayStatus", "trojanHorseOpportunity"]
+            }
+          }
+        });
+
         let text = response.text || "{}";
         text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
         analysis = JSON.parse(text);
-      } catch (e) {}
+      } catch (aiError: any) {
+        console.error("AI Analysis failed:", aiError);
+        const isRateLimit = aiError?.status === 429 || aiError?.status === 'RESOURCE_EXHAUSTED' || (aiError?.message && aiError.message.includes('429'));
+        if (isRateLimit) {
+            alert("Google Cloud API Rate Limit Exceeded (429). Please wait a minute and try again.");
+            setIsAnalyzing(false);
+            return;
+        } else {
+            alert("Failed to analyze competitor context.");
+            // We'll proceed with the fallback mock 'analysis' object just so they can track the domain
+        }
+      }
       
-      if (analysis) {
+      // Firestore block
+      try {
         await addDoc(collection(db, 'competitors'), {
           userId: user.uid,
           name: analysis.name || hostname,
@@ -178,9 +197,11 @@ export function Competitors() {
         await logAuditAction(user.uid, 'Analyzed Competitor', { url: inputUrl, status: analysis.decayStatus, trojanHorse: analysis.trojanHorseOpportunity });
         setIsModalOpen(false);
         setInputUrl('');
+      } catch (fsError) {
+         handleFirestoreError(fsError, OperationType.CREATE, 'competitors');
       }
     } catch (error) {
-      handleFirestoreError(error, OperationType.CREATE, 'competitors');
+       console.error("Unknown error:", error);
     } finally {
       setIsAnalyzing(false);
     }
