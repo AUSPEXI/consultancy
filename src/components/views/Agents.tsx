@@ -194,13 +194,13 @@ export function Agents() {
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder="Enter a topic (e.g., 'Serverless Edge Computing Latency')"
-                className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
+                className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                 disabled={isOrchestrating}
               />
               <button 
                 onClick={runOrchestration}
                 disabled={isOrchestrating || !topic.trim()}
-                className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
               >
                 {isOrchestrating ? (
                   <>
@@ -221,7 +221,7 @@ export function Agents() {
             {/* Connecting Line */}
             <div className="absolute top-1/2 left-0 w-full h-0.5 bg-zinc-800 -translate-y-1/2 z-0 hidden md:block">
               <div 
-                className="h-full bg-pink-500 transition-all duration-1000 ease-in-out"
+                className="h-full bg-indigo-500 transition-all duration-1000 ease-in-out"
                 style={{ 
                   width: 
                     synthesisStatus === 'completed' ? '100%' :
@@ -234,7 +234,7 @@ export function Agents() {
             
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative z-10">
               {/* Agent 1 */}
-              <div className={`bg-zinc-950 border ${crawlerStatus === 'running' ? 'border-pink-500 shadow-[0_0_15px_-3px_rgba(99,102,241,0.3)]' : 'border-zinc-800'} rounded-xl p-5 text-center transition-all duration-300`}>
+              <div className={`bg-zinc-950 border ${crawlerStatus === 'running' ? 'border-indigo-500 shadow-[0_0_15px_-3px_rgba(99,102,241,0.3)]' : 'border-zinc-800'} rounded-xl p-5 text-center transition-all duration-300`}>
                 <div className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3 transition-colors ${crawlerStatus === 'running' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50' : 'bg-zinc-900 text-zinc-500 border border-zinc-800'}`}>
                   <Search className="w-5 h-5" />
                 </div>
@@ -244,7 +244,7 @@ export function Agents() {
               </div>
 
               {/* Agent 2 */}
-              <div className={`bg-zinc-950 border ${extractionStatus === 'running' ? 'border-pink-500 shadow-[0_0_15px_-3px_rgba(99,102,241,0.3)]' : 'border-zinc-800'} rounded-xl p-5 text-center transition-all duration-300`}>
+              <div className={`bg-zinc-950 border ${extractionStatus === 'running' ? 'border-indigo-500 shadow-[0_0_15px_-3px_rgba(99,102,241,0.3)]' : 'border-zinc-800'} rounded-xl p-5 text-center transition-all duration-300`}>
                 <div className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3 transition-colors ${extractionStatus === 'running' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50' : 'bg-zinc-900 text-zinc-500 border border-zinc-800'}`}>
                   <FileText className="w-5 h-5" />
                 </div>
@@ -254,7 +254,7 @@ export function Agents() {
               </div>
 
               {/* Agent 3 */}
-              <div className={`bg-zinc-950 border ${schemaStatus === 'running' ? 'border-pink-500 shadow-[0_0_15px_-3px_rgba(99,102,241,0.3)]' : 'border-zinc-800'} rounded-xl p-5 text-center transition-all duration-300`}>
+              <div className={`bg-zinc-950 border ${schemaStatus === 'running' ? 'border-indigo-500 shadow-[0_0_15px_-3px_rgba(99,102,241,0.3)]' : 'border-zinc-800'} rounded-xl p-5 text-center transition-all duration-300`}>
                 <div className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3 transition-colors ${schemaStatus === 'running' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50' : 'bg-zinc-900 text-zinc-500 border border-zinc-800'}`}>
                   <Code2 className="w-5 h-5" />
                 </div>
@@ -264,7 +264,7 @@ export function Agents() {
               </div>
 
               {/* Agent 4 */}
-              <div className={`bg-zinc-950 border ${synthesisStatus === 'running' ? 'border-pink-500 shadow-[0_0_15px_-3px_rgba(99,102,241,0.3)]' : 'border-zinc-800'} rounded-xl p-5 text-center transition-all duration-300`}>
+              <div className={`bg-zinc-950 border ${synthesisStatus === 'running' ? 'border-indigo-500 shadow-[0_0_15px_-3px_rgba(99,102,241,0.3)]' : 'border-zinc-800'} rounded-xl p-5 text-center transition-all duration-300`}>
                 <div className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3 transition-colors ${synthesisStatus === 'running' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50' : 'bg-zinc-900 text-zinc-500 border border-zinc-800'}`}>
                   <PenTool className="w-5 h-5" />
                 </div>
@@ -305,7 +305,7 @@ export function Agents() {
               </div>
 
               {/* Final Article */}
-              <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-6 shadow-lg border-t-4 border-t-pink-500">
+              <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-6 shadow-lg border-t-4 border-t-indigo-500">
                 <div className="flex items-center gap-2 mb-4 text-purple-400">
                   <PenTool className="w-5 h-5" />
                   <h4 className="text-base font-semibold text-white">Final Synthesized Content</h4>

@@ -61,30 +61,6 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["email", "source", "status", "createdAt"]
-    },
-    "AuditLog": {
-      "title": "Audit Log",
-      "description": "Immutable audit log for SOC 2 compliance.",
-      "type": "object",
-      "properties": {
-        "userId": { "type": "string" },
-        "action": { "type": "string" },
-        "details": { "type": "string" },
-        "timestamp": { "type": "string", "format": "date-time" }
-      },
-      "required": ["userId", "action", "timestamp"]
-    },
-    "KnowledgeGraphNode": {
-      "title": "Knowledge Graph Node",
-      "description": "Learned facts and questions from voice agent conversations.",
-      "type": "object",
-      "properties": {
-        "topic": { "type": "string" },
-        "fact": { "type": "string" },
-        "source": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["topic", "fact", "source", "createdAt"]
     }
   },
   "firestore": {
@@ -107,14 +83,6 @@
     "/leads/{leadId}": {
       "schema": { "$ref": "#/entities/Lead" },
       "description": "Captured leads."
-    },
-    "/audit_logs/{logId}": {
-      "schema": { "$ref": "#/entities/AuditLog" },
-      "description": "Immutable audit logs."
-    },
-    "/knowledge_graph/{nodeId}": {
-      "schema": { "$ref": "#/entities/KnowledgeGraphNode" },
-      "description": "Learned facts from voice agent conversations."
     }
   }
 }

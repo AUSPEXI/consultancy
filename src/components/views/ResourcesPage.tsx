@@ -72,7 +72,7 @@ export function ResourcesPage() {
                 key={index} 
                 className="bg-zinc-900/30 border border-zinc-800 rounded-2xl p-6 hover:bg-zinc-900/50 transition-colors group flex flex-col h-full"
               >
-                <div className="w-12 h-12 rounded-lg bg-pink-500/10 flex items-center justify-center mb-6 text-pink-400">
+                <div className="w-12 h-12 rounded-lg bg-indigo-500/10 flex items-center justify-center mb-6 text-indigo-400">
                   <resource.icon className="w-6 h-6" />
                 </div>
                 <div className="mb-4">
@@ -86,7 +86,7 @@ export function ResourcesPage() {
                 </p>
                 <a 
                   href={resource.link}
-                  className="inline-flex items-center text-pink-400 font-medium hover:text-pink-300 transition-colors mt-auto"
+                  className="inline-flex items-center text-indigo-400 font-medium hover:text-indigo-300 transition-colors mt-auto"
                 >
                   Access Resource <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </a>
@@ -94,7 +94,7 @@ export function ResourcesPage() {
             ))}
           </div>
 
-          <div className="mt-20 bg-gradient-to-br from-pink-900/20 to-purple-900/20 border border-pink-500/20 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
+          <div className="mt-20 bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border border-indigo-500/20 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:32px_32px]" />
             <div className="relative z-10">
               <h2 className="text-3xl font-bold font-heading mb-4 text-white">Need a custom GEO strategy?</h2>

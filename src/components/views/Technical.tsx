@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { Code, Server, RefreshCw, Loader2, ArrowRight, Copy, CheckCircle2, FileJson, Download } from 'lucide-react';
+import { Code, Server, RefreshCw, Loader2, ArrowRight, Copy, CheckCircle2, FileJson } from 'lucide-react';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
-import { logAuditAction } from '@/lib/audit';
 
 export function Technical() {
-  const { tier, user } = useAuth();
+  const { tier } = useAuth();
   const [inputText, setInputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<{ fluff: string; table: string } | null>(null);
@@ -73,9 +72,6 @@ export function Technical() {
           fluff: parsed.detectedFluff,
           table: parsed.htmlTable
         });
-        if (user) {
-          await logAuditAction(user.uid, 'Restructured Semantic HTML', { length: inputText.length });
-        }
       }
     } catch (error) {
       console.error('Error restructuring text:', error);
@@ -114,9 +110,6 @@ export function Technical() {
       });
 
       setSchemaResult(response.text);
-      if (user) {
-        await logAuditAction(user.uid, 'Generated JSON-LD Schema', { factLength: factText.length });
-      }
     } catch (error) {
       console.error('Error generating schema:', error);
       alert('Failed to generate schema. Please try again.');
@@ -183,9 +176,6 @@ export default {
   }
 };`;
     setWorkerScript(script);
-    if (user) {
-      logAuditAction(user.uid, 'Generated Edge SEO Worker', { domain });
-    }
   };
 
   const copyWorker = () => {
@@ -194,37 +184,11 @@ export default {
     setTimeout(() => setCopiedWorker(false), 2000);
   };
 
-  const downloadWorker = () => {
-    const blob = new Blob([workerScript], { type: 'text/javascript' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'worker.js';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
   const copySchema = () => {
     if (schemaResult) {
       navigator.clipboard.writeText(schemaResult);
       setCopiedSchema(true);
       setTimeout(() => setCopiedSchema(false), 2000);
-    }
-  };
-
-  const downloadSchema = () => {
-    if (schemaResult) {
-      const blob = new Blob([schemaResult], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'schema.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
     }
   };
 
@@ -276,30 +240,21 @@ export default {
               <div className="mt-6 animate-in slide-in-from-bottom-4 duration-500">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">worker.js</span>
-                  <div className="flex items-center gap-3">
-                    <button 
-                      onClick={downloadWorker}
-                      className="text-xs font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
-                    >
-                      <Download className="w-3 h-3" />
-                      Download
-                    </button>
-                    <button 
-                      onClick={copyWorker}
-                      className="text-xs font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
-                    >
-                      {copiedWorker ? <CheckCircle2 className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                      {copiedWorker ? 'Copied!' : 'Copy Script'}
-                    </button>
-                  </div>
+                  <button 
+                    onClick={copyWorker}
+                    className="text-xs font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
+                  >
+                    {copiedWorker ? <CheckCircle2 className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                    {copiedWorker ? 'Copied!' : 'Copy Script'}
+                  </button>
                 </div>
                 <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 overflow-x-auto">
                   <pre className="text-xs text-zinc-300 font-mono">
                     {workerScript}
                   </pre>
                 </div>
-                <div className="mt-4 p-3 bg-pink-500/10 border border-pink-500/20 rounded-lg">
-                  <p className="text-xs text-pink-300">
+                <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg">
+                  <p className="text-xs text-indigo-300">
                     <strong>Next Steps:</strong> Go to your Cloudflare Dashboard, create a new Worker, paste this code, and deploy. Your site will now inject GEO Schema directly at the edge!
                   </p>
                 </div>
@@ -312,7 +267,7 @@ export default {
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden relative">
           <div className="p-6 border-b border-zinc-800">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-pink-500/10 rounded-lg text-pink-400">
+              <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
                 <Code className="w-5 h-5" />
               </div>
               <h3 className="text-base font-semibold text-white">The "Table-Maker" Module</h3>
@@ -327,13 +282,13 @@ export default {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Paste a dense paragraph here (e.g., 'Our basic plan costs $49 and includes 10 audits. The pro plan is $99 for 50 audits...')"
-              className="w-full h-32 bg-zinc-950 border border-zinc-800 rounded-lg p-4 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50 resize-none text-sm"
+              className="w-full h-32 bg-zinc-950 border border-zinc-800 rounded-lg p-4 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none text-sm"
             />
             
             <button 
               onClick={handleRestructure}
               disabled={isProcessing || !inputText.trim()}
-              className="w-full bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
             >
               {isProcessing ? (
                 <>
@@ -370,7 +325,7 @@ export default {
                       navigator.clipboard.writeText(result.table);
                       alert('HTML copied to clipboard!');
                     }}
-                    className="text-xs font-medium text-pink-400 hover:text-pink-300 flex items-center gap-1"
+                    className="text-xs font-medium text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
                   >
                     Copy HTML Code <ArrowRight className="w-3 h-3" />
                   </button>
@@ -419,22 +374,13 @@ export default {
             <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 mt-6 animate-in slide-in-from-bottom-4 duration-500">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-medium text-amber-400 uppercase tracking-wider">JSON-LD Schema</span>
-                <div className="flex items-center gap-3">
-                  <button 
-                    onClick={downloadSchema}
-                    className="text-xs font-medium text-amber-400 hover:text-amber-300 flex items-center gap-1"
-                  >
-                    <Download className="w-3 h-3" />
-                    Download
-                  </button>
-                  <button 
-                    onClick={copySchema}
-                    className="text-xs font-medium text-amber-400 hover:text-amber-300 flex items-center gap-1"
-                  >
-                    {copiedSchema ? <CheckCircle2 className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                    {copiedSchema ? 'Copied!' : 'Copy Code'}
-                  </button>
-                </div>
+                <button 
+                  onClick={copySchema}
+                  className="text-xs font-medium text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                >
+                  {copiedSchema ? <CheckCircle2 className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  {copiedSchema ? 'Copied!' : 'Copy Code'}
+                </button>
               </div>
               <pre className="text-xs text-zinc-300 font-mono overflow-x-auto p-4 bg-zinc-900 rounded border border-zinc-800">
                 {schemaResult}

@@ -59,7 +59,7 @@ export const UpgradePrompt: React.FC<UpgradePromptProps> = ({ title, description
         <Button 
           onClick={handleUpgrade} 
           disabled={isCheckingOut}
-          className="bg-pink-600 hover:bg-pink-700 text-white px-8"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-8"
         >
           {isCheckingOut ? 'Redirecting...' : `Upgrade to ${requiredTier}`}
         </Button>

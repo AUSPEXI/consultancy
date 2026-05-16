@@ -51,28 +51,21 @@ service cloud.firestore {
     // Domain Validators
     // ===============================================================
     function isValidUser(data) {
-      return hasOnlyAllowedFields(['email', 'name', 'role', 'tier', 'brand', 'domain', 'competitors', 'keywords', 'onboardingCompleted']) &&
+      return hasOnlyAllowedFields(['email', 'name', 'role', 'tier']) &&
              (!('email' in data) || data.email == null || (data.email is string && isValidEmail(data.email))) &&
              (!('name' in data) || (data.name is string && data.name.size() <= 100)) &&
              (!('role' in data) || data.role in ['admin', 'user']) &&
-             (!('tier' in data) || data.tier in ['Free', 'Basic', 'Medium', 'Premium', 'PipelineOffer']) &&
-             (!('brand' in data) || (data.brand is string && data.brand.size() <= 100)) &&
-             (!('domain' in data) || (data.domain is string && data.domain.size() <= 100)) &&
-             (!('competitors' in data) || (data.competitors is list && data.competitors.size() <= 5)) &&
-             (!('keywords' in data) || (data.keywords is list && data.keywords.size() <= 10)) &&
-             (!('onboardingCompleted' in data) || data.onboardingCompleted is bool);
+             (!('tier' in data) || data.tier in ['Free', 'Basic', 'Medium', 'Premium', 'LifetimeDeal']);
     }
 
     function isValidSovMetric(data) {
-      return hasOnlyAllowedFields(['userId', 'date', 'shortDate', 'brand', 'compA', 'compB', 'compC', 'compD', 'directTraffic', 'aiCitations']) &&
+      return hasOnlyAllowedFields(['userId', 'date', 'shortDate', 'brand', 'compA', 'compB', 'directTraffic', 'aiCitations']) &&
              data.userId is string && data.userId.size() > 0 && data.userId.size() < 50 &&
              data.date is string && isValidDateString(data.date) &&
              data.shortDate is string && data.shortDate.size() > 0 && data.shortDate.size() <= 10 &&
              data.brand is number && data.brand >= 0 && data.brand <= 100 &&
              data.compA is number && data.compA >= 0 && data.compA <= 100 &&
              data.compB is number && data.compB >= 0 && data.compB <= 100 &&
-             (!('compC' in data) || (data.compC is number && data.compC >= 0 && data.compC <= 100)) &&
-             (!('compD' in data) || (data.compD is number && data.compD >= 0 && data.compD <= 100)) &&
              data.directTraffic is number && data.directTraffic >= 0 &&
              data.aiCitations is number && data.aiCitations >= 0;
     }
@@ -104,15 +97,6 @@ service cloud.firestore {
              data.source is string && data.source.size() <= 100 &&
              data.status in ['new', 'contacted'] &&
              data.createdAt is string && isValidDateString(data.createdAt);
-    }
-
-    function isValidKnowledgeGraphNode(data) {
-      return hasOnlyAllowedFields(['topic', 'fact', 'source', 'createdAt', 'userId']) &&
-             data.topic is string && data.topic.size() > 0 && data.topic.size() <= 200 &&
-             data.fact is string && data.fact.size() > 0 && data.fact.size() <= 2000 &&
-             data.source is string && data.source.size() <= 200 &&
-             data.createdAt is string && isValidDateString(data.createdAt) &&
-             (!('userId' in data) || (data.userId is string && data.userId.size() <= 50));
     }
 
     // ===============================================================
@@ -150,19 +134,6 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow create: if isValidLead(request.resource.data) && request.resource.data.status == 'new';
       allow update: if isAdmin() && isValidLead(request.resource.data);
-      allow delete: if isAdmin();
-    }
-
-    match /audit_logs/{logId} {
-      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid || isAdmin();
-      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if false; // Immutable
-    }
-
-    match /knowledge_graph/{nodeId} {
-      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin() || !('userId' in resource.data));
-      allow create: if isAuthenticated() && isValidKnowledgeGraphNode(request.resource.data);
-      allow update: if isAdmin() && isValidKnowledgeGraphNode(request.resource.data);
       allow delete: if isAdmin();
     }
   }

@@ -3,10 +3,9 @@ import { MonitorPlay, Loader2, Bot, Sparkles } from 'lucide-react';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
-import { logAuditAction } from '@/lib/audit';
 
 export function Simulator() {
-  const { tier, user } = useAuth();
+  const { tier } = useAuth();
   const [query, setQuery] = useState('');
   const [brand, setBrand] = useState('');
   const [isSimulating, setIsSimulating] = useState(false);
@@ -73,11 +72,7 @@ export function Simulator() {
         }
       });
 
-      const parsedResult = JSON.parse(response.text || "{}");
-      setResults(parsedResult);
-      if (user) {
-        await logAuditAction(user.uid, 'Ran SOV Simulation', { query, brand, sovScore: parsedResult.sovScore });
-      }
+      setResults(JSON.parse(response.text || "{}"));
     } catch (error) {
       console.error("Error simulating:", error);
       alert("Failed to run simulation. Please try again.");
@@ -107,7 +102,7 @@ export function Simulator() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold font-heading mb-2 flex items-center gap-3">
-          <MonitorPlay className="w-8 h-8 text-pink-500" />
+          <MonitorPlay className="w-8 h-8 text-indigo-500" />
           Multi-Engine SOV Simulator
         </h1>
         <p className="text-zinc-400">Test high-intent queries across engines to see if your brand is recommended.</p>
@@ -122,7 +117,7 @@ export function Simulator() {
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
               placeholder="e.g., Auspexi"
-              className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-pink-500"
+              className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500"
             />
           </div>
           <div>
@@ -132,14 +127,14 @@ export function Simulator() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="e.g., Best GEO marketing platform"
-              className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-pink-500"
+              className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500"
             />
           </div>
         </div>
         <button
           onClick={handleSimulate}
           disabled={isSimulating || !query.trim() || !brand.trim()}
-          className="w-full py-3 bg-pink-600 hover:bg-pink-700 text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSimulating ? (
             <><Loader2 className="w-5 h-5 animate-spin" /> Running Simulation...</>
@@ -156,7 +151,7 @@ export function Simulator() {
               <h3 className="text-lg font-semibold text-white">Simulated AI Share of Voice (SOV)</h3>
               <p className="text-sm text-zinc-400">Percentage of engines that cited your brand for this query.</p>
             </div>
-            <div className="text-4xl font-bold text-pink-400">
+            <div className="text-4xl font-bold text-indigo-400">
               {results.sovScore}%
             </div>
           </div>

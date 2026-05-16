@@ -33,7 +33,7 @@ export function Header({ onMenuClick }: HeaderProps) {
       </div>
       
       <div className="flex items-center gap-3 md:gap-6">
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-pink-500/10 text-pink-400 text-xs font-medium border border-pink-500/20">
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-medium border border-indigo-500/20">
           <Shield className="w-3.5 h-3.5" />
           {tier} Tier
         </div>

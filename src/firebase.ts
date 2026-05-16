@@ -12,11 +12,11 @@ const firebaseConfig = {
   firestoreDatabaseId: import.meta.env.VITE_FIRESTORE_DATABASE_ID || "(default)"
 };
 
+if (firebaseConfig.apiKey === "dummy-api-key") {
+  console.error("Missing Firebase API Key. Please ensure your .env file is configured correctly with VITE_FIREBASE_API_KEY.");
+}
+
 // Initialize Firebase SDK
-console.log("Firebase Config:", {
-  ...firebaseConfig,
-  apiKey: firebaseConfig.apiKey ? "SET" : "MISSING"
-});
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);

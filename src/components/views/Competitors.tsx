@@ -6,7 +6,6 @@ import { collection, addDoc, onSnapshot, query, where, orderBy } from 'firebase/
 import { GoogleGenAI } from '@google/genai';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
-import { logAuditAction } from '@/lib/audit';
 
 interface Competitor {
   id: string;
@@ -70,40 +69,17 @@ export function Competitors() {
       if (!apiKey) {
         throw new Error("API key is missing");
       }
-      
-      let hostname = inputUrl;
-      try {
-        hostname = new URL(inputUrl).hostname;
-      } catch (e) {
-        // Fallback to raw input
-      }
-
-      // 1. Pull real data from the competitor's URL/domain via Exa
-      const exaRes = await fetch('/api/exa-search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: `site:${hostname}`, numResults: 3 })
-      });
-      const exaData = await exaRes.json();
-      
-      const contextText = exaData.success && exaData.results.length > 0
-        ? exaData.results.map((r: any) => `Title: ${r.title}\nText: ${r.text}`).join("\n\n")
-        : "No direct scraping data available. Analyze the domain logically based on typical corporate decay patterns.";
-
       const ai = new GoogleGenAI({ apiKey });
 
       const prompt = `
         You are an expert Generative Engine Optimization (GEO) agent.
-        Analyze the competitor at the following domain: ${hostname}
+        Analyze the competitor at the following URL: ${inputUrl}
         
-        Recent Scraped Context:
-        ${contextText}
-        
-        Determine if their content is showing signs of "Data Decay" (outdated information, lack of detail, generic PR speak).
+        Determine if their content is showing signs of "Data Decay" (outdated information, broken links, lack of recent updates).
         Also determine if there is a "Trojan Horse Opportunity" (a gap where we can inject our own high-entropy facts to steal their AI citations).
         
         Return ONLY a JSON object with:
-        - 'name' (string): The name of the competitor.
+        - 'name' (string): The name of the competitor or website.
         - 'decayStatus' (string): Must be one of: "healthy", "decaying", or "stale".
         - 'trojanHorseOpportunity' (boolean): True if there is a gap we can exploit.
       `;
@@ -119,6 +95,13 @@ export function Competitors() {
       const analysis = JSON.parse(response.text || "{}");
       
       if (analysis) {
+        let hostname = inputUrl;
+        try {
+          hostname = new URL(inputUrl).hostname;
+        } catch (e) {
+          // Fallback to raw input if not a valid URL object
+        }
+
         await addDoc(collection(db, 'competitors'), {
           userId: user.uid,
           name: analysis.name || hostname,
@@ -126,7 +109,6 @@ export function Competitors() {
           trojanHorseOpportunity: analysis.trojanHorseOpportunity || false,
           lastUpdated: new Date().toISOString().split('T')[0],
         });
-        await logAuditAction(user.uid, 'Analyzed Competitor', { url: inputUrl, status: analysis.decayStatus, trojanHorse: analysis.trojanHorseOpportunity });
         setIsModalOpen(false);
         setInputUrl('');
       }
@@ -148,7 +130,7 @@ export function Competitors() {
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
         >
           <Radar className="w-4 h-4" />
           Analyze Competitor
@@ -206,7 +188,7 @@ export function Competitors() {
         {/* Competitor SOV List */}
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 h-fit">
           <h3 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
-            <Radar className="w-4 h-4 text-pink-400" />
+            <Radar className="w-4 h-4 text-indigo-400" />
             Monitored Entities
           </h3>
           <div className="space-y-4">
@@ -254,7 +236,7 @@ export function Competitors() {
                 value={inputUrl}
                 onChange={(e) => setInputUrl(e.target.value)}
                 placeholder="https://competitor.com/blog-post"
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
               />
             </div>
             <div className="p-4 border-t border-zinc-800 bg-zinc-900/50 flex justify-end gap-3">
@@ -267,7 +249,7 @@ export function Competitors() {
               <button 
                 onClick={handleAnalyzeCompetitor}
                 disabled={isAnalyzing || !inputUrl.trim()}
-                className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
+                className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
               >
                 {isAnalyzing ? (
                   <>

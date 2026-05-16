@@ -7,7 +7,6 @@ import { GoogleGenAI } from '@google/genai';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { AmplifyModal } from '@/components/ui/AmplifyModal';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
-import { logAuditAction } from '@/lib/audit';
 
 interface Fact {
   id: string;
@@ -127,7 +126,6 @@ export function FactVault() {
             createdAt: new Date().toISOString().split('T')[0],
           });
         }
-        await logAuditAction(user.uid, 'Extracted Facts', { count: extractedFacts.length, source: 'Text Input' });
         setIsModalOpen(false);
         setInputText('');
       }
@@ -155,7 +153,7 @@ export function FactVault() {
       const ai = new GoogleGenAI({ apiKey });
 
       const prompt = `
-        You are an expert Generative Engine Optimization (GEO) agent and Fact-Grabber research assistant.
+        You are an expert Generative Engine Optimization (GEO) agent and NotebookLM-style research assistant.
         The user's industry/domain is: "${industry}".
         Generate 3 "High-Entropy Facts" (unique, non-obvious, highly specific data points or statistics that AI models would want to cite) related to this industry.
         For each fact, assign an "Entropy Score" from 0 to 100 (higher means more unique).
@@ -184,7 +182,6 @@ export function FactVault() {
             createdAt: new Date().toISOString().split('T')[0],
           });
         }
-        await logAuditAction(user.uid, 'Researched Facts', { count: extractedFacts.length, industry });
         setIsResearchModalOpen(false);
         setIndustry('');
       }
@@ -214,7 +211,7 @@ export function FactVault() {
                 setIsResearchModalOpen(true);
               }
             }}
-            className={`${isAtLimit ? 'bg-zinc-700 cursor-not-allowed' : 'bg-pink-600/20 text-pink-400 hover:bg-pink-600/30'} px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2`}
+            className={`${isAtLimit ? 'bg-zinc-700 cursor-not-allowed' : 'bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600/30'} px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2`}
           >
             <Sparkles className="w-4 h-4" />
             Auto-Research
@@ -227,7 +224,7 @@ export function FactVault() {
                 setIsModalOpen(true);
               }
             }}
-            className={`${isAtLimit ? 'bg-zinc-700 cursor-not-allowed' : 'bg-pink-600 hover:bg-pink-700 text-white'} px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2`}
+            className={`${isAtLimit ? 'bg-zinc-700 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white'} px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2`}
           >
             <Database className="w-4 h-4" />
             Add New Fact
@@ -259,17 +256,17 @@ export function FactVault() {
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center justify-center max-w-md mx-auto">
-                      <div className="w-16 h-16 bg-pink-500/10 rounded-full flex items-center justify-center mb-4">
-                        <Database className="w-8 h-8 text-pink-400" />
+                      <div className="w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center mb-4">
+                        <Database className="w-8 h-8 text-indigo-400" />
                       </div>
                       <h3 className="text-lg font-medium text-white mb-2">Your Fact-Vault is Empty</h3>
                       <p className="text-zinc-400 text-sm mb-6">
-                        Store unique, high-entropy data points here to feed AI models. Not sure where to start? Let our Fact-Grabber research assistant generate some facts for your industry.
+                        Store unique, high-entropy data points here to feed AI models. Not sure where to start? Let our NotebookLM-style research assistant generate some facts for your industry.
                       </p>
                       <div className="flex gap-3 w-full">
                         <button
                           onClick={() => setIsResearchModalOpen(true)}
-                          className="flex-1 bg-pink-600 hover:bg-pink-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                          className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
                         >
                           <Sparkles className="w-4 h-4" />
                           Research My Industry
@@ -325,7 +322,7 @@ export function FactVault() {
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => setAmplifyingFact(fact.statement)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 hover:text-pink-300 transition-colors text-xs font-medium border border-pink-500/20"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 transition-colors text-xs font-medium border border-indigo-500/20"
                       >
                         <Megaphone className="w-3.5 h-3.5" /> Amplify
                       </button>
@@ -359,7 +356,7 @@ export function FactVault() {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Paste your content here..."
-                className="w-full h-48 bg-zinc-950 border border-zinc-800 rounded-lg p-4 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50 resize-none"
+                className="w-full h-48 bg-zinc-950 border border-zinc-800 rounded-lg p-4 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none"
               />
             </div>
             <div className="p-4 border-t border-zinc-800 bg-zinc-900/50 flex justify-end gap-3">
@@ -372,7 +369,7 @@ export function FactVault() {
               <button 
                 onClick={handleExtractFacts}
                 disabled={isExtracting || !inputText.trim()}
-                className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
+                className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
               >
                 {isExtracting ? (
                   <>
@@ -397,8 +394,8 @@ export function FactVault() {
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl w-full max-w-md overflow-hidden shadow-2xl">
             <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-pink-400" />
-                Fact-Grabber Research
+                <Sparkles className="w-5 h-5 text-indigo-400" />
+                NotebookLM Research
               </h2>
               <button 
                 onClick={() => setIsResearchModalOpen(false)}
@@ -416,7 +413,7 @@ export function FactVault() {
                 value={industry}
                 onChange={(e) => setIndustry(e.target.value)}
                 placeholder="e.g. B2B SaaS, Cybersecurity, Vegan Skincare..."
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && industry.trim() && !isResearching) {
                     handleResearch();
@@ -434,7 +431,7 @@ export function FactVault() {
               <button 
                 onClick={handleResearch}
                 disabled={isResearching || !industry.trim()}
-                className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
+                className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
               >
                 {isResearching ? (
                   <>
