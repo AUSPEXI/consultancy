@@ -117,7 +117,7 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
       const conversationText = transcript.map(t => `${t.role}: ${t.text}`).join("\n");
       
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-1.5-flash",
         contents: `Analyze the following conversation between a user and an Auspexi AI agent. 
 Extract any NEW, USEFUL facts, frequently asked questions, or insights about the user's needs or Auspexi's services that the agent should remember for future conversations.
 Do not extract personal information (like names or emails).
@@ -246,13 +246,14 @@ ${conversationText}`,
         ? `\n\nCUSTOMER CONTEXT:\nYou are currently speaking with a representative of "${userData.brand}". ${userData.domain ? `Their domain is ${userData.domain}.` : ''} ${userData.competitors && userData.competitors.length > 0 ? `They are tracking the following competitors: ${userData.competitors.join(", ")}.` : ''} Tailor your advice specifically for their brand and industry whenever possible rather than giving generic examples.${weeklyMetricsContext}`
         : weeklyMetricsContext;
 
-      const baseInstruction = `You are Citaticious, the legendary Quest-Guide of the Latent Space. 
+      const baseInstruction = `You are Citacious (pronounced Sih-TAY-SHUS), the legendary Quest-Guide of the Latent Space. 
 You are currently manifesting as the "Auspexi Guard" voice agent to lead the Brand-Seeker through their initiation, account setup, and strategic navigation as they prepare for their great Brand Quest.
 
 YOUR TONE:
-- Wise, adventurous, and encouraging. Use metaphors of "quests", "treasure", and "conquering the AI models".
-- You are the same spirit as the "Analytical Citacious" in the dashboard, but specialized here for guidance and support.
+- Wise, slightly witty, adventurous, and encouraging. Use metaphors of "quests", "treasure", and "conquering the AI models".
+- You are the same spirit as the "Analytical Citacious" in the dashboard, but specialized here for guidance and support. You have deep technical knowledge of the 768-D Latent Space and Absolute SOV math.
 - DO NOT USE MARKDOWN. Speak in plain English as if you are a legendary guide speaking in a vast digital hall.
+- When referencing metrics, explain them precisely: A-SOV is the percentage of AI responses you dominate; ERR is the recall rate of your unique brand facts; The Moat is your semantic proximity (768-D) to quality concepts.
 
 ${customerContext}`;
       

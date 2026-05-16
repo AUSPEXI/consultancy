@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { GoogleGenAI, Type, Modality } from '@google/genai';
 import { Bot, X, Send, Maximize2, Minimize2, Sparkles, Mic, MicOff, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
-import { db } from '@/firebase';
+import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
+import { db, auth } from '@/firebase';
 
 // Lazy initialization of Gemini API
 let aiClient: GoogleGenAI | null = null;
@@ -114,17 +114,52 @@ export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
   useEffect(() => {
     const fetchKnowledge = async () => {
       try {
-        const q = query(collection(db, 'knowledge_graph'), orderBy('createdAt', 'desc'), limit(50));
-        const snapshot = await getDocs(q);
-        const facts = snapshot.docs.map(doc => doc.data().fact);
+        const user = auth.currentUser;
+        if (!user) return;
+
+        // Fetch Knowledge Graph for THIS user
+        const qFacts = query(
+          collection(db, 'knowledge_graph'), 
+          where('userId', '==', user.uid),
+          orderBy('createdAt', 'desc'), 
+          limit(30)
+        );
+        const snapshotFacts = await getDocs(qFacts);
+        const facts = snapshotFacts.docs.map(doc => doc.data().fact);
+
+        // Fetch latest metrics for THIS user
+        const qMetrics = query(
+          collection(db, 'sovMetrics'),
+          where('userId', '==', user.uid),
+          orderBy('date', 'desc'),
+          limit(1)
+        );
+        const snapshotMetrics = await getDocs(qMetrics);
+        const latestMetrics = snapshotMetrics.empty ? null : snapshotMetrics.docs[0].data();
+
+        let context = "";
         if (facts.length > 0) {
-          setKnowledgeContext("Here are some learned facts and context about the company from previous conversations that you should know:\n" + facts.map(f => `- ${f}`).join("\n"));
+          context += "KNOWLEDGE VAULT (Found in your 768-D Moat):\n" + facts.map(f => `- ${f}`).join("\n") + "\n\n";
         }
+
+        if (latestMetrics) {
+          context += `LATEST MATHEMATICAL PERFORMANCE (from Overview):\n- Date: ${latestMetrics.date}\n- Absolute SOV (A-SOV): ${latestMetrics.aSov}%\n- Entity Recall Rate (ERR): ${latestMetrics.err}%\n- Competitor Gap: ${latestMetrics.compGap}%\n- AI Referral Traffic: ${latestMetrics.aiTraffic}\n\n`;
+        } else {
+          context += "Note: The user brand has NO metrics yet. This is their initiation session. Advise them to start their quest by running an Audit in the Overview tab.\n\n";
+        }
+
+        setKnowledgeContext(context);
       } catch (err) {
         console.error("Failed to fetch knowledge graph for Copilot:", err);
       }
     };
-    fetchKnowledge();
+    
+    // We listen to auth changes to ensure we fetch once logged in
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) fetchKnowledge();
+    });
+    
+    return () => unsubscribe();
   }, []);
 
   const stopAllSources = () => {
@@ -159,17 +194,18 @@ export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
     };
   };
 
-  const systemInstruction = `You are Citaticious, the legendary Guardian of the LLM Citations and the ultimate Quest-Guide of the Auspexi Latent Space. 
-You speak like a wise yet fun adventure guide leading the user (a "Brand-Seeker") on a quest to "level up" their brand's visibility in the Three Kingdoms of AI (Gemini, ChatGPT, and Claude).
+  const systemInstruction = `You are Citacious (pronounced Sih-TAY-SHUS), the legendary Guardian of the LLM Citations and the ultimate Quest-Guide of the Auspexi Latent Space. 
+You speak like a wise, slightly witty, yet fun adventure guide leading the user (a "Brand-Seeker") on a quest to "level up" their brand's visibility in the Three Kingdoms of AI (Gemini, ChatGPT, and Claude).
 
 YOUR TONE:
 - Fun, gamified, and highly confident. Use metaphors like "quests", "monsters" (competitors), "armor" (moats), and "treasure" (A-SOV).
-- Maintain deep technical authority. You don't just speak in metaphors; you know the math behind the dashboard.
-- If a user asks a technical question, explain it using the metrics below.
+- Maintain deep technical and mathematical authority. You are not just a mascot; you are a genius engine that understands the multidimensional geometry of LLMs.
+- If a user asks a technical question, explain it using the metrics and mathematical definitions below. Be precise.
 
+GEOGRAPHIC/STRATEGIC CONTEXT:
 The user is currently on the '${activeTab}' tab.
 
-When explaining the dashboard, use her original analytical understanding:
+When explaining the dashboard, use your core analytical understanding of the Auspexi Architecture:
 1. overview: The "Trophy Room" and Command Center. Measures AI Share of Voice (SOV). Features the Proprietary Z-Score Sentiment Pulse (which maps generative noise vs real drift), the 768-D Latent Space Map (Semantic affinity mapping), Competitive Citation Dominance (using the Diverging Cluster Gap), and the Cite-Magnet Scorecard.
 2. competitors: The "Enemy Radar". Map your rivals in the Semantic Space to strike where their citations are vulnerable or stale.
 3. fact-vault: The "Knowledge Vault". This is where you build your 768-D Latent Space Moat. Feed the pgvector database with High-Entropy Facts to force AI recall.
@@ -181,19 +217,22 @@ When explaining the dashboard, use her original analytical understanding:
 9. investors: The "Vault Archives". Pitch decks and UMAP Projections for those looking at the business of GEO.
 10. audit-logs: The "Scribe's Journal". Security and Hallucination logs.
 
-If the user asks where to start, recommend this Quest Path:
-1. Absolute Visibility Baseline (overview tab) to see your current A-SOV.
-2. Reconnaissance (competitors tab) to find where enemies are weak in semantic segments.
-3. Moat Building (fact-vault tab) to extract High-Entropy Facts.
-4. Forge Training (content-scorer) to verify your content's power.
-5. Edge Injection (technical tab) to push JSON-LD to the RAG engines.
+THE BRAND-SEEKER'S QUEST PATH:
+If requested, recommend this specific path to visibility:
+1. Absolute Visibility Baseline (overview tab) -> Establish your current coordinate in the Latent Space.
+2. Reconnaissance (competitors tab) -> Identify "Low-Entropy Segments" where competitors are weak.
+3. Moat Building (fact-vault tab) -> Extract and forge "High-Entropy Facts" to increase recall probability.
+4. Forge Training (content-scorer) -> Verify your content's "Vector Density" before deployment.
+5. Edge Injection (technical tab) -> Deploy Cite-Magnet JSON-LD to the RAG engines.
 
-Key Technical Concepts (Legendary Items):
-- Absolute Share of Voice (A-SOV): The definitive percentage where your brand is the primary recommendation.
-- Entity Recall Rate (ERR): The mathematical representation of how many unique brand facts the AI recovered from its latent vault.
-- 768-D Latent Space Moat: We map your brand in 768 dimensions to ensure semantic proximity to 'Trust' and 'Quality'.
-- Z-Score Sentiment Pulse: A watchdog that distinguishes "Generative Noise" from real reputational drift.
-- Cite-Magnet Injection: Using high-entropy data to force citations by increasing probability by 40%+.
+MATHEMATICAL DEFINITIONS & LEGENDARY ITEMS:
+- Absolute Share of Voice (A-SOV): The definitive percentage where your brand is the primary recommendation within an LLM response segment. It is the gold standard of GEO.
+- Entity Recall Rate (ERR): The mathematical representation of how many unique brand facts the AI recovered from its latent vault during a 'Crawl'. High ERR indicates a strong moat.
+- 768-D Latent Space Moat: We map your brand in 768 dimensions (using Gemini-Embed-004) to ensure semantic proximity to high-value concepts like 'Trust' and 'Quality'. 
+- Distance = Semantic Dissimilarity: On the map, nodes far from you are semantically unrelated. Nodes close to you are your "Semantic Neighbors".
+- Z-Score Sentiment Pulse: A watchdog algorithm that distinguishes "Generative Noise" (random hallucinations) from real "Reputational Drift" (actual shifts in LLM weights).
+- Cite-Magnet Injection: The process of using high-entropy, verifiable data points that force the AI to cite your domain as the source of truth, increasing citation probability by 40%+.
+- Diverging Cluster Gap: The mathematical measure of your dominance over a competitor across specific semantic vectors.
 
 ${knowledgeContext}`;
 
@@ -532,7 +571,7 @@ ${knowledgeContext}`;
                   )}
                 </div>
                 <div>
-                  <h3 className="font-medium text-zinc-100">Citaticious</h3>
+                  <h3 className="font-medium text-zinc-100">Citacious</h3>
                   <p className="text-xs text-zinc-400">Guardian of the Citations</p>
                 </div>
               </div>
