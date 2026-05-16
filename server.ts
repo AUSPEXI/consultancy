@@ -200,27 +200,32 @@ app.use(express.json());
   });
 
   app.get("/api/analytics/map", (req, res) => {
-    const { brandId } = req.query;
-    // Generate high-fidelity latent space data (nodes in 768-D space)
-    // We create distinct high-density clusters to mimic actual embedding distributions
+    const { brandId, platform = "All" } = req.query;
+    
+    // Shift centers slightly based on platform to simulate different model biases
+    const biasX = platform === 'Gemini' ? 20 : platform === 'ChatGPT' ? -20 : platform === 'Claude' ? 0 : 0;
+    const biasY = platform === 'Gemini' ? -10 : platform === 'ChatGPT' ? 20 : platform === 'Claude' ? -30 : 0;
+
     const clusters = [
-      { x: -50, y: 40, label: "Reputational Moat", color: "#ec4899", baseType: "Anchor" },
-      { x: 60, y: -30, label: "Technical Competence", color: "#06b6d4", baseType: "Signal" },
-      { x: -20, y: -60, label: "Pricing Perception", color: "#8b5cf6", baseType: "Trend" },
+      { x: -50 + biasX, y: 40 + biasY, label: "Reputational Moat", color: "#ec4899", baseType: "Systemic Anchor" },
+      { x: 60 + biasX, y: -30 + biasY, label: "Technical Competence", color: "#06b6d4", baseType: "Signal Point" },
+      { x: -20 + biasX, y: -60 + biasY, label: "Pricing Perception", color: "#8b5cf6", baseType: "Emergent Trend" },
     ];
 
     const points = Array.from({ length: 60 }, (_, i) => {
       const cluster = clusters[i % clusters.length];
       const theta = Math.random() * 2 * Math.PI;
-      const r = Math.sqrt(Math.random()) * 50; // Proper distribution inside cluster
+      const r = Math.sqrt(Math.random()) * 50; 
       
       return {
         id: i,
         x: cluster.x + r * Math.cos(theta),
         y: cluster.y + r * Math.sin(theta),
+        z: Math.random() * 40 - 20,
         size: Math.floor(Math.random() * 6) + 3,
         type: cluster.label,
         groupType: cluster.baseType,
+        source: platform === "All" ? ["Gemini", "ChatGPT", "Claude"][i % 3] : platform,
         label: [
           "Security Compliance", "API Latency", "Founder History", 
           "Tokenomics", "Market Share", "Github Activity",
@@ -231,7 +236,7 @@ app.use(express.json());
         sentiment: Math.random() > 0.4 ? 'positive' : 'negative',
       };
     });
-    res.json({ success: true, points });
+    res.json({ success: true, points, metadata: { engine: "Gemini-Embed-004", dimensions: 768, platform } });
   });
 
   app.get("/api/analytics/sentiment-trace", (req, res) => {
