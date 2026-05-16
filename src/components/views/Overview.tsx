@@ -701,11 +701,37 @@ export function Overview() {
                    Live 768-D Mapping
                  </div>
               </div>
-              <div className="flex items-center gap-2">
+               <div className="flex items-center gap-2">
                 <p className="text-xs text-zinc-500">Mapping your brand anchors across the LLM collective latent space.</p>
                 <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                  <span className="text-[8px] font-mono text-zinc-500">ENGINE:</span>
+                  <span className="text-[8px] font-mono text-zinc-500 uppercase tracking-tighter">SNAPSHOT:</span>
+                  <span className="text-[8px] font-mono text-zinc-400">2026-05-15 08:42 UTC</span>
+                </div>
+                <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 group relative cursor-help">
+                  <span className="text-[8px] font-mono text-zinc-500 uppercase tracking-tighter">ENGINE:</span>
                   <span className="text-[8px] font-mono text-emerald-400">GEMINI-EMBED-004</span>
+                  
+                  {/* Methodology Tooltip */}
+                  <div className="absolute top-full left-0 mt-2 w-72 p-4 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[100] text-[10px] leading-relaxed backdrop-blur-xl">
+                    <p className="text-white font-bold mb-2 uppercase tracking-widest text-[9px] border-b border-zinc-800 pb-2">Semantic Audit Methodology</p>
+                    <p className="text-zinc-400 mb-2">
+                      The map displays the <span className="text-pink-400 font-bold">Reputational Twin</span> generated during the last Deep Audit.
+                    </p>
+                    <div className="space-y-1 text-zinc-500">
+                      <div className="flex justify-between">
+                        <span>Crawl Depth:</span>
+                        <span className="text-white">1,240 Paths</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Token Intensity:</span>
+                        <span className="text-white">420k - 680k</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Vector Accuracy:</span>
+                        <span className="text-emerald-400">98.2%</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -424,12 +424,18 @@ ${knowledgeContext}`;
     
     // If voice is active, send via Live API
     if (isVoiceActive && sessionRef.current) {
-      sessionRef.current.sendRealtimeInput({
-        clientContent: {
-          turns: [{ role: 'user', parts: [{ text: userMessage }] }],
-          turnComplete: true
-        }
-      });
+      try {
+        sessionRef.current.sendRealtimeInput({
+          clientContent: {
+            turns: [{ role: 'user', parts: [{ text: userMessage }] }],
+            turnComplete: true
+          }
+        });
+      } catch (err) {
+        console.error("Live API Send Error:", err);
+        setMessages(prev => [...prev, { role: 'model', content: "CRITICAL SYSTEM FAULT: The Live Voice link to the Nerve Center was severed. Please restart session." }]);
+        setIsVoiceActive(false);
+      }
       return;
     }
 
@@ -470,9 +476,13 @@ ${knowledgeContext}`;
 
       setMessages(prev => [...prev, { role: 'model', content: responseText }]);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Copilot Error:", error);
-      setMessages(prev => [...prev, { role: 'model', content: "I encountered a synchronization error with the Fact-Vault. My connection to the Nerve Center was interrupted. Please try re-sending your message or check your internet connection." }]);
+      const errorMessage = error.message && error.message.includes("CRITICAL") 
+        ? error.message 
+        : "I encountered a synchronization error with the Fact-Vault. My connection to the Nerve Center was interrupted. Please try re-sending your message or check your internet connection.";
+      
+      setMessages(prev => [...prev, { role: 'model', content: errorMessage }]);
     } finally {
       setIsLoading(false);
     }
