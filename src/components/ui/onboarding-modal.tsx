@@ -57,24 +57,6 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
         onboardingCompleted: true
       }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `users/${user.uid}`));
 
-      // 1.5 Add competitors to the competitors collection
-      for (const compName of competitors) {
-        if (compName) {
-          try {
-            await addDoc(collection(db, 'competitors'), {
-              userId: user.uid,
-              name: compName,
-              url: 'Auto-added during onboarding',
-              decayScore: Math.floor(Math.random() * 50) + 10, // Placeholder
-              lastUpdated: new Date().toISOString().split('T')[0],
-              vulnerabilities: ['Needs deeper analysis. Run a scan.']
-            });
-          } catch (compErr) {
-            console.error("Failed to add initial competitor:", compErr);
-          }
-        }
-      }
-
       // 2. Trigger the first real audit and WAIT for it
       try {
         const res = await fetch('/api/run-daily-audit', {
