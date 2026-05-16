@@ -210,8 +210,35 @@ app.use(express.json());
     res.json({ status: "ok", message: "Auspexi Backend is running" });
   });
 
-  app.get("/api/analytics/map", (req, res) => {
-    const { brandId, platform = "All", timeframe = "current" } = req.query;
+  app.get("/api/analytics/map", async (req, res) => {
+    const { userId, platform = "All", timeframe = "current" } = req.query as any;
+    
+    // Default clusters if no custom ones exist
+    let clusters = [
+      { x: -50, y: 40, label: "Reputational Moat", color: "#ec4899", baseType: "Systemic Anchor" },
+      { x: 60, y: -30, label: "Technical Competence", color: "#06b6d4", baseType: "Signal Point" },
+      { x: -20, y: -60, label: "Pricing Perception", color: "#8b5cf6", baseType: "Emergent Trend" },
+    ];
+
+    // Fetch custom clusters from Firestore if userId provided
+    if (userId && dbAdmin) {
+      try {
+        const userDoc = await dbAdmin.collection('users').doc(userId).get();
+        if (userDoc.exists) {
+          const data = userDoc.data();
+          if (data?.latentAnchors && Array.isArray(data.latentAnchors) && data.latentAnchors.length > 0) {
+            // Assign fixed coordinates to anchors for deterministic clusters
+            clusters = data.latentAnchors.map((a: any, idx: number) => ({
+              ...a,
+              x: idx === 0 ? -60 : idx === 1 ? 70 : idx === 2 ? -10 : idx === 3 ? 40 : -30,
+              y: idx === 0 ? 50 : idx === 1 ? -40 : idx === 2 ? -70 : idx === 3 ? 20 : 10
+            }));
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching custom anchors:", err);
+      }
+    }
     
     // Shift centers slightly based on platform to simulate different model biases
     const biasX = platform === 'Gemini' ? 20 : platform === 'ChatGPT' ? -20 : platform === 'Claude' ? 0 : 0;
@@ -221,18 +248,17 @@ app.use(express.json());
     const driftFactor = timeframe === 'month' ? 1.5 : timeframe === 'week' ? 0.7 : 0;
     const timeSeed = timeframe === 'month' ? 30 : timeframe === 'week' ? 7 : 1;
 
-    const clusters = [
-      { x: -50 + biasX + (driftFactor * 5), y: 40 + biasY - (driftFactor * 3), label: "Reputational Moat", color: "#ec4899", baseType: "Systemic Anchor" },
-      { x: 60 + biasX - (driftFactor * 2), y: -30 + biasY + (driftFactor * 5), label: "Technical Competence", color: "#06b6d4", baseType: "Signal Point" },
-      { x: -20 + biasX, y: -60 + biasY + (driftFactor * 10), label: "Pricing Perception", color: "#8b5cf6", baseType: "Emergent Trend" },
-    ];
+    const clustersWithBias = clusters.map((c, i) => ({
+      ...c,
+      x: c.x + biasX + (driftFactor * (i + 1) * 2),
+      y: c.y + biasY - (driftFactor * (i + 1) * 1.5)
+    }));
 
     const points = Array.from({ length: 120 }, (_, i) => {
-      const cluster = clusters[i % clusters.length];
+      const cluster = clustersWithBias[i % clustersWithBias.length];
       const theta = Math.random() * 2 * Math.PI;
       const r = Math.sqrt(Math.random()) * 50; 
       
-      // Random deterministic drift based on index and timeframe
       const individualDrift = Math.sin(i + timeSeed) * driftFactor * 2;
       
       return {
