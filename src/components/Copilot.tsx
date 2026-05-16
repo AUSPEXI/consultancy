@@ -149,9 +149,17 @@ export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
         const snapshotMetrics = await getDocs(qMetrics);
         const latestMetrics = snapshotMetrics.empty ? null : snapshotMetrics.docs[0].data();
 
+        // Fetch user data for anchors
+        const userDoc = await getDocs(query(collection(db, 'users'), where('uid', '==', user.uid), limit(1)));
+        const latentAnchors = !userDoc.empty ? userDoc.docs[0].data()?.latentAnchors : null;
+
         let context = "";
         if (facts.length > 0) {
           context += "KNOWLEDGE VAULT (Found in your 768-D Moat):\n" + facts.map(f => `- ${f}`).join("\n") + "\n\n";
+        }
+
+        if (latentAnchors && Array.isArray(latentAnchors) && latentAnchors.length > 0) {
+          context += "STRATEGIC SEMANTIC ANCHORS (Monitoring Vectors):\n" + latentAnchors.map((a: any) => `- ${a.label} (${a.baseType}) [Color: ${a.color}]`).join("\n") + "\n\n";
         }
 
         if (latestMetrics) {

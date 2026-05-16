@@ -126,6 +126,35 @@ export function Overview() {
     }
   }, [userData]);
 
+  const [isSuggestingAnchors, setIsSuggestingAnchors] = useState(false);
+
+  const handleSuggestAnchors = async () => {
+    if (!user || !userData?.brandName || !userData?.domain) {
+      alert("Please ensure your Brand Name and Domain are set in Settings to use Auto-Suggest.");
+      return;
+    }
+
+    setIsSuggestingAnchors(true);
+    try {
+      const resp = await fetch('/api/suggest-anchors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brand: userData.brandName,
+          domain: userData.domain
+        })
+      });
+      const data = await resp.json();
+      if (data.success && data.anchors) {
+        setEditAnchorsState(data.anchors);
+      }
+    } catch (e) {
+      console.error("Failed to suggest anchors", e);
+    } finally {
+      setIsSuggestingAnchors(false);
+    }
+  };
+
   const handleSaveAnchors = async () => {
     if (!user) return;
     setIsSavingAnchors(true);
@@ -351,11 +380,10 @@ export function Overview() {
       }
     } catch (e) {
       // Demo mode fallback
-      setTimeout(() => {
-        setGeneratedShadowLink(`${shadowUrl}${shadowUrl.includes('?') ? '&' : '?'}utm_source=chatgpt&utm_medium=ai_citation&utm_campaign=auspexi_shadow`);
-        setIsGeneratingLink(false);
-      }, 500);
-    } 
+      setGeneratedShadowLink(`${shadowUrl}${shadowUrl.includes('?') ? '&' : '?'}utm_source=llm_ingest&utm_medium=ai_chat&utm_campaign=fact_vault_magnet`);
+    } finally {
+      setIsGeneratingLink(false);
+    }
   };
 
   const displayData = metrics.length > 0 ? metrics : [
@@ -535,6 +563,13 @@ export function Overview() {
       metrics: historyLine
     };
   }).sort((a: any, b: any) => b.citations - a.citations).slice(0, 4);
+
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(generatedShadowLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -866,9 +901,19 @@ export function Overview() {
                        <h4 className="text-lg font-bold text-white tracking-tight">Configure Semantic Anchors</h4>
                        <p className="text-xs text-zinc-500 mt-1">Define the high-confidence monoliths that ground your brand in the latent space.</p>
                     </div>
-                    <button onClick={() => setIsEditingAnchors(false)} className="p-2 hover:bg-zinc-900 rounded-full text-zinc-400">
-                       <X className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center gap-3">
+                       <button
+                          onClick={handleSuggestAnchors}
+                          disabled={isSuggestingAnchors}
+                          className="flex items-center gap-2 px-3 py-1.5 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 rounded-lg text-[10px] font-bold text-pink-400 transition-colors"
+                       >
+                          {isSuggestingAnchors ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                          Auto-Suggest
+                       </button>
+                       <button onClick={() => setIsEditingAnchors(false)} className="p-2 hover:bg-zinc-900 rounded-full text-zinc-400">
+                          <X className="w-5 h-5" />
+                       </button>
+                    </div>
                  </div>
 
                  <div className="space-y-4 flex-1 overflow-y-auto pr-4 custom-scrollbar">
@@ -1300,14 +1345,40 @@ export function Overview() {
             </button>
           </div>
           {generatedShadowLink && (
-            <div className="mt-4 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex items-center justify-between animate-in fade-in duration-300">
-              <code className="text-emerald-400 text-sm break-all">{generatedShadowLink}</code>
-              <button 
-                onClick={() => { navigator.clipboard.writeText(generatedShadowLink); alert('Copied to clipboard!'); }}
-                className="ml-4 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-md text-xs font-medium transition-colors whitespace-nowrap"
-              >
-                Copy URL
-              </button>
+            <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-500">
+              <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex items-center justify-between">
+                <code className="text-emerald-400 text-sm break-all">{generatedShadowLink}</code>
+                <button 
+                  onClick={handleCopy}
+                  className="ml-4 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-md text-xs font-medium transition-colors whitespace-nowrap"
+                >
+                  {copied ? 'Copied!' : 'Copy URL'}
+                </button>
+              </div>
+              
+              <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4">
+                <p className="text-xs font-bold text-zinc-300 mb-2 uppercase tracking-widest flex items-center gap-2">
+                  <HelpCircle className="w-3 h-3 text-pink-400" />
+                  Where to place this link?
+                </p>
+                <p className="text-xs text-zinc-500 mb-4 leading-relaxed">
+                  To prove AI ROI, swap your standard links with this shadow link inside your <span className="text-zinc-300 font-semibold">JSON-LD Schema</span>. 
+                  When an LLM (like ChatGPT or Gemini) crawls your site and summarizes your content, it will often include these structured URLs in its citations. 
+                  Unlike browser traffic, these clicks carry your specific UTM parameters directly into Google Analytics.
+                </p>
+                
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded opacity-0 group-hover:opacity-100 transition-opacity blur" />
+                  <pre className="relative bg-black p-3 rounded border border-zinc-800 text-[10px] font-mono text-emerald-500/90 overflow-x-auto">
+{`{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Your Product Name",
+  "url": "${generatedShadowLink}"
+}`}
+                  </pre>
+                </div>
+              </div>
             </div>
           )}
         </div>

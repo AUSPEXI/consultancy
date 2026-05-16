@@ -33,7 +33,24 @@ export function GeoPulse() {
     if (!keyword.trim()) return;
     setIsProbing(true);
     setResults(null);
+    setCurrentStep(0);
     
+    // Simulate steps
+    const steps = [
+      "Accessing Proprietary Data Lake...",
+      "Benchmarking against Semantic Anchors...",
+      "Analyzing Vector Distribution...",
+      "Calculating Share of Voice...",
+      "Finalizing Market Vulnerability Insights..."
+    ];
+    
+    let step = 0;
+    const interval = setInterval(() => {
+      step++;
+      setCurrentStep(step);
+      if (step >= steps.length) clearInterval(interval);
+    }, 600);
+
     // Simulate API calls to LLMs
     setTimeout(() => {
       setResults({
@@ -51,8 +68,18 @@ export function GeoPulse() {
         ]
       });
       setIsProbing(false);
-    }, 3000);
+      setCurrentStep(-1);
+    }, 3500);
   };
+
+  const [currentStep, setCurrentStep] = useState(-1);
+  const probeSteps = [
+    "Accessing Proprietary Data Lake...",
+    "Benchmarking against Semantic Anchors...",
+    "Analyzing Vector Distribution...",
+    "Calculating Share of Voice...",
+    "Finalizing Market Vulnerability Insights..."
+  ];
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -108,8 +135,18 @@ export function GeoPulse() {
               <Network className="absolute inset-0 m-auto w-6 h-6 text-pink-400 animate-pulse" />
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Querying Proprietary Data Lake</h3>
-            <p className="text-sm text-zinc-400 max-w-md mx-auto">
-              Aggregating first-party search intent patterns, analyzing public semantic associations, and mapping vector distributions.
+            
+            <div className="space-y-2 mt-4 max-w-xs mx-auto text-left">
+              {probeSteps.map((step, i) => (
+                <div key={i} className={`flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold transition-all duration-300 ${i < currentStep ? 'text-emerald-500' : i === currentStep ? 'text-pink-500' : 'text-zinc-700'}`}>
+                   <div className={`w-1.5 h-1.5 rounded-full ${i < currentStep ? 'bg-emerald-500' : i === currentStep ? 'bg-pink-500 animate-pulse' : 'bg-zinc-800'}`} />
+                   {step}
+                </div>
+              ))}
+            </div>
+
+            <p className="text-sm text-zinc-500 mt-8 max-w-md mx-auto">
+              Aggregating first-party search intent patterns and mapping vector distributions against your Semantic Anchors.
             </p>
           </div>
         )}
