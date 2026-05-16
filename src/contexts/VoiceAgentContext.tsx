@@ -236,11 +236,12 @@ ${conversationText}`,
       await fetchKnowledgeGraph();
       const weeklyMetricsContext = await fetchWeeklyMetrics();
 
-      const baseUrl = `${window.location.protocol}//${window.location.host}/api/genai`;
-      const ai = new GoogleGenAI({ 
-        apiKey: "dummy", 
-        httpOptions: { baseUrl }
-      });
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+      if (!apiKey) {
+        throw new Error("Gemini API key is required. Please check your environment variables.");
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
 
       const customerContext = userData?.brand 
         ? `\n\nCUSTOMER CONTEXT:\nYou are currently speaking with a representative of "${userData.brand}". ${userData.domain ? `Their domain is ${userData.domain}.` : ''} ${userData.competitors && userData.competitors.length > 0 ? `They are tracking the following competitors: ${userData.competitors.join(", ")}.` : ''} Tailor your advice specifically for their brand and industry whenever possible rather than giving generic examples.${weeklyMetricsContext}`
@@ -260,7 +261,7 @@ ${customerContext}`;
       const systemInstruction = baseInstruction;
 
       const sessionPromise = ai.live.connect({
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-2.0-flash-exp", // Standard Exp for Multimodal Live
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
@@ -336,7 +337,15 @@ ${customerContext}`;
               audioContextRef.current = audioCtx;
               nextPlayTimeRef.current = audioCtx.currentTime;
 
-              const stream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 16000, channelCount: 1 } });
+              const stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: { 
+                  sampleRate: 16000, 
+                  channelCount: 1,
+                  echoCancellation: true,
+                  noiseSuppression: true,
+                  autoGainControl: true
+                } 
+              });
               mediaStreamRef.current = stream;
 
               const source = audioCtx.createMediaStreamSource(stream);

@@ -10,11 +10,17 @@ let aiClient: GoogleGenAI | null = null;
 
 function getAIClient(): GoogleGenAI {
   if (!aiClient) {
-    const baseUrl = `${window.location.protocol}//${window.location.host}/api/genai`;
-    aiClient = new GoogleGenAI({ 
-      apiKey: 'dummy',
-      httpOptions: { baseUrl }
-    });
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+      // Fallback to proxy if key is not available on client
+      const baseUrl = `${window.location.protocol}//${window.location.host}/api/genai`;
+      aiClient = new GoogleGenAI({ 
+        apiKey: 'dummy',
+        httpOptions: { baseUrl }
+      });
+    } else {
+      aiClient = new GoogleGenAI(apiKey);
+    }
   }
   return aiClient;
 }
@@ -323,7 +329,15 @@ ${knowledgeContext}`;
               audioContextRef.current = audioCtx;
               nextPlayTimeRef.current = audioCtx.currentTime;
 
-              const stream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 16000, channelCount: 1 } });
+              const stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: { 
+                  sampleRate: 16000, 
+                  channelCount: 1,
+                  echoCancellation: true,
+                  noiseSuppression: true,
+                  autoGainControl: true
+                } 
+              });
               mediaStreamRef.current = stream;
 
               const source = audioCtx.createMediaStreamSource(stream);
