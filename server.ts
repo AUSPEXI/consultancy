@@ -918,7 +918,7 @@ app.use(express.json());
 
       // Map history to the format expected by the SDK
       const contents = (chatHistory || []).map((msg: any) => ({
-        role: msg.role === 'assistant' ? 'model' : 'user',
+        role: (msg.role === 'assistant' || msg.role === 'model') ? 'model' : 'user',
         parts: [{ text: msg.content }]
       }));
 
@@ -956,7 +956,7 @@ app.use(express.json());
 
       res.status(500).json({ 
         success: false, 
-        error: "SYNC_FAILURE: Failed to communicate with the Citacious Nerve Center." 
+        error: "SYNC_FAILURE: Failed to communicate with the Citacious Engine." 
       });
     }
   });
