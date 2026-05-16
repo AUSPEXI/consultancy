@@ -56,11 +56,15 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
 
   const onPointerOver = useCallback((e: any) => {
     e.stopPropagation();
-    setHovered(e.index);
-    onHoverChange?.(true);
+    // Use the index directly from the event
+    if (e.index !== undefined) {
+      setHovered(e.index);
+      onHoverChange?.(true);
+    }
   }, [onHoverChange]);
 
-  const onPointerOut = useCallback(() => {
+  const onPointerOut = useCallback((e: any) => {
+    // Only clear if we're moving away from the points entirely
     setHovered(null);
     onHoverChange?.(false);
   }, [onHoverChange]);
@@ -219,8 +223,7 @@ export function UmapVisualization({ points = [] }: { points?: any[] }) {
         <OrbitControls 
           enablePan={false} 
           enableZoom={true} 
-          autoRotate={!isHovered} 
-          autoRotateSpeed={0.8}
+          autoRotate={false} 
           maxDistance={25}
           minDistance={8}
           makeDefault

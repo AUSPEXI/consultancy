@@ -74,6 +74,7 @@ export function Overview() {
   const { user, tier, userData, role } = useAuth();
   const [latentView, setLatentView] = useState<'2d' | '3d'>('2d');
   const [selectedPlatform, setSelectedPlatform] = useState<string>('All');
+  const [selectedTimeframe, setSelectedTimeframe] = useState<string>('current');
   
   const defaultPrompts = [
     "Is Auspexi a secure enterprise choice?",
@@ -86,7 +87,8 @@ export function Overview() {
   const { pulseData, mapPoints, sentimentTrace, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(
     userData?.brand || '', 
     userPrompts,
-    selectedPlatform
+    selectedPlatform,
+    selectedTimeframe
   );
   
   const [metrics, setMetrics] = useState<any[]>([]);
@@ -696,6 +698,16 @@ export function Overview() {
                    >
                      3D
                    </button>
+                   <div className="w-[1px] h-3 bg-zinc-800 mx-1" />
+                   {['current', 'week', 'month'].map(t => (
+                     <button
+                       key={t}
+                       onClick={() => setSelectedTimeframe(t)}
+                       className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all border ${selectedTimeframe === t ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-zinc-900 text-zinc-500 border-zinc-800 hover:border-zinc-700'}`}
+                     >
+                       {t === 'current' ? 'Live' : t === 'week' ? '7D Roll' : '30D Roll'}
+                     </button>
+                   ))}
                  </div>
                  <div className="px-1.5 py-0.5 rounded-full bg-pink-500/10 border border-pink-500/20 text-[9px] font-bold text-pink-400 uppercase tracking-widest animate-pulse ml-auto">
                    Live 768-D Mapping
@@ -704,8 +716,13 @@ export function Overview() {
                <div className="flex items-center gap-2">
                 <p className="text-xs text-zinc-500">Mapping your brand anchors across the LLM collective latent space.</p>
                 <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                  <span className="text-[8px] font-mono text-zinc-500 uppercase tracking-tighter">SNAPSHOT:</span>
-                  <span className="text-[8px] font-mono text-zinc-400">2026-05-15 08:42 UTC</span>
+                  <span className="text-[8px] font-mono text-zinc-500 uppercase tracking-tighter">
+                    {selectedTimeframe === 'current' ? 'SNAPSHOT' : 'AGGREGATED'}:
+                  </span>
+                  <span className="text-[8px] font-mono text-zinc-400 uppercase">
+                    {selectedTimeframe === 'current' ? '2026-05-15 08:42 UTC' : 
+                     selectedTimeframe === 'week' ? 'Past 7 Days' : 'Rolling 30 Days'}
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 group relative cursor-help">
                   <span className="text-[8px] font-mono text-zinc-500 uppercase tracking-tighter">ENGINE:</span>
