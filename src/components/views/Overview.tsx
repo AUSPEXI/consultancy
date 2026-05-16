@@ -1,108 +1,23 @@
 import { useState, useEffect } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, Cell, ReferenceArea, ScatterChart, Scatter, ZAxis, PieChart, Pie } from 'recharts';
-import { TrendingUp, Users, Target, MousePointerClick, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, Save, Gauge, HelpCircle } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line } from 'recharts';
+import { TrendingUp, Users, Target, MousePointerClick, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
 import { collection, addDoc, setDoc, doc, onSnapshot, query, where, orderBy, limit } from 'firebase/firestore';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
-import { useGeoAnalytics } from '@/hooks/useGeoAnalytics';
-
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import { UmapVisualization } from '../ui/UmapVisualization';
-
-// --- Interpretation Legend ---
-const NeuralLegend = () => (
-  <div className="flex flex-wrap gap-4 mt-4 px-4 py-3 bg-zinc-900/30 border border-zinc-800/50 rounded-xl">
-    <div className="flex items-center gap-2">
-      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-      <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">Positive Anchor</span>
-    </div>
-    <div className="flex items-center gap-2">
-      <div className="w-2.5 h-2.5 rounded-full bg-pink-500 shadow-[0_0_8px_rgba(236,72,153,0.4)]" />
-      <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">Risk / Neg. Citation</span>
-    </div>
-    <div className="flex items-center gap-2">
-      <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
-      <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">Neutral Signal</span>
-    </div>
-    <div className="ml-auto flex items-center gap-2 text-zinc-500">
-      <BrainCircuit className="w-3 h-3" />
-      <span className="text-[9px] font-mono leading-none">DISTANCE = SEMANTIC DISSIMILARITY</span>
-    </div>
-  </div>
-);
-const RacingDial = ({ value, label, color = "#ec4899", size = "sm" }: { value: number; label: string; color?: string; size?: "sm" | "lg" }) => {
-  const data = [
-    { name: 'value', value: Math.min(100, Math.max(0, value)), fill: color },
-    { name: 'remainder', value: 100 - Math.min(100, Math.max(0, value)), fill: '#18181b' }
-  ];
-
-  const isLarge = size === "lg";
-
-  return (
-    <div className="flex flex-col items-center">
-      <div className={`relative ${isLarge ? 'w-48 h-28' : 'w-32 h-20'}`}>
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="100%"
-              startAngle={180}
-              endAngle={0}
-              innerRadius={isLarge ? 60 : 40}
-              outerRadius={isLarge ? 80 : 55}
-              paddingAngle={0}
-              dataKey="value"
-              stroke="none"
-            />
-          </PieChart>
-        </ResponsiveContainer>
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center">
-          <span className={`${isLarge ? 'text-3xl' : 'text-xl'} font-black text-white tracking-tighter`}>{value}%</span>
-        </div>
-      </div>
-      <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-2">{label}</p>
-    </div>
-  );
-};
 
 export function Overview() {
-  const { user, tier, userData, role } = useAuth();
-  const [latentView, setLatentView] = useState<'2d' | '3d'>('2d');
-  const [selectedPlatform, setSelectedPlatform] = useState<string>('All');
-  const [selectedTimeframe, setSelectedTimeframe] = useState<string>('current');
-  
-  const defaultPrompts = [
-    "Is Auspexi a secure enterprise choice?",
-    "How does Auspexi compare to legacy SEO?",
-    "Is Auspexi's GEO tech proprietary?",
-    "Founder reputation and reliability"
-  ];
-  const userPrompts = userData?.sentimentPrompts || defaultPrompts;
-
-  const { pulseData, mapPoints, sentimentTrace, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(
-    userData?.brand || '', 
-    userPrompts,
-    selectedPlatform,
-    selectedTimeframe
-  );
-  
+  const { user, tier, userData } = useAuth();
   const [metrics, setMetrics] = useState<any[]>([]);
   const [isAuditing, setIsAuditing] = useState(false);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const [shadowUrl, setShadowUrl] = useState('');
   const [generatedShadowLink, setGeneratedShadowLink] = useState('');
-  
-  const [isEditingPrompts, setIsEditingPrompts] = useState(false);
-  const [editPromptsState, setEditPromptsState] = useState<string[]>(userPrompts);
-  const [isSavingPrompts, setIsSavingPrompts] = useState(false);
 
   useEffect(() => {
-    if (!user || !checkTierAccess(tier, 'Basic')) return;
+    if (!user || tier === 'Free') return;
     const q = query(
       collection(db, 'sovMetrics'),
       where('userId', '==', user.uid),
@@ -123,7 +38,7 @@ export function Overview() {
     return () => unsubscribe();
   }, [user, tier]);
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Basic')) {
+  if (tier === 'Free') {
     return (
       <div className="space-y-6">
         <div>
@@ -153,8 +68,7 @@ export function Overview() {
             brand: userData.brand,
             domain: userData.domain,
             competitors: userData.competitors || [],
-            keywords: userData.keywords,
-            sentimentPrompts: userPrompts
+            keywords: userData.keywords
           })
         });
         
@@ -162,14 +76,10 @@ export function Overview() {
         if (data.success && data.metrics) {
           const today = new Date();
           const dateStr = today.toISOString().split('T')[0];
-          const expiresAtDate = new Date();
-          expiresAtDate.setDate(expiresAtDate.getDate() + 90);
-          
           await setDoc(doc(db, 'sovMetrics', `${user.uid}_${dateStr}`), {
             userId: user.uid,
             date: dateStr,
             shortDate: today.toLocaleDateString('en-US', { weekday: 'short' }),
-            expiresAt: expiresAtDate,
             ...data.metrics
           }, { merge: true });
           await logAuditAction(user.uid, 'Ran Real SOV Audit', { date: dateStr });
@@ -196,38 +106,6 @@ export function Overview() {
         const newAsov = Math.min(100, prevAsov + Math.floor(Math.random() * 8));
         const newCompA = Math.max(0, prevCompA - Math.floor(Math.random() * 5));
 
-        const simulatedPlatforms = {
-          chatgpt: Math.min(100, newAsov + 15),
-          perplexity: Math.max(0, newAsov - 15),
-          claude: newAsov + 5,
-          gemini: newAsov + 25
-        };
-        
-        const simulatedRadar = [
-          { subject: 'Pricing Insights', brandScore: newAsov + 20, compScore: newCompA + 10 },
-          { subject: 'Feature Comparison', brandScore: Math.max(0, newAsov - 5), compScore: newCompA + 25 },
-          { subject: 'Implementation Docs', brandScore: newAsov + 10, compScore: Math.max(0, newCompA - 15) },
-          { subject: 'Customer Support', brandScore: newAsov + 30, compScore: Math.max(0, newCompA - 20) },
-          { subject: 'Security & Auth', brandScore: Math.max(0, newAsov - 15), compScore: newCompA + 20 },
-          { subject: 'Enterprise Ready', brandScore: newAsov + 5, compScore: newCompA }
-        ];
-
-        const simulatedSentiment = userPrompts.map((p: string, idx: number) => {
-          let score = 0;
-          if (idx === 0) score = newAsov + 40;
-          else if (idx === 1) score = newAsov > 20 ? 80 : 30;
-          else if (idx === 2) score = newAsov > 25 ? 20 : -40;
-          else score = -10;
-          return { prompt: p, score: Math.min(100, Math.max(-100, score)) };
-        });
-
-        const simulatedTopUrls = [
-          { path: "/blog/what-is-our-product", citations: Math.floor(newAsov * 1.5) },
-          { path: "/pricing", citations: Math.floor(newAsov * 1.2) },
-          { path: "/features", citations: newAsov },
-          { path: "/about", citations: Math.max(2, Math.floor(newAsov / 3)) }
-        ];
-
         await setDoc(doc(db, 'sovMetrics', `${user.uid}_${dateStr}`), {
           userId: user.uid,
           date: dateStr,
@@ -238,10 +116,6 @@ export function Overview() {
           compA: newCompA,
           compB: Math.max(0, (metrics.length > 0 ? metrics[metrics.length - 1].compB : 30) - Math.floor(Math.random() * 5)),
           aiTraffic: prevAiTraffic + Math.floor(Math.random() * 40) + 10,
-          platforms: simulatedPlatforms,
-          radar: simulatedRadar,
-          sentiment: simulatedSentiment,
-          topUrls: simulatedTopUrls
         }, { merge: true });
         await logAuditAction(user.uid, 'Ran Simulated SOV Audit', { date: dateStr });
       }
@@ -283,11 +157,11 @@ export function Overview() {
   };
 
   const displayData = metrics.length > 0 ? metrics : [
-    { shortDate: 'Mon', aSov: 12, err: 20, compGap: -33, compA: 45, compB: 30, aiTraffic: 120, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } },
-    { shortDate: 'Tue', aSov: 18, err: 35, compGap: -24, compA: 42, compB: 28, aiTraffic: 132, platforms: { chatgpt: 25, claude: 20, gemini: 30, perplexity: 15 } },
-    { shortDate: 'Wed', aSov: 25, err: 45, compGap: -13, compA: 38, compB: 25, aiTraffic: 250, platforms: { chatgpt: 35, claude: 30, gemini: 40, perplexity: 20 } },
-    { shortDate: 'Thu', aSov: 32, err: 60, compGap: -3, compA: 35, compB: 22, aiTraffic: 280, platforms: { chatgpt: 45, claude: 40, gemini: 50, perplexity: 25 } },
-    { shortDate: 'Fri', aSov: 45, err: 80, compGap: 15, compA: 30, compB: 18, aiTraffic: 310, platforms: { chatgpt: 60, claude: 55, gemini: 70, perplexity: 35 } },
+    { shortDate: 'Mon', aSov: 12, err: 20, compGap: -33, compA: 45, compB: 30, aiTraffic: 120 },
+    { shortDate: 'Tue', aSov: 18, err: 35, compGap: -24, compA: 42, compB: 28, aiTraffic: 132 },
+    { shortDate: 'Wed', aSov: 25, err: 45, compGap: -13, compA: 38, compB: 25, aiTraffic: 250 },
+    { shortDate: 'Thu', aSov: 32, err: 60, compGap: -3, compA: 35, compB: 22, aiTraffic: 280 },
+    { shortDate: 'Fri', aSov: 45, err: 80, compGap: 15, compA: 30, compB: 18, aiTraffic: 310 },
   ];
 
   const latest = displayData[displayData.length - 1];
@@ -295,171 +169,30 @@ export function Overview() {
 
   // Safe fallbacks for older documents that might be missing the new metric fields
   const safeLatest = {
-    aSov: latest.aSov ?? 0,
-    err: latest.err ?? 0,
-    compGap: latest.compGap ?? 0,
-    aiTraffic: latest.aiTraffic ?? 0,
-    compA: latest.compA ?? 0,
+    aSov: latest.aSov || 0,
+    err: latest.err || 0,
+    compGap: latest.compGap || 0,
+    aiTraffic: latest.aiTraffic || 0,
   };
   
   const safePrevious = {
-    aSov: previous.aSov ?? 0,
-    err: previous.err ?? 0,
-    compGap: previous.compGap ?? 0,
-    aiTraffic: previous.aiTraffic ?? 0,
-    compA: previous.compA ?? 0,
+    aSov: previous.aSov || 0,
+    err: previous.err || 0,
+    compGap: previous.compGap || 0,
+    aiTraffic: previous.aiTraffic || 0,
   };
 
-  const asovTrend = Math.round(safeLatest.aSov - safePrevious.aSov);
-  const trafficTrend = Math.round(safeLatest.aiTraffic - safePrevious.aiTraffic);
-  const errTrend = Math.round(safeLatest.err - safePrevious.err);
-  const gapTrend = Math.round(safeLatest.compGap - safePrevious.compGap);
-
-  const radarData = (latest.radar || [
-    { subject: 'Brand Trust', brandScore: safeLatest.aSov + 20, compScore: safeLatest.compA + 10 },
-    { subject: 'Technical Moat', brandScore: safeLatest.aSov - 5, compScore: safeLatest.compA + 25 },
-    { subject: 'Citation Depth', brandScore: safeLatest.aSov + 10, compScore: safeLatest.compA - 15 },
-    { subject: 'Fact Veracity', brandScore: safeLatest.aSov + 30, compScore: safeLatest.compA - 20 },
-    { subject: 'Neural Sync', brandScore: safeLatest.aSov - 15, compScore: safeLatest.compA + 20 },
-    { subject: 'Market Dominance', brandScore: safeLatest.aSov + 5, compScore: safeLatest.compA }
-  ]).map((d: any) => ({
-    subject: d.subject,
-    A: Math.round(Math.min(100, Math.max(0, d.brandScore))),
-    B: Math.round(Math.min(100, Math.max(0, d.compScore))),
-    diff: Math.round(Math.abs((d.brandScore || 0) - (d.compScore || 0))),
-    fullMark: 100
-  }));
-
-  const computedRadarData = mapPoints.length > 0 ? mapPoints.slice(0, 6).map((point: any) => ({
-    subject: point.type || point.label || 'General',
-    A: Math.round(Math.min(100, Math.max(0, 100 - (point.distance || 0.1) * 100))),
-    B: Math.round(Math.min(100, Math.max(0, 80 - (point.distance || 0.2) * 100))),
-    fullMark: 100
-  })) : radarData;
-
-  const lp = latest.platforms || {};
-  const safePlatforms = {
-    chatgpt: lp.chatgpt ?? (safeLatest.aSov + 15),
-    perplexity: lp.perplexity ?? (safeLatest.aSov - 25),
-    claude: lp.claude ?? (safeLatest.aSov + 5),
-    gemini: lp.gemini ?? (safeLatest.aSov + 25)
-  };
-
-  const platformData = [
-    { name: 'ChatGPT', visibility: Math.min(100, Math.max(0, safePlatforms.chatgpt)), fill: '#10a37f' },
-    { name: 'Perplexity', visibility: Math.min(100, Math.max(0, safePlatforms.perplexity)), fill: '#22d3ee' },
-    { name: 'Claude', visibility: Math.min(100, Math.max(0, safePlatforms.claude)), fill: '#d97757' },
-    { name: 'Gemini', visibility: Math.min(100, Math.max(0, safePlatforms.gemini)), fill: '#4285f4' },
-  ];
-
-  const chartData = displayData.slice(-5);
-  const getHistoricalSentimentScore = (d: any, defaultKey: string) => {
-    if (d.sentiment) {
-      const match = d.sentiment.find((s: any) => s.prompt.toLowerCase().includes(defaultKey));
-      if (match && typeof match.score === 'number') return match.score;
-    }
-    return null;
-  };
-
-  const sentimentData = sentimentTrace.length > 0 ? sentimentTrace.map(t => ({
-    prompt: t.prompt,
-    scores: t.data.map((d: any) => d.positive - d.negative)
-  })) : userPrompts.map((p: string, rowIdx: number) => {
-    // Generate synthetic flex patterns to fake history if real history doesn't exist.
-    const base = rowIdx === 0 ? 60 : rowIdx === 1 ? 10 : rowIdx === 2 ? -80 : 20;
-    const flex = rowIdx === 0 ? 40 : rowIdx === 1 ? 30 : rowIdx === 2 ? -40 : -20;
-    
-    return {
-      prompt: p,
-      scores: chartData.map((d, i) => {
-        const realScore = getHistoricalSentimentScore(d, p.toLowerCase());
-        if (realScore !== null) return realScore;
-
-        const progress = i / Math.max(1, chartData.length - 1);
-        const isLatest = i === chartData.length - 1;
-        
-        let finalScore = base + Math.floor((flex - base) * progress);
-        if (isLatest) {
-           if (rowIdx === 0) finalScore = safeLatest.aSov + 40;
-           if (rowIdx === 1) finalScore = safeLatest.aSov > 20 ? 80 : 30;
-           if (rowIdx === 2) finalScore = safeLatest.aSov > 25 ? 20 : -40;
-        }
-        return finalScore;
-      })
-    };
-  });
-
-  const getSentimentColor = (score: number) => {
-    if (score >= 60) return 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]';
-    if (score >= 20) return 'bg-emerald-400/80';
-    if (score >= -20) return 'bg-zinc-600';
-    if (score >= -60) return 'bg-rose-400/80';
-    return 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.3)]';
-  };
-
-  const handleSavePrompts = async () => {
-    if (!user) return;
-    setIsSavingPrompts(true);
-    try {
-      await setDoc(doc(db, 'users', user.uid), {
-        sentimentPrompts: editPromptsState.filter(p => p.trim() !== '')
-      }, { merge: true });
-      setIsEditingPrompts(false);
-      // Trigger immediate refetch of analytics with new prompts
-      refetchGeo();
-    } catch (e) {
-      console.error("Failed to save custom prompts", e);
-    } finally {
-      setIsSavingPrompts(false);
-    }
-  };
-
-  const safeTopUrls = latest.topUrls || [
-    { path: '/blog/enterprise-geo-audit-logging', citations: 45 },
-    { path: '/pricing', citations: 32 },
-    { path: '/features', citations: 28 },
-    { path: '/about', citations: Math.max(2, Math.floor(safeLatest.aSov / 3)) }
-  ];
-
-  const getHistoricalCitations = (d: any, defaultPath: string) => {
-    if (d.topUrls) {
-      const match = d.topUrls.find((u: any) => u.path === defaultPath);
-      if (match && typeof match.citations === 'number') return match.citations;
-    }
-    return null;
-  };
-
-  const scorecardData = safeTopUrls.map((urlObj: any) => {
-    // Reconstruct the history
-    const historyLine = chartData.map((d, i) => {
-      const realCitation = getHistoricalCitations(d, urlObj.path);
-      if (realCitation !== null) return realCitation;
-      
-      // Fallback interpolation for older docs
-      const diff = Math.floor(urlObj.citations * 0.4); // assume grew by 40%
-      const start = Math.max(1, urlObj.citations - diff);
-      const progress = i / Math.max(1, chartData.length - 1);
-      return start + Math.floor((urlObj.citations - start) * progress);
-    });
-
-    const previousCitations = historyLine.length > 1 ? historyLine[historyLine.length - 2] : historyLine[0];
-    const trendValue = previousCitations > 0 ? Math.round(((urlObj.citations - previousCitations) / previousCitations) * 100) : 0;
-    const trendStr = `${trendValue >= 0 ? '+' : ''}${trendValue}%`;
-
-    return {
-      url: urlObj.path,
-      citations: urlObj.citations,
-      trend: trendStr,
-      metrics: historyLine
-    };
-  }).sort((a: any, b: any) => b.citations - a.citations).slice(0, 4);
+  const asovTrend = safeLatest.aSov - safePrevious.aSov;
+  const trafficTrend = safeLatest.aiTraffic - safePrevious.aiTraffic;
+  const errTrend = safeLatest.err - safePrevious.err;
+  const gapTrend = safeLatest.compGap - safePrevious.compGap;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Executive Performance Hub</h1>
-          <p className="text-sm text-zinc-400 mt-1">Track Absolute SOV, Entity Recall, and the growth of your Proprietary Neural Moat.</p>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Prove-It-Works Dashboard</h1>
+          <p className="text-sm text-zinc-400 mt-1">Track Absolute SOV, Entity Recall, and AI Referral Traffic.</p>
         </div>
         <div className="flex gap-3">
           {metrics.length === 0 && (
@@ -478,44 +211,22 @@ export function Overview() {
         </div>
       </div>
 
-      {/* High-Impact Performance Dials (Racing Style) */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          { label: 'A-SOV Dominance', value: Math.round(safeLatest.aSov), color: '#ec4899', icon: Target, desc: 'Absolute Share of Voice - % of AI responses dominated by your brand' },
-          { label: 'Entity Recall', value: Math.round(safeLatest.err), color: '#a855f7', icon: BrainCircuit, desc: 'Entity Recall Rate - how often specific facts about your brand are correctly retrieved' },
-          { label: 'Platform Sync', value: Math.round((safePlatforms.chatgpt + safePlatforms.claude + safePlatforms.gemini) / 3), color: '#3b82f6', icon: Activity, desc: 'Across-model consistency index' },
-          { label: 'Sentiment Index', value: 78, color: '#10b981', icon: TrendingUp, desc: 'Average qualitative sentiment score across tracked vectors' },
-        ].map((dial, i) => (
-          <div key={i} className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden group hover:border-zinc-700 transition-all cursor-help" title={dial.desc}>
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-zinc-800 to-transparent opacity-50" />
-            <RacingDial value={dial.value} label={dial.label} color={dial.color} />
-            <div className="absolute top-4 right-4 flex flex-col items-end gap-1 opacity-40 group-hover:opacity-100 transition-opacity">
-               <dial.icon className="w-4 h-4 text-zinc-400" />
-               <HelpCircle className="w-3 h-3 text-zinc-600" />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Secondary KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {[
-          { label: 'Competitor Gap', value: `${safeLatest.compGap > 0 ? '+' : ''}${Math.round(safeLatest.compGap)}%`, trend: `${gapTrend >= 0 ? '+' : ''}${gapTrend} pts`, icon: TrendingUp, color: 'text-blue-400', desc: 'Margin over top enterprise rival' },
-          { label: 'AI Referral Clicks', value: safeLatest.aiTraffic.toLocaleString(), trend: `${trafficTrend >= 0 ? '+' : ''}${trafficTrend}`, icon: Users, color: 'text-emerald-400', desc: 'Direct attributed sessions from generative responses' },
+          { label: 'Absolute SOV (A-SOV)', value: `${safeLatest.aSov}%`, trend: `${asovTrend >= 0 ? '+' : ''}${asovTrend}%`, icon: Target, color: 'text-pink-400' },
+          { label: 'Entity Recall Rate (ERR)', value: `${safeLatest.err}%`, trend: `${errTrend >= 0 ? '+' : ''}${errTrend}%`, icon: BrainCircuit, color: 'text-purple-400' },
+          { label: 'Competitor Gap', value: `${safeLatest.compGap > 0 ? '+' : ''}${safeLatest.compGap}%`, trend: `${gapTrend >= 0 ? '+' : ''}${gapTrend} pts`, icon: TrendingUp, color: 'text-blue-400' },
+          { label: 'AI Referral Clicks', value: safeLatest.aiTraffic.toLocaleString(), trend: `${trafficTrend >= 0 ? '+' : ''}${trafficTrend}`, icon: Users, color: 'text-emerald-400' },
         ].map((kpi, i) => (
-          <div key={i} className="bg-zinc-900/40 border border-zinc-800/60 rounded-xl p-5 flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">{kpi.label}</span>
-                <span className={`text-[10px] font-mono ${(kpi.trend.startsWith('+') || kpi.trend.includes('+')) ? 'text-emerald-500' : 'text-rose-500'}`}>{kpi.trend}</span>
-              </div>
-              <div className="flex items-baseline gap-3">
-                <span className="text-2xl font-black text-white">{kpi.value}</span>
-                <span className="text-[10px] text-zinc-600 font-medium">{kpi.desc}</span>
-              </div>
+          <div key={i} className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-zinc-400">{kpi.label}</span>
+              <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
             </div>
-            <div className={`p-3 rounded-full bg-zinc-950 border border-zinc-800 ${kpi.color}`}>
-              <kpi.icon className="w-5 h-5" />
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-white">{kpi.value}</span>
+              <span className={`text-xs font-medium ${(kpi.trend.startsWith('+') || kpi.trend.includes('+')) ? 'text-emerald-400' : 'text-rose-400'}`}>{kpi.trend}</span>
             </div>
           </div>
         ))}
@@ -569,515 +280,6 @@ export function Overview() {
                 />
                 <Bar yAxisId="right" dataKey="aiTraffic" name="AI Referral Traffic" fill="#a855f7" fillOpacity={0.2} radius={[4, 4, 0, 0]} />
                 <Line yAxisId="left" type="monotone" dataKey="err" name="Fact Recall Rate" stroke="#a855f7" strokeWidth={2} dot={{ r: 4, fill: '#a855f7', strokeWidth: 0 }} />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-          <div className="mb-6">
-            <h3 className="text-base font-semibold text-white">Competitive Citation Dominance</h3>
-            <p className="text-xs text-zinc-400 mt-1">Relative neural dominance per vector: Brands vs Nearest Enterprise Rival.</p>
-          </div>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={computedRadarData}
-                layout="vertical"
-                margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
-                stackOffset="sign"
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={false} />
-                <XAxis type="number" hide domain={[-100, 100]} />
-                <YAxis dataKey="subject" type="category" stroke="#a1a1aa" fontSize={10} tickLine={false} axisLine={false} />
-                <Tooltip 
-                  cursor={{ fill: '#27272a', opacity: 0.1 }}
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7', borderRadius: '12px' }}
-                  formatter={(value: any, name: string) => {
-                    const abs = Math.abs(value);
-                    const label = name === "A" ? "Your Brand" : "Competitor";
-                    return [`${abs}% Dominance`, label];
-                  }}
-                />
-                <ReferenceArea x1={-100} x2={100} fill="transparent" />
-                {/* We treat A as positive and B as negative for the diverging effect */}
-                <Bar dataKey="A" name="A" stackId="stack" fill="#ec4899" radius={[0, 4, 4, 0]} />
-                <Bar dataKey={(d: any) => -d.B} name="B" stackId="stack" fill="#3f3f46" radius={[4, 0, 0, 4]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="flex justify-between items-center mt-4 px-10">
-             <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">← Competitor Dominance</span>
-             <span className="text-[10px] font-black text-pink-500 uppercase tracking-widest">Brand Dominance →</span>
-          </div>
-        </div>
-
-        {/* Platform-Specific Visibility Matrix */}
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-          <div className="mb-6">
-            <h3 className="text-base font-semibold text-white">Platform-Specific Visibility</h3>
-            <p className="text-xs text-zinc-400 mt-1">Breakdown of A-SOV across major AI engines.</p>
-          </div>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={platformData} layout="vertical" margin={{ top: 10, right: 30, left: 20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={false} />
-                <XAxis type="number" domain={[0, 100]} stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}%`} />
-                <YAxis dataKey="name" type="category" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip 
-                  cursor={{ fill: '#27272a', opacity: 0.4 }}
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7' }}
-                  formatter={(value) => [`${value}% Share of Voice`, 'Visibility']}
-                />
-                <Bar dataKey="visibility" name="Visibility" radius={[0, 4, 4, 0]}>
-                  {
-                    platformData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))
-                  }
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          
-          <div className="mt-6 space-y-2">
-            {platformData.map((p) => (
-              <div key={p.name} className="flex items-center justify-between p-3 rounded-lg bg-zinc-950/40 border border-zinc-900 group hover:border-zinc-800 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_currentColor]" style={{ backgroundColor: p.fill, color: p.fill }} />
-                  <span className="text-sm font-semibold text-zinc-200">{p.name}</span>
-                </div>
-                <div className="flex items-center gap-6">
-                  <div className="hidden sm:block w-48 h-1.5 bg-zinc-900 rounded-full overflow-hidden">
-                    <div className="h-full transition-all duration-1000" style={{ width: `${p.visibility}%`, backgroundColor: p.fill }} />
-                  </div>
-                  <div className="flex flex-col items-end">
-                    <span className="text-sm font-black text-white font-mono">{p.visibility}%</span>
-                    <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">A-SOV index</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Sentiment Pulse */}
-        <div className="lg:col-span-2 bg-black border border-zinc-900 rounded-2xl p-6 relative overflow-hidden group">
-          {/* Neural Grid Background */}
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
-               style={{ 
-                 backgroundImage: 'radial-gradient(circle at 1px 1px, #ec4899 1px, transparent 0)',
-                 backgroundSize: '24px 24px' 
-               }} 
-          />
-          
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 relative z-20">
-            <div>
-              <div className="flex flex-wrap items-center gap-2 mb-1">
-                 <h3 className="text-base font-semibold text-white">Neural Cluster Distribution</h3>
-                 <div className="flex items-center gap-1.5 ml-3">
-                   {['All', 'Gemini', 'ChatGPT', 'Claude'].map(p => (
-                     <button
-                       key={p}
-                       onClick={() => setSelectedPlatform(p)}
-                       className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all border ${selectedPlatform === p ? 'bg-pink-500 border-pink-500 text-white' : 'bg-zinc-900 text-zinc-500 border-zinc-800 hover:border-zinc-700'}`}
-                     >
-                       {p}
-                     </button>
-                   ))}
-                   <div className="w-[1px] h-3 bg-zinc-800 mx-1" />
-                   <button 
-                     onClick={() => setLatentView('2d')}
-                     className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all ${latentView === '2d' ? 'bg-zinc-900 text-pink-400 border border-pink-500/30' : 'bg-zinc-900 text-zinc-500 border border-zinc-800'}`}
-                   >
-                     2D
-                   </button>
-                   <button 
-                     onClick={() => setLatentView('3d')}
-                     className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all ${latentView === '3d' ? 'bg-zinc-900 text-pink-400 border border-pink-500/30' : 'bg-zinc-900 text-zinc-500 border border-zinc-800'}`}
-                   >
-                     3D
-                   </button>
-                   <div className="w-[1px] h-3 bg-zinc-800 mx-1" />
-                   {['current', 'week', 'month'].map(t => (
-                     <button
-                       key={t}
-                       onClick={() => setSelectedTimeframe(t)}
-                       className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all border ${selectedTimeframe === t ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-zinc-900 text-zinc-500 border-zinc-800 hover:border-zinc-700'}`}
-                     >
-                       {t === 'current' ? 'Live' : t === 'week' ? '7D Roll' : '30D Roll'}
-                     </button>
-                   ))}
-                 </div>
-                 <div className="px-1.5 py-0.5 rounded-full bg-pink-500/10 border border-pink-500/20 text-[9px] font-bold text-pink-400 uppercase tracking-widest animate-pulse ml-auto">
-                   Live 768-D Mapping
-                 </div>
-              </div>
-               <div className="flex items-center gap-2">
-                <p className="text-xs text-zinc-500">Mapping your brand anchors across the LLM collective latent space.</p>
-                <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                  <span className="text-[8px] font-mono text-zinc-500 uppercase tracking-tighter">
-                    {selectedTimeframe === 'current' ? 'SNAPSHOT' : 'AGGREGATED'}:
-                  </span>
-                  <span className="text-[8px] font-mono text-zinc-400 uppercase">
-                    {selectedTimeframe === 'current' ? '2026-05-15 08:42 UTC' : 
-                     selectedTimeframe === 'week' ? 'Past 7 Days' : 'Rolling 30 Days'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 group relative cursor-help">
-                  <span className="text-[8px] font-mono text-zinc-500 uppercase tracking-tighter">ENGINE:</span>
-                  <span className="text-[8px] font-mono text-emerald-400">GEMINI-EMBED-004</span>
-                  
-                  {/* Methodology Tooltip */}
-                  <div className="absolute bottom-full left-0 mb-2 w-72 p-4 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[100] text-[10px] leading-relaxed backdrop-blur-xl pointer-events-none">
-                    <p className="text-white font-bold mb-2 uppercase tracking-widest text-[9px] border-b border-zinc-800 pb-2">Semantic Audit Methodology</p>
-                    <p className="text-zinc-400 mb-2">
-                      The map displays the <span className="text-pink-400 font-bold">Reputational Twin</span> generated during the last Deep Audit.
-                    </p>
-                    <div className="space-y-1 text-zinc-500">
-                      <div className="flex justify-between">
-                        <span>Crawl Depth:</span>
-                        <span className="text-white">1,240 Paths</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Token Intensity:</span>
-                        <span className="text-white">420k - 680k</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Vector Accuracy:</span>
-                        <span className="text-emerald-400">98.2%</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right hidden sm:block">
-                <p className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Projection Method</p>
-                <p className="text-[10px] font-mono text-zinc-500">UMAP_DENSITY_ESTIMATION</p>
-              </div>
-              {geoLoading && <Loader2 className="w-4 h-4 animate-spin text-pink-500" />}
-            </div>
-          </div>
-          
-          <div className="h-[400px] w-full relative z-10 border border-zinc-800/50 rounded-2xl bg-zinc-950/20 overflow-hidden">
-            {mapPoints.length > 0 ? (
-              latentView === '2d' ? (
-                <TransformWrapper
-                  initialScale={1}
-                  initialPositionX={0}
-                  initialPositionY={0}
-                  minScale={0.5}
-                  maxScale={4}
-                >
-                  {({ zoomIn, zoomOut, resetTransform }) => (
-                    <>
-                      <div className="absolute top-4 right-4 z-20 flex gap-1">
-                        <button onClick={() => zoomIn()} className="p-1.5 bg-zinc-900/80 backdrop-blur-md border border-zinc-800 rounded text-white hover:bg-zinc-800 transition-colors">
-                          <Plus className="w-3 h-3" />
-                        </button>
-                        <button onClick={() => zoomOut()} className="p-1.5 bg-zinc-900/80 backdrop-blur-md border border-zinc-800 rounded text-white hover:bg-zinc-800 transition-colors">
-                          <Activity className="w-3 h-3 -rotate-90" />
-                        </button>
-                        <button onClick={() => resetTransform()} className="p-1.5 bg-zinc-900/80 backdrop-blur-md border border-zinc-800 rounded text-white hover:bg-zinc-800 transition-colors">
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                      
-                      <TransformComponent wrapperStyle={{ width: "100%", height: "100%" }}>
-                        <div className="w-[1200px] h-[800px] flex items-center justify-center cursor-move">
-                          <ResponsiveContainer width={1200} height={800}>
-                            <ScatterChart margin={{ top: 100, right: 100, bottom: 100, left: 100 }}>
-                              <XAxis type="number" dataKey="x" hide domain={[-150, 150]} />
-                              <YAxis type="number" dataKey="y" hide domain={[-150, 150]} />
-                              <ZAxis type="number" dataKey="size" range={[80, 800]} />
-                              <Tooltip 
-                                cursor={{ strokeDasharray: '3 3', stroke: '#ec4899', strokeOpacity: 0.3 }}
-                                content={({ active, payload }) => {
-                                  if (active && payload && payload.length) {
-                                    const data = payload[0].payload;
-                                    return (
-                                      <div className="bg-zinc-950/95 border border-zinc-800 p-4 rounded-xl shadow-2xl backdrop-blur-xl border-l-4 border-l-pink-500 min-w-[200px]">
-                                        <p className="text-[9px] font-black text-pink-500 uppercase tracking-[0.2em] mb-2">{data.type}</p>
-                                        <p className="text-sm font-bold text-white mb-3">{data.label}</p>
-                                        
-                                        <div className="space-y-2">
-                                          <div className="flex justify-between items-center text-[10px]">
-                                            <span className="text-zinc-500">SEMANTIC STRENGTH</span>
-                                            <span className="text-white font-mono">{Math.round((1 - data.distance) * 100)}%</span>
-                                          </div>
-                                          <div className="h-1 w-full bg-zinc-900 rounded-full overflow-hidden">
-                                             <div className={`h-full ${data.sentiment === 'positive' ? 'bg-emerald-500' : 'bg-pink-500'} rounded-full`} style={{ width: `${(1 - data.distance) * 100}%` }} />
-                                          </div>
-                                        </div>
-
-                                        <div className="flex justify-between items-center mt-4 pt-4 border-t border-zinc-800/50">
-                                           <div className="flex items-center gap-1.5">
-                                             <div className={`w-1.5 h-1.5 rounded-full ${data.sentiment === 'positive' ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-pink-500 shadow-[0_0_8px_#ec4899]'}`} />
-                                             <span className={`text-[10px] font-bold uppercase ${data.sentiment === 'positive' ? 'text-emerald-400' : 'text-pink-400'}`}>
-                                               {data.sentiment === 'positive' ? 'Positive Citation' : 'Risk Detected'}
-                                             </span>
-                                           </div>
-                                           <span className="text-[9px] text-zinc-600 font-mono">ID: {data.id}</span>
-                                        </div>
-                                      </div>
-                                    );
-                                  }
-                                  return null;
-                                }}
-                              />
-                              <Scatter name="Latent Nodes" data={mapPoints}>
-                                {mapPoints.map((entry: any, index: number) => (
-                                  <Cell 
-                                    key={`cell-${index}`} 
-                                    fill={entry.sentiment === 'positive' ? '#10b981' : '#ec4899'} 
-                                    fillOpacity={0.4}
-                                    stroke={entry.sentiment === 'positive' ? '#10b981' : '#ec4899'}
-                                    strokeWidth={1}
-                                    className="transition-all duration-300"
-                                    style={{ 
-                                      filter: `blur(${entry.distance * 1.5}px) drop-shadow(0 0 15px ${entry.sentiment === 'positive' ? '#10b98144' : '#ec489944'})`
-                                    }}
-                                  />
-                                ))}
-                              </Scatter>
-                            </ScatterChart>
-                          </ResponsiveContainer>
-                        </div>
-                      </TransformComponent>
-                    </>
-                  )}
-                </TransformWrapper>
-              ) : (
-                <UmapVisualization points={mapPoints} />
-              )
-            ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center border border-dashed border-zinc-800 rounded-2xl">
-                <BrainCircuit className="w-10 h-10 text-zinc-800 mb-4" />
-                <p className="text-zinc-500 text-sm font-medium">Synchronizing Neural Field...</p>
-                <p className="text-zinc-600 text-[10px] uppercase tracking-widest mt-2">Loading Latent Embeddings</p>
-              </div>
-            )}
-            
-            {/* Ambient Lighting Overlays */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/5 blur-[100px] pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 blur-[100px] pointer-events-none" />
-          </div>
-
-          <NeuralLegend />
-        </div>
-
-        {/* Share of Sentiment Heatmap */}
-        <div className="lg:col-span-2 bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 relative">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-            <div>
-              <h3 className="text-base font-semibold text-white">"Share of Sentiment" Trace</h3>
-              <p className="text-xs text-zinc-400 mt-1">Tracks AI response sentiment across high-risk reputational queries.</p>
-            </div>
-            <div className="flex items-center gap-3 mt-4 sm:mt-0 text-xs text-zinc-400">
-              <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.3)]"></div> Negative</div>
-              <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-zinc-600"></div> Neutral</div>
-              <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]"></div> Positive</div>
-              <button onClick={() => setIsEditingPrompts(true)} className="ml-2 p-1.5 hover:bg-zinc-800 rounded-md transition-colors" title="Customize Tracked Prompts">
-                <Settings className="w-3.5 h-3.5 text-zinc-500 hover:text-zinc-300" />
-              </button>
-            </div>
-          </div>
-          
-          {isEditingPrompts ? (
-            <div className="absolute inset-0 bg-zinc-950/95 backdrop-blur-sm z-20 rounded-xl p-6 flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-sm font-semibold text-white">Customize Reputational Prompts</h4>
-                <button onClick={() => { setIsEditingPrompts(false); setEditPromptsState(userPrompts); }} className="text-zinc-400 hover:text-white">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="space-y-3 flex-1 overflow-y-auto pr-2">
-                {editPromptsState.map((val, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                     <span className="text-zinc-500 text-xs w-4">{idx + 1}.</span>
-                     <input 
-                       className="flex-1 bg-zinc-900 border border-zinc-700 rounded p-2 text-sm text-zinc-200 focus:outline-none focus:border-emerald-500"
-                       value={val}
-                       onChange={(e) => {
-                         const n = [...editPromptsState];
-                         n[idx] = e.target.value;
-                         setEditPromptsState(n);
-                       }}
-                       placeholder={`Custom reputational prompt ${idx + 1}`}
-                     />
-                  </div>
-                ))}
-                {editPromptsState.length < 5 && (
-                  <button onClick={() => setEditPromptsState([...editPromptsState, ""])} className="text-xs text-emerald-400 hover:text-emerald-300 mt-2 flex items-center gap-1">
-                    <Plus className="w-3 h-3" /> Add Prompt
-                  </button>
-                )}
-              </div>
-              <div className="mt-4 pt-4 border-t border-zinc-800 flex justify-end">
-                <button
-                  onClick={handleSavePrompts}
-                  disabled={isSavingPrompts}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
-                >
-                  {isSavingPrompts ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  Save Configuration
-                </button>
-              </div>
-            </div>
-          ) : null}
-
-          <div className="overflow-x-auto custom-scrollbar pb-4">
-            <div className="min-w-[800px]">
-              <div 
-                className="grid gap-2 mb-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest" 
-                style={{ gridTemplateColumns: `2fr repeat(${sentimentTrace.length > 0 ? sentimentTrace[0].data.length : chartData.length}, 1fr)` }}
-              >
-                <div>Reputational Prompt</div>
-                {(sentimentTrace.length > 0 ? sentimentTrace[0].data : chartData).map((d: any, i: number) => (
-                  <div key={i} className="text-center">
-                    {d.date ? new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : `D-${chartData.length - i}`}
-                  </div>
-                ))}
-              </div>
-              
-              <div className="space-y-3">
-                {sentimentData.map((row, i) => (
-                  <div 
-                    key={i} 
-                    className="grid gap-2 items-center"
-                    style={{ gridTemplateColumns: `2fr repeat(${row.scores.length}, 1fr)` }}
-                  >
-                    <div className="text-xs font-medium text-zinc-400 truncate pr-4 group-hover:text-white transition-colors" title={row.prompt}>
-                      {row.prompt}
-                    </div>
-                    {row.scores.map((score, colIdx) => (
-                      <div key={colIdx} className="flex justify-center group/cell relative">
-                        <div className={`w-full h-10 rounded-md transition-all duration-500 border border-white/5 ${getSentimentColor(score)}`} />
-                        <div className="absolute opacity-0 group-hover/cell:opacity-100 transition-all -top-10 bg-zinc-900 text-white text-[10px] font-bold px-2 py-1.5 rounded-lg pointer-events-none whitespace-nowrap z-50 border border-zinc-700 shadow-2xl">
-                          NET SENTIMENT: {score > 0 ? '+' : ''}{score}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* "Cite-Magnet" Content Scorecard */}
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-          <div className="mb-6">
-            <h3 className="text-base font-semibold text-white">"Cite-Magnet" Scorecard</h3>
-            <p className="text-xs text-zinc-400 mt-1">Top performing URLs driving AI citations.</p>
-          </div>
-          <div className="space-y-4">
-            {scorecardData.map((item: any, idx: number) => (
-              <div key={idx} className="flex items-center justify-between border-b border-zinc-800/50 pb-4 last:border-0 last:pb-0">
-                <div className="overflow-hidden pr-4 max-w-[55%]">
-                  <p className="text-sm font-medium text-zinc-200 truncate" title={item.url}>{item.url}</p>
-                  <p className="text-xs text-zinc-500 mt-1">Citation Freq: {item.citations} <span className={item.trend.startsWith('+') ? 'text-emerald-400' : 'text-rose-400'}>({item.trend})</span></p>
-                </div>
-                <div className="w-24 h-10">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={item.metrics.map((v: number) => ({ value: v }))}>
-                      <Line type="monotone" dataKey="value" stroke={item.trend.startsWith('-') ? '#f43f5e' : '#10b981'} strokeWidth={2} dot={{ r: 2, fill: item.trend.startsWith('-') ? '#f43f5e' : '#10b981', strokeWidth: 0 }} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Monitoring Objectives (Agency) */}
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-base font-semibold text-white">Monitoring Objectives</h3>
-                <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-bold border border-emerald-500/20">LIVE SYNC</span>
-              </div>
-              <p className="text-xs text-zinc-400">Define the reputational anchors and risk vectors the AI monitors.</p>
-            </div>
-            <button 
-              onClick={() => setIsEditingPrompts(true)}
-              className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-pink-400 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="space-y-3">
-            {userPrompts.map((prompt: string, i: number) => (
-              <div key={i} className="flex items-center justify-between p-3 bg-zinc-950 border border-zinc-800/50 rounded-lg group hover:border-zinc-700 transition-colors">
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <div className={`w-1.5 h-1.5 rounded-full ${i % 2 === 0 ? 'bg-pink-500 shadow-[0_0_8px_#ec4899]' : 'bg-cyan-500 shadow-[0_0_8px_#06b6d4]'}`} />
-                  <span className="text-sm text-zinc-300 truncate">{prompt}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                   <div className="px-1.5 py-0.5 rounded bg-zinc-900 text-[9px] text-zinc-500 font-mono flex items-center gap-1 group-hover:text-emerald-400 transition-colors">
-                     <Activity className="w-3 h-3" />
-                     {geoLoading ? 'FETCHING' : 'ACTIVE'}
-                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-6 pt-6 border-t border-zinc-800/50">
-            <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-3 flex items-center gap-2">
-              <BrainCircuit className="w-3 h-3" />
-              Automated Discovery Vectors
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {['CEO Reliability', 'Technical Moat', 'Pricing Fairness', 'Open Source Sync', 'Enterprise Scale'].map(tag => (
-                <span 
-                  key={tag} 
-                  className="px-2 py-1 rounded bg-zinc-950 text-[10px] text-zinc-500 border border-zinc-800 cursor-help hover:border-pink-500/30 hover:text-pink-400 transition-all"
-                  title={`Monitoring real-time LLM sentiment drift for the ${tag} vector.`}
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* LLM Conversion Pipeline */}
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-          <div className="mb-6">
-            <h3 className="text-base font-semibold text-white">LLM Conversion Pipeline</h3>
-            <p className="text-xs text-zinc-400 mt-1">Attribution funnel for AI-referred traffic.</p>
-          </div>
-          <div className="h-[280px] w-full mt-2">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={[
-                { stage: 'AI Citations', amount: Math.round(500 + safeLatest.aSov * 10), fill: '#3b82f6' },
-                { stage: 'AI Referral Clicks', amount: Math.round(safeLatest.aiTraffic), fill: '#8b5cf6' },
-                { stage: 'Signups', amount: Math.round(safeLatest.aiTraffic * 0.15), fill: '#ec4899' },
-                { stage: 'Active Users', amount: Math.round(safeLatest.aiTraffic * 0.05), fill: '#10b981' },
-              ]} layout="vertical" margin={{ top: 0, right: 30, left: 40, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={true} vertical={false} />
-                <XAxis type="number" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis dataKey="stage" type="category" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip 
-                  cursor={{ fill: '#27272a', opacity: 0.4 }} 
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7', borderRadius: '8px' }} 
-                  formatter={(value) => [value, 'Volume']}
-                />
-                <Bar dataKey="amount" barSize={24} radius={[0, 4, 4, 0]}>
-                   {
-                    [
-                      { fill: '#3b82f6' },
-                      { fill: '#8b5cf6' },
-                      { fill: '#ec4899' },
-                      { fill: '#10b981' },
-                    ].map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))
-                   }
-                </Bar>
               </ComposedChart>
             </ResponsiveContainer>
           </div>

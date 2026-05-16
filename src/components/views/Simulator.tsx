@@ -2,19 +2,18 @@ import { useState } from 'react';
 import { MonitorPlay, Loader2, Bot, Sparkles } from 'lucide-react';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
-import { checkTierAccess } from '@/constants/tiers';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
 import { logSimulatorResult } from '@/lib/metrics';
 
 export function Simulator() {
-  const { tier, role, user } = useAuth();
+  const { tier, user } = useAuth();
   const [query, setQuery] = useState('');
   const [brand, setBrand] = useState('');
   const [isSimulating, setIsSimulating] = useState(false);
   const [results, setResults] = useState<any>(null);
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Medium')) {
+  if (tier === 'Free' || tier === 'Basic') {
     return (
       <div className="space-y-6">
         <div>
@@ -36,16 +35,46 @@ export function Simulator() {
     setResults(null);
 
     try {
-      const res = await fetch('/api/simulate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, brand })
-      });
-      const data = await res.json();
-      
-      if (!data.success) throw new Error(data.error);
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+      if (!apiKey) throw new Error("API key is missing");
+      const ai = new GoogleGenAI({ apiKey });
 
-      const parsedResult = data.result;
+      const prompt = `
+        You are an advanced AI simulation engine.
+        Simulate how 4 different AI engines (ChatGPT, Claude, Gemini, Perplexity) would answer the following high-intent query: "${query}".
+        The brand we are tracking is: "${brand}".
+        
+        For each engine, write a realistic 2-3 sentence response to the query. 
+        Decide randomly if the engine should mention the brand or a competitor. 
+        
+        Return a JSON object with:
+        - chatgpt: { response: string, mentionedBrand: boolean }
+        - claude: { response: string, mentionedBrand: boolean }
+        - gemini: { response: string, mentionedBrand: boolean }
+        - perplexity: { response: string, mentionedBrand: boolean }
+        - sovScore: number (0 to 100, based on how many mentioned the brand)
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              chatgpt: { type: Type.OBJECT, properties: { response: { type: Type.STRING }, mentionedBrand: { type: Type.BOOLEAN } } },
+              claude: { type: Type.OBJECT, properties: { response: { type: Type.STRING }, mentionedBrand: { type: Type.BOOLEAN } } },
+              gemini: { type: Type.OBJECT, properties: { response: { type: Type.STRING }, mentionedBrand: { type: Type.BOOLEAN } } },
+              perplexity: { type: Type.OBJECT, properties: { response: { type: Type.STRING }, mentionedBrand: { type: Type.BOOLEAN } } },
+              sovScore: { type: Type.NUMBER }
+            },
+            required: ["chatgpt", "claude", "gemini", "perplexity", "sovScore"]
+          }
+        }
+      });
+
+      const parsedResult = JSON.parse(response.text || "{}");
       setResults(parsedResult);
       if (user) {
         await logAuditAction(user.uid, 'Ran SOV Simulation', { query, brand, sovScore: parsedResult.sovScore });

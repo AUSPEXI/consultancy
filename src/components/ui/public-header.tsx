@@ -24,7 +24,7 @@ export function PublicHeader({ onLoginClick }: { onLoginClick: () => void }) {
 
   return (
     <nav className="fixed top-0 w-full z-50 border-b border-zinc-800/50 bg-zinc-950/80 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Mobile Hamburger */}
         <div className="md:hidden flex items-center">
           <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-zinc-300 hover:text-white">
@@ -34,8 +34,7 @@ export function PublicHeader({ onLoginClick }: { onLoginClick: () => void }) {
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <img src="/auspexi-logo.png" alt="Auspexi Logo" className="w-14 h-14 object-contain shrink-0" />
-          <span className="font-heading font-bold text-2xl tracking-tight text-white hidden sm:block">Auspexi</span>
+          <span className="font-heading font-bold text-xl tracking-tight text-white">Auspexi</span>
         </Link>
 
         {/* Desktop Nav */}

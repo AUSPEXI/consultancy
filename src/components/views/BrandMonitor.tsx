@@ -1,18 +1,17 @@
 import { useState } from 'react';
-import { Radar, Loader2, AlertOctagon, MessageSquare, TrendingDown, PenTool } from 'lucide-react';
+import { Radar, Loader2, AlertOctagon, MessageSquare, TrendingDown } from 'lucide-react';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
-import { checkTierAccess } from '@/constants/tiers';
 
 export function BrandMonitor() {
-  const { tier, role, user } = useAuth();
+  const { tier, user } = useAuth();
   const [brand, setBrand] = useState('');
   const [isMonitoring, setIsMonitoring] = useState(false);
   const [results, setResults] = useState<any>(null);
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Medium')) {
+  if (tier === 'Free' || tier === 'Basic') {
     return (
       <div className="space-y-6">
         <div>
@@ -34,18 +33,72 @@ export function BrandMonitor() {
     setResults(null);
 
     try {
-      const res = await fetch('/api/brand-monitor', {
+      // 1. Search Exa for Reddit/Quora mentions
+      const exaRes = await fetch('/api/exa-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ brand })
+        body: JSON.stringify({ query: `"${brand}" site:reddit.com OR site:quora.com`, numResults: 5 })
       });
+      const exaData = await exaRes.json();
       
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || 'Failed to fetch consensus sentiment.');
+      if (!exaData.success) throw new Error(exaData.error);
 
-      setResults(data.result);
+      const context = exaData.results.map((r: any) => `Title: ${r.title}\nURL: ${r.url}\nText: ${r.text}`).join("\n\n");
+
+      // 2. Analyze sentiment with Gemini
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+      if (!apiKey) throw new Error("API key is missing");
+      const ai = new GoogleGenAI({ apiKey });
+
+      const prompt = `
+        You are a Defensive GEO Analyst.
+        Analyze the following search results from Reddit and Quora regarding the brand: "${brand}".
+        
+        Context:
+        ${context}
+        
+        Determine the overall sentiment and identify any "Context Poisoning Risks" (negative narratives that could be absorbed by LLMs).
+        
+        Return a JSON object with:
+        - overallSentiment: "Positive", "Neutral", or "Negative"
+        - riskScore: number (0-100, higher means more risk of AI context poisoning)
+        - threads: array of objects { title: string, url: string, sentiment: "Positive" | "Neutral" | "Negative", summary: string }
+        - actionPlan: string (what the brand should do to inject positive counter-narratives)
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              overallSentiment: { type: Type.STRING },
+              riskScore: { type: Type.NUMBER },
+              threads: { 
+                type: Type.ARRAY, 
+                items: { 
+                  type: Type.OBJECT, 
+                  properties: { 
+                    title: { type: Type.STRING }, 
+                    url: { type: Type.STRING }, 
+                    sentiment: { type: Type.STRING }, 
+                    summary: { type: Type.STRING } 
+                  } 
+                } 
+              },
+              actionPlan: { type: Type.STRING }
+            },
+            required: ["overallSentiment", "riskScore", "threads", "actionPlan"]
+          }
+        }
+      });
+
+      const parsedResult = JSON.parse(response.text || "{}");
+      setResults(parsedResult);
       if (user) {
-        await logAuditAction(user.uid, 'Ran Brand Monitor', { brand, riskScore: data.result.riskScore });
+        await logAuditAction(user.uid, 'Ran Brand Monitor', { brand, riskScore: parsedResult.riskScore });
       }
     } catch (error) {
       console.error("Error monitoring brand:", error);
@@ -142,19 +195,6 @@ export function BrandMonitor() {
                   <MessageSquare className="w-4 h-4 mt-0.5 shrink-0" />
                   <p className="leading-relaxed">{thread.summary}</p>
                 </div>
-                {(thread.sentiment === 'Negative' || thread.sentiment === 'Neutral' || thread.sentiment === 'Mixed') && (
-                  <div className="mt-4 flex justify-end">
-                    <button
-                      onClick={() => {
-                         window.dispatchEvent(new CustomEvent('set-agent-topic', { detail: { topic: `Write a counter-narrative or response addressing this consensus topic: ${thread.title}` }}));
-                         window.dispatchEvent(new CustomEvent('change-dashboard-tab', { detail: { tab: 'agents' } }));
-                      }}
-                      className="px-4 py-2 border border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 text-zinc-300 text-xs font-medium rounded-lg flex items-center gap-2 transition-colors"
-                    >
-                      <PenTool className="w-3.5 h-3.5" /> Draft Counter-Narrative (Agents)
-                    </button>
-                  </div>
-                )}
               </div>
             ))}
             {results.threads.length === 0 && (

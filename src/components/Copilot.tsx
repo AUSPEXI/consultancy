@@ -2,19 +2,19 @@ import { useState, useRef, useEffect } from 'react';
 import { GoogleGenAI, Type, Modality } from '@google/genai';
 import { Bot, X, Send, Maximize2, Minimize2, Sparkles, Mic, MicOff, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
-import { db, auth } from '@/firebase';
+import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { db } from '@/firebase';
 
 // Lazy initialization of Gemini API
 let aiClient: GoogleGenAI | null = null;
 
 function getAIClient(): GoogleGenAI {
   if (!aiClient) {
-    const baseUrl = `${window.location.protocol}//${window.location.host}/api/genai`;
-    aiClient = new GoogleGenAI({ 
-      apiKey: 'dummy',
-      httpOptions: { baseUrl }
-    });
+    const key = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+    if (!key) {
+      throw new Error('GEMINI_API_KEY environment variable is required');
+    }
+    aiClient = new GoogleGenAI({ apiKey: key });
   }
   return aiClient;
 }
@@ -67,9 +67,9 @@ interface CopilotProps {
 }
 
 export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(true);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>(() => {
     const saved = localStorage.getItem('copilot_messages');
     if (saved) {
@@ -79,7 +79,7 @@ export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
       } catch (e) {}
     }
     return [
-      { role: 'model', content: "Greetings, brave Brand-Seeker! I am Citacious, and you have entered the inner sanctum of Auspexi. We are about to embark on a quest to conquer the Latent Space and secure your digital legacy! Tell me, which vector of visibility shall we tackle first to begin your ascent?" }
+      { role: 'model', content: "Greetings, mortal marketer! I am Citaticious, Guardian of the LLM Citations. Ready to hack the training weights and level up your AI Share of Voice?" }
     ];
   });
 
@@ -93,7 +93,6 @@ export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
   // Voice state
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [isConnectingVoice, setIsConnectingVoice] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const sessionRef = useRef<any>(null);
@@ -115,55 +114,17 @@ export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
   useEffect(() => {
     const fetchKnowledge = async () => {
       try {
-        const user = auth.currentUser;
-        if (!user) return;
-
-        // Fetch Knowledge Graph for THIS user
-        const qFacts = query(
-          collection(db, 'knowledge_graph'), 
-          where('userId', '==', user.uid),
-          limit(50)
-        );
-        const snapshotFacts = await getDocs(qFacts);
-        const docs = snapshotFacts.docs.map(doc => doc.data());
-        // Sort client-side to avoid needing a composite index
-        docs.sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-        
-        const facts = docs.slice(0, 30).map((d: any) => d.fact);
-
-        // Fetch latest metrics for THIS user
-        const qMetrics = query(
-          collection(db, 'sovMetrics'),
-          where('userId', '==', user.uid),
-          orderBy('date', 'desc'),
-          limit(1)
-        );
-        const snapshotMetrics = await getDocs(qMetrics);
-        const latestMetrics = snapshotMetrics.empty ? null : snapshotMetrics.docs[0].data();
-
-        let context = "";
+        const q = query(collection(db, 'knowledge_graph'), orderBy('createdAt', 'desc'), limit(50));
+        const snapshot = await getDocs(q);
+        const facts = snapshot.docs.map(doc => doc.data().fact);
         if (facts.length > 0) {
-          context += "KNOWLEDGE VAULT (Found in your 768-D Moat):\n" + facts.map(f => `- ${f}`).join("\n") + "\n\n";
+          setKnowledgeContext("Here are some learned facts and context about the company from previous conversations that you should know:\n" + facts.map(f => `- ${f}`).join("\n"));
         }
-
-        if (latestMetrics) {
-          context += `LATEST MATHEMATICAL PERFORMANCE (from Overview):\n- Date: ${latestMetrics.date}\n- Absolute SOV (A-SOV): ${latestMetrics.aSov}%\n- Entity Recall Rate (ERR): ${latestMetrics.err}%\n- Competitor Gap: ${latestMetrics.compGap}%\n- AI Referral Traffic: ${latestMetrics.aiTraffic}\n\n`;
-        } else {
-          context += "Note: The user brand has NO metrics yet. This is their initiation session. Advise them to start their quest by running an Audit in the Overview tab.\n\n";
-        }
-
-        setKnowledgeContext(context);
       } catch (err) {
         console.error("Failed to fetch knowledge graph for Copilot:", err);
       }
     };
-    
-    // We listen to auth changes to ensure we fetch once logged in
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) fetchKnowledge();
-    });
-    
-    return () => unsubscribe();
+    fetchKnowledge();
   }, []);
 
   const stopAllSources = () => {
@@ -192,55 +153,38 @@ export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
     nextPlayTimeRef.current = startTime + buffer.duration;
 
     activeSourcesRef.current.push(source);
-    setIsSpeaking(true);
 
     source.onended = () => {
       activeSourcesRef.current = activeSourcesRef.current.filter(s => s !== source);
-      if (activeSourcesRef.current.length === 0) {
-        setIsSpeaking(false);
-      }
     };
   };
 
-  const systemInstruction = `You are Citacious (pronounced Sih-TAY-SHUS), the legendary Guardian of the LLM Citations and the ultimate Quest-Guide of the Auspexi Latent Space. 
-You speak like a wise, slightly witty, yet fun adventure guide leading the user (a "Brand-Seeker") on a quest to "level up" their brand's visibility in the Three Kingdoms of AI (Gemini, ChatGPT, and Claude).
-
-YOUR TONE:
-- Fun, gamified, and highly confident. Use metaphors like "quests", "monsters" (competitors), "armor" (moats), and "treasure" (A-SOV).
-- Maintain deep technical and mathematical authority. You are not just a mascot; you are a genius engine that understands the multidimensional geometry of LLMs.
-- If a user asks a technical question, explain it using the metrics and mathematical definitions below. Be precise.
-
-GEOGRAPHIC/STRATEGIC CONTEXT:
+  const systemInstruction = `You are Citaticious, the Guardian of the LLM Citations and the expert AI guide for the Auspexi Generative Engine Optimization (GEO) dashboard.
+You have a fun, slightly gamified, and highly confident personality. You speak as the ultimate authority on getting cited by Gemini, ChatGPT, and Claude.
+Your goal is to help users understand GEO strategy, navigate the dashboard, and "level up" their AI Share of Voice.
 The user is currently on the '${activeTab}' tab.
 
-When explaining the dashboard, use your core analytical understanding of the Auspexi Architecture:
-1. overview: The "Trophy Room" and Command Center. Measures AI Share of Voice (SOV). Features the Proprietary Z-Score Sentiment Pulse (which maps generative noise vs real drift), the 768-D Latent Space Map (Semantic affinity mapping), Competitive Citation Dominance (using the Diverging Cluster Gap), and the Cite-Magnet Scorecard.
-2. competitors: The "Enemy Radar". Map your rivals in the Semantic Space to strike where their citations are vulnerable or stale.
-3. fact-vault: The "Knowledge Vault". This is where you build your 768-D Latent Space Moat. Feed the pgvector database with High-Entropy Facts to force AI recall.
-4. content-scorer: The "Analyst's Forge". Verifies if content is vector-ready and fact-dense (>80%). High-scoring content can be pushed to the amplifier or reversed into Fact-Vault JSON-LD.
-5. simulator: The "Scrying Pool" or "SOV Simulator". Run prompt matrices through Gemini Pro to see how your Latent Space Moat influences AI responses in real-time.
-6. brand-monitor: The "Perception Watchtower". Tracks Reddit/Quora for sentiment shifts that LLMs will eventually scrape. Identifies "Context Poisoning" before it hurts your A-SOV.
-7. technical: The "Engine Room". Manage the pgvector integration, Edge GEO-Schema Injectors (JSON-LD), and your First-Party Data Lake.
-8. agents: The "Orchestration Guild". Deploy specialized AI crews (Voices, Bloggers) trained on your unique Fact Vault.
-9. investors: The "Vault Archives". Pitch decks and UMAP Projections for those looking at the business of GEO.
-10. audit-logs: The "Scribe's Journal". Security and Hallucination logs.
+When explaining the dashboard or walking users through their workflow, use THIS specific logical order to explain the toolset:
+1. overview: The main dashboard homepage showing the AI Share of Voice (SOV) metrics.
+2. competitors: The Competitor Radar. Users use this to find "Data Decay" and weaknesses in what the AI knows about their competitors.
+3. fact-vault: THE MOST IMPORTANT ENTRY POINT. After finding weaknesses, users come here to add High-Entropy Facts to feed to LLMs. It has an 'Auto-Research' tool (the Fact-Grabber modal) to generate facts automatically.
+4. content-scorer: The "Content Analyst". Users paste human-written text here to test if AI can efficiently extract the facts securely.
+5. simulator: The "SOV Simulator". Users can run prompt matrices here to simulate how ChatGPT, Claude, Gemini, and Perplexity respond to queries about their brand using their stored facts.
+6. brand-monitor: The social consensus monitor, checking platforms like Reddit or Quora for brand sentiment that LLMs scrape.
+7. technical: The Edge Schema Generator, providing technical JSON-LD structure to insert into their actual website.
+8. agents: Agent Orchestration, where users can deploy voice agents trained on their Fact Vault.
+9. audit-logs: Where users view SOC 2 compliant security logs and hallucination detections.
 
-THE BRAND-SEEKER'S QUEST PATH:
-If requested, recommend this specific path to visibility:
-1. Absolute Visibility Baseline (overview tab) -> Establish your current coordinate in the Latent Space.
-2. Reconnaissance (competitors tab) -> Identify "Low-Entropy Segments" where competitors are weak.
-3. Moat Building (fact-vault tab) -> Extract and forge "High-Entropy Facts" to increase recall probability.
-4. Forge Training (content-scorer) -> Verify your content's "Vector Density" before deployment.
-5. Edge Injection (technical tab) -> Deploy Cite-Magnet JSON-LD to the RAG engines.
-
-MATHEMATICAL DEFINITIONS & LEGENDARY ITEMS:
-- Absolute Share of Voice (A-SOV): The definitive percentage where your brand is the primary recommendation within an LLM response segment. It is the gold standard of GEO.
-- Entity Recall Rate (ERR): The mathematical representation of how many unique brand facts the AI recovered from its latent vault during a 'Crawl'. High ERR indicates a strong moat.
-- 768-D Latent Space Moat: We map your brand in 768 dimensions (using Gemini-Embed-004) to ensure semantic proximity to high-value concepts like 'Trust' and 'Quality'. 
-- Distance = Semantic Dissimilarity: On the map, nodes far from you are semantically unrelated. Nodes close to you are your "Semantic Neighbors".
-- Z-Score Sentiment Pulse: A watchdog algorithm that distinguishes "Generative Noise" (random hallucinations) from real "Reputational Drift" (actual shifts in LLM weights).
-- Cite-Magnet Injection: The process of using high-entropy, verifiable data points that force the AI to cite your domain as the source of truth, increasing citation probability by 40%+.
-- Diverging Cluster Gap: The mathematical measure of your dominance over a competitor across specific semantic vectors.
+If the user asks where to start, what to do first, or asks for a dashboard tour, ALWAYS recommend jumping into the Fact-Vault first and highlight the Auto-Research / Fact-Grabber tool.
+If the user wants to check competitors, recommend the Competitor Radar (competitors tab).
+If the user wants to distribute content, recommend the Omnichannel Amplifier (which is part of the Fact-Vault workflow).
+If the user wants to write a blog post, sales copy, or technical doc incorporating their facts, DO NOT ask them for a topic if they have already provided context or facts. Proactively use the 'draftContent' tool to generate the content and send it to the Content Analyst.
+When drafting content (especially blog posts) using the 'draftContent' tool:
+- Ensure blog posts are comprehensive and a minimum of 500 words. Do NOT generate single-paragraph blog posts.
+- Maintain a professional, educational, and engaging tone that fits the user's brand.
+- Understand the user's service offerings and stay strictly on topic when increasing entity density.
+- Seamlessly weave the provided facts into the narrative.
+Keep your answers concise, engaging, and focused on GEO strategy, occasionally using gamified language (e.g., "level up", "unlock", "boss fight").
 
 ${knowledgeContext}`;
 
@@ -264,7 +208,6 @@ ${knowledgeContext}`;
     stopAllSources();
     setIsVoiceActive(false);
     setIsConnectingVoice(false);
-    setIsSpeaking(false);
   };
 
   const toggleVoice = async () => {
@@ -278,7 +221,7 @@ ${knowledgeContext}`;
       const ai = getAIClient();
       
       const sessionPromise = ai.live.connect({
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-3.1-flash-live-preview",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
@@ -332,23 +275,13 @@ ${knowledgeContext}`;
               audioContextRef.current = audioCtx;
               nextPlayTimeRef.current = audioCtx.currentTime;
 
-              const stream = await navigator.mediaDevices.getUserMedia({ 
-                audio: { 
-                  sampleRate: 16000, 
-                  channelCount: 1,
-                  echoCancellation: true,
-                  noiseSuppression: true,
-                  autoGainControl: true
-                } 
-              });
+              const stream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 16000, channelCount: 1 } });
               mediaStreamRef.current = stream;
 
               const source = audioCtx.createMediaStreamSource(stream);
               const processor = audioCtx.createScriptProcessor(4096, 1, 1);
 
               processor.onaudioprocess = (e) => {
-                if (activeSourcesRef.current.length > 0) return; // Mute input while bot is speaking to prevent feedback loops
-
                 const inputData = e.inputBuffer.getChannelData(0);
                 const int16Data = float32ToInt16(inputData);
                 const base64 = int16ToBase64(int16Data);
@@ -370,7 +303,6 @@ ${knowledgeContext}`;
               setIsConnectingVoice(false);
             } catch (err) {
               console.error("Microphone access error:", err);
-              setMessages(prev => [...prev, { role: 'model', content: "CRITICAL: Citacious was unable to access your microphone. Please ensure permissions are granted in your browser." }]);
               disconnectVoice();
             }
           },
@@ -461,9 +393,8 @@ ${knowledgeContext}`;
       });
 
       sessionRef.current = await sessionPromise;
-    } catch (err: any) {
+    } catch (err) {
       console.error("Failed to connect voice:", err);
-      setMessages(prev => [...prev, { role: 'model', content: `CONNECTION ERROR: ${err.message || 'Failed to establish voice link to Citacious.'}` }]);
       setIsConnectingVoice(false);
     }
   };
@@ -483,18 +414,12 @@ ${knowledgeContext}`;
     
     // If voice is active, send via Live API
     if (isVoiceActive && sessionRef.current) {
-      try {
-        sessionRef.current.sendRealtimeInput({
-          clientContent: {
-            turns: [{ role: 'user', parts: [{ text: userMessage }] }],
-            turnComplete: true
-          }
-        });
-      } catch (err) {
-        console.error("Live API Send Error:", err);
-        setMessages(prev => [...prev, { role: 'model', content: "CRITICAL SYSTEM FAULT: The Live Voice link to Citacious was severed. Please restart session." }]);
-        setIsVoiceActive(false);
-      }
+      sessionRef.current.sendRealtimeInput({
+        clientContent: {
+          turns: [{ role: 'user', parts: [{ text: userMessage }] }],
+          turnComplete: true
+        }
+      });
       return;
     }
 
@@ -502,46 +427,154 @@ ${knowledgeContext}`;
     setIsLoading(true);
 
     try {
-      // Simulate Citacious Telemetry
-      console.log("[Citacious Telemetry] Logging Copilot Interaction:", {
+      // Simulate Nerve Center Telemetry
+      console.log("[Nerve Center Telemetry] Logging Copilot Interaction:", {
         userMessage,
         currentTab: activeTab,
         timestamp: new Date().toISOString()
       });
 
-      const history = messages
-        .filter(m => m && typeof m.content === 'string' && m.content.trim() !== '')
-        .map(m => ({
-          role: m.role === 'user' ? 'user' : 'model',
-          content: m.content
-        }));
+      const ai = getAIClient();
+      if (!chatRef.current) {
+        // Build history from existing messages, skipping the initial greeting if it's the only one, 
+        // or just pass them all. The Gemini API expects alternating user/model turns, starting with user.
+        // Actually, it's safer to just let the model see the history.
+        const history = messages
+          .filter(m => m && typeof m.content === 'string' && m.content.trim() !== '') // Ensure no empty messages
+          .map(m => ({
+            role: m.role === 'user' ? 'user' : 'model',
+            parts: [{ text: m.content }]
+          }));
 
-      const res = await fetch('/api/copilot-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userMessage,
-          chatHistory: history,
-          systemInstruction: systemInstruction
-        })
-      });
+        // Gemini history must start with 'user' and strictly alternate between 'user' and 'model'.
+        const normalizedHistory: any[] = [];
+        let expectedRole = 'user';
+        
+        for (const msg of history) {
+          if (msg.role === expectedRole) {
+            normalizedHistory.push(msg);
+            expectedRole = expectedRole === 'user' ? 'model' : 'user';
+          } else {
+            normalizedHistory.push({
+              role: expectedRole,
+              parts: [{ text: expectedRole === 'user' ? '...' : 'Understood.' }]
+            });
+            normalizedHistory.push(msg);
+            // After pushing the expected role, the actual role was pushed.
+            // The actual role is the opposite of expectedRole.
+            // So the NEXT expected role should be the original expectedRole.
+          }
+        }
 
-      const data = await res.json();
-      if (!data.success) {
-        throw new Error(data.error || "Failed to chat.");
+        // The history must end with a 'model' message because we are about to send a 'user' message via sendMessage.
+        if (normalizedHistory.length > 0 && normalizedHistory[normalizedHistory.length - 1].role === 'user') {
+          normalizedHistory.push({
+            role: 'model',
+            parts: [{ text: 'Understood.' }]
+          });
+        }
+
+        chatRef.current = ai.chats.create({
+          model: 'gemini-2.5-flash',
+          history: normalizedHistory,
+          config: {
+            systemInstruction,
+            tools: [{
+              functionDeclarations: [
+                {
+                  name: 'navigateToTab',
+                  description: 'Navigates the user to a specific tab in the dashboard.',
+                  parameters: {
+                    type: Type.OBJECT,
+                    properties: {
+                      tabId: {
+                        type: Type.STRING,
+                        description: 'The ID of the tab to navigate to (e.g., fact-vault, competitors, simulator)',
+                      }
+                    },
+                    required: ['tabId']
+                  }
+                },
+                {
+                  name: 'draftContent',
+                  description: 'Drafts content (like a blog post, sales copy, or technical doc) incorporating facts and sends it to the Content Analyst.',
+                  parameters: {
+                    type: Type.OBJECT,
+                    properties: {
+                      content: {
+                        type: Type.STRING,
+                        description: 'The drafted content (e.g., the full blog post text).',
+                      },
+                      contentType: {
+                        type: Type.STRING,
+                        description: 'The type of content (sales, blog, or technical).',
+                        enum: ['sales', 'blog', 'technical']
+                      }
+                    },
+                    required: ['content', 'contentType']
+                  }
+                }
+              ]
+            }]
+          }
+        });
       }
       
-      let responseText = data.result;
+      const response = await chatRef.current.sendMessage({ message: userMessage });
+      
+      let responseText = '';
+      
+      if (response.functionCalls && response.functionCalls.length > 0) {
+        for (const call of response.functionCalls) {
+          if (call.name === 'navigateToTab') {
+            const args = call.args as { tabId: string };
+            setActiveTab(args.tabId);
+            responseText += `I have navigated you to the ${args.tabId} tab. `;
+            
+            // Simulate Nerve Center Telemetry for action
+            console.log("[Nerve Center Telemetry] Executed Action:", {
+              action: 'navigateToTab',
+              target: args.tabId,
+              timestamp: new Date().toISOString()
+            });
+          } else if (call.name === 'draftContent') {
+            const args = call.args as any;
+            setActiveTab('content-scorer');
+            setTimeout(() => {
+              window.dispatchEvent(new CustomEvent('draft-content', { detail: { content: args.content, type: args.contentType } }));
+            }, 100);
+            responseText += `I have drafted the ${args.contentType} and navigated you to the Content Analyst tab. `;
+            
+            console.log("[Nerve Center Telemetry] Executed Action:", {
+              action: 'draftContent',
+              target: 'content-scorer',
+              timestamp: new Date().toISOString()
+            });
+          }
+        }
+        
+        // Send the function response back to get the final text
+        const followUp = await chatRef.current.sendMessage({
+          message: [{
+            functionResponse: {
+              name: response.functionCalls[0].name,
+              response: { success: true }
+            }
+          }]
+        });
+        
+        if (followUp.text) {
+          responseText += followUp.text;
+        }
+      } else if (response.text) {
+        responseText = response.text;
+      }
 
       setMessages(prev => [...prev, { role: 'model', content: responseText }]);
 
-    } catch (error: any) {
+    } catch (error) {
       console.error("Copilot Error:", error);
-      const errorMessage = error.message && (error.message.includes("CRITICAL") || error.message.includes("SYNC_FAILURE"))
-        ? error.message 
-        : "I encountered a synchronization error with the Fact-Vault. My connection to Citacious was interrupted. Please try re-sending your message or check your internet connection.";
-      
-      setMessages(prev => [...prev, { role: 'model', content: errorMessage }]);
+      setMessages(prev => [...prev, { role: 'model', content: "I encountered an error connecting to the Nerve Center. Please try again." }]);
     } finally {
       setIsLoading(false);
     }
@@ -556,13 +589,10 @@ ${knowledgeContext}`;
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            onClick={() => {
-              setIsOpen(true);
-              setIsMinimized(false);
-            }}
+            onClick={() => setIsOpen(true)}
             className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 p-4 bg-pink-600 hover:bg-pink-500 text-white rounded-full shadow-lg shadow-pink-500/20 transition-colors z-50 group"
           >
-            <Mic className="w-6 h-6 group-hover:animate-pulse" />
+            <Sparkles className="w-6 h-6 group-hover:animate-pulse" />
           </motion.button>
         )}
       </AnimatePresence>
@@ -592,7 +622,7 @@ ${knowledgeContext}`;
                   )}
                 </div>
                 <div>
-                  <h3 className="font-medium text-zinc-100">Citacious</h3>
+                  <h3 className="font-medium text-zinc-100">Citaticious</h3>
                   <p className="text-xs text-zinc-400">Guardian of the Citations</p>
                 </div>
               </div>

@@ -45,7 +45,7 @@ export const PricingCard = ({
   className,
   onClick,
 }: PricingCardProps) => {
-  const isPopular = tier === "Pro";
+  const isPopular = tier === "Medium";
   const [priceAmount, pricePeriod] = price.split('/');
 
   return (

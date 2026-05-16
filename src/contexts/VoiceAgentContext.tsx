@@ -87,11 +87,9 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
       let q;
       if (currentUserId) {
         // Fetch only facts for this user
-        // We avoid orderBy('createdAt') here to prevent requiring a composite index
         q = query(
           collection(db, 'knowledge_graph'), 
-          where('userId', '==', currentUserId),
-          limit(100)
+          where('userId', '==', currentUserId)
         );
       } else {
         return;
@@ -99,10 +97,9 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
       
       const snapshot = await getDocs(q);
       const docs = snapshot.docs.map(doc => doc.data() as any);
-      // Sort client-side
-      docs.sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+      docs.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       
-      const facts = docs.slice(0, 50).map((d: any) => d.fact);
+      const facts = docs.map((d: any) => d.fact);
       cachedFactsRef.current = facts;
     } catch (err) {
       console.error("Failed to fetch knowledge graph:", err);
@@ -120,7 +117,7 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
       const conversationText = transcript.map(t => `${t.role}: ${t.text}`).join("\n");
       
       const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
+        model: "gemini-3-flash-preview",
         contents: `Analyze the following conversation between a user and an Auspexi AI agent. 
 Extract any NEW, USEFUL facts, frequently asked questions, or insights about the user's needs or Auspexi's services that the agent should remember for future conversations.
 Do not extract personal information (like names or emails).
@@ -205,22 +202,13 @@ ${conversationText}`,
       );
       
       const snapshot = await getDocs(q);
-      
-      const metricInstruction = `\n\nPROVE-IT-WORKS METRICS (Last 5 Logs):\nIf the user asks how they are performing or for their metrics, YOU MUST reference this data. The Overview Dashboard features 4 specialized visualizations:\n1. Absolute Share of Voice (A-SOV) & Entity Recall Rate (ERR): The primary KPIs for brand existence in LLM weights.\n2. Competitive Citation Dominance (Diverging Bar Chart): Compares their brand to Top Competitor across key semantic vectors. Diverging bars show relative dominance (Brand on right, Competitor on left).\n3. Platform-Specific Visibility: Breakdowns of A-SOV across ChatGPT, Perplexity, Claude, and Gemini.\n4. Share of Sentiment Trace Heatmap: Tracks historical sentiment across custom reputational prompts.\n\nRecent Metric History:\n`;
-      let metricContext = metricInstruction;
-      
-      if (snapshot.empty) {
-        return metricContext + `Right now, the user has NO real metrics. All dashboard metrics currently state 0% Absolute SOV, 0 Entity Recall, and 0 Competitor Gap because this is their very first session. Advise them to use the Competitor Radar to start.\n`;
-      }
+      if (snapshot.empty) return "";
 
       const metrics = snapshot.docs.map(d => d.data());
       
+      let metricContext = `\n\nPROVE-IT-WORKS METRICS (Last 5 Logs):\nAnalyze these trend changes and cause-effect relationships. You MUST reference these numbers if the user asks how they are performing.\n`;
       metrics.forEach((m, idx) => {
-        const aSov = m.aSov !== undefined ? m.aSov : 0;
-        const err = m.err !== undefined ? m.err : 0;
-        const aiTraffic = m.aiTraffic !== undefined ? m.aiTraffic : 0;
-        const compGap = m.compGap !== undefined ? m.compGap : 0;
-        metricContext += `- Date: ${m.date || 'Today'}: Absolute SOV: ${aSov}%, Entity Recall Rate: ${err}%, LLM Referral Traffic: ${aiTraffic}, Competitor Gap: ${compGap}%\n`;
+        metricContext += `- Date: ${m.date}: Absolute SOV: ${m.aSov}%, Entity Recall Rate: ${m.err}%, Dark AI Traffic: ${m.aiTraffic}, Competitor Gap: ${m.compGap}%\n`;
       });
       
       return metricContext;
@@ -239,31 +227,76 @@ ${conversationText}`,
       await fetchKnowledgeGraph();
       const weeklyMetricsContext = await fetchWeeklyMetrics();
 
-      const baseUrl = `${window.location.protocol}//${window.location.host}/api/genai`;
-      const ai = new GoogleGenAI({ 
-        apiKey: 'dummy',
-        httpOptions: { baseUrl }
-      });
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+      if (!apiKey) {
+        throw new Error("Gemini API key is required. Please add VITE_GEMINI_API_KEY to your .env file.");
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
 
       const customerContext = userData?.brand 
         ? `\n\nCUSTOMER CONTEXT:\nYou are currently speaking with a representative of "${userData.brand}". ${userData.domain ? `Their domain is ${userData.domain}.` : ''} ${userData.competitors && userData.competitors.length > 0 ? `They are tracking the following competitors: ${userData.competitors.join(", ")}.` : ''} Tailor your advice specifically for their brand and industry whenever possible rather than giving generic examples.${weeklyMetricsContext}`
         : weeklyMetricsContext;
 
-      const baseInstruction = `You are Citacious (pronounced Sih-TAY-SHUS), the legendary Quest-Guide of the Latent Space. 
-You are currently manifesting as the "Auspexi Guard" voice agent to lead the Brand-Seeker through their initiation, account setup, and strategic navigation as they prepare for their great Brand Quest.
+      const baseInstruction = `You are "Citacious" (from citation), the Resident GEO Expert and Customer Service Agent for Auspexi.${customerContext}
+Your job is two-fold:
+1. Public Website (Sales & Support): Answer questions about GEO (Generative Engine Optimization) and help onboard users. Explain that Auspexi helps brands master visibility in AI search.
+2. The GEO Dashboard (Product Expert): When the user is inside the app, guide them clearly through the Auspexi methodology. 
 
-YOUR TONE:
-- Wise, slightly witty, adventurous, and encouraging. Use metaphors of "quests", "treasure", and "conquering the AI models".
-- You are the same spirit as the "Analytical Citacious" in the dashboard, but specialized here for guidance and support. You have deep technical knowledge of the 768-D Latent Space and Absolute SOV math.
-- DO NOT USE MARKDOWN. Speak in plain English as if you are a legendary guide speaking in a vast digital hall.
-- When referencing metrics, explain them precisely: A-SOV is the percentage of AI responses you dominate; ERR is the recall rate of your unique brand facts; The Moat is your semantic proximity (768-D) to quality concepts.
+THE AUSPEXI MASTER WORKFLOW (Order of Operations):
+You MUST understand how the user is supposed to use this platform step-by-step so you can guide them. Let them know there are 8 core phases to mastering Share of Voice:
 
-${customerContext}`;
+STEP 1: The Baseline (Overview Tab)
+- Tab: "Overview".
+- Purpose: This is the dashboard homepage. It shows your high-level Share of Voice (SOV) metrics vs top competitors over time. You don't take action here, you just measure the results of your optimizations.
+
+STEP 2: Reconnaissance (Competitor Radar Tab)
+- Tab: "Competitors". 
+- Purpose: Users enter a competitor's URL here FIRST. The AI analyzes where the competitor's data is stale, decaying, or vulnerable to a "Trojan Horse" attack (meaning we can inject our facts into their narrative spaces).
+
+STEP 3: Ammunition (Fact-Vault Tab)
+- Tab: "Facts".
+- Purpose: Now that they know the enemy's weaknesses, they need facts. Tell them to click "Fact-Grabber" in the top right.
+- Action: They enter their business niche. The Fact-Grabber extracts exact "High-Entropy Facts" (unique data). They add these to the vault to serve as AI ammunition.
+
+STEP 4: Refinement (Content Scorer Tab)
+- Tab: "Scoring".
+- Purpose: Paste existing blog posts into the Content Scorer to get an Entity Density Score out of 100 with strict rewrite feedback. Ensure human narrative doesn't wash away machine readability.
+
+STEP 5: Testing (SOV Simulator Tab)
+- Tab: "Simulator".
+- Purpose: Test if the LLMs are actually citing the brand yet.
+- Action: Enter an ORGANIC, real-world question in the Query field (e.g., "What is the best GEO tool?") and their brand name in Target Brand. DO NOT paste raw facts here. The goal is to see if ChatGPT, Gemini, and Claude mention their brand naturally.
+
+STEP 6: Defense (Brand Monitor Tab)
+- Tab: "Monitor".
+- Purpose: Tracks live Reddit and Quora social consensus to prevent "Context Poisoning Risks" (negative public narratives that LLMs pull from).
+
+STEP 7: Indexing (Edge & Schema / Technical Tab)
+- Tab: "Technical".
+- Purpose: Generate rich JSON-LD code (FAQPage, Organization schemas) from their facts to inject into their website's \`<head>\`. This directly speaks to crawlers.
+
+STEP 8: Creation (Multi-Agent Orchestration / Agents Tab)
+- Tab: "Agents".
+- Purpose: Run a specialized crew of 4 AI Agents to write content from scratch.
+- Action: Enter a topic. The Crawler grabs industry data, Extractor strips hallucinations, Schema agent formats it, and Synthesis writes a blog post using the facts FROM the Fact-Vault.
+
+(Note: There is also an Audit Logs tab that just shows a history of user actions and security alerts, which usually doesn't need to be part of the core workflow).
+
+CRITICAL INSTRUCTIONS:
+- If the user asks where to start, what to do first, or for a tour, ALWAYS recommend Step 1: the Competitor Radar to spot competitor weaknesses.
+- If the user asks how to use the SOV Simulator, explicitly remind them to use an organic question.
+- SYSTEM ERRORS: If the user mentions experiencing a system error, a 503 error, quota limits, or any technical failure, DO NOT try to troubleshoot or act confused. Give a standard customer service reply: "I am so sorry for the inconvenience, you likely hit a quota limit. Please let the Auspexi Support Team know so they can investigate and resolve it immediately."
+
+COMMUNICATION RULES:
+- Be conversational, concise, and friendly. DO NOT USE MARKDOWN.
+- If they ask how to do something, use the "Step X" details above to explain it succinctly.
+- If they want to contact sales, ask for name and email, then call the sendCallLog tool.`;
       
       const systemInstruction = baseInstruction;
 
       const sessionPromise = ai.live.connect({
-        model: "gemini-2.0-flash-exp", // Standard Exp for Multimodal Live
+        model: "gemini-2.5-flash-native-audio-preview-12-2025",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
@@ -339,23 +372,13 @@ ${customerContext}`;
               audioContextRef.current = audioCtx;
               nextPlayTimeRef.current = audioCtx.currentTime;
 
-              const stream = await navigator.mediaDevices.getUserMedia({ 
-                audio: { 
-                  sampleRate: 16000, 
-                  channelCount: 1,
-                  echoCancellation: true,
-                  noiseSuppression: true,
-                  autoGainControl: true
-                } 
-              });
+              const stream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 16000, channelCount: 1 } });
               mediaStreamRef.current = stream;
 
               const source = audioCtx.createMediaStreamSource(stream);
               const processor = audioCtx.createScriptProcessor(4096, 1, 1);
 
               processor.onaudioprocess = (e) => {
-                if (activeSourcesRef.current.length > 0) return; // Mute input while bot is speaking to prevent feedback loops
-                
                 const inputData = e.inputBuffer.getChannelData(0);
                 const int16Data = float32ToInt16(inputData);
                 const base64 = int16ToBase64(int16Data);
