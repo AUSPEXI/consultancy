@@ -10,7 +10,6 @@ import { ContentScorer } from '@/components/views/ContentScorer';
 import { Simulator } from '@/components/views/Simulator';
 import { BrandMonitor } from '@/components/views/BrandMonitor';
 import { AuditLogs } from '@/components/views/AuditLogs';
-import { Settings } from '@/components/views/Settings';
 import { Copilot } from '@/components/Copilot';
 import { OnboardingModal } from '@/components/ui/onboarding-modal';
 import { useAuth } from '@/contexts/AuthContext';
@@ -43,7 +42,6 @@ export function Dashboard() {
       case 'competitors': return <Competitors />;
       case 'technical': return <Technical />;
       case 'agents': return <Agents />;
-      case 'settings': return <Settings />;
       default: return <Overview />;
     }
   };
