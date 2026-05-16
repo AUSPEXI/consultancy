@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
 import { SparklesCore } from '@/components/ui/sparkles';
 import { SplineScene } from '@/components/ui/splite';
 import { BentoGrid, BentoCard } from '@/components/ui/bento-grid';
@@ -9,7 +8,7 @@ import { Footerdemo } from '@/components/ui/footer-section';
 import { TestimonialsColumn } from '@/components/ui/testimonials-columns-1';
 import { ImageZoom } from '@/components/ui/image-zoom';
 import { DottedSurface } from '@/components/ui/dotted-surface';
-import { ArrowRight, Bot, Target, Zap, Search, BarChart3, ShieldAlert, CheckCircle2, Database, Mic, Brain, Blocks, Activity, Hash } from 'lucide-react';
+import { ArrowRight, Bot, Target, Zap, Search, BarChart3, ShieldAlert, CheckCircle2, Database, Mic, Brain, Blocks, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LeadCaptureModal } from '@/components/ui/lead-capture-modal';
@@ -29,16 +28,6 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
   const [modalSource, setModalSource] = useState('trial');
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [currency, setCurrency] = useState<'GBP' | 'USD'>('GBP');
-
-  // Latent Space Node Labels for Hero Section
-  const latentNodes = [
-    { label: 'RENDER_NODE:TRUST', x: '10%', y: '20%', delay: 0 },
-    { label: 'SYS_LATENT_OK', x: '85%', y: '15%', delay: 0.5 },
-    { label: 'VECTOR_768_D', x: '15%', y: '80%', delay: 1 },
-    { label: 'GEO_CANONICAL', x: '80%', y: '75%', delay: 1.5 },
-    { label: 'NODE_P1856', x: '45%', y: '10%', delay: 2 },
-    { label: 'EMBED_V3_MAP', x: '60%', y: '85%', delay: 2.5 }
-  ];
 
   useEffect(() => {
     // Auto-detect IP for currency
@@ -107,35 +96,35 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       Icon: Search,
       name: "Zero-Click Dominance",
       description: "Ensure your brand is the definitive answer when users query AI, completely bypassing the traditional SERP. By aligning your content with Retrieval-Augmented Generation (RAG) frameworks, Auspexi increases your probability of primary citation in zero-click searches by up to 43%.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-amber-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
     },
     {
       Icon: Brain,
       name: "Citacious AI Analyst",
       description: "A dedicated 12-Month Citacious Context Memory analyst that organically understands your dashboard tools, analyzes past results, and orchestrates intelligent future actions to ensure maximum visibility.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-sky-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-zinc-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-2 lg:col-end-4 lg:row-start-1 lg:row-end-2",
     },
     {
       Icon: Target,
       name: "Cite-Magnet Injection",
       description: "We extract and inject High-Entropy Facts to force AI models to cite your content. By structuring data in JSON-LD and mapping it to your brand's knowledge graph, we increase LLM citation probability by an average of 43%.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-emerald-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-2 lg:col-end-3 lg:row-start-2 lg:row-end-3",
     },
     {
       Icon: Database,
       name: "Fact-Vault Extraction",
       description: "Automatically find the highest-entropy data points in your whitepapers, case studies, and proprietary research, turning them into potent cite-magnets that models crave.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-emerald-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-zinc-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-3 lg:col-end-4 lg:row-start-2 lg:row-end-3",
     },
     {
       Icon: BarChart3,
       name: "SOV Simulator & Brand Monitor",
       description: "Track your brand's visibility across Gemini, ChatGPT, and Claude in real-time. Understand exactly how often you are recommended for high-intent industry queries.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-violet-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-3 lg:row-start-3 lg:row-end-4",
     },
     {
@@ -149,14 +138,14 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       Icon: ShieldAlert,
       name: "768-D Latent Space Moat",
       description: "Our proprietary pgvector integration mathematically ensures your brand remains the canonical truth. By generating embeddings with Gemini, we map your brand's semantic proximity to subjective attributes like 'trust' or 'quality'.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-fuchsia-700/50 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-rose-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-5",
     },
     {
       Icon: Zap,
       name: "Edge & Schema Generator",
       description: "Deploy GEO-optimized JSON-LD schema directly to your site with one click. Ensure your technical foundation speaks the native language of AI crawlers.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-yellow-500/50 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-amber-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5",
     },
   ];
@@ -206,20 +195,8 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       <PublicHeader onLoginClick={onLoginClick} />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-black">
-        {/* Subtle pink vector grid overlay like on the blog */}
-        <div 
-          className="absolute inset-0 opacity-[0.15] pointer-events-none z-[1]"
-          style={{
-            backgroundImage: `linear-gradient(to right, #EC4899 1px, transparent 1px), linear-gradient(to bottom, #EC4899 1px, transparent 1px)`,
-            backgroundSize: '40px 40px',
-            backgroundPosition: 'left top',
-            WebkitMaskImage: 'radial-gradient(circle at center, black 10%, transparent 80%)',
-            maskImage: 'radial-gradient(circle at center, black 10%, transparent 80%)',
-          }}
-        />
-
-        <div className="absolute inset-0 w-full h-full z-0 opacity-40">
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div className="absolute inset-0 w-full h-full z-0">
           <SparklesCore
             id="tsparticlesfullpage"
             background="transparent"
@@ -230,23 +207,20 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
             particleColor="#ffffff"
             speed={1}
           />
+          <div className="absolute inset-0 bg-zinc-950 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Column */}
             <div className="text-left md:col-span-5">
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20 text-pink-400 text-sm font-medium mb-6"
-              >
+              <div className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-zinc-800/50 border border-zinc-700 text-zinc-300 text-sm font-medium mb-6">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zinc-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-zinc-500"></span>
                 </span>
                 The New Era of Search is Here
-              </motion.div>
+              </div>
               <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-heading tracking-tight mb-6 leading-[1.1]">
                 Don't let AI leave your <span className="text-white">brand behind.</span>
               </h1>
@@ -254,80 +228,48 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
                 Traditional SEO is dying. Auspexi is the premier Generative Engine Optimization (GEO) platform that ensures your brand is cited, recommended, and prioritized by AI models like Gemini, ChatGPT, and Claude.
               </p>
               
-              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 mb-8 backdrop-blur-sm">
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 mb-8">
                 <h3 className="text-white font-semibold mb-2">What is Generative Engine Optimization (GEO)?</h3>
                 <p className="text-sm text-zinc-300 leading-relaxed">
-                  Generative Engine Optimization (GEO) is the process of optimizing your brand's content so that it is cited as the primary source of truth by AI models like ChatGPT, Google Gemini, Claude, and Perplexity.
+                  Generative Engine Optimization (GEO) is the process of optimizing your brand's content so that it is cited as the primary source of truth by AI models like ChatGPT, Google Gemini, Claude, and Perplexity. Unlike traditional SEO which focuses on ranking links on a search engine results page, GEO focuses on ensuring your facts and data are the ones the AI chooses to synthesize into its direct answers.
                 </p>
               </div>
               
-              <div className="flex flex-col gap-3 w-full max-w-md relative z-20">
+              <div className="flex flex-col gap-3 w-full max-w-md">
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Input 
                     type="email" 
                     placeholder="Enter your work email" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-zinc-900/80 border-zinc-800 focus-visible:ring-pink-700 text-white placeholder:text-zinc-500 h-12"
+                    className="bg-zinc-900/50 border-zinc-800 focus-visible:ring-zinc-700 text-white placeholder:text-zinc-500 h-12"
                   />
                   <Input 
                     type="text" 
                     placeholder="Company domain" 
                     value={domain}
                     onChange={(e) => setDomain(e.target.value)}
-                    className="bg-zinc-900/80 border-zinc-800 focus-visible:ring-pink-700 text-white placeholder:text-zinc-500 h-12"
+                    className="bg-zinc-900/50 border-zinc-800 focus-visible:ring-zinc-700 text-white placeholder:text-zinc-500 h-12"
                   />
                 </div>
-                <Button onClick={() => handleOpenModal('report')} className="bg-white hover:bg-zinc-200 text-black h-12 w-full rounded-xl font-medium text-lg shadow-[0_0_20px_-5px_white]">
+                <Button onClick={() => handleOpenModal('report')} className="bg-white hover:bg-zinc-200 text-black h-12 w-full rounded-xl font-medium text-lg">
                   Get Free Report
                 </Button>
               </div>
             </div>
 
-            {/* Right Column - LATENT SPACE VIZ */}
+            {/* Right Column */}
             <div className="md:col-span-7 relative h-[400px] md:h-[600px] w-full flex items-center justify-end">
-              <div className="absolute inset-0 w-[120%] -right-[10%] h-full z-10">
+              <div className="absolute inset-0 w-[120%] -right-[10%] h-full">
                 <SplineScene 
                   scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
                   className="w-full h-full"
                 />
               </div>
-              
-              {/* Floating Latent Space Node Annotations */}
-              <div className="absolute inset-0 z-30 pointer-events-none overflow-hidden">
-                {latentNodes.map((node, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ 
-                      opacity: [0.3, 0.6, 0.3],
-                      y: [0, -10, 0],
-                      x: [0, 5, 0],
-                    }}
-                    transition={{
-                      duration: 4 + Math.random() * 2,
-                      repeat: Infinity,
-                      delay: node.delay,
-                      ease: "easeInOut"
-                    }}
-                    style={{ left: node.x, top: node.y }}
-                    className="absolute flex items-center gap-2 whitespace-nowrap"
-                  >
-                    <div className="w-1.5 h-1.5 rounded-full bg-pink-500 shadow-[0_0_8px_#EC4899]" />
-                    <span className="text-[10px] font-mono tracking-widest text-[#F472B6]/70 uppercase">
-                      {node.label}
-                    </span>
-                  </motion.div>
-                ))}
-              </div>
-              
-              {/* Radial Fade Overlay */}
-              <div className="absolute inset-0 bg-transparent z-[20] pointer-events-none [mask-image:radial-gradient(circle_at_center,transparent_30%,black_100%)]" />
             </div>
           </div>
         </div>
       </section>
-
 
       {/* Video Section */}
       <section className="py-24 bg-zinc-950 border-y border-zinc-900 relative">
@@ -489,6 +431,69 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section id="faq" className="py-24 bg-zinc-950 border-y border-zinc-900">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">Frequently Asked Questions</h2>
+            <p className="text-zinc-400 text-lg">
+              Everything you need to know about Auspexi and GEO.
+            </p>
+          </div>
+          
+          <div className="space-y-6">
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+              <h3 className="text-xl font-semibold text-white mb-2">What is Generative Engine Optimization (GEO)?</h3>
+              <p className="text-zinc-400">
+                GEO is the evolution of SEO. Instead of optimizing for blue links on Google, GEO optimizes your brand to be the definitive answer inside AI models like ChatGPT, Claude, Gemini, and Perplexity. It's about securing your "Share of Voice" across AI Answer Engines.
+              </p>
+            </div>
+
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+              <h3 className="text-xl font-semibold text-white mb-2">Why do I need GEO if I already do SEO?</h3>
+              <p className="text-zinc-400">
+                AI search engines don't rank pages the way Google does. They synthesize answers based on "High-Entropy Facts" and semantic relevance. Traditional SEO tactics (like keyword stuffing or backlinks) don't guarantee AI citations. Auspexi bridges this gap by structuring your data exactly how LLMs prefer to consume it.
+              </p>
+            </div>
+
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+              <h3 className="text-xl font-semibold text-white mb-2">What exactly am I buying?</h3>
+              <p className="text-zinc-400">
+                You are getting access to a proprietary suite of Generative Engine Optimization (GEO) tools. This includes our Multi-Engine SOV Simulator to track your brand across AI models, our Content Scorer to ensure your text is AI-readable, our JSON-LD Cite-Magnet Generator to inject high-entropy facts into your site's code, and our Consensus Platform Monitor to defend your brand against negative AI context poisoning.
+              </p>
+            </div>
+            
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+              <h3 className="text-xl font-semibold text-white mb-2">How does the billing work? Can I cancel?</h3>
+              <p className="text-zinc-400">
+                Yes, our subscriptions are month-to-month. You can cancel anytime after your first month's subscription. There are no long-term lock-ins unless you choose an annual plan.
+              </p>
+            </div>
+
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+              <h3 className="text-xl font-semibold text-white mb-2">What happens if I cancel a special or one-time deal?</h3>
+              <p className="text-zinc-400">
+                If you secure a discounted rate, lifetime deal, or special promotional pricing, that rate is locked in for as long as your subscription remains active. If you decide to cancel and sign back up later, you will be subject to the standard, full subscription pricing available at that time.
+              </p>
+            </div>
+
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+              <h3 className="text-xl font-semibold text-white mb-2">How quickly will I see results?</h3>
+              <p className="text-zinc-400">
+                Unlike traditional SEO which can take 6-12 months, GEO results can often be seen much faster. When you inject Cite-Magnets and update your JSON-LD schema, AI models can pick up these high-entropy facts during their next crawl or training run, often resulting in increased Share of Voice within weeks.
+              </p>
+            </div>
+            
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+              <h3 className="text-xl font-semibold text-white mb-2">Do I need technical knowledge to use this?</h3>
+              <p className="text-zinc-400">
+                No. We've abstracted the complex AI engineering into simple, actionable tools. Our JSON-LD generator creates the exact code you need to copy-paste into your website, and our Content Scorer tells you exactly what to change in plain English.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing */}
       <section id="pricing" className="py-24">
         <div className="max-w-6xl mx-auto px-6">
@@ -512,62 +517,68 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <PricingCard
-              tier="Starter"
-              price={currency === 'USD' ? "$99/mo" : "£79/mo"}
-              bestFor="For individuals exploring AI visibility"
-              CTA="Start Now"
+              tier="Basic"
+              price={currency === 'USD' ? "$119/mo" : "£99/mo"}
+              bestFor="For startups establishing AI presence"
+              CTA="Start Basic"
               onClick={() => handleCheckout('Basic')}
               benefits={[
                 { text: "Track 1 Brand, 5 Keywords", checked: true },
                 { text: "Citacious AI Copilot (Standard)", checked: true },
                 { text: "Fact-Vault Access", checked: true },
-                { text: "Basic GEO Sentiment Analysis", checked: true },
-                { text: "Weekly Brand Pulse", checked: true },
+                { text: "Content Scorer Access", checked: true },
+                { text: "30-Day Metric Analytics Storage", checked: true },
+                { text: "Sentiment Drift (Z-Score)", checked: true },
+                { text: "Standard Audit Logging", checked: true },
+                { text: "12-Month Citacious Context Memory", checked: false },
               ]}
             />
             <PricingCard
               tier="Pro"
-              price={currency === 'USD' ? "$199/mo" : "£159/mo"}
-              bestFor="For lean marketing teams"
+              price={currency === 'USD' ? "$399/mo" : "£349/mo"}
+              bestFor="For growing teams & agencies"
               CTA="Start Pro"
               onClick={() => handleCheckout('Pro')}
               benefits={[
-                { text: "Track 3 Brands, 10 Keywords", checked: true },
-                { text: "Full 768-D Latent Map Preview", checked: true },
-                { text: "6 Competitor Tracking", checked: true },
-                { text: "Z-Score Anomaly Alerts", checked: true },
-                { text: "Content Scorer Advanced", checked: true },
-                { text: "12-Month Citacious Memory", checked: true },
+                { text: "Track 3 Brands, 25 Keywords", checked: true },
+                { text: "Citacious AI Copilot (Advanced)", checked: true },
+                { text: "Fact-Vault & First-Party Moat", checked: true },
+                { text: "Sentiment Drift (Z-Score)", checked: true },
+                { text: "Omnichannel Amplifier", checked: true },
+                { text: "Content Scorer Access", checked: true },
+                { text: "12-Month Citacious Context Memory", checked: true },
               ]}
             />
             <PricingCard
               tier="Business"
-              price={currency === 'USD' ? "$499/mo" : "£399/mo"}
-              bestFor="For mid-market SaaS & brands"
+              price={currency === 'USD' ? "$1,499/mo" : "£1,250/mo"}
+              bestFor="For growing brands dominating niches"
               CTA="Start Business"
               onClick={() => handleCheckout('Business')}
               benefits={[
-                { text: "Track 50 Keywords", checked: true },
-                { text: "Autonomous Social Seeding", checked: true },
-                { text: "Z-Score Predictive Alerts", checked: true },
-                { text: "Reddit & LinkedIn Automation", checked: true },
-                { text: "Unlimited Brand Tracking", checked: true },
-                { text: "Full API Access (Beta)", checked: true },
+                { text: "Track Unlimited Brands", checked: true },
+                { text: "Full 768-D Latent Space Map", checked: true },
+                { text: "SOV Simulator Matrix", checked: true },
+                { text: "Real-time Brand Monitor", checked: true },
+                { text: "Edge Schema (JSON-LD) Generator", checked: true },
+                { text: "90-Day Metric Analytics Storage", checked: true },
+                { text: "12-Month Citacious Context Memory", checked: true },
               ]}
             />
             <PricingCard
               tier="Enterprise"
-              price={currency === 'USD' ? "$2,500+/mo" : "£2,000+/mo"}
-              bestFor="For Fortune 500 market leaders"
+              price={currency === 'USD' ? "$4,999/mo" : "£3,999/mo"}
+              bestFor="For enterprise market leaders"
               CTA="Talk to AI Sales"
               onClick={() => window.location.href = '/voice-agents'}
               benefits={[
-                { text: "Unlimited Keywords & Competitors", checked: true },
-                { text: "Custom SLM Fine-tuning", checked: true },
-                { text: "Full 768-D Latent Map Access", checked: true },
-                { text: "Dedicated ML Engineer (Retainer)", checked: true },
-                { text: "SOC2 Compliance Integration", checked: true },
-                { text: "Private pgvector Instance", checked: true },
+                { text: "Custom Brand & Keyword Tracking", checked: true },
+                { text: "768-D Latent Space Map via pgvector", checked: true },
+                { text: "SOV Simulator Matrix & API Access", checked: true },
+                { text: "Real-time Brand Monitor", checked: true },
+                { text: "Edge Schema (JSON-LD) Generator", checked: true },
+                { text: "Unlimited Dashboard Analytics Storage", checked: true },
+                { text: "12-Month Citacious Context Memory", checked: true },
               ]}
             />
           </div>

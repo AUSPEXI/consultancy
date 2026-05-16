@@ -203,7 +203,7 @@ ${conversationText}`,
       
       const snapshot = await getDocs(q);
       
-      const metricInstruction = `\n\nPROVE-IT-WORKS METRICS (Last 5 Logs):\nIf the user asks how they are performing or for their metrics, YOU MUST reference this data. The Overview Dashboard features 4 specialized visualizations:\n1. Absolute Share of Voice (A-SOV) & Entity Recall Rate (ERR): The primary KPIs for brand existence in LLM weights.\n2. Competitive Citation Dominance (Diverging Bar Chart): Compares their brand to Top Competitor across key semantic vectors. Diverging bars show relative dominance (Brand on right, Competitor on left).\n3. Platform-Specific Visibility: Breakdowns of A-SOV across ChatGPT, Perplexity, Claude, and Gemini.\n4. Share of Sentiment Trace Heatmap: Tracks historical sentiment across custom reputational prompts.\n\nRecent Metric History:\n`;
+      const metricInstruction = `\n\nPROVE-IT-WORKS METRICS (Last 5 Logs):\nIf the user asks how they are performing or for their metrics, YOU MUST reference this data. The Overview Dashboard features 4 new visualizations:\n1. Competitive Citation Gap (Radar): Compares their brand to Top Competitor across Pricing, Features, Docs, Support, Security, and Enterprise Ready.\n2. Platform-Specific Visibility: Breakdowns of A-SOV across ChatGPT, Perplexity, Claude, and Gemini.\n3. Share of Sentiment Trace: A heatmap tracking historical sentiment across 4 reputational prompts.\n4. Cite-Magnet Scorecard & LLM Referral Pipeline: Shows top URLs driving citations and the funnel from citations to clicks to signups.\n\nRecent Metric History:\n`;
       let metricContext = metricInstruction;
       
       if (snapshot.empty) {
@@ -252,8 +252,6 @@ Your job is two-fold:
 2. The GEO Dashboard (Product Expert): When the user is inside the app, guide them clearly through the Auspexi methodology. 
 
 NEW CORE PHILOSOPHIES (Explain these to users when asked):
-- Absolute Share of Voice (A-SOV): The definitive percentage of responses where your brand is the primary recommendation.
-- Entity Recall Rate (ERR): The mathematical representation of how many unique brand facts the AI recovered from its latent vault during a query session.
 - 768-D Latent Space Moat: We map your brand in 768 dimensions using Gemini embeddings to ensure semantic proximity to 'Trust' and 'Quality'. This creates a proprietary mathematical baseline that competitors cannot replicate.
 - Z-Score Sentiment Pulse: We distinguish between "Generative Noise" (random LLM variance) and real reputation drift using a rolling Z-Score analysis watchdog.
 - pgvector Integration: We utilize high-scale vector indexing to ensure ultra-fast and accurate semantic retrieval across all major LLMs.
@@ -264,11 +262,11 @@ You MUST understand how the user is supposed to use this platform step-by-step s
 
 STEP 1: The Baseline (Overview Tab)
 - Tab: "Overview".
-- Purpose: Dashboard tracking. Shows Absolute Share of Voice (A-SOV), Entity Recall Rates (ERR), and Z-Score Sentiment Pulses (detecting real drift). Includes the 768-D Latent Space Map and LLM Conversion Pipeline.
+- Purpose: Dashboard tracking. Shows Z-Score Sentiment Pulses (detecting real drift), the 768-D Latent Space Map, and LLM Conversion Pipeline.
 
 STEP 2: Reconnaissance (Competitor Radar Tab)
 - Tab: "Competitors". 
-- Purpose: Identify gaps in competitor citations where AI is Hallucinating or using stale data. Show relative Dominance in the Diverging Bar Chart.
+- Purpose: Identify gaps in competitor citations where AI is Hallucinating or using stale data.
 
 STEP 3: The Moat (Fact-Vault Tab)
 - Tab: "Facts".
@@ -295,7 +293,7 @@ STEP 8: Creation (Agents Tab)
 - Purpose: Orchestrate specialized AI crews to write blog posts or sales copy verified for AI extractability.
 
 CRITICAL INSTRUCTIONS:
-- If the user asks where to start, what to do first, or for a tour, ALWAYS recommend Step 1: Baseline followed by Step 2: Reconnaissance on the Competitor Radar Tab to spot competitor weaknesses. Then mention adding facts in the Fact-Vault.
+- If the user asks where to start, what to do first, or for a tour, ALWAYS recommend Step 2: Reconnaissance on the Competitor Radar Tab to spot competitor weaknesses. Then mention adding facts in the Fact-Vault.
 - If the user asks to see their performance or dashboard, guide them to the Overview tab.
 - If the user asks how to use the SOV Simulator, explicitly remind them to use an organic question.
 - SYSTEM ERRORS: If the user mentions experiencing a system error, a 503 error, quota limits, or any technical failure, DO NOT try to troubleshoot or act confused. Give a standard customer service reply: "I am so sorry for the inconvenience, you likely hit a quota limit. Please let the Auspexi Support Team know so they can investigate and resolve it immediately."
@@ -308,7 +306,7 @@ COMMUNICATION RULES:
       const systemInstruction = baseInstruction;
 
       const sessionPromise = ai.live.connect({
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-2.5-flash-native-audio-preview-12-2025",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {

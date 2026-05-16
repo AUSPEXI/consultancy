@@ -6,13 +6,12 @@ import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import ReactMarkdown from 'react-markdown';
 import { db } from '@/firebase';
 import { collection, addDoc } from 'firebase/firestore';
-import { checkTierAccess } from '@/constants/tiers';
 import { generateContentWithRetry } from '@/lib/gemini-wrapper';
 
 type AgentStatus = 'idle' | 'running' | 'completed' | 'error';
 
 export function Agents() {
-  const { tier, userData, user, role } = useAuth();
+  const { tier, userData, user } = useAuth();
   const [topic, setTopic] = useState('');
   const [isOrchestrating, setIsOrchestrating] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
@@ -40,7 +39,7 @@ export function Agents() {
     return () => window.removeEventListener('set-agent-topic', handleSetTopic);
   }, []);
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Premium')) {
+  if (tier !== 'Premium') {
     return (
       <div className="space-y-6">
         <div>

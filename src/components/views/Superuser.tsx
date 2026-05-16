@@ -1,11 +1,9 @@
 import { useState } from 'react';
-import { ShieldAlert, Trash2, Database, Loader2, CheckCircle2, History, TrendingUp, PieChart, Eye, Rocket, Share2, ExternalLink } from 'lucide-react';
+import { ShieldAlert, Trash2, Database, Zap, Loader2, CheckCircle2, History } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/firebase';
-import { collection, query, where, getDocs, deleteDoc, doc, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, where, getDocs, deleteDoc, doc, setDoc, writeBatch } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
-import { Button } from '@/components/ui/button';
-import { blogPosts } from '@/data/blogPosts';
 
 export function Superuser() {
   const { user } = useAuth();
@@ -15,16 +13,11 @@ export function Superuser() {
 
   const collectionsToClear = [
     'sovMetrics',
-    'audit_logs',
     'auditLogs',
     'facts',
     'competitorScans',
     'contentScans',
-    'latent_space',
-    'articles',
-    'knowledge_graph',
-    'mentions',
-    'scrapes'
+    'latent_space'
   ];
 
   const hardReset = async () => {
@@ -34,62 +27,40 @@ export function Superuser() {
     setStatus(null);
     
     try {
-      console.log("Starting hard reset for user:", user.uid);
-      
       for (const collName of collectionsToClear) {
-        try {
-          const q = query(collection(db, collName), where('userId', '==', user.uid));
-          const snapshot = await getDocs(q);
-          
-          if (snapshot.empty) continue;
-          
-          console.log(`Clearing ${snapshot.size} documents from ${collName}...`);
-          
-          const batchSize = 100;
-          let processed = 0;
-          
-          while (processed < snapshot.size) {
-            const batch = writeBatch(db);
-            snapshot.docs.slice(processed, processed + batchSize).forEach(d => {
-              batch.delete(d.ref);
-            });
-            await batch.commit();
-            processed += batchSize;
-          }
-        } catch (err) {
-          console.error(`Failed to clear collection ${collName}:`, err);
-          // Continue with next collection
+        const q = query(collection(db, collName), where('userId', '==', user.uid));
+        const snapshot = await getDocs(q);
+        
+        const batchSize = 100;
+        let processed = 0;
+        
+        while (processed < snapshot.size) {
+          const batch = writeBatch(db);
+          snapshot.docs.slice(processed, processed + batchSize).forEach(d => {
+            batch.delete(d.ref);
+          });
+          await batch.commit();
+          processed += batchSize;
         }
       }
 
-      // Reset user profile onboarding - use setDoc WITHOUT merge: true to effectively clear old fields
-      const userRef = doc(db, 'users', user.uid);
-      await setDoc(userRef, {
-        uid: user.uid,
-        email: user.email,
+      // Reset user profile onboarding
+      await setDoc(doc(db, 'users', user.uid), {
         onboardingCompleted: false,
         brand: '',
         domain: '',
         keywords: [],
-        competitors: [],
-        connectedSocials: [],
-        cmsWebhookUrl: '',
-        sentimentPrompts: [],
-        tier: 'Free', // Reset to free tier
-        role: 'user',
-        createdAt: new Date().toISOString().split('T')[0]
-      });
+        competitors: []
+      }, { merge: true });
 
-      // Clear local storage and session storage
+      // Clear local storage
       localStorage.clear();
-      sessionStorage.clear();
       
-      setStatus({ type: 'success', message: 'Hard reset complete. All data purged. Reinitializing platform...' });
+      setStatus({ type: 'success', message: 'Hard reset complete. Local data purged. Redirecting...' });
       setTimeout(() => window.location.reload(), 2000);
     } catch (error) {
-      console.error("Critical failure during hard reset:", error);
       handleFirestoreError(error, OperationType.WRITE, 'multi-collection-reset');
-      setStatus({ type: 'error', message: 'Reset encountered critical errors. Check console for details.' });
+      setStatus({ type: 'error', message: 'Reset failed. Check logs.' });
     } finally {
       setIsResetting(false);
     }
@@ -119,7 +90,6 @@ export function Superuser() {
           shortDate: date.toLocaleDateString('en-US', { weekday: 'short' }),
           aSov: baseSov + Math.sin(i) * 5,
           err: 40 + (i * 3),
-          compGap: 5 + (i * 1.5),
           compA: 40 - (i * 1.5),
           aiTraffic: 100 + (i * 50) + Math.random() * 20,
           platforms: {
@@ -160,7 +130,7 @@ export function Superuser() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 md:p-12 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
           <ShieldAlert className="w-32 h-32 text-pink-500" />
@@ -184,7 +154,7 @@ export function Superuser() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <button
               onClick={seedHistoricalData}
               disabled={isSeeding || isResetting}
@@ -213,91 +183,6 @@ export function Superuser() {
               </p>
             </button>
           </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        <div className="md:col-span-8 bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
-            <PieChart className="w-24 h-24 text-pink-500" />
-          </div>
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-emerald-500" />
-              </div>
-              <h3 className="text-xl font-bold text-white">Investor Transparency Mode</h3>
-            </div>
-            <p className="text-zinc-400 text-sm mb-6 max-w-xl">
-              Use these tools to verify the "Money Machine" unit economics. These simulate high-growth scenarios used for Investor Pitch Decks and Series A Due Diligence.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Button 
-                onClick={() => window.location.href = '/investors'} 
-                variant="outline" 
-                className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10"
-              >
-                <Eye className="w-4 h-4 mr-2" /> View Live Data Room
-              </Button>
-              <Button 
-                onClick={() => {
-                  setStatus({ type: 'success', message: 'Hyper-Growth projections enabled for current session.' });
-                }}
-                variant="outline"
-                className="border-pink-500/30 text-pink-400 hover:bg-pink-500/10"
-              >
-                <Rocket className="w-4 h-4 mr-2" /> Simulate Scale-Up
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        <div className="md:col-span-4 bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8">
-          <h3 className="text-lg font-bold text-white mb-4">Lead Funnel (7-Day Hook)</h3>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center p-3 bg-zinc-950 border border-zinc-800 rounded-xl">
-              <span className="text-xs text-zinc-500">Captured Leads</span>
-              <span className="text-sm font-bold text-white">1,240</span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-zinc-950 border border-zinc-800 rounded-xl">
-              <span className="text-xs text-zinc-500">Sequence Replies</span>
-              <span className="text-sm font-bold text-white">12%</span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-zinc-950 border border-zinc-800 rounded-xl">
-              <span className="text-xs text-zinc-500">Conv. Rate</span>
-              <span className="text-sm font-bold text-emerald-500">8.4%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-8 h-8 bg-pink-500/10 rounded-lg flex items-center justify-center">
-            <Share2 className="w-5 h-5 text-pink-500" />
-          </div>
-          <h3 className="text-xl font-bold text-white">Blog Social Preview Manager</h3>
-        </div>
-        <p className="text-zinc-400 text-sm mb-6">
-          We've automated the generation of "Hot Pink Latent Space" social preview images. Visit any post's preview URL below and take a screenshot, or use an automated service to fetch these URLs.
-        </p>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-          {blogPosts.map(post => (
-            <div key={post.slug} className="p-4 bg-zinc-950 border border-zinc-800 rounded-xl flex items-center justify-between group hover:border-pink-500/30 transition-colors">
-              <div className="min-w-0">
-                <p className="text-sm font-bold text-white truncate">{post.title}</p>
-                <p className="text-[10px] text-zinc-500 font-mono">/og-preview/{post.slug}</p>
-              </div>
-              <button 
-                onClick={() => window.open(`/og-preview/${post.slug}`, '_blank')}
-                className="p-2 text-zinc-500 hover:text-pink-400 hover:bg-zinc-900 rounded-lg transition-all"
-                title="Open Social Preview"
-              >
-                <ExternalLink className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
         </div>
       </div>
 

@@ -1,40 +1,24 @@
-import { initializeApp, getApp, getApps } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// 1. Gather config from environment variables
-const firebaseConfig: any = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "dummy-api-key",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "dummy-auth-domain",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "dummy-project-id",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "dummy-storage-bucket",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "dummy-sender-id",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "dummy-app-id",
+  firestoreDatabaseId: import.meta.env.VITE_FIRESTORE_DATABASE_ID || "(default)"
 };
 
-// 2. Initialize App
-let app;
-const apps = getApps();
-
-if (apps.length > 0) {
-  app = apps[0];
-} else {
-  // If we're in AI Studio and env vars are missing, we'll try to find the config synchronously
-  // (In a real Vite build, we'd use a plugin or env injection, but here we can try a few fallbacks)
-  const finalConfig = { ...firebaseConfig };
-  
-  if (!finalConfig.apiKey) {
-    // If you need to debug config loading, you can add logs here
-    // but we'll default to dummy values to prevent absolute crashes
-    finalConfig.apiKey = finalConfig.apiKey || "AI_STUDIO_DUMMY";
-    finalConfig.projectId = finalConfig.projectId || "AI_STUDIO_DUMMY";
-  }
-
-  app = initializeApp(finalConfig);
-}
-
-// 3. Define services
-export const db = getFirestore(app, import.meta.env.VITE_FIRESTORE_DATABASE_ID || "(default)");
+// Initialize Firebase SDK
+console.log("Firebase Config:", {
+  ...firebaseConfig,
+  apiKey: firebaseConfig.apiKey ? "SET" : "MISSING"
+});
+const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
 
 export const signInWithGoogle = async () => {
@@ -43,7 +27,6 @@ export const signInWithGoogle = async () => {
     await signInWithPopup(auth, provider);
   } catch (error) {
     console.error("Error signing in with Google", error);
-    throw error;
   }
 };
 
@@ -52,6 +35,5 @@ export const logout = async () => {
     await signOut(auth);
   } catch (error) {
     console.error("Error signing out", error);
-    throw error;
   }
 };

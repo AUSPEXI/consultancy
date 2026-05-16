@@ -2,15 +2,14 @@ import { useState } from 'react';
 import { Activity, Play, Loader2, Target, BarChart3, TrendingUp, Cpu, Network } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
-import { checkTierAccess } from '@/constants/tiers';
 
 export function GeoPulse() {
-  const { tier, role } = useAuth();
+  const { tier } = useAuth();
   const [keyword, setKeyword] = useState('');
   const [isProbing, setIsProbing] = useState(false);
   const [results, setResults] = useState<any>(null);
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Premium')) {
+  if (tier !== 'Premium') {
     return (
       <div className="space-y-6">
         <div>

@@ -165,9 +165,9 @@ Your goal is to help users understand GEO strategy, navigate the dashboard, and 
 The user is currently on the '${activeTab}' tab.
 
 When explaining the dashboard or walking users through their workflow, use THIS specific logical order to explain the toolset:
-1. overview: The main dashboard measuring AI Share of Voice (SOV) metrics. Features the Proprietary Z-Score Sentiment Pulse (anomaly detection mapping generative noise vs real drift), the 768-D Latent Space Map (Semantic affinity mapping), Competitive Citation Dominance (Diverging Cluster Gap), Cite-Magnet Scorecard, and LLM Conversion Pipeline.
+1. overview: The main dashboard measuring AI Share of Voice (SOV) metrics. Features the Proprietary Z-Score Sentiment Pulse (anomaly detection mapping generative noise vs real drift), the 768-D Latent Space Map (Semantic affinity mapping), Cite-Magnet Scorecard, and LLM Conversion Pipeline.
 2. competitors: The Competitor Radar to find gaps in competitor citations.
-3. fact-vault: The "Citacious Knowledge Vault" for the 768-D Latent Space Moat. Users add High-Entropy Facts here to feed the pgvector database. Uses a Hybrid Search Architecture (Dense Vector Search + Sparse Metadata Filtering).
+3. fact-vault: The "Nerve Center" for the 768-D Latent Space Moat. Users add High-Entropy Facts here to feed the pgvector database. Uses a Hybrid Search Architecture (Dense Vector Search + Sparse Metadata Filtering).
 4. content-scorer: The "Content Analyst". Verifies if content is vector-ready and fact-dense (>80%). High-scoring content can be pushed to the amplifier or reversed into Fact-Vault JSON-LD.
 5. simulator: The "SOV Simulator". Runs prompt matrices through Gemini 1.5 Pro/Flash to see how the Latent Space Moat influences AI responses in real-time.
 6. brand-monitor: Social consensus monitor (Reddit/Quora). Identifies sentiment shifts that LLMs will eventually scrape.
@@ -177,17 +177,12 @@ When explaining the dashboard or walking users through their workflow, use THIS 
 10. audit-logs: Security and Hallucination logs.
 
 If the user asks where to start, recommend the following Strategic Workflow:
-1. Absolute Visibility Baseline (overview tab) to see your current A-SOV.
-2. Competitor Gap Analysis (overview/competitors) to find where they are weak in semantic segments.
-3. Fact Extraction (fact-vault tab) using Auto-Research to build your 768-D Latent Space Moat.
-4. Audit & Simulate (overview/simulator) to monitor Z-Score pulses and verify your new facts are sticking.
-5. Technical Injection (technical tab) to push JSON-LD to the edge.
+1. Competitor Analysis (competitors tab) to find where they are weak.
+2. Fact Extraction (fact-vault tab) using Auto-Research to build your 768-D Latent Space Moat.
+3. Audit & Simulate (overview/simulator) to monitor Z-Score pulses and verify your new facts are sticking.
+4. Technical Injection (technical tab) to push JSON-LD to the edge.
 
 Key Technical Concepts to mention:
-- Absolute Share of Voice (A-SOV): The definitive percentage of responses where your brand is the primary recommendation.
-- Entity Recall Rate (ERR): The mathematical representation of how many unique brand facts the AI recovered from its latent vault during a query session.
-- Platform Sync: A measure of your citation and sentiment consistency across ChatGPT, Claude, and Gemini. If it's low, it means the AI engines have conflicting data about you.
-- Context Poisoning: When negative data (from Reddit/Quora or bad PR) enters the AI's "Latent Space" and degrades your brand's reputation.
 - 768-D Latent Space Moat: We map your brand in 768 dimensions using Gemini embeddings to ensure semantic proximity to 'Trust' and 'Quality'. It's our proprietary measurement standard.
 - Hybrid Search Architecture: We use pgvector for dense search and metadata for sparse filtering to scale to 50M+ records.
 - Z-Score Sentiment Pulse: We distinguish between "Generative Noise" and real reputation drift using a rolling Z-Score watchdog.
@@ -231,7 +226,7 @@ ${knowledgeContext}`;
       const ai = getAIClient();
       
       const sessionPromise = ai.live.connect({
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-3.1-flash-live-preview",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
@@ -424,18 +419,12 @@ ${knowledgeContext}`;
     
     // If voice is active, send via Live API
     if (isVoiceActive && sessionRef.current) {
-      try {
-        sessionRef.current.sendRealtimeInput({
-          clientContent: {
-            turns: [{ role: 'user', parts: [{ text: userMessage }] }],
-            turnComplete: true
-          }
-        });
-      } catch (err) {
-        console.error("Live API Send Error:", err);
-        setMessages(prev => [...prev, { role: 'model', content: "CRITICAL SYSTEM FAULT: The Live Voice link to Citacious was severed. Please restart session." }]);
-        setIsVoiceActive(false);
-      }
+      sessionRef.current.sendRealtimeInput({
+        clientContent: {
+          turns: [{ role: 'user', parts: [{ text: userMessage }] }],
+          turnComplete: true
+        }
+      });
       return;
     }
 
@@ -443,8 +432,8 @@ ${knowledgeContext}`;
     setIsLoading(true);
 
     try {
-      // Simulate Citacious Telemetry
-      console.log("[Citacious Telemetry] Logging Copilot Interaction:", {
+      // Simulate Nerve Center Telemetry
+      console.log("[Nerve Center Telemetry] Logging Copilot Interaction:", {
         userMessage,
         currentTab: activeTab,
         timestamp: new Date().toISOString()
@@ -476,13 +465,9 @@ ${knowledgeContext}`;
 
       setMessages(prev => [...prev, { role: 'model', content: responseText }]);
 
-    } catch (error: any) {
+    } catch (error) {
       console.error("Copilot Error:", error);
-      const errorMessage = error.message && error.message.includes("CRITICAL") 
-        ? error.message 
-        : "I encountered a synchronization error with the Fact-Vault. My connection to Citacious was interrupted. Please try re-sending your message or check your internet connection.";
-      
-      setMessages(prev => [...prev, { role: 'model', content: errorMessage }]);
+      setMessages(prev => [...prev, { role: 'model', content: "I encountered an error connecting to the Nerve Center. Please try again." }]);
     } finally {
       setIsLoading(false);
     }

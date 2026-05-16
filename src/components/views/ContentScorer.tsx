@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { PenTool, Loader2, CheckCircle2, AlertTriangle, ArrowRight, LayoutTemplate, FileText, BookOpen, Database, Megaphone } from 'lucide-react';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
-import { checkTierAccess } from '@/constants/tiers';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
 import { AmplifyModal } from '@/components/ui/AmplifyModal';
@@ -12,7 +11,7 @@ import { collection, addDoc } from 'firebase/firestore';
 type ContentType = 'sales' | 'blog' | 'technical';
 
 export function ContentScorer() {
-  const { tier, role, user } = useAuth();
+  const { tier, user } = useAuth();
   const [content, setContent] = useState(() => localStorage.getItem('contentScorer_content') || '');
   const [contentType, setContentType] = useState<ContentType>(() => (localStorage.getItem('contentScorer_contentType') as ContentType) || 'sales');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -113,7 +112,7 @@ export function ContentScorer() {
     }
   };
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Basic')) {
+  if (tier === 'Free') {
     return (
       <div className="space-y-6">
         <div>

@@ -6,10 +6,9 @@ import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
 import { db } from '@/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { checkTierAccess } from '@/constants/tiers';
 
 export function Technical() {
-  const { tier, role, user } = useAuth();
+  const { tier, user } = useAuth();
   const [inputText, setInputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<{ fluff: string; table: string } | null>(null);
@@ -42,7 +41,7 @@ export function Technical() {
     fetchFacts();
   }, [user]);
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Premium')) {
+  if (tier !== 'Premium') {
     return (
       <div className="space-y-6">
         <div>
