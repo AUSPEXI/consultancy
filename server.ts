@@ -200,28 +200,35 @@ app.use(express.json());
   });
 
   app.get("/api/analytics/map", (req, res) => {
-    const { brandId, platform = "All" } = req.query;
+    const { brandId, platform = "All", timeframe = "current" } = req.query;
     
     // Shift centers slightly based on platform to simulate different model biases
     const biasX = platform === 'Gemini' ? 20 : platform === 'ChatGPT' ? -20 : platform === 'Claude' ? 0 : 0;
     const biasY = platform === 'Gemini' ? -10 : platform === 'ChatGPT' ? 20 : platform === 'Claude' ? -30 : 0;
 
+    // Simulate "drift" for historical snapshots
+    const driftFactor = timeframe === 'month' ? 1.5 : timeframe === 'week' ? 0.7 : 0;
+    const timeSeed = timeframe === 'month' ? 30 : timeframe === 'week' ? 7 : 1;
+
     const clusters = [
-      { x: -50 + biasX, y: 40 + biasY, label: "Reputational Moat", color: "#ec4899", baseType: "Systemic Anchor" },
-      { x: 60 + biasX, y: -30 + biasY, label: "Technical Competence", color: "#06b6d4", baseType: "Signal Point" },
-      { x: -20 + biasX, y: -60 + biasY, label: "Pricing Perception", color: "#8b5cf6", baseType: "Emergent Trend" },
+      { x: -50 + biasX + (driftFactor * 5), y: 40 + biasY - (driftFactor * 3), label: "Reputational Moat", color: "#ec4899", baseType: "Systemic Anchor" },
+      { x: 60 + biasX - (driftFactor * 2), y: -30 + biasY + (driftFactor * 5), label: "Technical Competence", color: "#06b6d4", baseType: "Signal Point" },
+      { x: -20 + biasX, y: -60 + biasY + (driftFactor * 10), label: "Pricing Perception", color: "#8b5cf6", baseType: "Emergent Trend" },
     ];
 
-    const points = Array.from({ length: 60 }, (_, i) => {
+    const points = Array.from({ length: 120 }, (_, i) => {
       const cluster = clusters[i % clusters.length];
       const theta = Math.random() * 2 * Math.PI;
       const r = Math.sqrt(Math.random()) * 50; 
       
+      // Random deterministic drift based on index and timeframe
+      const individualDrift = Math.sin(i + timeSeed) * driftFactor * 2;
+      
       return {
         id: i,
-        x: cluster.x + r * Math.cos(theta),
-        y: cluster.y + r * Math.sin(theta),
-        z: Math.random() * 40 - 20,
+        x: cluster.x + r * Math.cos(theta) + individualDrift,
+        y: cluster.y + r * Math.sin(theta) - individualDrift,
+        z: (Math.random() * 40 - 20) + (individualDrift * 2),
         size: Math.floor(Math.random() * 6) + 3,
         type: cluster.label,
         groupType: cluster.baseType,
@@ -243,8 +250,9 @@ app.use(express.json());
         engine: "Gemini-Embed-004", 
         dimensions: 768, 
         platform,
-        aggregatedAt: new Date(Date.now() - 3600000 * 24).toISOString(), // 24 hours ago
-        pathCount: 1240
+        timeframe,
+        aggregatedAt: new Date(Date.now() - (timeSeed * 3600000 * 24)).toISOString(),
+        pathCount: 1240 + (timeSeed * 10)
       } 
     });
   });
