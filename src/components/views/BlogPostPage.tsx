@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
 import { blogPosts } from '@/data/blogPosts';
+import { BlogHero } from '@/components/BlogHero';
 import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -39,11 +40,8 @@ export function BlogPostPage() {
               <span>•</span>
               <span>{post.date}</span>
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading mb-8 leading-tight">
-              {post.title}
-            </h1>
-            <div className="aspect-[21/9] rounded-2xl overflow-hidden border border-zinc-800">
-              <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
+            <div className="w-full min-h-[300px] md:min-h-[400px] flex rounded-2xl overflow-hidden border border-zinc-800 relative bg-[#0B0E14] group">
+              <BlogHero title={post.title} category={post.category} compact={false} />
             </div>
           </div>
           

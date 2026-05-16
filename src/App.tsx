@@ -9,9 +9,12 @@ import { LandingPage } from '@/components/views/LandingPage';
 import { Dashboard } from '@/components/views/Dashboard';
 import { BlogPage } from '@/components/views/BlogPage';
 import { BlogPostPage } from '@/components/views/BlogPostPage';
+import OGPreviewPage from '@/components/views/OGPreviewPage';
 import { FAQPage } from '@/components/views/FAQPage';
 import { VoiceAgentsPage } from '@/components/views/VoiceAgentsPage';
 import { AboutPage } from '@/components/views/AboutPage';
+import { RoadmapPage } from '@/components/views/RoadmapPage';
+import { InvestorHubPage } from '@/components/views/InvestorHubPage';
 import { ResourcesPage } from '@/components/views/ResourcesPage';
 import { PrivacyPolicyPage } from '@/components/views/PrivacyPolicyPage';
 import { TermsOfServicePage } from '@/components/views/TermsOfServicePage';
@@ -26,6 +29,37 @@ import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 function AppContent() {
   const { user, loading, signInWithGoogle } = useAuth();
   const location = useLocation();
+
+  useEffect(() => {
+    // Fetch embedded schemas injected via Webhook
+    const fetchActiveSchema = async () => {
+      try {
+        const res = await fetch('/api/schema/active');
+        if (res.ok) {
+          const schemas = await res.json();
+          if (schemas && schemas.length > 0) {
+            // Remove any previously injected schema tags
+            document.querySelectorAll('script[data-auspexi-schema="true"]').forEach(e => e.remove());
+            
+            // Inject new combined schemas
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.setAttribute('data-auspexi-schema', 'true');
+            // Using Graph structure for multiple schemas
+            const graphSchema = {
+              "@context": "https://schema.org",
+              "@graph": schemas
+            };
+            script.innerHTML = JSON.stringify(graphSchema);
+            document.head.appendChild(script);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load active schemas", err);
+      }
+    };
+    fetchActiveSchema();
+  }, [location.pathname]); // Re-run when navigation happens if needed
 
   useEffect(() => {
     const handleStripeRedirect = async () => {
@@ -63,24 +97,25 @@ function AppContent() {
     );
   }
 
-  const isDashboard = location.pathname.startsWith('/dashboard');
-
   return (
     <VoiceAgentProvider>
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={!user ? <LandingPage onLoginClick={signInWithGoogle} /> : <Navigate to="/dashboard" />} />
+        <Route path="/" element={<LandingPage onLoginClick={signInWithGoogle} />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route path="/faq" element={<FAQPage />} />
         <Route path="/resources" element={<ResourcesPage />} />
         <Route path="/voice-agents" element={<VoiceAgentsPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/roadmap" element={<RoadmapPage />} />
+        <Route path="/investors" element={<InvestorHubPage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/terms" element={<TermsOfServicePage />} />
+        <Route path="/og-preview/:slug" element={<OGPreviewPage />} />
         <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/" />} />
       </Routes>
-      {!isDashboard && <FloatingVoiceButton />}
+      {!location.pathname.startsWith('/dashboard') && <FloatingVoiceButton />}
     </VoiceAgentProvider>
   );
 }

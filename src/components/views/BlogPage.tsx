@@ -4,6 +4,7 @@ import { Footerdemo } from '@/components/ui/footer-section';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { blogPosts } from '@/data/blogPosts';
+import { BlogHero } from '@/components/BlogHero';
 
 export function BlogPage() {
   const { signInWithGoogle } = useAuth();
@@ -23,8 +24,8 @@ export function BlogPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogPosts.map((post) => (
               <Link to={`/blog/${post.slug}`} key={post.slug} className="group cursor-pointer bg-zinc-900/30 border border-zinc-800 rounded-2xl overflow-hidden hover:border-zinc-700 transition-colors flex flex-col">
-                <div className="aspect-[16/9] overflow-hidden border-b border-zinc-800">
-                  <img src={post.image} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                <div className="w-full flex min-h-[220px] overflow-hidden border-b border-zinc-800 relative bg-[#0B0E14]">
+                  <BlogHero title={post.title} category={post.category} compact={true} />
                 </div>
                 <div className="p-6 flex flex-col flex-1">
                   <div className="flex items-center gap-3 text-xs font-medium text-zinc-500 mb-3">

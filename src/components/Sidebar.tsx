@@ -1,10 +1,13 @@
-import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, Wrench, PenTool, MonitorPlay, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, Wrench, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { Link } from 'react-router-dom';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
+
+import { UserTier, TIERS, checkTierAccess } from '@/constants/tiers';
 
 interface SidebarProps {
   activeTab: string;
@@ -14,31 +17,30 @@ interface SidebarProps {
 }
 
 export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarProps) {
-  const { user, logout, tier } = useAuth();
+  const { user, logout, tier, role } = useAuth();
   
   const navItems = [
-    { id: 'overview', label: 'AI SOV Overview', icon: LayoutDashboard, requiredTier: 'Basic' },
-    { id: 'competitors', label: 'Competitor Radar', icon: Radar, requiredTier: 'Medium' },
-    { id: 'fact-vault', label: 'Fact-Vault', icon: Database, requiredTier: 'Basic' },
-    { id: 'content-scorer', label: 'Content Scorer', icon: PenTool, requiredTier: 'Basic' },
-    { id: 'simulator', label: 'SOV Simulator', icon: MonitorPlay, requiredTier: 'Medium' },
-    { id: 'brand-monitor', label: 'Brand Monitor', icon: Radar, requiredTier: 'Medium' },
-    { id: 'technical', label: 'Edge & Schema', icon: Code, requiredTier: 'Premium' },
-    { id: 'agents', label: 'Agent Orchestration', icon: Bot, requiredTier: 'Premium' },
-    { id: 'audit-logs', label: 'Audit Logs', icon: ShieldCheck, requiredTier: 'Basic' },
-    { id: 'settings', label: 'Settings', icon: Settings, requiredTier: 'Basic' },
+    { id: 'overview', label: 'AI SOV Overview', icon: LayoutDashboard, requiredTier: 'Basic' as UserTier },
+    { id: 'geo-pulse', label: 'GEO Pulse Index (Beta)', icon: Activity, requiredTier: 'Premium' as UserTier },
+    { id: 'competitors', label: 'Competitor Radar', icon: Radar, requiredTier: 'Medium' as UserTier },
+    { id: 'fact-vault', label: 'Fact-Vault', icon: Database, requiredTier: 'Basic' as UserTier },
+    { id: 'content-scorer', label: 'Content Scorer', icon: PenTool, requiredTier: 'Basic' as UserTier },
+    { id: 'simulator', label: 'SOV Simulator', icon: MonitorPlay, requiredTier: 'Medium' as UserTier },
+    { id: 'brand-monitor', label: 'Brand Monitor', icon: Radar, requiredTier: 'Medium' as UserTier },
+    { id: 'technical', label: 'Edge & Schema', icon: Code, requiredTier: 'Premium' as UserTier },
+    { id: 'agents', label: 'Multi-Agent Crawler', icon: Bot, requiredTier: 'Premium' as UserTier },
+    { id: 'audit-logs', label: 'Audit Logs', icon: ShieldCheck, requiredTier: 'Basic' as UserTier },
+    { id: 'settings', label: 'Settings', icon: Settings, requiredTier: 'Basic' as UserTier },
   ];
 
-  const hasAccess = (requiredTier: string) => {
-    const tiers = ['Free', 'Basic', 'Medium', 'Premium', 'PipelineOffer'];
-    const userTierIndex = tiers.indexOf(tier || 'Free');
-    const requiredTierIndex = tiers.indexOf(requiredTier);
-    return userTierIndex >= requiredTierIndex;
+  const hasAccess = (requiredTier: UserTier) => {
+    if (role === 'admin') return true;
+    return checkTierAccess(tier, requiredTier);
   };
 
-  const isAdmin = user?.email === 'hopiumcalculator@gmail.com';
+  const isAdmin = role === 'admin' || user?.email === 'hopiumcalculator@gmail.com';
 
-  const handleTestUpgrade = async (newTier: string) => {
+  const handleTestUpgrade = async (newTier: UserTier) => {
     if (!user) return;
     try {
       await setDoc(doc(db, 'users', user.uid), { tier: newTier }, { merge: true });
@@ -66,10 +68,8 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
       )}>
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-pink-600 flex items-center justify-center font-bold text-white">
-              A
-            </div>
-            <span className="text-xl font-semibold text-white tracking-tight">Auspexi</span>
+            <img src="/auspexi-logo.png" alt="Auspexi Logo" className="w-14 h-14 object-contain shrink-0" />
+            <span className="text-2xl font-semibold text-white tracking-tight">Auspexi</span>
           </div>
           <button 
             onClick={() => setIsOpen(false)}
@@ -79,11 +79,11 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
           </button>
         </div>
         
-        <nav className="flex-1 px-4 space-y-1 mt-4 overflow-y-auto">
+        <nav className="flex-1 px-4 space-y-1 mt-4 overflow-y-auto overflow-x-hidden">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
-          const isLocked = !hasAccess(item.requiredTier);
+          const isLocked = !hasAccess(item.requiredTier as UserTier);
           return (
             <button
               key={item.id}
@@ -103,30 +103,68 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
             </button>
           );
         })}
-
-        {isAdmin && (
-          <div className="mt-8 pt-4 border-t border-zinc-800">
-            <div className="px-3 mb-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
-              <Wrench className="w-3.5 h-3.5" />
-              Admin Tools
-            </div>
-            <div className="space-y-1">
-              {['Free', 'Basic', 'Medium', 'Premium', 'PipelineOffer'].map((t) => (
-                <button
-                  key={t}
-                  onClick={() => handleTestUpgrade(t)}
-                  className="w-full text-left px-3 py-2 rounded-md text-sm text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-colors"
-                >
-                  Set Tier: {t}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </nav>
 
-      <div className="p-4 border-t border-zinc-800 space-y-1">
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-colors">
+      <div className="p-4 border-t border-zinc-800 space-y-3">
+        {/* Tier Status Indicator / Switcher for Admins */}
+        <div className="px-3 py-2 bg-zinc-900 rounded-lg border border-zinc-800">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Active Tier</span>
+            {isAdmin && <span className="text-[10px] font-bold text-pink-500 uppercase tracking-widest">Admin Mode</span>}
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {isAdmin ? (
+               <div className="grid grid-cols-2 gap-1 w-full mt-1">
+                 {TIERS.map((t) => (
+                   <button
+                     key={t}
+                     onClick={() => handleTestUpgrade(t)}
+                     className={cn(
+                       "px-2 py-1 rounded text-[9px] font-bold uppercase transition-all",
+                       tier === t 
+                         ? "bg-pink-600 text-white" 
+                         : "bg-zinc-800 text-zinc-500 hover:text-zinc-300"
+                     )}
+                   >
+                     {t}
+                   </button>
+                 ))}
+               </div>
+            ) : (
+              <span className="text-sm font-bold text-white">{tier}</span>
+            )}
+          </div>
+        </div>
+        <Link 
+          to="/"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-colors"
+        >
+          <Globe className="w-5 h-5 text-pink-500" />
+          Back to Website
+        </Link>
+        {isAdmin && (
+          <button 
+            onClick={() => setActiveTab('superuser')}
+            className={cn(
+              "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+              activeTab === 'superuser' 
+                ? "bg-pink-500/10 text-pink-400 border border-pink-500/20" 
+                : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+            )}
+          >
+            <ShieldAlert className="w-5 h-5" />
+            Superuser Control
+          </button>
+        )}
+        <button 
+          onClick={() => setActiveTab('settings')}
+          className={cn(
+            "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+            activeTab === 'settings' 
+              ? "bg-zinc-800 text-white" 
+              : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+          )}
+        >
           <Settings className="w-5 h-5" />
           Settings
         </button>

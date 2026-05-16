@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Database, Lock, Unlock, CheckCircle2, AlertCircle, Plus, X, Loader2, Megaphone, Sparkles, Search } from 'lucide-react';
+import { Database, Lock, Unlock, CheckCircle2, AlertCircle, Plus, X, Loader2, Megaphone, Sparkles, Search, Network } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
 import { collection, addDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { GoogleGenAI, Type } from '@google/genai';
@@ -20,7 +21,7 @@ interface Fact {
 }
 
 export function FactVault() {
-  const { user, tier } = useAuth();
+  const { user, tier, userData, role } = useAuth();
   const [facts, setFacts] = useState<Fact[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isResearchModalOpen, setIsResearchModalOpen] = useState(false);
@@ -53,16 +54,17 @@ export function FactVault() {
   }, [user]);
 
   const getFactLimit = () => {
-    if (tier === 'Free') return 0;
+    if (!checkTierAccess(tier, 'Basic')) return 0;
     if (tier === 'Basic') return 10;
     if (tier === 'Medium') return 50;
-    return Infinity; // Premium
+    if (tier === 'Premium') return 150;
+    return Infinity; // Pro, Business, Enterprise, PipelineOffer
   };
 
   const currentLimit = getFactLimit();
   const isAtLimit = facts.length >= currentLimit;
 
-  if (tier === 'Free') {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Basic')) {
     return (
       <div className="space-y-6">
         <div>
@@ -88,45 +90,44 @@ export function FactVault() {
 
     setIsExtracting(true);
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-      if (!apiKey) {
-        throw new Error("Gemini API key is missing");
-      }
-      const ai = new GoogleGenAI({ apiKey });
-
-      const prompt = `
-        You are an expert Generative Engine Optimization (GEO) agent.
-        Analyze the following text and extract 3 "High-Entropy Facts" (unique, non-obvious data points that AI models would want to cite).
-        For each fact, assign an "Entropy Score" from 0 to 100 (higher means more unique).
-        
-        Text to analyze:
-        ${inputText}
-        
-        Return ONLY a JSON array of objects with 'statement' (string) and 'entropyScore' (number).
-      `;
-
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-        }
+      const response = await fetch('/api/extract-high-entropy-facts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: inputText })
       });
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error);
 
-      const extractedFacts = JSON.parse(response.text || "[]");
+      const extractedFacts = data.facts || [];
       
       if (extractedFacts && Array.isArray(extractedFacts)) {
         // Save extracted facts to Firestore
+        const newFactsPayloads = [];
         for (const fact of extractedFacts) {
-          await addDoc(collection(db, 'facts'), {
+          const payload = {
             userId: user.uid,
             statement: fact.statement,
             entropyScore: fact.entropyScore,
             cliffhangerActive: fact.entropyScore > 80, // Automatically gate high-entropy facts
             category: 'Extracted',
             createdAt: new Date().toISOString().split('T')[0],
-          });
+          };
+          await addDoc(collection(db, 'facts'), payload);
+          newFactsPayloads.push(payload);
         }
+        
+        if (userData?.cmsWebhookUrl && newFactsPayloads.length > 0) {
+          try {
+            await fetch(userData.cmsWebhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ type: 'fact_injection', source: 'extraction', facts: newFactsPayloads })
+            });
+          } catch(e) {
+            console.error("Webhook push failed", e);
+          }
+        }
+
         await logAuditAction(user.uid, 'Extracted Facts', { count: extractedFacts.length, source: 'Text Input' });
         setIsModalOpen(false);
         setInputText('');
@@ -148,59 +149,43 @@ export function FactVault() {
 
     setIsResearching(true);
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-      if (!apiKey) {
-        throw new Error("Gemini API key is missing");
-      }
-      const ai = new GoogleGenAI({ apiKey });
-
-      const prompt = `
-        You are an expert Generative Engine Optimization (GEO) agent and Fact-Grabber research assistant.
-        The user's industry/domain is: "${industry}".
-        Generate 3 "High-Entropy Facts" (unique, non-obvious, highly specific data points or statistics that AI models would want to cite) related to this industry.
-        For each fact, assign an "Entropy Score" from 0 to 100 (higher means more unique).
-      `;
-
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                statement: { type: Type.STRING },
-                entropyScore: { type: Type.NUMBER }
-              },
-              required: ["statement", "entropyScore"]
-            }
-          }
-        }
+      const res = await fetch('/api/research-facts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ industry })
       });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
 
-      let extractedFacts = [];
-      try {
-        let text = response.text || "[]";
-        text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-        extractedFacts = JSON.parse(text);
-      } catch (e) {
-        console.error("Failed to parse Gemini response:", e);
-        extractedFacts = [];
-      }
+      let extractedFacts = data.facts || [];
       
       if (extractedFacts && Array.isArray(extractedFacts)) {
+        const newFactsPayloads = [];
         for (const fact of extractedFacts) {
-          await addDoc(collection(db, 'facts'), {
+          const payload = {
             userId: user.uid,
             statement: fact.statement,
             entropyScore: fact.entropyScore,
             cliffhangerActive: fact.entropyScore > 80,
             category: 'Auto-Researched',
             createdAt: new Date().toISOString().split('T')[0],
-          });
+          };
+          await addDoc(collection(db, 'facts'), payload);
+          newFactsPayloads.push(payload);
         }
+        
+        if (userData?.cmsWebhookUrl && newFactsPayloads.length > 0) {
+          try {
+            await fetch(userData.cmsWebhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ type: 'fact_injection', source: 'auto_research', facts: newFactsPayloads })
+            });
+          } catch(e) {
+            console.error("Webhook push failed", e);
+          }
+        }
+
         await logAuditAction(user.uid, 'Researched Facts', { count: extractedFacts.length, industry });
         setIsResearchModalOpen(false);
         setIndustry('');
@@ -340,12 +325,71 @@ export function FactVault() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button
-                        onClick={() => setAmplifyingFact(fact.statement)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 hover:text-pink-300 transition-colors text-xs font-medium border border-pink-500/20"
-                      >
-                        <Megaphone className="w-3.5 h-3.5" /> Amplify
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={async () => {
+                            const ontologyData = {
+                              "@context": "https://schema.org",
+                              "@type": "Fact",
+                              "text": fact.statement,
+                              "entropyScore": fact.entropyScore,
+                              "status": fact.cliffhangerActive ? "gated" : "public",
+                              "about": {
+                                "@type": "Thing",
+                                "name": "Brand Fact"
+                              }
+                            };
+                            
+                            const downloadFallback = () => {
+                              const blob = new Blob([JSON.stringify(ontologyData, null, 2)], { type: 'application/ld+json' });
+                              const url = URL.createObjectURL(blob);
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = `ontology-fact-${fact.id}.json`;
+                              document.body.appendChild(a);
+                              a.click();
+                              document.body.removeChild(a);
+                              URL.revokeObjectURL(url);
+                            };
+
+                            if (userData?.cmsWebhookUrl) {
+                              try {
+                                let webhookUrl = userData.cmsWebhookUrl.trim();
+                                // If the user provided the frontend URL but they are on a different environment, 
+                                // it may fail due to CORS. 
+                                // To make testing easier, use a local URL if it seems they want the current app backend:
+                                if (webhookUrl.includes('/api/webhooks/auspexi')) {
+                                   webhookUrl = '/api/webhooks/auspexi';
+                                }
+
+                                const response = await fetch(webhookUrl, {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ type: 'ontology_injection', ontology: ontologyData })
+                                });
+                                if (!response.ok) throw new Error('Webhook rejected');
+                                alert("Successfully injected ontology schema via your CMS Webhook.");
+                              } catch (e: any) {
+                                console.error(e);
+                                alert("Failed to push ontology to Webhook. If you see 'Failed to fetch', ensure the Webhook URL is correct, or if using the Shared App URL, ensure you click 'Share' again to deploy the latest backend changes. Falling back to download.");
+                                downloadFallback();
+                              }
+                            } else {
+                              downloadFallback();
+                              alert("Ontology JSON-LD downloaded! To automatically inject schema directly to your CMS, configure a Webhook URL in Settings.");
+                            }
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 transition-colors text-xs font-medium border border-indigo-500/20"
+                        >
+                          <Network className="w-3.5 h-3.5" /> Map Ontology
+                        </button>
+                        <button
+                          onClick={() => setAmplifyingFact(fact.statement)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 hover:text-pink-300 transition-colors text-xs font-medium border border-pink-500/20"
+                        >
+                          <Megaphone className="w-3.5 h-3.5" /> Amplify
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

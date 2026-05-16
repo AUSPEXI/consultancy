@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
-import { PenTool, Loader2, CheckCircle2, AlertTriangle, ArrowRight, LayoutTemplate, FileText, BookOpen } from 'lucide-react';
+import { PenTool, Loader2, CheckCircle2, AlertTriangle, ArrowRight, LayoutTemplate, FileText, BookOpen, Database, Megaphone } from 'lucide-react';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
+import { checkTierAccess } from '@/constants/tiers';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
+import { AmplifyModal } from '@/components/ui/AmplifyModal';
+import { db } from '@/firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
 type ContentType = 'sales' | 'blog' | 'technical';
 
 export function ContentScorer() {
-  const { tier, user } = useAuth();
+  const { tier, role, user } = useAuth();
   const [content, setContent] = useState(() => localStorage.getItem('contentScorer_content') || '');
   const [contentType, setContentType] = useState<ContentType>(() => (localStorage.getItem('contentScorer_contentType') as ContentType) || 'sales');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -42,6 +46,9 @@ export function ContentScorer() {
   const [isPreviewingUpdate, setIsPreviewingUpdate] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishSuccess, setPublishSuccess] = useState(false);
+  const [showAmplifyModal, setShowAmplifyModal] = useState(false);
+  const [isSavingFacts, setIsSavingFacts] = useState(false);
+  const [factsSaved, setFactsSaved] = useState(false);
 
   useEffect(() => {
     const handleDraftContent = (e: Event) => {
@@ -68,7 +75,45 @@ export function ContentScorer() {
     }, 3000);
   };
 
-  if (tier === 'Free') {
+  const handleSaveFacts = async () => {
+    if (!user || !result || !content.trim()) return;
+    setIsSavingFacts(true);
+    try {
+      const response = await fetch('/api/extract-facts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, contentType, userId: user.uid })
+      });
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error);
+
+      const facts = data.facts || [];
+      
+      const dateStr = new Date().toISOString().split('T')[0];
+      
+      for (const fact of facts) {
+          await addDoc(collection(db, 'facts'), {
+             userId: user.uid,
+             statement: typeof fact === 'string' ? fact.substring(0, 1000) : JSON.stringify(fact).substring(0, 1000),
+             entropyScore: Math.floor(Math.random() * 40) + 60, // Mock entropy score for content extracted fact
+             cliffhangerActive: false,
+             category: contentType,
+             createdAt: dateStr
+          });
+      }
+      
+      await logAuditAction(user.uid, 'Extracted facts to Vault', { count: facts.length });
+      setFactsSaved(true);
+      setTimeout(() => setFactsSaved(false), 3000);
+    } catch (e) {
+      console.error(e);
+      alert('Failed to save facts.');
+    } finally {
+      setIsSavingFacts(false);
+    }
+  };
+
+  if (role !== 'admin' && !checkTierAccess(tier, 'Basic')) {
     return (
       <div className="space-y-6">
         <div>
@@ -90,57 +135,18 @@ export function ContentScorer() {
     setResult(null);
 
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-      if (!apiKey) throw new Error("API key is missing");
-      const ai = new GoogleGenAI({ apiKey });
+      if (!user) throw new Error("User required");
 
-      const prompt = `
-        You are an expert Generative Engine Optimization (GEO) agent.
-        Analyze the following content for "Machine Readability" and its likelihood to be cited by LLMs (ChatGPT, Claude, Gemini).
-        
-        CRITICAL CONTEXT: The user has specified this content is intended for: "${contentType}".
-        ${contentType === 'sales' ? 'Do NOT penalize the content for having marketing hooks, persuasive copy, or human-centric storytelling. Instead, evaluate how well they have WEAVED machine-readable facts, entities, and statistical anchors INTO the sales copy without destroying the human conversion rate. Suggest ways to add "Cite-Magnets" without ruining the sales pitch.' : ''}
-        ${contentType === 'technical' ? 'This is technical documentation. It should be ruthlessly optimized for machine readability, high entity density, and direct answers. Penalize fluff heavily.' : ''}
-        ${contentType === 'blog' ? 'This is a blog post. It should balance engaging human narrative with clear, extractable facts and inverted pyramid structures for key takeaways. Suggest adding summary bullet points or bolded data points.' : ''}
-        
-        Content:
-        ${content}
-        
-        Score the content out of 100 based on:
-        1. Entity Density (Are key entities clearly defined? BE EXTREMELY RIGOROUS. A short paragraph with a few entities should score low (e.g., 30-50). Only comprehensive, highly technical content with dense, interconnected entities should score above 80. If the content is short or lacks specific nouns and technical terms, penalize the score heavily.)
-        2. Statistical Anchors (Are there hard numbers/facts instead of qualitative fluff?)
-        3. Inverted Pyramid of Synthesis (Is the direct answer accessible, even if wrapped in a narrative?)
-        
-        Return a JSON object with:
-        - overallScore (number 0-100)
-        - entityDensityScore (number 0-100)
-        - statisticalAnchorsScore (number 0-100)
-        - invertedPyramidScore (number 0-100)
-        - feedback (array of strings, specific actionable advice on what to change, respecting the content type)
-        - rewrittenSnippet (string, a suggested rewrite of a weak paragraph to make it more machine-readable while maintaining the appropriate tone for a ${contentType})
-      `;
-
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              overallScore: { type: Type.NUMBER },
-              entityDensityScore: { type: Type.NUMBER },
-              statisticalAnchorsScore: { type: Type.NUMBER },
-              invertedPyramidScore: { type: Type.NUMBER },
-              feedback: { type: Type.ARRAY, items: { type: Type.STRING } },
-              rewrittenSnippet: { type: Type.STRING }
-            },
-            required: ["overallScore", "entityDensityScore", "statisticalAnchorsScore", "invertedPyramidScore", "feedback", "rewrittenSnippet"]
-          }
-        }
+      const res = await fetch('/api/content-scorer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, contentType, userId: user.uid })
       });
+      
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || "Analysis failed");
 
-      const parsedResult = JSON.parse(response.text || "{}");
+      const parsedResult = data.result;
       setResult(parsedResult);
       if (user) {
         await logAuditAction(user.uid, 'Scored Content', { contentType, score: parsedResult.overallScore });
@@ -344,9 +350,49 @@ export function ContentScorer() {
                 </div>
               )}
             </div>
+            
+            {result.overallScore > 80 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in slide-in-from-bottom-2 duration-300">
+                <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 relative overflow-hidden flex flex-col justify-between">
+                   <div className="mb-4">
+                     <h3 className="text-sm font-semibold text-white flex items-center gap-2 mb-2">
+                       <Megaphone className="w-4 h-4 text-emerald-400" />
+                       Ready for Omnichannel Distribution
+                     </h3>
+                     <p className="text-xs text-zinc-400">Because this content scored highly (&gt;{result.overallScore}%), it is extractable enough to seed into LinkedIn and Reddit without losing its core entities.</p>
+                   </div>
+                   <button
+                     onClick={() => setShowAmplifyModal(true)}
+                     className="w-full py-2.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                   >
+                     <Megaphone className="w-4 h-4" /> Push to Omnichannel Amplifier
+                   </button>
+                </div>
+                
+                <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 relative overflow-hidden flex flex-col justify-between">
+                   <div className="mb-4">
+                     <h3 className="text-sm font-semibold text-white flex items-center gap-2 mb-2">
+                       <Database className="w-4 h-4 text-blue-400" />
+                       Reverse-Extract Knowledge
+                     </h3>
+                     <p className="text-xs text-zinc-400">Automatically isolate the core statements from this text and save them back into your Fact-Vault as persistent, verifiable JSON-LD atomic facts.</p>
+                   </div>
+                   <button
+                     onClick={handleSaveFacts}
+                     disabled={isSavingFacts || factsSaved}
+                     className="w-full py-2.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                   >
+                     {isSavingFacts ? <Loader2 className="w-4 h-4 animate-spin" /> : factsSaved ? <CheckCircle2 className="w-4 h-4" /> : <Database className="w-4 h-4" />}
+                     {isSavingFacts ? 'Extracting...' : factsSaved ? 'Saved to Vault' : 'Extract into Fact-Vault'}
+                   </button>
+                </div>
+              </div>
+            )}
+            
           </div>
         )}
       </div>
+      {showAmplifyModal && <AmplifyModal fact={content} onClose={() => setShowAmplifyModal(false)} />}
     </div>
   );
 }
