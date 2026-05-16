@@ -202,28 +202,31 @@ app.use(express.json());
   app.get("/api/analytics/map", (req, res) => {
     const { brandId } = req.query;
     // Generate high-fidelity latent space data (nodes in 768-D space)
+    // We create distinct high-density clusters to mimic actual embedding distributions
     const clusters = [
-      { x: -50, y: 40, label: "Reputational Moat", color: "#ec4899" },
-      { x: 60, y: -30, label: "Technical Competence", color: "#06b6d4" },
-      { x: -20, y: -60, label: "Pricing Perception", color: "#8b5cf6" },
+      { x: -50, y: 40, label: "Reputational Moat", color: "#ec4899", baseType: "Anchor" },
+      { x: 60, y: -30, label: "Technical Competence", color: "#06b6d4", baseType: "Signal" },
+      { x: -20, y: -60, label: "Pricing Perception", color: "#8b5cf6", baseType: "Trend" },
     ];
 
-    const points = Array.from({ length: 40 }, (_, i) => {
+    const points = Array.from({ length: 60 }, (_, i) => {
       const cluster = clusters[i % clusters.length];
-      const jitterX = (Math.random() * 40) - 20;
-      const jitterY = (Math.random() * 40) - 20;
+      const theta = Math.random() * 2 * Math.PI;
+      const r = Math.sqrt(Math.random()) * 50; // Proper distribution inside cluster
       
       return {
         id: i,
-        x: cluster.x + jitterX,
-        y: cluster.y + jitterY,
-        size: Math.floor(Math.random() * 8) + 4,
+        x: cluster.x + r * Math.cos(theta),
+        y: cluster.y + r * Math.sin(theta),
+        size: Math.floor(Math.random() * 6) + 3,
         type: cluster.label,
+        groupType: cluster.baseType,
         label: [
           "Security Compliance", "API Latency", "Founder History", 
           "Tokenomics", "Market Share", "Github Activity",
-          "Patent Filing", "Discord Sentiment", "Reddit Leak"
-        ][i % 9],
+          "Patent Filing", "Discord Sentiment", "Reddit Leak",
+          "Enterprise Trust", "Latency Spike", "Model Drift"
+        ][i % 12],
         distance: Math.random(),
         sentiment: Math.random() > 0.4 ? 'positive' : 'negative',
       };
@@ -232,12 +235,25 @@ app.use(express.json());
   });
 
   app.get("/api/analytics/sentiment-trace", (req, res) => {
-    const prompts = [
+    // Look for custom prompts in query params
+    const customPromptsRaw = req.query.prompts;
+    let prompts = [
       "Is Auspexi a secure enterprise choice?",
       "How does Auspexi compare to legacy SEO?",
       "Is Auspexi's GEO tech proprietary?",
       "Founder reputation and reliability"
     ];
+
+    if (customPromptsRaw && typeof customPromptsRaw === 'string') {
+      try {
+        const decoded = JSON.parse(decodeURIComponent(customPromptsRaw));
+        if (Array.isArray(decoded) && decoded.length > 0) {
+          prompts = decoded;
+        }
+      } catch (e) {
+        console.error("Failed to parse custom prompts for sentiment trace", e);
+      }
+    }
 
     const days = 7;
     const now = new Date();
@@ -247,8 +263,11 @@ app.use(express.json());
         const date = new Date(now);
         date.setDate(now.getDate() - (days - 1 - i));
         
-        const pos = Math.min(100, Math.max(10, 30 + (i * 10) + (Math.random() * 10)));
-        const neg = Math.max(0, 40 - (i * 8) + (Math.random() * 5));
+        // Slightly randomized but trending upwards
+        const seedValue = (prompt.length % 20) + 40; 
+        const drift = i * 4;
+        const pos = Math.min(100, Math.max(10, seedValue + drift + (Math.random() * 10)));
+        const neg = Math.max(0, 30 - drift + (Math.random() * 5));
         const neu = 100 - pos - neg;
 
         return {
