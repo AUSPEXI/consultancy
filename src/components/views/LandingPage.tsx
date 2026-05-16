@@ -15,7 +15,8 @@ import { LeadCaptureModal } from '@/components/ui/lead-capture-modal';
 import { useAuth } from '@/contexts/AuthContext';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Link, useLocation } from 'react-router-dom';
-import { blogPosts } from './BlogPage';
+import { blogPosts } from '@/data/blogPosts';
+import { cn } from '@/lib/utils';
 
 export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
   const { user } = useAuth();
@@ -25,6 +26,19 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalSource, setModalSource] = useState('trial');
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [currency, setCurrency] = useState<'GBP' | 'USD'>('GBP');
+
+  useEffect(() => {
+    // Auto-detect IP for currency
+    fetch('https://ipapi.co/json/')
+      .then(res => res.json())
+      .then(data => {
+        if (data.country_code === 'US') {
+          setCurrency('USD');
+        }
+      })
+      .catch(err => console.error('Error fetching IP data:', err));
+  }, []);
 
   const handleCheckout = async (tier: string) => {
     if (!user) {
@@ -60,6 +74,17 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
     }
   };
 
+  const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth >= 768 : true);
+
+  useEffect(() => {
+    const checkIsDesktop = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+    checkIsDesktop();
+    window.addEventListener('resize', checkIsDesktop);
+    return () => window.removeEventListener('resize', checkIsDesktop);
+  }, []);
+
   const handleOpenModal = (source: string) => {
     setModalSource(source);
     setIsModalOpen(true);
@@ -70,45 +95,35 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       Icon: Search,
       name: "Zero-Click Dominance",
       description: "Ensure your brand is the definitive answer when users query AI, completely bypassing the traditional SERP. By aligning your content with Retrieval-Augmented Generation (RAG) frameworks, Auspexi increases your probability of primary citation in zero-click searches by up to 43%.",
-      href: "#",
-      cta: "Learn more",
-      background: <div className="absolute -right-20 -top-20 opacity-0 group-hover:opacity-40 transition-opacity duration-500 bg-indigo-500/50 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:row-start-1 lg:row-end-4 lg:col-start-2 lg:col-end-3",
     },
     {
       Icon: Target,
       name: "Cite-Magnet Injection",
       description: "We extract and inject High-Entropy Facts to force AI models to cite your content. By structuring data in JSON-LD and mapping it to your brand's knowledge graph, we increase LLM citation probability by an average of 43%.",
-      href: "#",
-      cta: "See how it works",
-      background: <div className="absolute -right-20 -top-20 opacity-0 group-hover:opacity-40 transition-opacity duration-500 bg-emerald-500/50 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-emerald-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
     },
     {
       Icon: ShieldAlert,
       name: "Trojan Horse Strategy",
       description: "Identify competitor data decay and replace their stale answers with your fresh insights. Capitalize on the typical 6-12 month lag in LLM training data updates by feeding real-time JSON-LD corrections directly to AI crawlers.",
-      href: "#",
-      cta: "Analyze competitors",
-      background: <div className="absolute -right-20 -top-20 opacity-0 group-hover:opacity-40 transition-opacity duration-500 bg-rose-500/50 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-rose-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4",
     },
     {
       Icon: BarChart3,
       name: "Share of Voice Analytics",
       description: "Track your brand's visibility across Gemini, ChatGPT, and Claude in real-time. Understand exactly how often you are recommended versus your competitors.",
-      href: "#",
-      cta: "View dashboard",
-      background: <div className="absolute -right-20 -top-20 opacity-0 group-hover:opacity-40 transition-opacity duration-500 bg-cyan-500/50 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-cyan-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
     },
     {
       Icon: Zap,
       name: "Automated Schema",
       description: "Deploy GEO-optimized JSON-LD schema directly to your site with one click. Ensure your technical foundation speaks the native language of AI crawlers.",
-      href: "#",
-      cta: "Get started",
-      background: <div className="absolute -right-20 -top-20 opacity-0 group-hover:opacity-40 transition-opacity duration-500 bg-amber-500/50 w-64 h-64 rounded-full blur-3xl" />,
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-amber-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-3 lg:col-end-3 lg:row-start-2 lg:row-end-4",
     },
   ];
@@ -462,54 +477,65 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">Simple, Transparent Pricing</h2>
-            <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
+            <p className="text-zinc-400 max-w-2xl mx-auto text-lg mb-8">
               Invest in your brand's future visibility. Cancel anytime after your first month.
             </p>
+            
+            <div className="flex items-center justify-center gap-3">
+              <span className={cn("text-sm font-medium", currency === 'USD' ? "text-white" : "text-zinc-500")}>USD</span>
+              <button 
+                onClick={() => setCurrency(c => c === 'GBP' ? 'USD' : 'GBP')}
+                className="relative inline-flex h-6 w-11 items-center rounded-full bg-zinc-800 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+              >
+                <span className={cn("inline-block h-4 w-4 transform rounded-full bg-pink-500 transition-transform", currency === 'GBP' ? "translate-x-6" : "translate-x-1")} />
+              </button>
+              <span className={cn("text-sm font-medium", currency === 'GBP' ? "text-white" : "text-zinc-500")}>GBP</span>
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <PricingCard
               tier="Basic"
-              price="$499/mo"
+              price={currency === 'USD' ? "$89/mo" : "£75/mo"}
               bestFor="For startups establishing AI presence"
               CTA="Start Basic"
               onClick={() => handleCheckout('Basic')}
               benefits={[
-                { text: "Monthly AI SOV Report", checked: true },
-                { text: "JS Pixel (Client-Side)", checked: true },
+                { text: "AI SOV Overview & Fact-Vault", checked: true },
+                { text: "Content Scorer Access", checked: true },
                 { text: "10 Facts Extracted / mo", checked: true },
-                { text: "AI 'To-Do' List", checked: true },
                 { text: "Standard Analytics", checked: true },
-                { text: "No Off-Page Seeding", checked: false },
+                { text: "Advanced Audit Logging", checked: true },
+                { text: "Hallucination Detection", checked: false },
               ]}
             />
             <PricingCard
               tier="Medium"
-              price="$1,499/mo"
+              price={currency === 'USD' ? "$1,499/mo" : "£1,199/mo"}
               bestFor="For growing brands dominating niches"
               CTA="Start Medium"
               onClick={() => handleCheckout('Medium')}
               benefits={[
-                { text: "Weekly AI SOV + Competitor Decay", checked: true },
-                { text: "JS Pixel + Semantic HTML Fixes", checked: true },
+                { text: "SOV Simulator & Brand Monitor", checked: true },
+                { text: "Competitor Radar", checked: true },
                 { text: "50 Facts Extracted / mo", checked: true },
-                { text: "4 Data-Style Posts / mo", checked: true },
-                { text: "Dark AI Traffic Tracking", checked: true },
+                { text: "Basic Hallucination Detection", checked: true },
+                { text: "Built on SOC 2 Compliant Infrastructure", checked: true },
                 { text: "Reddit/Quora Seeding", checked: true },
               ]}
             />
             <PricingCard
               tier="Premium"
-              price="$4,999/mo"
+              price={currency === 'USD' ? "$4,999/mo" : "£3,999/mo"}
               bestFor="For enterprise market leaders"
               CTA="Talk to AI Sales"
               onClick={() => window.location.href = '/voice-agents'}
               benefits={[
-                { text: "Real-Time Dashboard", checked: true },
-                { text: "Edge SEO (Cloudflare Server-Side)", checked: true },
+                { text: "Edge & Schema Generator", checked: true },
+                { text: "Agent Orchestration", checked: true },
                 { text: "Unlimited Facts + CMS Auto-Sync", checked: true },
-                { text: "Daily Posts + Info Cliffhangers", checked: true },
-                { text: "Full Prompt-to-Conversion Pipeline", checked: true },
+                { text: "Advanced Hallucination Detection", checked: true },
+                { text: "Built on SOC 2 Compliant Infrastructure", checked: true },
                 { text: "Active 'Trojan Horse' Overwrites", checked: true },
               ]}
             />
@@ -548,7 +574,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
                   <img src={post.image} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                 </div>
                 <div className="flex items-center gap-3 text-xs font-medium text-zinc-500 mb-2">
-                  <span className="text-indigo-400 bg-indigo-400/10 px-2 py-1 rounded-md">{post.category}</span>
+                  <span className="text-pink-400 bg-pink-400/10 px-2 py-1 rounded-md">{post.category}</span>
                   <span>•</span>
                   <span>{post.date}</span>
                 </div>
@@ -563,7 +589,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
 
       {/* CTA Section */}
       <section className="py-32 relative overflow-hidden">
-        <DottedSurface className="absolute inset-0 z-0 opacity-50" />
+        {isDesktop && <DottedSurface className="absolute inset-0 z-0 opacity-50" />}
         <div className="absolute inset-0 bg-zinc-800/10 z-0"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-zinc-800/20 rounded-full blur-[120px] pointer-events-none z-0"></div>
         
@@ -590,6 +616,8 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         source={modalSource} 
+        initialEmail={email}
+        initialDomain={domain}
       />
     </div>
   );

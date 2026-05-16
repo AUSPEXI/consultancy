@@ -6,6 +6,7 @@ import { collection, addDoc, onSnapshot, query, where, orderBy } from 'firebase/
 import { GoogleGenAI } from '@google/genai';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
+import { logAuditAction } from '@/lib/audit';
 
 interface Competitor {
   id: string;
@@ -109,6 +110,7 @@ export function Competitors() {
           trojanHorseOpportunity: analysis.trojanHorseOpportunity || false,
           lastUpdated: new Date().toISOString().split('T')[0],
         });
+        await logAuditAction(user.uid, 'Analyzed Competitor', { url: inputUrl, status: analysis.decayStatus, trojanHorse: analysis.trojanHorseOpportunity });
         setIsModalOpen(false);
         setInputUrl('');
       }
@@ -130,7 +132,7 @@ export function Competitors() {
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
+          className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
         >
           <Radar className="w-4 h-4" />
           Analyze Competitor
@@ -188,7 +190,7 @@ export function Competitors() {
         {/* Competitor SOV List */}
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 h-fit">
           <h3 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
-            <Radar className="w-4 h-4 text-indigo-400" />
+            <Radar className="w-4 h-4 text-pink-400" />
             Monitored Entities
           </h3>
           <div className="space-y-4">
@@ -236,7 +238,7 @@ export function Competitors() {
                 value={inputUrl}
                 onChange={(e) => setInputUrl(e.target.value)}
                 placeholder="https://competitor.com/blog-post"
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
               />
             </div>
             <div className="p-4 border-t border-zinc-800 bg-zinc-900/50 flex justify-end gap-3">
@@ -249,7 +251,7 @@ export function Competitors() {
               <button 
                 onClick={handleAnalyzeCompetitor}
                 disabled={isAnalyzing || !inputUrl.trim()}
-                className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
+                className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
               >
                 {isAnalyzing ? (
                   <>

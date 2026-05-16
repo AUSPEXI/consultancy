@@ -20,6 +20,7 @@ export function ImageZoom({ src, alt, zoomLevel = 2.5 }: ImageZoomProps) {
     
     let clientX, clientY;
     if ('touches' in e) {
+      if (e.touches.length === 0) return;
       clientX = e.touches[0].clientX;
       clientY = e.touches[0].clientY;
     } else {

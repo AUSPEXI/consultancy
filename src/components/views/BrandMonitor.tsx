@@ -3,9 +3,10 @@ import { Radar, Loader2, AlertOctagon, MessageSquare, TrendingDown } from 'lucid
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
+import { logAuditAction } from '@/lib/audit';
 
 export function BrandMonitor() {
-  const { tier } = useAuth();
+  const { tier, user } = useAuth();
   const [brand, setBrand] = useState('');
   const [isMonitoring, setIsMonitoring] = useState(false);
   const [results, setResults] = useState<any>(null);
@@ -94,7 +95,11 @@ export function BrandMonitor() {
         }
       });
 
-      setResults(JSON.parse(response.text || "{}"));
+      const parsedResult = JSON.parse(response.text || "{}");
+      setResults(parsedResult);
+      if (user) {
+        await logAuditAction(user.uid, 'Ran Brand Monitor', { brand, riskScore: parsedResult.riskScore });
+      }
     } catch (error) {
       console.error("Error monitoring brand:", error);
       alert("Failed to run monitor. Please try again.");
@@ -113,7 +118,7 @@ export function BrandMonitor() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold font-heading mb-2 flex items-center gap-3">
-          <Radar className="w-8 h-8 text-indigo-500" />
+          <Radar className="w-8 h-8 text-pink-500" />
           Consensus Platform Monitor
         </h1>
         <p className="text-zinc-400">Scan Reddit and Quora to detect "Context Poisoning" before the next LLM training run.</p>
@@ -127,13 +132,13 @@ export function BrandMonitor() {
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
               placeholder="Enter brand name to monitor..."
-              className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+              className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-pink-500"
             />
           </div>
           <button
             onClick={handleMonitor}
             disabled={isMonitoring || !brand.trim()}
-            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+            className="px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
           >
             {isMonitoring ? (
               <><Loader2 className="w-5 h-5 animate-spin" /> Scanning...</>
@@ -166,9 +171,9 @@ export function BrandMonitor() {
                 </div>
               )}
             </div>
-            <div className="bg-indigo-950/30 border border-indigo-500/30 rounded-xl p-6">
-              <h3 className="text-sm font-medium text-indigo-300 mb-3">Defensive Action Plan</h3>
-              <p className="text-sm text-indigo-100/80 leading-relaxed">
+            <div className="bg-pink-950/30 border border-pink-500/30 rounded-xl p-6">
+              <h3 className="text-sm font-medium text-pink-300 mb-3">Defensive Action Plan</h3>
+              <p className="text-sm text-pink-100/80 leading-relaxed">
                 {results.actionPlan}
               </p>
             </div>
@@ -179,7 +184,7 @@ export function BrandMonitor() {
             {results.threads.map((thread: any, i: number) => (
               <div key={i} className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
                 <div className="flex items-start justify-between gap-4 mb-3">
-                  <a href={thread.url} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 font-medium line-clamp-1">
+                  <a href={thread.url} target="_blank" rel="noreferrer" className="text-pink-400 hover:text-pink-300 font-medium line-clamp-1">
                     {thread.title}
                   </a>
                   <span className={`shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium border ${getSentimentColor(thread.sentiment)}`}>

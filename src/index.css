@@ -56,8 +56,10 @@
 }
 
 @layer base {
-  body {
+  html, body {
     overflow-x: hidden;
+    background-color: #09090b; /* bg-zinc-950 */
+    color: #fafafa; /* text-zinc-50 */
   }
   
   h1, h2, h3, h4, h5, h6 {

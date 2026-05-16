@@ -76,7 +76,7 @@ export function FAQPage() {
                   className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
                 >
                   <span className="text-lg font-semibold text-zinc-200 pr-8">{faq.question}</span>
-                  <div className={`flex-shrink-0 w-8 h-8 rounded-full bg-zinc-800/50 flex items-center justify-center transition-transform duration-200 ${openIndex === index ? 'rotate-180 bg-indigo-500/20 text-indigo-400' : 'text-zinc-400'}`}>
+                  <div className={`flex-shrink-0 w-8 h-8 rounded-full bg-zinc-800/50 flex items-center justify-center transition-transform duration-200 ${openIndex === index ? 'rotate-180 bg-pink-500/20 text-pink-400' : 'text-zinc-400'}`}>
                     <ChevronDown className="w-5 h-5" />
                   </div>
                 </button>

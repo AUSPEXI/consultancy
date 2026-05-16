@@ -9,16 +9,22 @@ import { Agents } from '@/components/views/Agents';
 import { ContentScorer } from '@/components/views/ContentScorer';
 import { Simulator } from '@/components/views/Simulator';
 import { BrandMonitor } from '@/components/views/BrandMonitor';
+import { AuditLogs } from '@/components/views/AuditLogs';
+import { Copilot } from '@/components/Copilot';
+import { OnboardingModal } from '@/components/ui/onboarding-modal';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { userData, loading } = useAuth();
 
   const renderContent = () => {
     switch (activeTab) {
       case 'overview': return <Overview />;
       case 'fact-vault': return <FactVault />;
       case 'content-scorer': return <ContentScorer />;
+      case 'audit-logs': return <AuditLogs />;
       case 'simulator': return <Simulator />;
       case 'brand-monitor': return <BrandMonitor />;
       case 'competitors': return <Competitors />;
@@ -28,8 +34,16 @@ export function Dashboard() {
     }
   };
 
+  if (loading) {
+    return <div className="flex h-screen bg-zinc-950 items-center justify-center text-zinc-400">Loading...</div>;
+  }
+
   return (
-    <div className="flex h-screen bg-zinc-950 text-zinc-50 font-sans overflow-hidden">
+    <div className="flex h-screen bg-zinc-950 text-zinc-50 font-sans overflow-hidden relative">
+      {userData && !userData.onboardingCompleted && (
+        <OnboardingModal onComplete={() => {}} />
+      )}
+      
       <Sidebar 
         activeTab={activeTab} 
         setActiveTab={(tab) => {
@@ -49,6 +63,8 @@ export function Dashboard() {
           </div>
         </main>
       </div>
+
+      <Copilot activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
 }

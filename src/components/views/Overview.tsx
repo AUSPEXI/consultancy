@@ -7,9 +7,10 @@ import { collection, addDoc, onSnapshot, query, where, orderBy, limit } from 'fi
 import { GoogleGenAI } from '@google/genai';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
+import { logAuditAction } from '@/lib/audit';
 
 export function Overview() {
-  const { user, tier } = useAuth();
+  const { user, tier, userData } = useAuth();
   const [metrics, setMetrics] = useState<any[]>([]);
   const [isAuditing, setIsAuditing] = useState(false);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
@@ -58,35 +59,62 @@ export function Overview() {
     if (!user) return;
     setIsAuditing(true);
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
-      if (!apiKey) throw new Error("API key is missing");
-      
-      // Simulate Gemini analyzing current SOV
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const lastDate = metrics.length > 0 ? new Date(metrics[metrics.length - 1].date) : new Date();
-      if (metrics.length > 0) {
-        lastDate.setDate(lastDate.getDate() + 1);
-      }
-      
-      const dateStr = lastDate.toISOString().split('T')[0];
-      const shortDate = lastDate.toLocaleDateString('en-US', { weekday: 'short' });
+      if (userData?.brand && userData?.domain && userData?.keywords && userData.keywords.length > 0) {
+        // Run real audit
+        const response = await fetch('/api/run-daily-audit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user.uid,
+            brand: userData.brand,
+            domain: userData.domain,
+            competitors: userData.competitors || [],
+            keywords: userData.keywords
+          })
+        });
+        
+        const data = await response.json();
+        if (data.success && data.metrics) {
+          const today = new Date();
+          await addDoc(collection(db, 'sovMetrics'), {
+            userId: user.uid,
+            date: today.toISOString().split('T')[0],
+            shortDate: today.toLocaleDateString('en-US', { weekday: 'short' }),
+            ...data.metrics
+          });
+          await logAuditAction(user.uid, 'Ran Real SOV Audit', { date: today.toISOString().split('T')[0] });
+        } else {
+          throw new Error(data.error || 'Failed to run audit');
+        }
+      } else {
+        // Fallback to simulated audit if onboarding data is missing
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        const lastDate = metrics.length > 0 ? new Date(metrics[metrics.length - 1].date) : new Date();
+        if (metrics.length > 0) {
+          lastDate.setDate(lastDate.getDate() + 1);
+        }
+        
+        const dateStr = lastDate.toISOString().split('T')[0];
+        const shortDate = lastDate.toLocaleDateString('en-US', { weekday: 'short' });
 
-      const prevBrand = metrics.length > 0 ? metrics[metrics.length - 1].brand : 12;
-      const prevCompA = metrics.length > 0 ? metrics[metrics.length - 1].compA : 45;
-      const prevCompB = metrics.length > 0 ? metrics[metrics.length - 1].compB : 30;
-      const prevDirect = metrics.length > 0 ? metrics[metrics.length - 1].directTraffic : 120;
-      
-      await addDoc(collection(db, 'sovMetrics'), {
-        userId: user.uid,
-        date: dateStr,
-        shortDate: shortDate,
-        brand: Math.min(100, prevBrand + Math.floor(Math.random() * 8) + 2),
-        compA: Math.max(0, prevCompA - Math.floor(Math.random() * 5)),
-        compB: Math.max(0, prevCompB - Math.floor(Math.random() * 5)),
-        directTraffic: prevDirect + Math.floor(Math.random() * 40) + 10,
-        aiCitations: Math.floor(Math.random() * 15) + 5
-      });
+        const prevBrand = metrics.length > 0 ? metrics[metrics.length - 1].brand : 12;
+        const prevCompA = metrics.length > 0 ? metrics[metrics.length - 1].compA : 45;
+        const prevCompB = metrics.length > 0 ? metrics[metrics.length - 1].compB : 30;
+        const prevDirect = metrics.length > 0 ? metrics[metrics.length - 1].directTraffic : 120;
+        
+        await addDoc(collection(db, 'sovMetrics'), {
+          userId: user.uid,
+          date: dateStr,
+          shortDate: shortDate,
+          brand: Math.min(100, prevBrand + Math.floor(Math.random() * 8) + 2),
+          compA: Math.max(0, prevCompA - Math.floor(Math.random() * 5)),
+          compB: Math.max(0, prevCompB - Math.floor(Math.random() * 5)),
+          directTraffic: prevDirect + Math.floor(Math.random() * 40) + 10,
+          aiCitations: Math.floor(Math.random() * 15) + 5
+        });
+        await logAuditAction(user.uid, 'Ran Simulated SOV Audit', { date: dateStr });
+      }
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'sovMetrics');
     } finally {
@@ -152,7 +180,7 @@ export function Overview() {
           <button 
             onClick={runAudit}
             disabled={isAuditing}
-            className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
+            className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
           >
             {isAuditing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Activity className="w-4 h-4" />}
             Run Daily SOV Audit
@@ -163,7 +191,7 @@ export function Overview() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          { label: 'AI Share of Voice', value: `${latest.brand}%`, trend: `${brandTrend >= 0 ? '+' : ''}${brandTrend}%`, icon: Target, color: 'text-indigo-400' },
+          { label: 'AI Share of Voice', value: `${latest.brand}%`, trend: `${brandTrend >= 0 ? '+' : ''}${brandTrend}%`, icon: Target, color: 'text-pink-400' },
           { label: 'Dark AI Traffic (Est)', value: latest.directTraffic.toLocaleString(), trend: `${trafficTrend >= 0 ? '+' : ''}${trafficTrend}`, icon: Users, color: 'text-emerald-400' },
           { label: 'Active Cite-Magnets', value: '84', trend: '+12', icon: TrendingUp, color: 'text-blue-400' },
           { label: 'Zero-Click Conversions', value: '3.2%', trend: '+0.8%', icon: MousePointerClick, color: 'text-amber-400' },
@@ -188,8 +216,8 @@ export function Overview() {
             <h3 className="text-base font-semibold text-white">AI Share of Voice (vs Competitors)</h3>
             <p className="text-xs text-zinc-400 mt-1">Your brand's visibility in ChatGPT, Perplexity, and Gemini.</p>
           </div>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-72" style={{ minHeight: 300 }}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
               <AreaChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorBrand" x1="0" y1="0" x2="0" y2="1">
@@ -218,8 +246,8 @@ export function Overview() {
             <h3 className="text-base font-semibold text-white">Dark AI Attribution</h3>
             <p className="text-xs text-zinc-400 mt-1">Correlating "Direct Traffic" spikes with new AI Citations.</p>
           </div>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-72" style={{ minHeight: 300 }}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
               <ComposedChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                 <XAxis dataKey="shortDate" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
@@ -239,7 +267,7 @@ export function Overview() {
         <div className="lg:col-span-2 bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
           <div className="mb-6">
             <h3 className="text-base font-semibold text-white flex items-center gap-2">
-              <LinkIcon className="w-4 h-4 text-indigo-400" />
+              <LinkIcon className="w-4 h-4 text-pink-400" />
               "Dark AI" Shadow Link Generator
             </h3>
             <p className="text-xs text-zinc-400 mt-1">
@@ -253,12 +281,12 @@ export function Overview() {
               value={shadowUrl}
               onChange={(e) => setShadowUrl(e.target.value)}
               placeholder="e.g., auspexi.com/latency-report"
-              className="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
+              className="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50 text-sm"
             />
             <button 
               onClick={generateShadowLink}
               disabled={isGeneratingLink || !shadowUrl.trim()}
-              className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-2"
+              className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-2"
             >
               {isGeneratingLink ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
               {isGeneratingLink ? 'Generating...' : 'Generate Link'}

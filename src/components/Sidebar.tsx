@@ -1,9 +1,10 @@
-import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, Wrench, PenTool, MonitorPlay } from 'lucide-react';
+import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, Wrench, PenTool, MonitorPlay, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
+import { logAuditAction } from '@/lib/audit';
 
 interface SidebarProps {
   activeTab: string;
@@ -19,6 +20,7 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
     { id: 'overview', label: 'AI SOV Overview', icon: LayoutDashboard, requiredTier: 'Basic' },
     { id: 'fact-vault', label: 'Fact-Vault', icon: Database, requiredTier: 'Basic' },
     { id: 'content-scorer', label: 'Content Scorer', icon: PenTool, requiredTier: 'Basic' },
+    { id: 'audit-logs', label: 'Audit Logs', icon: ShieldCheck, requiredTier: 'Basic' },
     { id: 'simulator', label: 'SOV Simulator', icon: MonitorPlay, requiredTier: 'Medium' },
     { id: 'brand-monitor', label: 'Brand Monitor', icon: Radar, requiredTier: 'Medium' },
     { id: 'competitors', label: 'Competitor Radar', icon: Radar, requiredTier: 'Medium' },
@@ -27,7 +29,7 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
   ];
 
   const hasAccess = (requiredTier: string) => {
-    const tiers = ['Free', 'Basic', 'Medium', 'Premium', 'LifetimeDeal'];
+    const tiers = ['Free', 'Basic', 'Medium', 'Premium', 'PipelineOffer'];
     const userTierIndex = tiers.indexOf(tier || 'Free');
     const requiredTierIndex = tiers.indexOf(requiredTier);
     return userTierIndex >= requiredTierIndex;
@@ -39,6 +41,7 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
     if (!user) return;
     try {
       await setDoc(doc(db, 'users', user.uid), { tier: newTier }, { merge: true });
+      await logAuditAction(user.uid, 'Test Upgrade', { newTier });
       alert(`Test Upgrade: Tier set to ${newTier}`);
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `users/${user.uid}`);
@@ -62,7 +65,7 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
       )}>
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white">
+            <div className="w-8 h-8 rounded-lg bg-pink-600 flex items-center justify-center font-bold text-white">
               A
             </div>
             <span className="text-xl font-semibold text-white tracking-tight">Auspexi</span>
@@ -107,7 +110,7 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
               Admin Tools
             </div>
             <div className="space-y-1">
-              {['Free', 'Basic', 'Medium', 'Premium', 'LifetimeDeal'].map((t) => (
+              {['Free', 'Basic', 'Medium', 'Premium', 'PipelineOffer'].map((t) => (
                 <button
                   key={t}
                   onClick={() => handleTestUpgrade(t)}

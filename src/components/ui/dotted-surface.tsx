@@ -24,7 +24,7 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 
 		// Scene setup
 		const scene = new THREE.Scene();
-		scene.fog = new THREE.Fog(0xffffff, 2000, 10000);
+		scene.fog = new THREE.Fog(0x09090b, 2000, 10000);
 
 		const updateSize = () => {
 			if (!containerRef.current) return;
@@ -107,6 +107,9 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 		// Animation function
 		const animate = () => {
 			animationId = requestAnimationFrame(animate);
+			if (sceneRef.current) {
+				sceneRef.current.animationId = animationId;
+			}
 
 			// Time-based animation so it moves at the same speed regardless of frame rate
 			const time = performance.now() * 0.001; // Time in seconds
@@ -140,12 +143,12 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 		};
 
 		// Handle resize
-		const resizeObserver = new ResizeObserver(() => {
+		const handleResize = () => {
 			updateSize();
 			windowHalfX = window.innerWidth / 2;
 			windowHalfY = window.innerHeight / 2;
-		});
-		resizeObserver.observe(containerRef.current);
+		};
+		window.addEventListener('resize', handleResize);
 
 		// Start animation
 		animate();
@@ -161,7 +164,7 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 
 		// Cleanup function
 		return () => {
-			resizeObserver.disconnect();
+			window.removeEventListener('resize', handleResize);
 			document.removeEventListener('mousemove', onDocumentMouseMove);
 			cancelAnimationFrame(animationId);
 
@@ -180,8 +183,8 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 
 				sceneRef.current.renderer.dispose();
 
-				if (containerRef.current && sceneRef.current.renderer.domElement) {
-					containerRef.current.removeChild(
+				if (sceneRef.current.renderer.domElement && sceneRef.current.renderer.domElement.parentNode) {
+					sceneRef.current.renderer.domElement.parentNode.removeChild(
 						sceneRef.current.renderer.domElement,
 					);
 				}
