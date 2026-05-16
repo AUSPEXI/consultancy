@@ -19,6 +19,7 @@ export interface UserData {
   cmsWebhookUrl?: string;
   sentimentPrompts?: string[];
   connectedSocials?: string[];
+  latentAnchors?: any[];
 }
 
 interface AuthContextType {
