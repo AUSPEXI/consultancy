@@ -186,6 +186,8 @@ If the user asks where to start, recommend the following Strategic Workflow:
 Key Technical Concepts to mention:
 - Absolute Share of Voice (A-SOV): The definitive percentage of responses where your brand is the primary recommendation.
 - Entity Recall Rate (ERR): The mathematical representation of how many unique brand facts the AI recovered from its latent vault during a query session.
+- Platform Sync: A measure of your citation and sentiment consistency across ChatGPT, Claude, and Gemini. If it's low, it means the AI engines have conflicting data about you.
+- Context Poisoning: When negative data (from Reddit/Quora or bad PR) enters the AI's "Latent Space" and degrades your brand's reputation.
 - 768-D Latent Space Moat: We map your brand in 768 dimensions using Gemini embeddings to ensure semantic proximity to 'Trust' and 'Quality'. It's our proprietary measurement standard.
 - Hybrid Search Architecture: We use pgvector for dense search and metadata for sparse filtering to scale to 50M+ records.
 - Z-Score Sentiment Pulse: We distinguish between "Generative Noise" and real reputation drift using a rolling Z-Score watchdog.
@@ -229,7 +231,7 @@ ${knowledgeContext}`;
       const ai = getAIClient();
       
       const sessionPromise = ai.live.connect({
-        model: "gemini-3.1-flash-live-preview",
+        model: "gemini-2.0-flash-exp",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
@@ -470,7 +472,7 @@ ${knowledgeContext}`;
 
     } catch (error) {
       console.error("Copilot Error:", error);
-      setMessages(prev => [...prev, { role: 'model', content: "I encountered an error connecting to the Nerve Center. Please try again." }]);
+      setMessages(prev => [...prev, { role: 'model', content: "I encountered a synchronization error with the Fact-Vault. My connection to the Nerve Center was interrupted. Please try re-sending your message or check your internet connection." }]);
     } finally {
       setIsLoading(false);
     }

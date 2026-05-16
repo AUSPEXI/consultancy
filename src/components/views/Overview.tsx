@@ -449,12 +449,12 @@ export function Overview() {
       {/* High-Impact Performance Dials (Racing Style) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'A-SOV Dominance', value: Math.round(safeLatest.aSov), color: '#ec4899', icon: Target },
-          { label: 'Entity Recall', value: Math.round(safeLatest.err), color: '#a855f7', icon: BrainCircuit },
-          { label: 'Platform Sync', value: Math.round((safePlatforms.chatgpt + safePlatforms.claude + safePlatforms.gemini) / 3), color: '#3b82f6', icon: Activity },
-          { label: 'Sentiment Index', value: 78, color: '#10b981', icon: TrendingUp },
+          { label: 'A-SOV Dominance', value: Math.round(safeLatest.aSov), color: '#ec4899', icon: Target, desc: 'Absolute Share of Voice' },
+          { label: 'Entity Recall', value: Math.round(safeLatest.err), color: '#a855f7', icon: BrainCircuit, desc: 'Fact retrieval rate' },
+          { label: 'Platform Sync', value: Math.round((safePlatforms.chatgpt + safePlatforms.claude + safePlatforms.gemini) / 3), color: '#3b82f6', icon: Activity, desc: 'Consistency across LLMs' },
+          { label: 'Sentiment Index', value: 78, color: '#10b981', icon: TrendingUp, desc: 'Qualitative pulse' },
         ].map((dial, i) => (
-          <div key={i} className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden group hover:border-zinc-700 transition-all">
+          <div key={i} className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden group hover:border-zinc-700 transition-all cursor-help" title={dial.desc}>
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-zinc-800 to-transparent opacity-50" />
             <RacingDial value={dial.value} label={dial.label} color={dial.color} />
             <dial.icon className="absolute top-4 right-4 w-4 h-4 text-zinc-800 group-hover:text-zinc-700 transition-colors" />
