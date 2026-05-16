@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-export const useGeoAnalytics = (brandId: string, customPrompts: string[] = [], platform: string = 'All', timeframe: string = 'current') => {
+export const useGeoAnalytics = (brandId: string, customPrompts: string[] = [], platform: string = 'All', timeframe: string = 'current', userId?: string) => {
   const [pulseData, setPulseData] = useState<any[]>([]);
   const [mapPoints, setMapPoints] = useState<any[]>([]);
   const [sentimentTrace, setSentimentTrace] = useState<any[]>([]);
@@ -16,14 +16,15 @@ export const useGeoAnalytics = (brandId: string, customPrompts: string[] = [], p
     if (!brandId) return;
     setLoading(true);
     try {
+      const authParam = userId ? `&userId=${userId}` : '';
       const promptsQuery = customPrompts.length > 0 
         ? `&prompts=${encodeURIComponent(JSON.stringify(customPrompts))}`
         : '';
         
       const [pulseRes, mapRes, traceRes] = await Promise.all([
-        fetch(`/api/analytics/pulse?brandId=${brandId}`),
-        fetch(`/api/analytics/map?brandId=${brandId}&platform=${platform}&timeframe=${timeframe}`),
-        fetch(`/api/analytics/sentiment-trace?brandId=${brandId}${promptsQuery}`)
+        fetch(`/api/analytics/pulse?brandId=${brandId}${authParam}`),
+        fetch(`/api/analytics/map?brandId=${brandId}&platform=${platform}&timeframe=${timeframe}${authParam}`),
+        fetch(`/api/analytics/sentiment-trace?brandId=${brandId}${promptsQuery}${authParam}`)
       ]);
       
       const pulse = await pulseRes.json();

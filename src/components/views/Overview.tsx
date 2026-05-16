@@ -13,6 +13,8 @@ import { useGeoAnalytics } from '@/hooks/useGeoAnalytics';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { UmapVisualization } from '../ui/UmapVisualization';
 
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+
 // --- Interpretation Legend ---
 const NeuralLegend = () => (
   <div className="flex flex-wrap gap-4 mt-4 px-4 py-3 bg-zinc-900/30 border border-zinc-800/50 rounded-xl">
@@ -88,7 +90,8 @@ export function Overview() {
     userData?.brand || '', 
     userPrompts,
     selectedPlatform,
-    selectedTimeframe
+    selectedTimeframe,
+    user?.uid
   );
   
   const [metrics, setMetrics] = useState<any[]>([]);
@@ -100,6 +103,45 @@ export function Overview() {
   const [isEditingPrompts, setIsEditingPrompts] = useState(false);
   const [editPromptsState, setEditPromptsState] = useState<string[]>(userPrompts);
   const [isSavingPrompts, setIsSavingPrompts] = useState(false);
+
+  const [isEditingAnchors, setIsEditingAnchors] = useState(false);
+  const [editAnchorsState, setEditAnchorsState] = useState<any[]>([]);
+  const [isSavingAnchors, setIsSavingAnchors] = useState(false);
+
+  const userAnchors = userData?.latentAnchors || [
+    { label: "Reputational Moat", color: "#ec4899", baseType: "Systemic Anchor" },
+    { label: "Technical Competence", color: "#06b6d4", baseType: "Signal Point" },
+    { label: "Pricing Perception", color: "#8b5cf6", baseType: "Emergent Trend" },
+  ];
+
+  useEffect(() => {
+    if (userData?.latentAnchors) {
+      setEditAnchorsState(userData.latentAnchors);
+    } else {
+      setEditAnchorsState([
+        { label: "Reputational Moat", color: "#ec4899", baseType: "Systemic Anchor" },
+        { label: "Technical Competence", color: "#06b6d4", baseType: "Signal Point" },
+        { label: "Pricing Perception", color: "#8b5cf6", baseType: "Emergent Trend" },
+      ]);
+    }
+  }, [userData]);
+
+  const handleSaveAnchors = async () => {
+    if (!user) return;
+    setIsSavingAnchors(true);
+    try {
+      await setDoc(doc(db, 'users', user.uid), {
+        latentAnchors: editAnchorsState.filter(a => a.label.trim() !== '')
+      }, { merge: true });
+      setIsEditingAnchors(false);
+      refetchGeo();
+      await logAuditAction(user.uid, 'Updated Latent Anchors');
+    } catch (e) {
+      console.error("Failed to save anchors", e);
+    } finally {
+      setIsSavingAnchors(false);
+    }
+  };
 
   useEffect(() => {
     if (!user || !checkTierAccess(tier, 'Basic')) return;
@@ -139,9 +181,12 @@ export function Overview() {
     );
   }
 
+  const [auditSuccess, setAuditSuccess] = useState(false);
+
   const runAudit = async () => {
     if (!user) return;
     setIsAuditing(true);
+    setAuditSuccess(false);
     try {
       if (userData?.brand && userData?.domain && userData?.keywords && userData.keywords.length > 0) {
         // Run real audit
@@ -173,12 +218,13 @@ export function Overview() {
             ...data.metrics
           }, { merge: true });
           await logAuditAction(user.uid, 'Ran Real SOV Audit', { date: dateStr });
+          setAuditSuccess(true);
         } else {
           throw new Error(data.error || 'Failed to run audit');
         }
       } else {
         // Fallback to simulated audit if onboarding data is missing
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
         const lastDate = metrics.length > 0 ? new Date(metrics[metrics.length - 1].date) : new Date();
         if (metrics.length > 0) {
@@ -193,20 +239,20 @@ export function Overview() {
         const prevAiTraffic = metrics.length > 0 ? metrics[metrics.length - 1].aiTraffic : 120;
         const prevCompA = metrics.length > 0 ? metrics[metrics.length - 1].compA : 45;
         
-        const newAsov = Math.min(100, prevAsov + Math.floor(Math.random() * 8));
-        const newCompA = Math.max(0, prevCompA - Math.floor(Math.random() * 5));
+        const newAsov = Math.min(100, Math.max(5, prevAsov + (Math.random() > 0.5 ? Math.floor(Math.random() * 12) : -Math.floor(Math.random() * 5))));
+        const newCompA = Math.max(0, Math.min(100, prevCompA + (Math.random() > 0.6 ? Math.floor(Math.random() * 5) : -Math.floor(Math.random() * 8))));
 
         const simulatedPlatforms = {
-          chatgpt: Math.min(100, newAsov + 15),
-          perplexity: Math.max(0, newAsov - 15),
-          claude: newAsov + 5,
-          gemini: newAsov + 25
+          chatgpt: Math.min(100, Math.max(5, newAsov + Math.floor(Math.random() * 20))),
+          perplexity: Math.min(100, Math.max(0, newAsov - Math.floor(Math.random() * 15))),
+          claude: Math.min(100, Math.max(5, newAsov + Math.floor(Math.random() * 10))),
+          gemini: Math.min(100, Math.max(5, newAsov + Math.floor(Math.random() * 25)))
         };
         
         const simulatedRadar = [
-          { subject: 'Pricing Insights', brandScore: newAsov + 20, compScore: newCompA + 10 },
+          { subject: 'Pricing Insights', brandScore: newAsov + Math.floor(Math.random() * 30), compScore: newCompA + 10 },
           { subject: 'Feature Comparison', brandScore: Math.max(0, newAsov - 5), compScore: newCompA + 25 },
-          { subject: 'Implementation Docs', brandScore: newAsov + 10, compScore: Math.max(0, newCompA - 15) },
+          { subject: 'Implementation Docs', brandScore: newAsov + Math.floor(Math.random() * 20), compScore: Math.max(0, newCompA - 15) },
           { subject: 'Customer Support', brandScore: newAsov + 30, compScore: Math.max(0, newCompA - 20) },
           { subject: 'Security & Auth', brandScore: Math.max(0, newAsov - 15), compScore: newCompA + 20 },
           { subject: 'Enterprise Ready', brandScore: newAsov + 5, compScore: newCompA }
@@ -217,7 +263,7 @@ export function Overview() {
           if (idx === 0) score = newAsov + 40;
           else if (idx === 1) score = newAsov > 20 ? 80 : 30;
           else if (idx === 2) score = newAsov > 25 ? 20 : -40;
-          else score = -10;
+          else score = Math.floor(Math.random() * 40) - 20;
           return { prompt: p, score: Math.min(100, Math.max(-100, score)) };
         });
 
@@ -233,18 +279,20 @@ export function Overview() {
           date: dateStr,
           shortDate: shortDate,
           aSov: newAsov,
-          err: Math.min(100, prevErr + Math.floor(Math.random() * 10)),
+          err: Math.min(100, Math.max(0, prevErr + Math.floor(Math.random() * 15) - 5)),
           compGap: newAsov - newCompA,
           compA: newCompA,
-          compB: Math.max(0, (metrics.length > 0 ? metrics[metrics.length - 1].compB : 30) - Math.floor(Math.random() * 5)),
-          aiTraffic: prevAiTraffic + Math.floor(Math.random() * 40) + 10,
+          compB: Math.max(0, (metrics.length > 0 ? (metrics[metrics.length - 1].compB || 30) : 30) - Math.floor(Math.random() * 5)),
+          aiTraffic: prevAiTraffic + Math.floor(Math.random() * 60) - 10,
           platforms: simulatedPlatforms,
           radar: simulatedRadar,
           sentiment: simulatedSentiment,
           topUrls: simulatedTopUrls
         }, { merge: true });
         await logAuditAction(user.uid, 'Ran Simulated SOV Audit', { date: dateStr });
+        setAuditSuccess(true);
       }
+      setTimeout(() => setAuditSuccess(false), 3000);
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'sovMetrics');
     } finally {
@@ -338,12 +386,18 @@ export function Overview() {
   })) : radarData;
 
   const lp = latest.platforms || {};
+  const platformSyncValue = (lp.chatgpt || lp.claude || lp.gemini) 
+    ? Math.round(( (lp.chatgpt || 0) + (lp.claude || 0) + (lp.gemini || 0) ) / 3)
+    : 0;
+
   const safePlatforms = {
-    chatgpt: lp.chatgpt ?? (safeLatest.aSov + 15),
-    perplexity: lp.perplexity ?? (safeLatest.aSov - 25),
-    claude: lp.claude ?? (safeLatest.aSov + 5),
-    gemini: lp.gemini ?? (safeLatest.aSov + 25)
+    chatgpt: lp.chatgpt ?? (safeLatest.aSov > 0 ? safeLatest.aSov + 15 : 20),
+    perplexity: lp.perplexity ?? (safeLatest.aSov > 0 ? Math.max(0, safeLatest.aSov - 25) : 10),
+    claude: lp.claude ?? (safeLatest.aSov > 0 ? safeLatest.aSov + 5 : 15),
+    gemini: lp.gemini ?? (safeLatest.aSov > 0 ? safeLatest.aSov + 25 : 30)
   };
+
+  const finalPlatformSync = platformSyncValue || Math.round((safePlatforms.chatgpt + safePlatforms.claude + safePlatforms.gemini) / 3);
 
   const platformData = [
     { name: 'ChatGPT', visibility: Math.min(100, Math.max(0, safePlatforms.chatgpt)), fill: '#10a37f' },
@@ -470,32 +524,40 @@ export function Overview() {
           <button 
             onClick={runAudit}
             disabled={isAuditing}
-            className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
+            className={`${auditSuccess ? 'bg-emerald-600' : 'bg-pink-600 hover:bg-pink-700'} disabled:opacity-50 text-white px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 shadow-lg ${auditSuccess ? 'shadow-emerald-500/20' : 'shadow-pink-500/20'}`}
           >
-            {isAuditing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Activity className="w-4 h-4" />}
-            Refresh Metrics
+            {isAuditing ? <Loader2 className="w-4 h-4 animate-spin" /> : auditSuccess ? <div className="flex items-center gap-2">✓ Updated</div> : <Activity className="w-4 h-4" />}
+            {!isAuditing && !auditSuccess && "Refresh Metrics"}
           </button>
         </div>
       </div>
 
       {/* High-Impact Performance Dials (Racing Style) */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'A-SOV Dominance', value: Math.round(safeLatest.aSov), color: '#ec4899', icon: Target, desc: 'Absolute Share of Voice - % of AI responses dominated by your brand' },
-          { label: 'Entity Recall', value: Math.round(safeLatest.err), color: '#a855f7', icon: BrainCircuit, desc: 'Entity Recall Rate - how often specific facts about your brand are correctly retrieved' },
-          { label: 'Platform Sync', value: Math.round((safePlatforms.chatgpt + safePlatforms.claude + safePlatforms.gemini) / 3), color: '#3b82f6', icon: Activity, desc: 'Across-model consistency index' },
-          { label: 'Sentiment Index', value: 78, color: '#10b981', icon: TrendingUp, desc: 'Average qualitative sentiment score across tracked vectors' },
-        ].map((dial, i) => (
-          <div key={i} className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden group hover:border-zinc-700 transition-all cursor-help" title={dial.desc}>
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-zinc-800 to-transparent opacity-50" />
-            <RacingDial value={dial.value} label={dial.label} color={dial.color} />
-            <div className="absolute top-4 right-4 flex flex-col items-end gap-1 opacity-40 group-hover:opacity-100 transition-opacity">
-               <dial.icon className="w-4 h-4 text-zinc-400" />
-               <HelpCircle className="w-3 h-3 text-zinc-600" />
-            </div>
-          </div>
-        ))}
-      </div>
+      <TooltipProvider>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: 'A-SOV Dominance', value: Math.round(safeLatest.aSov), color: '#ec4899', icon: Target, desc: 'Absolute Share of Voice - % of AI responses dominated by your brand' },
+            { label: 'Entity Recall', value: Math.round(safeLatest.err), color: '#a855f7', icon: BrainCircuit, desc: 'Entity Recall Rate - how often specific facts about your brand are correctly retrieved' },
+            { label: 'Platform Sync', value: finalPlatformSync, color: '#3b82f6', icon: Activity, desc: 'Across-model consistency index' },
+            { label: 'Sentiment Index', value: 78, color: '#10b981', icon: TrendingUp, desc: 'Average qualitative sentiment score across tracked vectors' },
+          ].map((dial, i) => (
+            <Tooltip key={i}>
+              <TooltipTrigger asChild>
+                <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden group hover:border-zinc-700 transition-all cursor-help">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-zinc-800 to-transparent opacity-50" />
+                  <RacingDial value={dial.value} label={dial.label} color={dial.color} />
+                  <div className="absolute top-4 right-4 flex flex-col items-end gap-1 opacity-40 group-hover:opacity-100 transition-opacity">
+                     <dial.icon className="w-4 h-4 text-zinc-400" />
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-[200px] text-center">
+                <p>{dial.desc}</p>
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
+      </TooltipProvider>
 
       {/* Secondary KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -662,7 +724,7 @@ export function Overview() {
         </div>
 
         {/* Sentiment Pulse */}
-        <div className="lg:col-span-2 bg-black border border-zinc-900 rounded-2xl p-6 relative overflow-hidden group">
+        <div className="lg:col-span-2 bg-black border border-zinc-900 rounded-2xl p-6 relative group z-30">
           {/* Neural Grid Background */}
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
                style={{ 
@@ -724,12 +786,12 @@ export function Overview() {
                      selectedTimeframe === 'week' ? 'Past 7 Days' : 'Rolling 30 Days'}
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 group relative cursor-help">
+                <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 group/engine relative cursor-help">
                   <span className="text-[8px] font-mono text-zinc-500 uppercase tracking-tighter">ENGINE:</span>
                   <span className="text-[8px] font-mono text-emerald-400">GEMINI-EMBED-004</span>
                   
                   {/* Methodology Tooltip */}
-                  <div className="absolute bottom-full left-0 mb-2 w-72 p-4 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[100] text-[10px] leading-relaxed backdrop-blur-xl pointer-events-none">
+                  <div className="absolute bottom-full left-0 mb-2 w-72 p-4 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl opacity-0 invisible group-hover/engine:opacity-100 group-hover/engine:visible transition-all z-[100] text-[10px] leading-relaxed backdrop-blur-xl pointer-events-none">
                     <p className="text-white font-bold mb-2 uppercase tracking-widest text-[9px] border-b border-zinc-800 pb-2">Semantic Audit Methodology</p>
                     <p className="text-zinc-400 mb-2">
                       The map displays the <span className="text-pink-400 font-bold">Reputational Twin</span> generated during the last Deep Audit.
@@ -753,6 +815,13 @@ export function Overview() {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <button 
+                onClick={() => setIsEditingAnchors(true)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-400 transition-colors"
+              >
+                <Settings className="w-3 h-3" />
+                Configure Anchors
+              </button>
               <div className="text-right hidden sm:block">
                 <p className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Projection Method</p>
                 <p className="text-[10px] font-mono text-zinc-500">UMAP_DENSITY_ESTIMATION</p>
@@ -762,6 +831,96 @@ export function Overview() {
           </div>
           
           <div className="h-[400px] w-full relative z-10 border border-zinc-800/50 rounded-2xl bg-zinc-950/20 overflow-hidden">
+            {isEditingAnchors ? (
+              <div className="absolute inset-0 z-[60] bg-zinc-950/95 backdrop-blur-xl flex flex-col p-8">
+                 <div className="flex items-center justify-between mb-8">
+                    <div>
+                       <h4 className="text-lg font-bold text-white tracking-tight">Configure Semantic Anchors</h4>
+                       <p className="text-xs text-zinc-500 mt-1">Define the high-confidence monoliths that ground your brand in the latent space.</p>
+                    </div>
+                    <button onClick={() => setIsEditingAnchors(false)} className="p-2 hover:bg-zinc-900 rounded-full text-zinc-400">
+                       <X className="w-5 h-5" />
+                    </button>
+                 </div>
+
+                 <div className="space-y-4 flex-1 overflow-y-auto pr-4 custom-scrollbar">
+                    {editAnchorsState.map((anchor, idx) => (
+                       <div key={idx} className="p-4 bg-zinc-900 border border-zinc-800 rounded-xl space-y-4">
+                          <div className="flex items-center justify-between">
+                             <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Anchor #{idx + 1}</span>
+                             {editAnchorsState.length > 1 && (
+                                <button onClick={() => setEditAnchorsState(editAnchorsState.filter((_, i) => i !== idx))} className="text-rose-500 hover:text-rose-400 text-[10px] font-bold uppercase tracking-wider">Remove</button>
+                             )}
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                             <div>
+                                <label className="block text-[9px] font-bold text-zinc-500 uppercase mb-1">Anchor Label</label>
+                                <input 
+                                   className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-sm text-white focus:outline-none focus:border-pink-500"
+                                   value={anchor.label}
+                                   onChange={(e) => {
+                                      const n = [...editAnchorsState];
+                                      n[idx].label = e.target.value;
+                                      setEditAnchorsState(n);
+                                   }}
+                                />
+                             </div>
+                             <div>
+                                <label className="block text-[9px] font-bold text-zinc-500 uppercase mb-1">Color Code</label>
+                                <div className="flex gap-2">
+                                  {['#ec4899', '#06b6d4', '#8b5cf6', '#10b981', '#f59e0b'].map(c => (
+                                    <button 
+                                      key={c}
+                                      onClick={() => {
+                                        const n = [...editAnchorsState];
+                                        n[idx].color = c;
+                                        setEditAnchorsState(n);
+                                      }}
+                                      className={`w-6 h-6 rounded-full border-2 transition-all ${anchor.color === c ? 'border-white scale-110 shadow-[0_0_10px_white]' : 'border-transparent opacity-50 hover:opacity-100'}`}
+                                      style={{ backgroundColor: c }}
+                                    />
+                                  ))}
+                                </div>
+                             </div>
+                             <div>
+                                <label className="block text-[9px] font-bold text-zinc-500 uppercase mb-1">Cluster Type</label>
+                                <select 
+                                   className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-sm text-white focus:outline-none focus:border-pink-500"
+                                   value={anchor.baseType}
+                                   onChange={(e) => {
+                                      const n = [...editAnchorsState];
+                                      n[idx].baseType = e.target.value;
+                                      setEditAnchorsState(n);
+                                   }}
+                                >
+                                   <option>Systemic Anchor</option>
+                                   <option>Signal Point</option>
+                                   <option>Emergent Trend</option>
+                                   <option>Risk Vector</option>
+                                </select>
+                             </div>
+                          </div>
+                       </div>
+                    ))}
+                    {editAnchorsState.length < 5 && (
+                       <button onClick={() => setEditAnchorsState([...editAnchorsState, { label: "New Anchor", color: "#ec4899", baseType: "Signal Point" }])} className="w-full p-4 border border-dashed border-zinc-800 rounded-xl text-zinc-500 hover:text-zinc-300 hover:border-zinc-700 transition-all text-sm font-bold flex items-center justify-center gap-2">
+                          <Plus className="w-4 h-4" /> Add Neural Anchor
+                       </button>
+                    )}
+                 </div>
+
+                 <div className="mt-8 flex justify-end">
+                    <button
+                       onClick={handleSaveAnchors}
+                       disabled={isSavingAnchors}
+                       className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-lg shadow-pink-500/20"
+                    >
+                       {isSavingAnchors ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                       Synchronize Semantic Model
+                    </button>
+                 </div>
+              </div>
+            ) : null}
             {mapPoints.length > 0 ? (
               latentView === '2d' ? (
                 <TransformWrapper
