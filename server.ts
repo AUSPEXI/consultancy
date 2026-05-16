@@ -961,7 +961,10 @@ Competitors: ${competitors.join(", ")}
 Search Context:
 ${combinedContext.substring(0, 30000)}
 
-Return ONLY a JSON object with the following structure, using derived or highly plausible estimates based on the context:
+Return ONLY a JSON object. 
+IMPORTANT: Your estimates for 'platforms' SHOULD NEVER BE ZERO. Base them on the citation frequency in the context.
+If the context is sparse, use a baseline of 5-15% for the brand if it's mentioned at all.
+
 {
   "brand": <integer percentage for ${brand}>,
   "compA": <integer percentage for ${competitors[0] || 'Competitor A'}>,
