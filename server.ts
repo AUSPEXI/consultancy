@@ -414,7 +414,7 @@ app.use(express.json());
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+        model: "gemini-2.0-flash-exp",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
@@ -482,7 +482,7 @@ app.use(express.json());
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.0-flash-exp",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
@@ -524,7 +524,7 @@ app.use(express.json());
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.0-flash-exp",
         contents: prompt,
         config: { responseMimeType: "application/json" }
       });
@@ -558,13 +558,13 @@ app.use(express.json());
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.0-flash-exp",
         contents: prompt,
         config: { responseMimeType: "application/json" }
       });
 
-      const facts = JSON.parse(response.text || "[]");
-      res.json({ success: true, facts });
+      const factsRes = JSON.parse(response.text || "[]");
+      res.json({ success: true, facts: factsRes });
     } catch (err: any) {
       console.error("Extract high entropy facts error:", err);
       res.status(500).json({ error: "Failed to extract facts" });
@@ -582,7 +582,7 @@ app.use(express.json());
       const prompt = `Extract 3 atomic facts from the following text and format as a JSON array of strings. Each string must be a concise, standalone fact.\\nText: ${content.substring(0, 5000)}`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.1-pro-preview',
+        model: 'gemini-2.0-flash-exp',
         contents: prompt,
         config: { responseMimeType: 'application/json' }
       });
@@ -642,7 +642,7 @@ app.use(express.json());
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.0-flash-exp",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
@@ -686,16 +686,16 @@ app.use(express.json());
            - vulnerabilities: array of strings (specific weaknesses found)
         `;
 
-        const response = await ai.models.generateContent({
-          model: "gemini-2.5-flash",
+        const responseComp = await ai.models.generateContent({
+          model: "gemini-2.0-flash-exp",
           contents: prompt,
           config: {
             responseMimeType: "application/json",
           }
         });
 
-        const parsed = JSON.parse(response.text || "{}");
-        res.json({ success: true, result: { name: hostname, ...parsed } });
+        const parsedComp = JSON.parse(responseComp.text || "{}");
+        res.json({ success: true, result: { name: hostname, ...parsedComp } });
     } catch (err: any) {
       console.error("Analyze competitor endpoint error:", err);
       res.status(500).json({ error: "Failed to analyze competitor" });
@@ -723,15 +723,15 @@ app.use(express.json());
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.0-flash-exp",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
         }
       });
 
-      const parsed = JSON.parse(response.text || "{}");
-      res.json({ success: true, result: parsed });
+      const parsedRes = JSON.parse(response.text || "{}");
+      res.json({ success: true, result: parsedRes });
     } catch (err: any) {
       console.error("Technical Restructure error:", err);
       res.status(500).json({ error: "Failed to restructure text" });
@@ -756,7 +756,7 @@ app.use(express.json());
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.0-flash-exp",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
@@ -798,7 +798,7 @@ app.use(express.json());
               CRITICAL: Prefix the report with a realistic external source (e.g., "According to the Forrester 2024 AI Index:", "A recent study by MIT CSAIL found..."). Do NOT author it yourself.
               Make it at least 400 words of dense facts.
             `;
-            const fbRes = await ai.models.generateContent({ model: "gemini-2.5-flash", contents: fallbackPrompt });
+            const fbRes = await ai.models.generateContent({ model: "gemini-2.0-flash-exp", contents: fallbackPrompt });
             crawlerData = fbRes.text || `Raw data found for ${topic}: No detailed data available.`;
       }
       res.json({ success: true, result: crawlerData });
@@ -824,7 +824,7 @@ app.use(express.json());
         ${vaultContext ? `\nCRUCIAL BRAND FACTS FROM VAULT (Include these in your extracted list):\n- ${vaultContext}` : ''}
       `;
 
-      const response = await ai.models.generateContent({ model: "gemini-2.5-flash", contents: extractPrompt});
+      const response = await ai.models.generateContent({ model: "gemini-2.0-flash-exp", contents: extractPrompt});
       res.json({ success: true, result: response.text });
     } catch (err: any) {
        console.error("Agent extract error:", err);
@@ -841,7 +841,7 @@ app.use(express.json());
         Do not write any markdown formatting or explanations. Output ONLY raw JSON.
         Facts: ${facts}
       `;
-      const response = await ai.models.generateContent({ model: "gemini-2.5-flash", contents: schemaPrompt });
+      const response = await ai.models.generateContent({ model: "gemini-2.0-flash-exp", contents: schemaPrompt });
       let text = response.text || "{}";
       text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
       res.json({ success: true, result: text });
@@ -876,7 +876,7 @@ app.use(express.json());
         
         Do not write generic PR fluff. Speak to Technical SEOs and Enterprise Marketing Directors. Use markdown formatting (H2, H3, bullet points). Ensure the final length is at least 500 words.
       `;
-      const response = await ai.models.generateContent({ model: "gemini-3.1-pro-preview", contents: synthesisPrompt });
+      const response = await ai.models.generateContent({ model: "gemini-2.0-flash-exp", contents: synthesisPrompt });
       res.json({ success: true, result: response.text });
      } catch (err: any) {
         console.error("Agent synthesize error:", err);
@@ -891,19 +891,21 @@ app.use(express.json());
 
       const ai = getGemini();
 
-      const chat = ai.chats.create({
-        model: "gemini-3.1-pro-preview",
+      // Map history to the format expected by the SDK
+      const contents = (chatHistory || []).map((msg: any) => ({
+        role: msg.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: msg.content }]
+      }));
+
+      // Add the new message
+      contents.push({ role: 'user', parts: [{ text: userMessage }] });
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.0-flash-exp",
+        contents,
         config: {
           systemInstruction,
         }
-      });
-      
-      // We don't have to restore full history if we just send the whole history in message or configure it.
-      // Easiest is just pushing history to the chat model.
-      const conversationContext = chatHistory.map((msg: any) => `${msg.role}: ${msg.content}`).join("\n");
-      
-      const response = await chat.sendMessage({
-         message: `Here is the conversation history:\n${conversationContext}\n\nUser: ${userMessage}`
       });
 
       res.json({ success: true, result: response.text });
@@ -994,14 +996,14 @@ Return ONLY a JSON object with the following structure, using derived or highly 
       let response;
       try {
         response = await ai.models.generateContent({
-          model: "gemini-3.1-pro-preview",
+          model: "gemini-2.0-flash-exp",
           contents: prompt,
           config: { responseMimeType: "application/json" }
         });
       } catch (geminiError: any) {
         console.warn("Primary Gemini model failed, trying fallback:", geminiError.message);
         response = await ai.models.generateContent({
-          model: "gemini-2.5-flash",
+          model: "gemini-1.5-flash",
           contents: prompt,
           config: { responseMimeType: "application/json" }
         });
@@ -1094,14 +1096,14 @@ Format the output in clean Markdown.
       let response;
       try {
         response = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
+          model: "gemini-2.0-flash-exp",
           contents: prompt,
         });
       } catch (geminiError: any) {
         console.warn("Primary Gemini model failed, trying fallback:", geminiError.message);
-        // Fallback to a highly available model if the preview model is experiencing high demand (503)
+        // Fallback to a highly available model
         response = await ai.models.generateContent({
-          model: "gemini-2.5-flash",
+          model: "gemini-1.5-flash",
           contents: prompt,
         });
       }
@@ -1365,15 +1367,15 @@ Format the output in clean Markdown.
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.0-flash-exp",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
         }
       });
 
-      const parsedResult = JSON.parse(response.text || "{}");
-      res.json({ success: true, result: parsedResult });
+      const parsedResultData = JSON.parse(response.text || "{}");
+      res.json({ success: true, result: parsedResultData });
     } catch (error: any) {
       console.error("Error in brand monitor:", error);
       res.status(500).json({ error: error.message });
