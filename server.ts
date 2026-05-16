@@ -66,8 +66,12 @@ function getGemini(): GoogleGenAI {
   if (!geminiClient) {
     const key = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
     if (!key) {
+      console.warn("GEMINI_API_KEY is missing from environment. AI features will fail.");
       throw new Error('GEMINI_API_KEY environment variable is required');
     }
+    // The SDK supports both string and object init. 
+    // If it's the newer SDK (which seems to be the case given the .models syntax used in this file), 
+    // it likely expects the apiKey in an object.
     geminiClient = new GoogleGenAI({ apiKey: key });
   }
   return geminiClient;
@@ -912,37 +916,32 @@ app.use(express.json());
       const { userMessage, chatHistory, systemInstruction } = req.body;
       if (!userMessage) return res.status(400).json({ error: "Missing message" });
 
-      console.log(`[Copilot] Processing request for message: ${userMessage.substring(0, 50)}...`);
+      console.log(`[Copilot] Processing request for: "${userMessage.substring(0, 50)}..."`);
 
       const ai = getGemini();
 
-      // Map history to the format expected by the SDK
       // IMPORTANT: Gemini history MUST start with a 'user' message.
-      // We skip the first message if it's from the 'model' (likely a welcome message).
       let historyToMap = chatHistory || [];
-      if (historyToMap.length > 0 && (historyToMap[0].role === 'assistant' || historyToMap[0].role === 'model')) {
-        historyToMap = historyToMap.slice(1);
+      
+      // Clean and normalize history
+      let cleanedHistory = historyToMap
+        .filter((m: any) => m && m.content && typeof m.content === 'string' && m.content.trim() !== '')
+        .map((m: any) => ({
+          role: (m.role === 'assistant' || m.role === 'model') ? 'model' : 'user',
+          parts: [{ text: m.content }]
+        }));
+
+      // Ensure history starts with 'user'
+      if (cleanedHistory.length > 0 && cleanedHistory[0].role === 'model') {
+        cleanedHistory = cleanedHistory.slice(1);
       }
 
-      const contents = historyToMap.map((msg: any) => ({
-        role: (msg.role === 'assistant' || msg.role === 'model') ? 'model' : 'user',
-        parts: [{ text: msg.content }]
-      }));
-
-      // Ensure alternating roles (user -> model -> user)
-      // This is a simple defensive check
-      if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
-        // Ready to push another user message? 
-        // Actually, if the last was user, we can't push another user.
-        // But chatHistory usually ends with a model response.
-        // If it doesn't, we might need to merge or skip.
-      }
-
-      // Add the new message
-      contents.push({ role: 'user', parts: [{ text: userMessage }] });
+      // Add the current message
+      const contents = [...cleanedHistory, { role: 'user', parts: [{ text: userMessage }] }];
 
       let response;
       try {
+        // Try the .models syntax first as it was used previously in this file
         response = await ai.models.generateContent({
           model: "gemini-1.5-pro",
           contents,
@@ -951,45 +950,40 @@ app.use(express.json());
           }
         });
       } catch (geminiError: any) {
-        console.warn("[Copilot] Primary model failed, trying fallback:", geminiError.message);
+        console.warn("[Copilot] Primary model (1.5-pro) failed or syntax error:", geminiError.message);
+        
         try {
-          response = await ai.models.generateContent({
+          // Try standard SDK pattern if the .models syntax failed
+          const model = ai.getGenerativeModel({ 
             model: "gemini-1.5-flash",
-            contents,
-            config: {
-              systemInstruction,
-            }
+            systemInstruction: systemInstruction 
           });
+          const result = await model.generateContent({ contents });
+          const responseText = result.response.text();
+          return res.json({ success: true, result: responseText });
         } catch (fallbackError: any) {
-           console.error("[Copilot] Fallback model also failed:", fallbackError.message);
+           console.error("[Copilot] Fallback also failed:", fallbackError.message);
            throw fallbackError;
         }
       }
 
       if (!response.text) {
-        console.warn("[Copilot] Received empty response from Gemini");
-        throw new Error("Empty response from AI engine");
+        console.warn("[Copilot] Empty response from Gemini");
+        throw new Error("Received an empty response from the branding engine.");
       }
 
       res.json({ success: true, result: response.text });
     } catch (err: any) {
-      console.error("Copilot Chat error detailed:", {
-        message: err.message,
-        stack: err.stack,
-        details: err.details || "No extra details"
-      });
+      console.error("[Copilot CRITICAL] Chat Error:", err);
       
-      // Check for specific Gemini errors (e.g. invalid API key)
-      if (err.message?.includes("API_KEY_INVALID")) {
-        return res.status(500).json({ 
-          success: false, 
-          error: "CRITICAL: GEMINI_API_KEY is invalid or missing in server environment." 
-        });
-      }
+      const isAuthError = err.message?.includes("API_KEY_INVALID") || err.message?.includes("403");
+      const errorMessage = isAuthError 
+        ? "CRITICAL: The Citacious Engine rejects our credentials. Please check GEMINI_API_KEY."
+        : `SYNC_FAILURE: ${err.message || 'Failed to communicate with the Citacious Engine.'}`;
 
       res.status(500).json({ 
         success: false, 
-        error: `SYNC_FAILURE: ${err.message || 'Failed to communicate with the Citacious Engine.'}` 
+        error: errorMessage
       });
     }
   });
