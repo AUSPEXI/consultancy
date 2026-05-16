@@ -14,7 +14,6 @@ export interface UserData {
   domain?: string;
   competitors?: string[];
   keywords?: string[];
-  cmsWebhookUrl?: string;
 }
 
 interface AuthContextType {

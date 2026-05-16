@@ -4,7 +4,6 @@ import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
-import { logSimulatorResult } from '@/lib/metrics';
 
 export function Simulator() {
   const { tier, user } = useAuth();
@@ -78,7 +77,6 @@ export function Simulator() {
       setResults(parsedResult);
       if (user) {
         await logAuditAction(user.uid, 'Ran SOV Simulation', { query, brand, sovScore: parsedResult.sovScore });
-        await logSimulatorResult(user.uid, parsedResult.sovScore);
       }
     } catch (error) {
       console.error("Error simulating:", error);

@@ -25,7 +25,6 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
     keyword1: '',
     keyword2: '',
     keyword3: '',
-    cmsWebhookUrl: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,7 +54,6 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
         domain: formData.domain,
         competitors,
         keywords,
-        cmsWebhookUrl: formData.cmsWebhookUrl,
         onboardingCompleted: true
       }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `users/${user.uid}`));
 
@@ -100,14 +98,14 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
             shortDate: today.toLocaleDateString('en-US', { weekday: 'short' }),
             ...data.metrics
           });
-          setStep(4); // Move to success step!
+          setStep(3); // Move to success step!
         } else {
           throw new Error('Audit API failed to return metrics');
         }
       } catch (auditErr) {
         console.error("Initial audit failed:", auditErr);
         // Even if audit fails, we mark onboarding complete so they aren't stuck forever
-        setStep(4); 
+        setStep(3); 
       }
 
     } catch (err: any) {
@@ -253,46 +251,8 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
                   Back
                 </button>
                 <button
-                  type="button"
-                  onClick={() => setStep(3)}
-                  disabled={!formData.competitor1 || !formData.keyword1}
-                  className="flex-1 bg-white hover:bg-zinc-200 disabled:opacity-50 text-black px-4 py-2.5 rounded-lg font-medium transition-colors mt-4"
-                >
-                  Next Step
-                </button>
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-              <div className="space-y-2">
-                <h3 className="text-xl font-bold text-white">CMS Webhook Integration</h3>
-                <p className="text-sm text-zinc-400">
-                  Connect your content management system (WordPress, Webflow, Shopify, Custom App, etc.) via a webhook URL to publish articles directly from Auspexi.
-                </p>
-                <label className="text-sm font-medium text-zinc-300 flex items-center gap-2 mt-4">
-                  Webhook URL (Optional)
-                </label>
-                <input
-                  name="cmsWebhookUrl"
-                  value={formData.cmsWebhookUrl}
-                  onChange={handleChange}
-                  placeholder="https://hooks.zapier.com/... or your custom endpoint"
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
-                />
-              </div>
-              <div className="flex gap-3 mt-4">
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="px-4 py-2.5 rounded-lg font-medium text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
-                >
-                  Back
-                </button>
-                <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || !formData.competitor1 || !formData.keyword1}
                   className="flex-1 bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
                 >
                   {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
@@ -302,7 +262,7 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
             </div>
           )}
 
-          {step === 4 && (
+          {step === 3 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 text-center py-6">
               <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
                 <Target className="w-8 h-8 text-emerald-400" />

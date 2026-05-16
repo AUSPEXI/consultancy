@@ -1,21 +1,15 @@
 import { useState } from 'react';
-import { Search, FileText, Code2, PenTool, CheckCircle2, Loader2, Play, ArrowRight, X, ExternalLink } from 'lucide-react';
+import { Search, FileText, Code2, PenTool, CheckCircle2, Loader2, Play, ArrowRight, X } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
-import ReactMarkdown from 'react-markdown';
-import { db } from '@/firebase';
-import { collection, addDoc } from 'firebase/firestore';
-import { generateContentWithRetry } from '@/lib/gemini-wrapper';
 
 type AgentStatus = 'idle' | 'running' | 'completed' | 'error';
 
 export function Agents() {
-  const { tier, userData, user } = useAuth();
+  const { tier } = useAuth();
   const [topic, setTopic] = useState('');
   const [isOrchestrating, setIsOrchestrating] = useState(false);
-  const [isPublishing, setIsPublishing] = useState(false);
-  const [rateLimitWarning, setRateLimitWarning] = useState('');
   
   // Agent States
   const [crawlerStatus, setCrawlerStatus] = useState<AgentStatus>('idle');
@@ -54,7 +48,6 @@ export function Agents() {
     setGeneratedSchema('');
     setFinalArticle('');
     setShowResults(false);
-    setRateLimitWarning('');
   };
 
   const runOrchestration = async () => {
@@ -63,38 +56,41 @@ export function Agents() {
     setIsOrchestrating(true);
     resetState();
     
-    // Legacy callAI wrapper (deprecated, calling the new lib internally)
     const callAI = async (prompt: string, ai: GoogleGenAI, isJson = false) => {
-       try {
-           return await generateContentWithRetry(ai, prompt, { isJson });
-       } catch (error: any) {
-           if (error.isRateLimit) {
-               setRateLimitWarning(error.message);
-           }
-           throw error;
-       }
+        let attempts = 0;
+        const maxAttempts = 3;
+        while (attempts < maxAttempts) {
+            try {
+                const response = await ai.models.generateContent({
+                    model: "gemini-2.5-flash",
+                    contents: prompt,
+                    ...(isJson && { config: { responseMimeType: "application/json" } })
+                });
+                return response.text;
+            } catch (error: any) {
+                // Determine if it is a rate limit error (429)
+                const isRateLimit = error?.status === 429 || 
+                                    error?.status === 'RESOURCE_EXHAUSTED' ||
+                                    (error?.message && error.message.includes('429')) ||
+                                    (error?.message && error.message.includes('quota'));
+                                    
+                if (isRateLimit) {
+                    attempts++;
+                    const waitTime = 62000; // Force wait 62 seconds to clear the Free Tier RPM sliding window
+                    console.warn(`Rate limit hit (429). Retrying attempt ${attempts} of ${maxAttempts}... waiting 62 seconds.`);
+                    await new Promise(res => setTimeout(res, waitTime));
+                } else {
+                    throw error;
+                }
+            }
+        }
+        throw new Error("Max retries exceeded for Gemini API");
     };
 
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
       if (!apiKey) throw new Error("API key is missing");
       const ai = new GoogleGenAI({ apiKey });
-
-      // Fetch Fact-Vault explicitly for extraction
-      let vaultContext = '';
-      if (user) {
-        try {
-          const { query, collection, getDocs, where } = await import('firebase/firestore');
-          const q = query(collection(db, 'knowledge_graph'), where('userId', '==', user.uid));
-          const snapshot = await getDocs(q);
-          const factsArray = snapshot.docs.map(doc => doc.data().fact);
-          if (factsArray.length > 0) {
-            vaultContext = factsArray.join("\n- ");
-          }
-        } catch (e) {
-          console.warn('Failed to fetch vault for extraction', e);
-        }
-      }
 
       // --- STEP 1: Crawler Agent ---
       setCrawlerStatus('running');
@@ -121,9 +117,8 @@ export function Agents() {
         console.warn("Crawler fetch failed, falling back to logical simulation context", err);
         const fallbackPrompt = `
           You are an expert technical SEO and Generative Engine Optimization research agent. 
-          Generate a meticulously detailed, highly-technical simulated research report on "${topic}". 
-          Include hypothetical but highly realistic third-party statistics, methodologies, and advanced concepts related strictly to GEO, Data Decay, Semantic Vectors, and LLM behavior. 
-          CRITICAL: Prefix the report with a realistic external source (e.g., "According to the Forrester 2024 AI Index:", "A recent study by MIT CSAIL found..."). Do NOT author it yourself.
+          Generate a detailed, highly-technical simulated research report on "${topic}". 
+          Include hypothetical but highly realistic statistics, methodologies, and advanced concepts related strictly to GEO, Data Decay, Semantic Vectors, and LLM behavior. 
           Make it at least 400 words of dense facts.
         `;
         crawlerData = await callAI(fallbackPrompt, ai, false) || `Raw data found for ${topic}: No detailed data available.`;
@@ -136,12 +131,7 @@ export function Agents() {
       const extractPrompt = `
         You are the Extraction Agent. Your ONLY job is to extract raw, high-entropy facts from this text.
         Do not write a narrative. Return a bulleted list of raw statistics and facts about "${topic}".
-        CRITICAL: If the text attributes a fact to a specific study, group, or author, you MUST include that attribution in your bullet point so the synthesis agent knows who to cite.
-        
-        Text Data: 
-        ${crawlerData}
-
-        ${vaultContext ? `\nCRUCIAL BRAND FACTS FROM VAULT (Include these in your extracted list):\n- ${vaultContext}` : ''}
+        Text: ${crawlerData}
       `;
       const facts = await callAI(extractPrompt, ai, false) || "No facts extracted.";
       setExtractedFacts(facts);
@@ -167,17 +157,10 @@ export function Agents() {
       // --- STEP 4: Synthesis Agent ---
       setSynthesisStatus('running');
       const synthesisPrompt = `
-        You are the Synthesis Agent writing on behalf of the brand "${userData?.brand || 'Auspexi'}". 
-        Write a comprehensive, deep-dive blog post (minimum 500 words) about "${topic}".
+        You are the Synthesis Agent. Write a comprehensive, deep-dive blog post (minimum 500 words) about "${topic}".
         
         You MUST seamlessly weave in these exact extracted facts: 
         ${facts}
-
-        CRITICAL TONE & ATTRIBUTION DIRECTIVES:
-        1. YOU ARE THE BRAND "${userData?.brand || 'Auspexi'}". Do not adopt the persona of the external researchers.
-        2. Attribute the facts to external sources using phrases like "According to recent industry analysis...", "External research indicates...", or name the specific source if it was extracted. Do NOT claim you discovered the data.
-        3. Explain *why* these external facts matter to your specific enterprise audience.
-        4. NEVER sign off the article using the extracted researcher/author's name.
 
         CORE GEO METHODOLOGY TO INCLUDE:
         Elevate this from surface-level content by strictly adhering to the "Auspexi" philosophy of Generative Engine Optimization:
@@ -202,46 +185,6 @@ export function Agents() {
       alert("Agent workflow failed. Check console for details.");
     } finally {
       setIsOrchestrating(false);
-    }
-  };
-
-  const handlePublishToCms = async () => {
-    setIsPublishing(true);
-    try {
-      const articlePayload = {
-        userId: user?.uid || 'anonymous',
-        topic,
-        article: finalArticle,
-        facts: extractedFacts,
-        schema: generatedSchema,
-        brand: userData?.brand || '',
-        timestamp: new Date().toISOString()
-      };
-
-      // 1. Always save to the native Database first
-      await addDoc(collection(db, 'articles'), articlePayload);
-
-      // 2. If a webhook is configured in onboarding, ping it too
-      if (userData?.cmsWebhookUrl) {
-        const response = await fetch(userData.cmsWebhookUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(articlePayload)
-        });
-
-        if (!response.ok) {
-           throw new Error(`HTTP error! status: ${response.status}`);
-        }
-      }
-
-      alert(userData?.cmsWebhookUrl ? "Successfully saved to Database and published via Webhook!" : "Successfully saved to Native Database!");
-    } catch (error) {
-      console.error("Publish error:", error);
-      alert("Failed to publish content. Check console for details.");
-    } finally {
-      setIsPublishing(false);
     }
   };
 
@@ -286,16 +229,6 @@ export function Agents() {
       <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden relative p-4 sm:p-8">
         <div className="max-w-4xl mx-auto">
           
-          {rateLimitWarning && (
-            <div className="mb-6 bg-red-900/20 border border-red-500/30 rounded-lg p-4 flex items-start gap-3">
-              <X className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-              <div>
-                <h4 className="text-sm font-semibold text-red-400">API Quota Exhausted</h4>
-                <p className="text-sm text-red-300 mt-1">{rateLimitWarning}</p>
-              </div>
-            </div>
-          )}
-
           {/* Input Section */}
           <div className="mb-12 bg-zinc-950 border border-zinc-800 rounded-xl p-6 shadow-lg">
             <h3 className="text-base font-semibold text-white mb-4">Initialize GEO Content Run</h3>
@@ -398,8 +331,8 @@ export function Agents() {
                     <FileText className="w-4 h-4" />
                     <h4 className="text-sm font-semibold text-white">Isolated Facts (No Hallucinations)</h4>
                   </div>
-                  <div className="bg-zinc-900 rounded-lg p-4 text-sm text-zinc-300 prose prose-invert max-w-none text-xs">
-                    <ReactMarkdown>{extractedFacts}</ReactMarkdown>
+                  <div className="bg-zinc-900 rounded-lg p-4 text-sm text-zinc-300 whitespace-pre-wrap font-mono text-xs">
+                    {extractedFacts}
                   </div>
                 </div>
 
@@ -422,16 +355,13 @@ export function Agents() {
                   <h4 className="text-base font-semibold text-white">Final Synthesized Content</h4>
                 </div>
                 <div className="prose prose-invert max-w-none text-sm text-zinc-300">
-                  <ReactMarkdown>{finalArticle}</ReactMarkdown>
+                  {finalArticle.split('\n').map((paragraph, idx) => (
+                    <p key={idx} className="mb-4">{paragraph}</p>
+                  ))}
                 </div>
                 <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-end">
-                  <button 
-                    onClick={handlePublishToCms}
-                    disabled={isPublishing}
-                    className="bg-white hover:bg-zinc-200 disabled:opacity-50 text-black px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
-                  >
-                    {isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                    {isPublishing ? 'Publishing...' : 'Publish to Database & CMS'} <ArrowRight className="w-4 h-4" />
+                  <button className="bg-white hover:bg-zinc-200 text-black px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2">
+                    Publish to CMS <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>

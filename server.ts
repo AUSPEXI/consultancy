@@ -560,7 +560,7 @@ Format the output in clean Markdown.
   // Dynamic Sitemap Generator
   app.get("/sitemap.xml", (req, res) => {
     try {
-      const appUrl = process.env.APP_URL || `https://auspexi.com`;
+      const appUrl = process.env.APP_URL || `http://localhost:${PORT}`;
       const today = new Date().toISOString().split('T')[0];
       
       // Define static routes
