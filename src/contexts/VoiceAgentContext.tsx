@@ -284,7 +284,7 @@ ${customerContext}`;
       const systemInstruction = baseInstruction;
 
       const sessionPromise = ai.live.connect({
-        model: "gemini-2.0-flash-exp", // Standard Exp for Multimodal Live
+        model: "gemini-3.1-flash-live-preview",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
@@ -376,7 +376,7 @@ ${customerContext}`;
 
               processor.onaudioprocess = (e) => {
                 // ABSOLUTE MUTE: Input is dropped if bot is speaking OR in the echo-cooldown phase
-                if (isOutputtingRef.current || isSpeaking || activeSourcesRef.current.length > 0) return;
+                if (isOutputtingRef.current || activeSourcesRef.current.length > 0) return;
                 
                 const inputData = e.inputBuffer.getChannelData(0);
                 const int16Data = float32ToInt16(inputData);
