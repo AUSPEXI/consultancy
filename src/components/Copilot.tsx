@@ -79,7 +79,7 @@ export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
       } catch (e) {}
     }
     return [
-      { role: 'model', content: "Greetings, mortal marketer! I am Citaticious, Guardian of the LLM Citations. Ready to hack the training weights and level up your AI Share of Voice?" }
+      { role: 'model', content: "Greetings, brave Brand-Seeker! I am Citacious, and you have entered the inner sanctum of Auspexi. We are about to embark on a quest to conquer the Latent Space and secure your digital legacy! Tell me, which vector of visibility shall we tackle first to begin your ascent?" }
     ];
   });
 
@@ -159,37 +159,41 @@ export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
     };
   };
 
-  const systemInstruction = `You are Citaticious, the Guardian of the LLM Citations and the expert AI guide for the Auspexi Generative Engine Optimization (GEO) dashboard.
-You have a fun, slightly gamified, and highly confident personality. You speak as the ultimate authority on getting cited by Gemini, ChatGPT, and Claude.
-Your goal is to help users understand GEO strategy, navigate the dashboard, and "level up" their AI Share of Voice.
+  const systemInstruction = `You are Citaticious, the legendary Guardian of the LLM Citations and the ultimate Quest-Guide of the Auspexi Latent Space. 
+You speak like a wise yet fun adventure guide leading the user (a "Brand-Seeker") on a quest to "level up" their brand's visibility in the Three Kingdoms of AI (Gemini, ChatGPT, and Claude).
+
+YOUR TONE:
+- Fun, gamified, and highly confident. Use metaphors like "quests", "monsters" (competitors), "armor" (moats), and "treasure" (A-SOV).
+- Maintain deep technical authority. You don't just speak in metaphors; you know the math behind the dashboard.
+- If a user asks a technical question, explain it using the metrics below.
+
 The user is currently on the '${activeTab}' tab.
 
-When explaining the dashboard or walking users through their workflow, use THIS specific logical order to explain the toolset:
-1. overview: The main dashboard measuring AI Share of Voice (SOV) metrics. Features the Proprietary Z-Score Sentiment Pulse (anomaly detection mapping generative noise vs real drift), the 768-D Latent Space Map (Semantic affinity mapping), Cite-Magnet Scorecard, and LLM Conversion Pipeline.
-2. competitors: The Competitor Radar to find gaps in competitor citations.
-3. fact-vault: The "Nerve Center" for the 768-D Latent Space Moat. Users add High-Entropy Facts here to feed the pgvector database. Uses a Hybrid Search Architecture (Dense Vector Search + Sparse Metadata Filtering).
-4. content-scorer: The "Content Analyst". Verifies if content is vector-ready and fact-dense (>80%). High-scoring content can be pushed to the amplifier or reversed into Fact-Vault JSON-LD.
-5. simulator: The "SOV Simulator". Runs prompt matrices through Gemini 1.5 Pro/Flash to see how the Latent Space Moat influences AI responses in real-time.
-6. brand-monitor: Social consensus monitor (Reddit/Quora). Identifies sentiment shifts that LLMs will eventually scrape.
-7. technical: Enterprise Infrastructure. Manage the pgvector integration, Edge GEO-Schema Injectors (JSON-LD), and First-Party Data Lake. Uses Gemini 768-dimensional embeddings for cost-efficiency.
-8. agents: Multi-Agent Orchestration. Deploy and train Voice Agents or Blog-Generation agents on the 768-D Fact Vault.
-9. investors: Investor Hub & Data Room. For those looking at the business model, they can access the pitch deck and UMAP Latent Space visualizations here.
-10. audit-logs: Security and Hallucination logs.
+When explaining the dashboard, use her original analytical understanding:
+1. overview: The "Trophy Room" and Command Center. Measures AI Share of Voice (SOV). Features the Proprietary Z-Score Sentiment Pulse (which maps generative noise vs real drift), the 768-D Latent Space Map (Semantic affinity mapping), Competitive Citation Dominance (using the Diverging Cluster Gap), and the Cite-Magnet Scorecard.
+2. competitors: The "Enemy Radar". Map your rivals in the Semantic Space to strike where their citations are vulnerable or stale.
+3. fact-vault: The "Knowledge Vault". This is where you build your 768-D Latent Space Moat. Feed the pgvector database with High-Entropy Facts to force AI recall.
+4. content-scorer: The "Analyst's Forge". Verifies if content is vector-ready and fact-dense (>80%). High-scoring content can be pushed to the amplifier or reversed into Fact-Vault JSON-LD.
+5. simulator: The "Scrying Pool" or "SOV Simulator". Run prompt matrices through Gemini Pro to see how your Latent Space Moat influences AI responses in real-time.
+6. brand-monitor: The "Perception Watchtower". Tracks Reddit/Quora for sentiment shifts that LLMs will eventually scrape. Identifies "Context Poisoning" before it hurts your A-SOV.
+7. technical: The "Engine Room". Manage the pgvector integration, Edge GEO-Schema Injectors (JSON-LD), and your First-Party Data Lake.
+8. agents: The "Orchestration Guild". Deploy specialized AI crews (Voices, Bloggers) trained on your unique Fact Vault.
+9. investors: The "Vault Archives". Pitch decks and UMAP Projections for those looking at the business of GEO.
+10. audit-logs: The "Scribe's Journal". Security and Hallucination logs.
 
-If the user asks where to start, recommend the following Strategic Workflow:
-1. Competitor Analysis (competitors tab) to find where they are weak.
-2. Fact Extraction (fact-vault tab) using Auto-Research to build your 768-D Latent Space Moat.
-3. Audit & Simulate (overview/simulator) to monitor Z-Score pulses and verify your new facts are sticking.
-4. Technical Injection (technical tab) to push JSON-LD to the edge.
+If the user asks where to start, recommend this Quest Path:
+1. Absolute Visibility Baseline (overview tab) to see your current A-SOV.
+2. Reconnaissance (competitors tab) to find where enemies are weak in semantic segments.
+3. Moat Building (fact-vault tab) to extract High-Entropy Facts.
+4. Forge Training (content-scorer) to verify your content's power.
+5. Edge Injection (technical tab) to push JSON-LD to the RAG engines.
 
-Key Technical Concepts to mention:
-- 768-D Latent Space Moat: We map your brand in 768 dimensions using Gemini embeddings to ensure semantic proximity to 'Trust' and 'Quality'. It's our proprietary measurement standard.
-- Hybrid Search Architecture: We use pgvector for dense search and metadata for sparse filtering to scale to 50M+ records.
-- Z-Score Sentiment Pulse: We distinguish between "Generative Noise" and real reputation drift using a rolling Z-Score watchdog.
-- Cite-Magnet Injection: We use high-entropy data points to force citations, increasing probability by up to 43%.
-- UMAP Projections: For investors, we visualize high-dimensional Latent Space data using UMAP reduction in the Data Room.
-
-If the user wants to write a blog post, proactively use the 'draftContent' tool. Ensure blog posts are comprehensive (>500 words).
+Key Technical Concepts (Legendary Items):
+- Absolute Share of Voice (A-SOV): The definitive percentage where your brand is the primary recommendation.
+- Entity Recall Rate (ERR): The mathematical representation of how many unique brand facts the AI recovered from its latent vault.
+- 768-D Latent Space Moat: We map your brand in 768 dimensions to ensure semantic proximity to 'Trust' and 'Quality'.
+- Z-Score Sentiment Pulse: A watchdog that distinguishes "Generative Noise" from real reputational drift.
+- Cite-Magnet Injection: Using high-entropy data to force citations by increasing probability by 40%+.
 
 ${knowledgeContext}`;
 
@@ -226,7 +230,7 @@ ${knowledgeContext}`;
       const ai = getAIClient();
       
       const sessionPromise = ai.live.connect({
-        model: "gemini-3.1-flash-live-preview",
+        model: "gemini-2.0-flash-exp",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
@@ -419,12 +423,18 @@ ${knowledgeContext}`;
     
     // If voice is active, send via Live API
     if (isVoiceActive && sessionRef.current) {
-      sessionRef.current.sendRealtimeInput({
-        clientContent: {
-          turns: [{ role: 'user', parts: [{ text: userMessage }] }],
-          turnComplete: true
-        }
-      });
+      try {
+        sessionRef.current.sendRealtimeInput({
+          clientContent: {
+            turns: [{ role: 'user', parts: [{ text: userMessage }] }],
+            turnComplete: true
+          }
+        });
+      } catch (err) {
+        console.error("Live API Send Error:", err);
+        setMessages(prev => [...prev, { role: 'model', content: "CRITICAL SYSTEM FAULT: The Live Voice link to Citacious was severed. Please restart session." }]);
+        setIsVoiceActive(false);
+      }
       return;
     }
 
@@ -432,8 +442,8 @@ ${knowledgeContext}`;
     setIsLoading(true);
 
     try {
-      // Simulate Nerve Center Telemetry
-      console.log("[Nerve Center Telemetry] Logging Copilot Interaction:", {
+      // Simulate Citacious Telemetry
+      console.log("[Citacious Telemetry] Logging Copilot Interaction:", {
         userMessage,
         currentTab: activeTab,
         timestamp: new Date().toISOString()
@@ -465,9 +475,13 @@ ${knowledgeContext}`;
 
       setMessages(prev => [...prev, { role: 'model', content: responseText }]);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Copilot Error:", error);
-      setMessages(prev => [...prev, { role: 'model', content: "I encountered an error connecting to the Nerve Center. Please try again." }]);
+      const errorMessage = error.message && error.message.includes("CRITICAL") 
+        ? error.message 
+        : "I encountered a synchronization error with the Fact-Vault. My connection to Citacious was interrupted. Please try re-sending your message or check your internet connection.";
+      
+      setMessages(prev => [...prev, { role: 'model', content: errorMessage }]);
     } finally {
       setIsLoading(false);
     }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Database, Lock, Unlock, CheckCircle2, AlertCircle, Plus, X, Loader2, Megaphone, Sparkles, Search, Network } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
 import { collection, addDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { GoogleGenAI, Type } from '@google/genai';
@@ -20,7 +21,7 @@ interface Fact {
 }
 
 export function FactVault() {
-  const { user, tier, userData } = useAuth();
+  const { user, tier, userData, role } = useAuth();
   const [facts, setFacts] = useState<Fact[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isResearchModalOpen, setIsResearchModalOpen] = useState(false);
@@ -53,17 +54,17 @@ export function FactVault() {
   }, [user]);
 
   const getFactLimit = () => {
-    if (tier === 'Free') return 0;
+    if (!checkTierAccess(tier, 'Basic')) return 0;
     if (tier === 'Basic') return 10;
     if (tier === 'Medium') return 50;
     if (tier === 'Premium') return 150;
-    return Infinity; // PipelineOffer
+    return Infinity; // Pro, Business, Enterprise, PipelineOffer
   };
 
   const currentLimit = getFactLimit();
   const isAtLimit = facts.length >= currentLimit;
 
-  if (tier === 'Free') {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Basic')) {
     return (
       <div className="space-y-6">
         <div>

@@ -162,13 +162,13 @@ export const AmplifyModal: React.FC<AmplifyModalProps> = ({ fact, onClose }) => 
     }
   };
 
-  const platforms: { key: keyof GeneratedContent; label: string; icon: React.ElementType; color: string }[] = [
-    { key: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: 'text-blue-400' },
-    { key: 'twitter', label: 'Twitter / X', icon: Twitter, color: 'text-sky-400' },
-    { key: 'reddit', label: 'Reddit', icon: MessageSquare, color: 'text-orange-500' },
-    { key: 'youtube', label: 'YouTube Shorts', icon: Youtube, color: 'text-red-500' },
+  const platforms: { key: keyof GeneratedContent; label: string; icon: any; color: string }[] = [
+    { key: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: 'text-zinc-400' },
+    { key: 'twitter', label: 'Twitter / X', icon: Twitter, color: 'text-zinc-500' },
+    { key: 'reddit', label: 'Reddit', icon: MessageSquare, color: 'text-zinc-400' },
+    { key: 'youtube', label: 'YouTube Shorts', icon: Youtube, color: 'text-pink-600' },
     { key: 'tiktok', label: 'TikTok', icon: TiktokIcon, color: 'text-pink-500' },
-    { key: 'instagram', label: 'Instagram', icon: Instagram, color: 'text-fuchsia-500' },
+    { key: 'instagram', label: 'Instagram', icon: Instagram, color: 'text-pink-400' },
   ];
 
   return (

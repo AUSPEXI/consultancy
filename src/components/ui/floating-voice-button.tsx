@@ -24,8 +24,15 @@ export function FloatingVoiceButton() {
     return () => clearTimeout(timer);
   }, [isConnected]);
 
-  // Use VoiceAgentContext's connect method
   const { connect } = useVoiceAgent();
+  
+  const isDashboardPath = location.pathname.startsWith('/dashboard') || 
+                         location.pathname.startsWith('/overview') || 
+                         location.pathname.startsWith('/fact-vault') ||
+                         location.pathname.startsWith('/competitors') ||
+                         location.pathname.startsWith('/content-scorer');
+
+  if (isDashboardPath || location.pathname !== '/') return null;
 
   return (
     <AnimatePresence>
@@ -52,7 +59,7 @@ export function FloatingVoiceButton() {
                 </p>
               </div>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-3">
-                Have questions about your SOV or Fact-Vault? Talk to Citaticious now.
+                Have questions about your SOV or Fact-Vault? Talk to Citacious now.
               </p>
               <button 
                 onClick={() => {

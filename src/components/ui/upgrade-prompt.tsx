@@ -10,9 +10,11 @@ interface UpgradePromptProps {
 }
 
 export const UpgradePrompt: React.FC<UpgradePromptProps> = ({ title, description, requiredTier }) => {
-  const { tier } = useAuth();
+  const { tier, role, user } = useAuth();
   const [isCheckingOut, setIsCheckingOut] = React.useState(false);
-  const { user } = useAuth();
+
+  // Admins can see everything
+  if (role === 'admin') return null;
 
   const handleUpgrade = async () => {
     if (!user) return;

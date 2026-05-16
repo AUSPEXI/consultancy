@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Radar, ArrowRight, ShieldAlert, Plus, X, Loader2, Trash2, Database } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
 import { collection, addDoc, deleteDoc, doc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { GoogleGenAI, Type } from '@google/genai';
@@ -20,7 +21,7 @@ interface Competitor {
 }
 
 export function Competitors() {
-  const { user, tier } = useAuth();
+  const { user, tier, role } = useAuth();
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [inputUrl, setInputUrl] = useState('');
@@ -28,7 +29,8 @@ export function Competitors() {
   const [pushingFact, setPushingFact] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user || tier === 'Free' || tier === 'Basic') return;
+    if (!user) return;
+    if (role !== 'admin' && !checkTierAccess(tier, 'Medium')) return;
 
     const q = query(
       collection(db, 'competitors'),
@@ -47,9 +49,9 @@ export function Competitors() {
     });
 
     return () => unsubscribe();
-  }, [user, tier]);
+  }, [user, tier, role]);
 
-  if (tier === 'Free' || tier === 'Basic') {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Medium')) {
     return (
       <div className="space-y-6">
         <div>

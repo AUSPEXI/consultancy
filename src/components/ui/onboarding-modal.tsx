@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/firebase';
-import { doc, updateDoc, collection, addDoc } from 'firebase/firestore';
+import { doc, setDoc, collection, addDoc } from 'firebase/firestore';
 import { Loader2, Target, Globe, Building2, Search } from 'lucide-react';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 
@@ -22,9 +22,18 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
     competitor2: '',
     competitor3: '',
     competitor4: '',
+    competitor5: '',
+    competitor6: '',
     keyword1: '',
     keyword2: '',
     keyword3: '',
+    keyword4: '',
+    keyword5: '',
+    keyword6: '',
+    keyword7: '',
+    keyword8: '',
+    keyword9: '',
+    keyword10: '',
     cmsWebhookUrl: '',
   });
 
@@ -44,20 +53,25 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
         formData.competitor1, 
         formData.competitor2, 
         formData.competitor3, 
-        formData.competitor4
+        formData.competitor4,
+        formData.competitor5,
+        formData.competitor6
       ].filter(Boolean);
-      const keywords = [formData.keyword1, formData.keyword2, formData.keyword3].filter(Boolean);
+      const keywords = [
+        formData.keyword1, formData.keyword2, formData.keyword3, formData.keyword4, formData.keyword5,
+        formData.keyword6, formData.keyword7, formData.keyword8, formData.keyword9, formData.keyword10
+      ].filter(Boolean);
 
       // 1. Update user document
       const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, {
+      await setDoc(userRef, {
         brand: formData.brand,
         domain: formData.domain,
         competitors,
         keywords,
         cmsWebhookUrl: formData.cmsWebhookUrl,
         onboardingCompleted: true
-      }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `users/${user.uid}`));
+      }, { merge: true }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `users/${user.uid}`));
 
       // 1.5 Add competitors to the competitors collection
       for (const compName of competitors) {
@@ -212,36 +226,46 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
                     placeholder="Competitor 4 (Optional)"
                     className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
                   />
+                  <input
+                    name="competitor5"
+                    value={formData.competitor5}
+                    onChange={handleChange}
+                    placeholder="Competitor 5 (Optional)"
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
+                  />
+                  <input
+                    name="competitor6"
+                    value={formData.competitor6}
+                    onChange={handleChange}
+                    placeholder="Competitor 6 (Optional)"
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                   <Search className="w-4 h-4 text-pink-500" />
-                  Target Keywords (What do people search for?)
+                  Target Keywords (Up to 10)
                 </label>
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <input
                     required
                     name="keyword1"
                     value={formData.keyword1}
                     onChange={handleChange}
-                    placeholder="e.g., best AI consultancy London"
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
+                    placeholder="e.g., best AI consultancy"
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
                   />
-                  <input
-                    name="keyword2"
-                    value={formData.keyword2}
-                    onChange={handleChange}
-                    placeholder="e.g., generative engine optimization services"
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
-                  />
-                  <input
-                    name="keyword3"
-                    value={formData.keyword3}
-                    onChange={handleChange}
-                    placeholder="e.g., how to rank in ChatGPT"
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
-                  />
+                  {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                    <input
+                      key={num}
+                      name={`keyword${num}`}
+                      value={(formData as any)[`keyword${num}`]}
+                      onChange={handleChange}
+                      placeholder={`Keyword ${num} (Optional)`}
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
+                    />
+                  ))}
                 </div>
               </div>
               <div className="flex gap-3 mt-4">
