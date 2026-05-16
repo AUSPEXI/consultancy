@@ -99,6 +99,7 @@ export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
   // Voice state
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [isConnectingVoice, setIsConnectingVoice] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const sessionRef = useRef<any>(null);
@@ -127,11 +128,14 @@ export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
         const qFacts = query(
           collection(db, 'knowledge_graph'), 
           where('userId', '==', user.uid),
-          orderBy('createdAt', 'desc'), 
-          limit(30)
+          limit(50)
         );
         const snapshotFacts = await getDocs(qFacts);
-        const facts = snapshotFacts.docs.map(doc => doc.data().fact);
+        const docs = snapshotFacts.docs.map(doc => doc.data());
+        // Sort client-side to avoid needing a composite index
+        docs.sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+        
+        const facts = docs.slice(0, 30).map((d: any) => d.fact);
 
         // Fetch latest metrics for THIS user
         const qMetrics = query(
@@ -194,9 +198,13 @@ export function Copilot({ activeTab, setActiveTab }: CopilotProps) {
     nextPlayTimeRef.current = startTime + buffer.duration;
 
     activeSourcesRef.current.push(source);
+    setIsSpeaking(true);
 
     source.onended = () => {
       activeSourcesRef.current = activeSourcesRef.current.filter(s => s !== source);
+      if (activeSourcesRef.current.length === 0) {
+        setIsSpeaking(false);
+      }
     };
   };
 
@@ -262,6 +270,7 @@ ${knowledgeContext}`;
     stopAllSources();
     setIsVoiceActive(false);
     setIsConnectingVoice(false);
+    setIsSpeaking(false);
   };
 
   const toggleVoice = async () => {
@@ -344,6 +353,8 @@ ${knowledgeContext}`;
               const processor = audioCtx.createScriptProcessor(4096, 1, 1);
 
               processor.onaudioprocess = (e) => {
+                if (activeSourcesRef.current.length > 0) return; // Mute input while bot is speaking to prevent feedback loops
+
                 const inputData = e.inputBuffer.getChannelData(0);
                 const int16Data = float32ToInt16(inputData);
                 const base64 = int16ToBase64(int16Data);
@@ -365,6 +376,7 @@ ${knowledgeContext}`;
               setIsConnectingVoice(false);
             } catch (err) {
               console.error("Microphone access error:", err);
+              setMessages(prev => [...prev, { role: 'model', content: "CRITICAL: Citacious was unable to access your microphone. Please ensure permissions are granted in your browser." }]);
               disconnectVoice();
             }
           },
@@ -455,8 +467,9 @@ ${knowledgeContext}`;
       });
 
       sessionRef.current = await sessionPromise;
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to connect voice:", err);
+      setMessages(prev => [...prev, { role: 'model', content: `CONNECTION ERROR: ${err.message || 'Failed to establish voice link to Citacious.'}` }]);
       setIsConnectingVoice(false);
     }
   };
@@ -530,7 +543,7 @@ ${knowledgeContext}`;
 
     } catch (error: any) {
       console.error("Copilot Error:", error);
-      const errorMessage = error.message && error.message.includes("CRITICAL") 
+      const errorMessage = error.message && (error.message.includes("CRITICAL") || error.message.includes("SYNC_FAILURE"))
         ? error.message 
         : "I encountered a synchronization error with the Fact-Vault. My connection to Citacious was interrupted. Please try re-sending your message or check your internet connection.";
       

@@ -87,9 +87,11 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
       let q;
       if (currentUserId) {
         // Fetch only facts for this user
+        // We avoid orderBy('createdAt') here to prevent requiring a composite index
         q = query(
           collection(db, 'knowledge_graph'), 
-          where('userId', '==', currentUserId)
+          where('userId', '==', currentUserId),
+          limit(100)
         );
       } else {
         return;
@@ -97,9 +99,10 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
       
       const snapshot = await getDocs(q);
       const docs = snapshot.docs.map(doc => doc.data() as any);
-      docs.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      // Sort client-side
+      docs.sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
       
-      const facts = docs.map((d: any) => d.fact);
+      const facts = docs.slice(0, 50).map((d: any) => d.fact);
       cachedFactsRef.current = facts;
     } catch (err) {
       console.error("Failed to fetch knowledge graph:", err);
@@ -236,12 +239,18 @@ ${conversationText}`,
       await fetchKnowledgeGraph();
       const weeklyMetricsContext = await fetchWeeklyMetrics();
 
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      let ai;
       if (!apiKey) {
-        throw new Error("Gemini API key is required. Please check your environment variables.");
+        // Fallback to proxy
+        const baseUrl = `${window.location.protocol}//${window.location.host}/api/genai`;
+        ai = new GoogleGenAI({ 
+          apiKey: 'dummy',
+          httpOptions: { baseUrl }
+        });
+      } else {
+        ai = new GoogleGenAI({ apiKey });
       }
-
-      const ai = new GoogleGenAI({ apiKey });
 
       const customerContext = userData?.brand 
         ? `\n\nCUSTOMER CONTEXT:\nYou are currently speaking with a representative of "${userData.brand}". ${userData.domain ? `Their domain is ${userData.domain}.` : ''} ${userData.competitors && userData.competitors.length > 0 ? `They are tracking the following competitors: ${userData.competitors.join(", ")}.` : ''} Tailor your advice specifically for their brand and industry whenever possible rather than giving generic examples.${weeklyMetricsContext}`
@@ -352,6 +361,8 @@ ${customerContext}`;
               const processor = audioCtx.createScriptProcessor(4096, 1, 1);
 
               processor.onaudioprocess = (e) => {
+                if (activeSourcesRef.current.length > 0) return; // Mute input while bot is speaking to prevent feedback loops
+                
                 const inputData = e.inputBuffer.getChannelData(0);
                 const int16Data = float32ToInt16(inputData);
                 const base64 = int16ToBase64(int16Data);
