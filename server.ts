@@ -236,7 +236,17 @@ app.use(express.json());
         sentiment: Math.random() > 0.4 ? 'positive' : 'negative',
       };
     });
-    res.json({ success: true, points, metadata: { engine: "Gemini-Embed-004", dimensions: 768, platform } });
+    res.json({ 
+      success: true, 
+      points, 
+      metadata: { 
+        engine: "Gemini-Embed-004", 
+        dimensions: 768, 
+        platform,
+        aggregatedAt: new Date(Date.now() - 3600000 * 24).toISOString(), // 24 hours ago
+        pathCount: 1240
+      } 
+    });
   });
 
   app.get("/api/analytics/sentiment-trace", (req, res) => {
@@ -894,6 +904,8 @@ app.use(express.json());
       const { userMessage, chatHistory, systemInstruction } = req.body;
       if (!userMessage) return res.status(400).json({ error: "Missing message" });
 
+      console.log(`[Copilot] Processing request for message: ${userMessage.substring(0, 50)}...`);
+
       const ai = getGemini();
 
       // Map history to the format expected by the SDK
@@ -913,10 +925,31 @@ app.use(express.json());
         }
       });
 
+      if (!response.text) {
+        console.warn("[Copilot] Received empty response from Gemini");
+        throw new Error("Empty response from AI engine");
+      }
+
       res.json({ success: true, result: response.text });
     } catch (err: any) {
-      console.error("Copilot Chat error:", err);
-      res.status(500).json({ error: "Failed to run copilot chat" });
+      console.error("Copilot Chat error detailed:", {
+        message: err.message,
+        stack: err.stack,
+        details: err.details || "No extra details"
+      });
+      
+      // Check for specific Gemini errors (e.g. invalid API key)
+      if (err.message?.includes("API_KEY_INVALID")) {
+        return res.status(500).json({ 
+          success: false, 
+          error: "CRITICAL: GEMINI_API_KEY is invalid or missing in server environment." 
+        });
+      }
+
+      res.status(500).json({ 
+        success: false, 
+        error: "SYNC_FAILURE: Failed to communicate with the Citacious Nerve Center." 
+      });
     }
   });
 

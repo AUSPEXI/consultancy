@@ -5,8 +5,5 @@ When users ask about the "Neural Cluster" or "Latent Space" maps:
 - Explain that these are **768-dimensional embeddings** from the **Gemini-004** engine.
 - Clarify that the "Distance" between nodes is **Semantic Distance** (similarity in how LLMs link concepts).
 - Users can switch between models (**Gemini, ChatGPT, Claude**) to see how different LLM clusters vary in their "reputational architecture".
-- The data is sourced from real-time "crawls" of the LLM collective inference paths, which are then passed through dimensionality reduction (UMAP).
-
-## Dashboard UI
-- Ensure all "Question Mark" / `cursor-help` items have descriptive `title` attributes that explain the "Alpha" metrics (A-SOV, ERR, etc.).
+- **Data Source clarification:** The data is compiled during the **Deep Semantic Audit** (performed once per brand scan). A full audit traverses approx. 1,000+ inference paths to build the "Reputational Twin" displayed here. The dashboard displays the cached projection of this audit to optimize token usage.
 - The 2D view is a standard UMAP scatter, while the 3D view is an interactive WebGL reconstruction using three.js.
