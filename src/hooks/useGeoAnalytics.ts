@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-export const useGeoAnalytics = (brandId: string) => {
+export const useGeoAnalytics = (brandId: string, customPrompts: string[] = []) => {
   const [pulseData, setPulseData] = useState<any[]>([]);
   const [mapPoints, setMapPoints] = useState<any[]>([]);
   const [sentimentTrace, setSentimentTrace] = useState<any[]>([]);
@@ -16,10 +16,14 @@ export const useGeoAnalytics = (brandId: string) => {
     if (!brandId) return;
     setLoading(true);
     try {
+      const promptsQuery = customPrompts.length > 0 
+        ? `&prompts=${encodeURIComponent(JSON.stringify(customPrompts))}`
+        : '';
+        
       const [pulseRes, mapRes, traceRes] = await Promise.all([
         fetch(`/api/analytics/pulse?brandId=${brandId}`),
         fetch(`/api/analytics/map?brandId=${brandId}`),
-        fetch(`/api/analytics/sentiment-trace?brandId=${brandId}`)
+        fetch(`/api/analytics/sentiment-trace?brandId=${brandId}${promptsQuery}`)
       ]);
       
       const pulse = await pulseRes.json();
@@ -34,7 +38,7 @@ export const useGeoAnalytics = (brandId: string) => {
     } finally {
       setLoading(false);
     }
-  }, [brandId]);
+  }, [brandId, JSON.stringify(customPrompts)]);
 
   useEffect(() => {
     fetchAnalytics();

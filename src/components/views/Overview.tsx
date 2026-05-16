@@ -49,21 +49,22 @@ const RacingDial = ({ value, label, color = "#ec4899", size = "sm" }: { value: n
 
 export function Overview() {
   const { user, tier, userData, role } = useAuth();
-  const { pulseData, mapPoints, sentimentTrace, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(userData?.brand || '');
+  
+  const defaultPrompts = [
+    "Is Auspexi a secure enterprise choice?",
+    "How does Auspexi compare to legacy SEO?",
+    "Is Auspexi's GEO tech proprietary?",
+    "Founder reputation and reliability"
+  ];
+  const userPrompts = userData?.sentimentPrompts || defaultPrompts;
+
+  const { pulseData, mapPoints, sentimentTrace, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(userData?.brand || '', userPrompts);
   
   const [metrics, setMetrics] = useState<any[]>([]);
   const [isAuditing, setIsAuditing] = useState(false);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const [shadowUrl, setShadowUrl] = useState('');
   const [generatedShadowLink, setGeneratedShadowLink] = useState('');
-  
-  const defaultPrompts = [
-    "Best alternative to top competitor?",
-    "Is the product reliable for enterprise?",
-    "Common user complaints & reviews?",
-    "Pricing compared to market average?"
-  ];
-  const userPrompts = userData?.sentimentPrompts || defaultPrompts;
   
   const [isEditingPrompts, setIsEditingPrompts] = useState(false);
   const [editPromptsState, setEditPromptsState] = useState<string[]>(userPrompts);
@@ -278,10 +279,10 @@ export function Overview() {
     compA: previous.compA || 0,
   };
 
-  const asovTrend = safeLatest.aSov - safePrevious.aSov;
-  const trafficTrend = safeLatest.aiTraffic - safePrevious.aiTraffic;
-  const errTrend = safeLatest.err - safePrevious.err;
-  const gapTrend = safeLatest.compGap - safePrevious.compGap;
+  const asovTrend = Math.round(safeLatest.aSov - safePrevious.aSov);
+  const trafficTrend = Math.round(safeLatest.aiTraffic - safePrevious.aiTraffic);
+  const errTrend = Math.round(safeLatest.err - safePrevious.err);
+  const gapTrend = Math.round(safeLatest.compGap - safePrevious.compGap);
 
   const radarData = (latest.radar || [
     { subject: 'Brand Trust', brandScore: safeLatest.aSov + 20, compScore: safeLatest.compA + 10 },
@@ -292,16 +293,16 @@ export function Overview() {
     { subject: 'Market Dominance', brandScore: safeLatest.aSov + 5, compScore: safeLatest.compA }
   ]).map((d: any) => ({
     subject: d.subject,
-    A: Math.min(100, Math.max(0, d.brandScore)),
-    B: Math.min(100, Math.max(0, d.compScore)),
-    diff: Math.abs((d.brandScore || 0) - (d.compScore || 0)),
+    A: Math.round(Math.min(100, Math.max(0, d.brandScore))),
+    B: Math.round(Math.min(100, Math.max(0, d.compScore))),
+    diff: Math.round(Math.abs((d.brandScore || 0) - (d.compScore || 0))),
     fullMark: 100
   }));
 
   const computedRadarData = mapPoints.length > 0 ? mapPoints.slice(0, 6).map((point: any) => ({
-    subject: point.type || point.content?.substring(0, 15) || 'General',
-    A: Math.min(100, Math.max(0, 100 - (point.distance || 0.1) * 100)),
-    B: Math.min(100, Math.max(0, 80 - (point.distance || 0.2) * 100)),
+    subject: point.type || point.label || 'General',
+    A: Math.round(Math.min(100, Math.max(0, 100 - (point.distance || 0.1) * 100))),
+    B: Math.round(Math.min(100, Math.max(0, 80 - (point.distance || 0.2) * 100))),
     fullMark: 100
   })) : radarData;
 
@@ -372,6 +373,8 @@ export function Overview() {
         sentimentPrompts: editPromptsState.filter(p => p.trim() !== '')
       }, { merge: true });
       setIsEditingPrompts(false);
+      // Trigger immediate refetch of analytics with new prompts
+      refetchGeo();
     } catch (e) {
       console.error("Failed to save custom prompts", e);
     } finally {
@@ -446,8 +449,8 @@ export function Overview() {
       {/* High-Impact Performance Dials (Racing Style) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'A-SOV Dominance', value: safeLatest.aSov, color: '#ec4899', icon: Target },
-          { label: 'Entity Recall', value: safeLatest.err, color: '#a855f7', icon: BrainCircuit },
+          { label: 'A-SOV Dominance', value: Math.round(safeLatest.aSov), color: '#ec4899', icon: Target },
+          { label: 'Entity Recall', value: Math.round(safeLatest.err), color: '#a855f7', icon: BrainCircuit },
           { label: 'Platform Sync', value: Math.round((safePlatforms.chatgpt + safePlatforms.claude + safePlatforms.gemini) / 3), color: '#3b82f6', icon: Activity },
           { label: 'Sentiment Index', value: 78, color: '#10b981', icon: TrendingUp },
         ].map((dial, i) => (
@@ -462,7 +465,7 @@ export function Overview() {
       {/* Secondary KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[
-          { label: 'Competitor Gap', value: `${safeLatest.compGap > 0 ? '+' : ''}${safeLatest.compGap}%`, trend: `${gapTrend >= 0 ? '+' : ''}${gapTrend} pts`, icon: TrendingUp, color: 'text-blue-400', desc: 'Margin over top enterprise rival' },
+          { label: 'Competitor Gap', value: `${safeLatest.compGap > 0 ? '+' : ''}${Math.round(safeLatest.compGap)}%`, trend: `${gapTrend >= 0 ? '+' : ''}${gapTrend} pts`, icon: TrendingUp, color: 'text-blue-400', desc: 'Margin over top enterprise rival' },
           { label: 'AI Referral Clicks', value: safeLatest.aiTraffic.toLocaleString(), trend: `${trafficTrend >= 0 ? '+' : ''}${trafficTrend}`, icon: Users, color: 'text-emerald-400', desc: 'Direct attributed sessions from generative responses' },
         ].map((kpi, i) => (
           <div key={i} className="bg-zinc-900/40 border border-zinc-800/60 rounded-xl p-5 flex items-center justify-between">
@@ -536,27 +539,41 @@ export function Overview() {
           </div>
         </div>
 
-        {/* Competitive Citation Gap Radar */}
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
           <div className="mb-6">
-            <h3 className="text-base font-semibold text-white">Competitive Citation Gap</h3>
-            <p className="text-xs text-zinc-400 mt-1">Relative neural dominance by topic (Brand vs Top Competitor).</p>
+            <h3 className="text-base font-semibold text-white">Competitive Citation Dominance</h3>
+            <p className="text-xs text-zinc-400 mt-1">Relative neural dominance per vector: Brands vs Nearest Enterprise Rival.</p>
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <RadarChart cx="50%" cy="50%" outerRadius="70%" data={computedRadarData}>
-                <PolarGrid stroke="#3f3f46" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: '#a1a1aa', fontSize: 10 }} />
-                <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#71717a', fontSize: 10 }} />
-                <Radar name="Your Brand" dataKey="A" stroke="#ec4899" fill="#ec4899" fillOpacity={0.4} />
-                <Radar name="Top Competitor" dataKey="B" stroke="#52525b" fill="#52525b" fillOpacity={0.4} />
+              <BarChart
+                data={computedRadarData}
+                layout="vertical"
+                margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
+                stackOffset="sign"
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={false} />
+                <XAxis type="number" hide domain={[-100, 100]} />
+                <YAxis dataKey="subject" type="category" stroke="#a1a1aa" fontSize={10} tickLine={false} axisLine={false} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7' }} 
-                  formatter={(value, name) => [`${value}% Dominance`, name]}
+                  cursor={{ fill: '#27272a', opacity: 0.1 }}
+                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7', borderRadius: '12px' }}
+                  formatter={(value: any, name: string) => {
+                    const abs = Math.abs(value);
+                    const label = name === "A" ? "Your Brand" : "Competitor";
+                    return [`${abs}% Dominance`, label];
+                  }}
                 />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
-              </RadarChart>
+                <ReferenceArea x1={-100} x2={100} fill="transparent" />
+                {/* We treat A as positive and B as negative for the diverging effect */}
+                <Bar dataKey="A" name="A" stackId="stack" fill="#ec4899" radius={[0, 4, 4, 0]} />
+                <Bar dataKey={(d: any) => -d.B} name="B" stackId="stack" fill="#3f3f46" radius={[4, 0, 0, 4]} />
+              </BarChart>
             </ResponsiveContainer>
+          </div>
+          <div className="flex justify-between items-center mt-4 px-10">
+             <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">← Competitor Dominance</span>
+             <span className="text-[10px] font-black text-pink-500 uppercase tracking-widest">Brand Dominance →</span>
           </div>
         </div>
 
@@ -590,44 +607,69 @@ export function Overview() {
         </div>
 
         {/* Sentiment Pulse */}
-        <div className="lg:col-span-2 bg-black border border-zinc-800 rounded-xl p-6 relative overflow-hidden">
-          {/* Subtle Neural Background */}
-          <div className="absolute inset-0 opacity-20 pointer-events-none">
-            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,#ec48991a_0,transparent_50%)]" />
-          </div>
-
+        <div className="lg:col-span-2 bg-black border border-zinc-900 rounded-2xl p-6 relative overflow-hidden group">
+          {/* Neural Grid Background */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+               style={{ 
+                 backgroundImage: 'radial-gradient(circle at 1px 1px, #ec4899 1px, transparent 0)',
+                 backgroundSize: '24px 24px' 
+               }} 
+          />
+          
           <div className="flex justify-between items-start mb-6 relative z-10">
             <div>
-              <h3 className="text-base font-semibold text-white">Neural Cluster Distribution</h3>
-              <p className="text-xs text-zinc-400 mt-1">Real-time mapping of your brand's presence in the LLM latent space.</p>
+              <div className="flex items-center gap-2 mb-1">
+                 <h3 className="text-base font-semibold text-white">Neural Cluster Distribution</h3>
+                 <div className="px-1.5 py-0.5 rounded-full bg-pink-500/10 border border-pink-500/20 text-[9px] font-bold text-pink-400 uppercase tracking-widest animate-pulse">
+                   Live 768-D Mapping
+                 </div>
+              </div>
+              <p className="text-xs text-zinc-500">Mapping your brand anchors across the LLM collective latent space.</p>
             </div>
-            {geoLoading && <Loader2 className="w-4 h-4 animate-spin text-pink-500" />}
+            <div className="flex items-center gap-4">
+              <div className="text-right hidden sm:block">
+                <p className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Projection Method</p>
+                <p className="text-[10px] font-mono text-zinc-500">UMAP_DENSITY_ESTIMATION</p>
+              </div>
+              {geoLoading && <Loader2 className="w-4 h-4 animate-spin text-pink-500" />}
+            </div>
           </div>
           
-          <div className="h-[300px] w-full relative z-10">
+          <div className="h-[350px] w-full relative z-10">
             {mapPoints.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
                   <XAxis type="number" dataKey="x" hide domain={[-120, 120]} />
                   <YAxis type="number" dataKey="y" hide domain={[-120, 120]} />
-                  <ZAxis type="number" dataKey="size" range={[80, 600]} />
+                  <ZAxis type="number" dataKey="size" range={[60, 500]} />
                   <Tooltip 
                     cursor={{ strokeDasharray: '3 3', stroke: '#ec4899', strokeOpacity: 0.3 }}
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
                         return (
-                          <div className="bg-zinc-900/95 border border-zinc-800 p-3 rounded-lg shadow-2xl backdrop-blur-md">
-                            <p className="text-[10px] font-bold text-pink-500 uppercase tracking-widest mb-1">{data.type}</p>
-                            <p className="text-sm font-semibold text-white">{data.label}</p>
-                            <div className="mt-2 h-0.5 w-full bg-zinc-800 rounded-full overflow-hidden">
-                               <div className="h-full bg-pink-500" style={{ width: `${(1 - data.distance) * 100}%` }} />
+                          <div className="bg-zinc-950/95 border border-zinc-800 p-4 rounded-xl shadow-2xl backdrop-blur-xl border-l-4 border-l-pink-500">
+                            <p className="text-[9px] font-black text-pink-500 uppercase tracking-[0.2em] mb-2">{data.type}</p>
+                            <p className="text-sm font-bold text-white mb-3">{data.label}</p>
+                            
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-zinc-500">SEMANTIC STRENGTH</span>
+                                <span className="text-white font-mono">{Math.round((1 - data.distance) * 100)}%</span>
+                              </div>
+                              <div className="h-1 w-full bg-zinc-900 rounded-full overflow-hidden">
+                                 <div className="h-full bg-pink-500 rounded-full" style={{ width: `${(1 - data.distance) * 100}%` }} />
+                              </div>
                             </div>
-                            <div className="flex justify-between items-center mt-2">
-                               <span className="text-[9px] text-zinc-500 font-mono">STRENGTH: {Math.round((1 - data.distance) * 100)}%</span>
-                               <span className={`text-[9px] font-bold uppercase ${data.sentiment === 'positive' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                 {data.sentiment}
-                               </span>
+
+                            <div className="flex justify-between items-center mt-4 pt-4 border-t border-zinc-800/50">
+                               <div className="flex items-center gap-1.5">
+                                 <div className={`w-1.5 h-1.5 rounded-full ${data.sentiment === 'positive' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                                 <span className={`text-[10px] font-bold uppercase ${data.sentiment === 'positive' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                   {data.sentiment}
+                                 </span>
+                               </div>
+                               <span className="text-[9px] text-zinc-600 font-mono">CLUSTER_ID: {data.id}</span>
                             </div>
                           </div>
                         );
@@ -640,13 +682,13 @@ export function Overview() {
                       <Cell 
                         key={`cell-${index}`} 
                         fill={entry.sentiment === 'positive' ? '#10b981' : '#ec4899'} 
-                        fillOpacity={0.4}
-                        stroke={entry.sentiment === 'positive' ? '#10b981' : '#ec4899'}
+                        fillOpacity={0.3}
+                        stroke={entry.sentiment === 'positive' ? '#10b98199' : '#ec489999'}
                         strokeWidth={1}
                         className="animate-pulse"
                         style={{ 
-                          animationDuration: `${3 + Math.random() * 4}s`,
-                          filter: `drop-shadow(0 0 8px ${entry.sentiment === 'positive' ? '#10b98144' : '#ec489944'})`
+                          animationDuration: `${2.5 + Math.random() * 4}s`,
+                          filter: `blur(${entry.distance * 2}px) drop-shadow(0 0 12px ${entry.sentiment === 'positive' ? '#10b98122' : '#ec489922'})`
                         }}
                       />
                     ))}
@@ -654,16 +696,16 @@ export function Overview() {
                 </ScatterChart>
               </ResponsiveContainer>
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center border border-dashed border-zinc-800 rounded-lg">
-                <BrainCircuit className="w-8 h-8 text-zinc-700 mb-2" />
-                <p className="text-zinc-500 text-sm">Synchronizing with Neural Grid...</p>
+              <div className="w-full h-full flex flex-col items-center justify-center border border-dashed border-zinc-800 rounded-2xl">
+                <BrainCircuit className="w-10 h-10 text-zinc-800 mb-4" />
+                <p className="text-zinc-500 text-sm font-medium">Synchronizing Neural Field...</p>
+                <p className="text-zinc-600 text-[10px] uppercase tracking-widest mt-2">Loading Latent Embeddings</p>
               </div>
             )}
             
-            {/* Visual Center Crosshair */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 border border-pink-500/10 rounded-full flex items-center justify-center pointer-events-none">
-               <div className="w-0.5 h-0.5 bg-pink-500/40 rounded-full" />
-            </div>
+            {/* Ambient Lighting Overlays */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/5 blur-[100px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 blur-[100px] pointer-events-none" />
           </div>
         </div>
 
@@ -795,8 +837,11 @@ export function Overview() {
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h3 className="text-base font-semibold text-white">Monitoring Objectives</h3>
-              <p className="text-xs text-zinc-400 mt-1">Define the reputational anchors and risk vectors the AI monitors.</p>
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-base font-semibold text-white">Monitoring Objectives</h3>
+                <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-bold border border-emerald-500/20">LIVE SYNC</span>
+              </div>
+              <p className="text-xs text-zinc-400">Define the reputational anchors and risk vectors the AI monitors.</p>
             </div>
             <button 
               onClick={() => setIsEditingPrompts(true)}
@@ -807,22 +852,28 @@ export function Overview() {
           </div>
           <div className="space-y-3">
             {userPrompts.map((prompt: string, i: number) => (
-              <div key={i} className="flex items-center justify-between p-3 bg-zinc-950 border border-zinc-800/50 rounded-lg group">
+              <div key={i} className="flex items-center justify-between p-3 bg-zinc-950 border border-zinc-800/50 rounded-lg group hover:border-zinc-700 transition-colors">
                 <div className="flex items-center gap-3 overflow-hidden">
-                  <div className={`w-1.5 h-1.5 rounded-full ${i % 2 === 0 ? 'bg-pink-500' : 'bg-cyan-500'}`} />
+                  <div className={`w-1.5 h-1.5 rounded-full ${i % 2 === 0 ? 'bg-pink-500 shadow-[0_0_8px_#ec4899]' : 'bg-cyan-500 shadow-[0_0_8px_#06b6d4]'}`} />
                   <span className="text-sm text-zinc-300 truncate">{prompt}</span>
                 </div>
-                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                   <div className="px-1.5 py-0.5 rounded bg-zinc-800 text-[10px] text-zinc-500 font-mono">ACTIVE</div>
+                <div className="flex items-center gap-2">
+                   <div className="px-1.5 py-0.5 rounded bg-zinc-900 text-[9px] text-zinc-500 font-mono flex items-center gap-1 group-hover:text-emerald-400 transition-colors">
+                     <Activity className="w-3 h-3" />
+                     {geoLoading ? 'FETCHING' : 'ACTIVE'}
+                   </div>
                 </div>
               </div>
             ))}
           </div>
           <div className="mt-6 pt-6 border-t border-zinc-800/50">
-            <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-2">Automated Discovery</p>
+            <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-3 flex items-center gap-2">
+              <BrainCircuit className="w-3 h-3" />
+              Automated Discovery Vectors
+            </p>
             <div className="flex flex-wrap gap-2">
-              {['CEO Reliability', 'Technical Moat', 'Pricing Fairness', 'Open Source Sync'].map(tag => (
-                <span key={tag} className="px-2 py-1 rounded bg-zinc-800/50 text-[10px] text-zinc-400 border border-zinc-800 cursor-help hover:border-zinc-700 transition-colors">
+              {['CEO Reliability', 'Technical Moat', 'Pricing Fairness', 'Open Source Sync', 'Enterprise Scale'].map(tag => (
+                <span key={tag} className="px-2 py-1 rounded bg-zinc-950 text-[10px] text-zinc-500 border border-zinc-800 cursor-help hover:border-pink-500/30 hover:text-pink-400 transition-all">
                   {tag}
                 </span>
               ))}
@@ -839,10 +890,10 @@ export function Overview() {
           <div className="h-[280px] w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={[
-                { stage: 'AI Citations', amount: 500 + safeLatest.aSov * 10, fill: '#3b82f6' },
-                { stage: 'AI Referral Clicks', amount: safeLatest.aiTraffic, fill: '#8b5cf6' },
-                { stage: 'Signups', amount: Math.floor(safeLatest.aiTraffic * 0.15), fill: '#ec4899' },
-                { stage: 'Active Users', amount: Math.floor(safeLatest.aiTraffic * 0.05), fill: '#10b981' },
+                { stage: 'AI Citations', amount: Math.round(500 + safeLatest.aSov * 10), fill: '#3b82f6' },
+                { stage: 'AI Referral Clicks', amount: Math.round(safeLatest.aiTraffic), fill: '#8b5cf6' },
+                { stage: 'Signups', amount: Math.round(safeLatest.aiTraffic * 0.15), fill: '#ec4899' },
+                { stage: 'Active Users', amount: Math.round(safeLatest.aiTraffic * 0.05), fill: '#10b981' },
               ]} layout="vertical" margin={{ top: 0, right: 30, left: 40, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={true} vertical={false} />
                 <XAxis type="number" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
