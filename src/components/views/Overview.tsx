@@ -671,7 +671,7 @@ export function Overview() {
                }} 
           />
           
-          <div className="flex justify-between items-start mb-6 relative z-10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 relative z-20">
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-1">
                  <h3 className="text-base font-semibold text-white">Neural Cluster Distribution</h3>
@@ -729,7 +729,7 @@ export function Overview() {
                   <span className="text-[8px] font-mono text-emerald-400">GEMINI-EMBED-004</span>
                   
                   {/* Methodology Tooltip */}
-                  <div className="absolute top-full left-0 mt-2 w-72 p-4 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[100] text-[10px] leading-relaxed backdrop-blur-xl">
+                  <div className="absolute bottom-full left-0 mb-2 w-72 p-4 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[100] text-[10px] leading-relaxed backdrop-blur-xl pointer-events-none">
                     <p className="text-white font-bold mb-2 uppercase tracking-widest text-[9px] border-b border-zinc-800 pb-2">Semantic Audit Methodology</p>
                     <p className="text-zinc-400 mb-2">
                       The map displays the <span className="text-pink-400 font-bold">Reputational Twin</span> generated during the last Deep Audit.

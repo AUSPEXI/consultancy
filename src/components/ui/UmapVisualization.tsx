@@ -56,15 +56,15 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
 
   const onPointerOver = useCallback((e: any) => {
     e.stopPropagation();
-    // Use the index directly from the event
-    if (e.index !== undefined) {
-      setHovered(e.index);
+    const index = e.index;
+    if (index !== undefined) {
+      setHovered(index);
       onHoverChange?.(true);
     }
   }, [onHoverChange]);
 
   const onPointerOut = useCallback((e: any) => {
-    // Only clear if we're moving away from the points entirely
+    // To prevent flicker when moving between points, we only clear if we are truly leaving
     setHovered(null);
     onHoverChange?.(false);
   }, [onHoverChange]);

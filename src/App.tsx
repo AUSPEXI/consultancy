@@ -115,7 +115,7 @@ function AppContent() {
         <Route path="/og-preview/:slug" element={<OGPreviewPage />} />
         <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/" />} />
       </Routes>
-      <FloatingVoiceButton />
+      {!location.pathname.startsWith('/dashboard') && <FloatingVoiceButton />}
     </VoiceAgentProvider>
   );
 }

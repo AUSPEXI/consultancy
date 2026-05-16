@@ -167,7 +167,7 @@ The user is currently on the '${activeTab}' tab.
 When explaining the dashboard or walking users through their workflow, use THIS specific logical order to explain the toolset:
 1. overview: The main dashboard measuring AI Share of Voice (SOV) metrics. Features the Proprietary Z-Score Sentiment Pulse (anomaly detection mapping generative noise vs real drift), the 768-D Latent Space Map (Semantic affinity mapping), Competitive Citation Dominance (Diverging Cluster Gap), Cite-Magnet Scorecard, and LLM Conversion Pipeline.
 2. competitors: The Competitor Radar to find gaps in competitor citations.
-3. fact-vault: The "Nerve Center" for the 768-D Latent Space Moat. Users add High-Entropy Facts here to feed the pgvector database. Uses a Hybrid Search Architecture (Dense Vector Search + Sparse Metadata Filtering).
+3. fact-vault: The "Citacious Knowledge Vault" for the 768-D Latent Space Moat. Users add High-Entropy Facts here to feed the pgvector database. Uses a Hybrid Search Architecture (Dense Vector Search + Sparse Metadata Filtering).
 4. content-scorer: The "Content Analyst". Verifies if content is vector-ready and fact-dense (>80%). High-scoring content can be pushed to the amplifier or reversed into Fact-Vault JSON-LD.
 5. simulator: The "SOV Simulator". Runs prompt matrices through Gemini 1.5 Pro/Flash to see how the Latent Space Moat influences AI responses in real-time.
 6. brand-monitor: Social consensus monitor (Reddit/Quora). Identifies sentiment shifts that LLMs will eventually scrape.
@@ -433,7 +433,7 @@ ${knowledgeContext}`;
         });
       } catch (err) {
         console.error("Live API Send Error:", err);
-        setMessages(prev => [...prev, { role: 'model', content: "CRITICAL SYSTEM FAULT: The Live Voice link to the Nerve Center was severed. Please restart session." }]);
+        setMessages(prev => [...prev, { role: 'model', content: "CRITICAL SYSTEM FAULT: The Live Voice link to Citacious was severed. Please restart session." }]);
         setIsVoiceActive(false);
       }
       return;
@@ -443,8 +443,8 @@ ${knowledgeContext}`;
     setIsLoading(true);
 
     try {
-      // Simulate Nerve Center Telemetry
-      console.log("[Nerve Center Telemetry] Logging Copilot Interaction:", {
+      // Simulate Citacious Telemetry
+      console.log("[Citacious Telemetry] Logging Copilot Interaction:", {
         userMessage,
         currentTab: activeTab,
         timestamp: new Date().toISOString()
@@ -480,7 +480,7 @@ ${knowledgeContext}`;
       console.error("Copilot Error:", error);
       const errorMessage = error.message && error.message.includes("CRITICAL") 
         ? error.message 
-        : "I encountered a synchronization error with the Fact-Vault. My connection to the Nerve Center was interrupted. Please try re-sending your message or check your internet connection.";
+        : "I encountered a synchronization error with the Fact-Vault. My connection to Citacious was interrupted. Please try re-sending your message or check your internet connection.";
       
       setMessages(prev => [...prev, { role: 'model', content: errorMessage }]);
     } finally {
