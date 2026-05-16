@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, Cell, ReferenceArea, ScatterChart, Scatter, ZAxis, PieChart, Pie } from 'recharts';
-import { TrendingUp, Users, Target, MousePointerClick, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, Save, Gauge } from 'lucide-react';
+import { TrendingUp, Users, Target, MousePointerClick, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, Save, Gauge, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
@@ -73,6 +73,7 @@ const RacingDial = ({ value, label, color = "#ec4899", size = "sm" }: { value: n
 export function Overview() {
   const { user, tier, userData, role } = useAuth();
   const [latentView, setLatentView] = useState<'2d' | '3d'>('2d');
+  const [selectedPlatform, setSelectedPlatform] = useState<string>('All');
   
   const defaultPrompts = [
     "Is Auspexi a secure enterprise choice?",
@@ -82,7 +83,11 @@ export function Overview() {
   ];
   const userPrompts = userData?.sentimentPrompts || defaultPrompts;
 
-  const { pulseData, mapPoints, sentimentTrace, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(userData?.brand || '', userPrompts);
+  const { pulseData, mapPoints, sentimentTrace, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(
+    userData?.brand || '', 
+    userPrompts,
+    selectedPlatform
+  );
   
   const [metrics, setMetrics] = useState<any[]>([]);
   const [isAuditing, setIsAuditing] = useState(false);
@@ -474,15 +479,18 @@ export function Overview() {
       {/* High-Impact Performance Dials (Racing Style) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'A-SOV Dominance', value: Math.round(safeLatest.aSov), color: '#ec4899', icon: Target, desc: 'Absolute Share of Voice' },
-          { label: 'Entity Recall', value: Math.round(safeLatest.err), color: '#a855f7', icon: BrainCircuit, desc: 'Fact retrieval rate' },
-          { label: 'Platform Sync', value: Math.round((safePlatforms.chatgpt + safePlatforms.claude + safePlatforms.gemini) / 3), color: '#3b82f6', icon: Activity, desc: 'Consistency across LLMs' },
-          { label: 'Sentiment Index', value: 78, color: '#10b981', icon: TrendingUp, desc: 'Qualitative pulse' },
+          { label: 'A-SOV Dominance', value: Math.round(safeLatest.aSov), color: '#ec4899', icon: Target, desc: 'Absolute Share of Voice - % of AI responses dominated by your brand' },
+          { label: 'Entity Recall', value: Math.round(safeLatest.err), color: '#a855f7', icon: BrainCircuit, desc: 'Entity Recall Rate - how often specific facts about your brand are correctly retrieved' },
+          { label: 'Platform Sync', value: Math.round((safePlatforms.chatgpt + safePlatforms.claude + safePlatforms.gemini) / 3), color: '#3b82f6', icon: Activity, desc: 'Across-model consistency index' },
+          { label: 'Sentiment Index', value: 78, color: '#10b981', icon: TrendingUp, desc: 'Average qualitative sentiment score across tracked vectors' },
         ].map((dial, i) => (
           <div key={i} className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden group hover:border-zinc-700 transition-all cursor-help" title={dial.desc}>
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-zinc-800 to-transparent opacity-50" />
             <RacingDial value={dial.value} label={dial.label} color={dial.color} />
-            <dial.icon className="absolute top-4 right-4 w-4 h-4 text-zinc-800 group-hover:text-zinc-700 transition-colors" />
+            <div className="absolute top-4 right-4 flex flex-col items-end gap-1 opacity-40 group-hover:opacity-100 transition-opacity">
+               <dial.icon className="w-4 h-4 text-zinc-400" />
+               <HelpCircle className="w-3 h-3 text-zinc-600" />
+            </div>
           </div>
         ))}
       </div>
@@ -663,18 +671,28 @@ export function Overview() {
           
           <div className="flex justify-between items-start mb-6 relative z-10">
             <div>
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
                  <h3 className="text-base font-semibold text-white">Neural Cluster Distribution</h3>
                  <div className="flex items-center gap-1.5 ml-3">
+                   {['All', 'Gemini', 'ChatGPT', 'Claude'].map(p => (
+                     <button
+                       key={p}
+                       onClick={() => setSelectedPlatform(p)}
+                       className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all border ${selectedPlatform === p ? 'bg-pink-500 border-pink-500 text-white' : 'bg-zinc-900 text-zinc-500 border-zinc-800 hover:border-zinc-700'}`}
+                     >
+                       {p}
+                     </button>
+                   ))}
+                   <div className="w-[1px] h-3 bg-zinc-800 mx-1" />
                    <button 
                      onClick={() => setLatentView('2d')}
-                     className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all ${latentView === '2d' ? 'bg-pink-500 text-white' : 'bg-zinc-900 text-zinc-500 border border-zinc-800'}`}
+                     className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all ${latentView === '2d' ? 'bg-zinc-900 text-pink-400 border border-pink-500/30' : 'bg-zinc-900 text-zinc-500 border border-zinc-800'}`}
                    >
                      2D
                    </button>
                    <button 
                      onClick={() => setLatentView('3d')}
-                     className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all ${latentView === '3d' ? 'bg-pink-500 text-white' : 'bg-zinc-900 text-zinc-500 border border-zinc-800'}`}
+                     className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all ${latentView === '3d' ? 'bg-zinc-900 text-pink-400 border border-pink-500/30' : 'bg-zinc-900 text-zinc-500 border border-zinc-800'}`}
                    >
                      3D
                    </button>
@@ -683,7 +701,13 @@ export function Overview() {
                    Live 768-D Mapping
                  </div>
               </div>
-              <p className="text-xs text-zinc-500">Mapping your brand anchors across the LLM collective latent space.</p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-zinc-500">Mapping your brand anchors across the LLM collective latent space.</p>
+                <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800">
+                  <span className="text-[8px] font-mono text-zinc-500">ENGINE:</span>
+                  <span className="text-[8px] font-mono text-emerald-400">GEMINI-EMBED-004</span>
+                </div>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">

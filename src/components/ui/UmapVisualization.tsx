@@ -16,31 +16,46 @@ interface MapPoint {
 
 function PointCloud({ points: data }: { points: MapPoint[] }) {
   const ref = useRef<THREE.Points>(null!);
-  const [hovered, setHovered] = useState<number | null>(null);
   
-  const { positions, colors } = useMemo(() => {
+  const { positions, colors, anchors } = useMemo(() => {
     const pos = new Float32Array(data.length * 3);
     const cols = new Float32Array(data.length * 3);
     
-    data.forEach((p, i) => {
-      // Map 2D coordinates to a 3D shell/field
-      pos[i * 3] = p.x / 10;
-      pos[i * 3 + 1] = p.y / 10;
-      pos[i * 3 + 2] = (p.z || (Math.random() * 20 - 10)) / 10;
+    // Identified major clusters/anchors in the data
+    const anchorMap = new Map<string, { x: number, y: number, z: number, sentiment: string }>();
 
-      const color = new THREE.Color(p.sentiment === 'positive' ? '#10b981' : '#ec4899');
+    data.forEach((p, i) => {
+      const x = p.x / 10;
+      const y = p.y / 10;
+      const z = (p.z || (Math.random() * 20 - 10)) / 10;
+      
+      pos[i * 3] = x;
+      pos[i * 3 + 1] = y;
+      pos[i * 3 + 2] = z;
+
+      // Make colors more vibrant (increase saturation/brightness)
+      const color = new THREE.Color(p.sentiment === 'positive' ? '#10b981' : '#f43f5e');
       cols[i * 3] = color.r;
       cols[i * 3 + 1] = color.g;
       cols[i * 3 + 2] = color.b;
+
+      // Pick every 15th node as a potential "Cluster Anchor" if it's high quality
+      if (i % 15 === 0) {
+        anchorMap.set(p.label, { x, y, z, sentiment: p.sentiment });
+      }
     });
     
-    return { positions: pos, colors: cols };
+    return { 
+      positions: pos, 
+      colors: cols,
+      anchors: Array.from(anchorMap.entries()).map(([label, pos]) => ({ label, ...pos }))
+    };
   }, [data]);
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
     if (ref.current) {
-       ref.current.rotation.y = t * 0.02;
+       ref.current.rotation.y = t * 0.015;
     }
   });
 
@@ -50,21 +65,44 @@ function PointCloud({ points: data }: { points: MapPoint[] }) {
         <PointMaterial
           transparent
           vertexColors
-          size={0.4}
+          size={0.5}
           sizeAttenuation={true}
           depthWrite={false}
           blending={THREE.AdditiveBlending}
+          opacity={0.8}
         />
       </Points>
       
-      {/* Labels for key clusters */}
-      {data.filter((_, i) => i % 10 === 0).map((p, i) => (
-        <Html key={p.id} position={[p.x / 10, p.y / 10, (p.z || 0) / 10]}>
-          <div className="pointer-events-none whitespace-nowrap">
-            <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter opacity-40">{p.label}</span>
-          </div>
-        </Html>
+      {/* Semantic Anchor Monoliths (Bigger, solid identifiers) */}
+      {anchors.map((p, i) => (
+        <group key={`anchor-${i}`} position={[p.x, p.y, p.z]}>
+          <mesh>
+            <sphereGeometry args={[0.2, 16, 16]} />
+            <meshStandardMaterial 
+              color={p.sentiment === 'positive' ? '#059669' : '#e11d48'} 
+              emissive={p.sentiment === 'positive' ? '#10b981' : '#f43f5e'}
+              emissiveIntensity={2}
+            />
+          </mesh>
+          <Html distanceFactor={10} position={[0, 0.4, 0]} center zIndexRange={[100, 0]}>
+            <div className="pointer-events-none px-2 py-1 bg-black/80 backdrop-blur-md border border-white/20 rounded shadow-2xl">
+              <span className="text-[9px] font-black text-white whitespace-nowrap uppercase tracking-widest">{p.label}</span>
+            </div>
+          </Html>
+        </group>
       ))}
+
+      {/* Subtle background nodes for depth */}
+      <Points positions={positions} stride={3} frustumCulled={false}>
+        <PointMaterial
+          transparent
+          color="#1e293b"
+          size={0.15}
+          sizeAttenuation={true}
+          depthWrite={false}
+          opacity={0.2}
+        />
+      </Points>
     </group>
   );
 }
@@ -99,8 +137,9 @@ export function UmapVisualization({ points = [] }: { points?: any[] }) {
   return (
     <div className="w-full h-full bg-transparent relative group">
       <Canvas camera={{ position: [0, 0, 15], fov: 45 }}>
-        <ambientLight intensity={1} />
-        <pointLight position={[10, 10, 10]} />
+        <color attach="background" args={['#09090b']} />
+        <ambientLight intensity={0.5} />
+        <pointLight position={[10, 10, 10]} intensity={1} />
         <Center>
           <PointCloud points={mockPoints} />
         </Center>
@@ -108,9 +147,10 @@ export function UmapVisualization({ points = [] }: { points?: any[] }) {
           enablePan={false} 
           enableZoom={true} 
           autoRotate 
-          autoRotateSpeed={0.5}
-          maxDistance={30}
-          minDistance={5}
+          autoRotateSpeed={0.8}
+          maxDistance={25}
+          minDistance={8}
+          makeDefault
         />
       </Canvas>
       
