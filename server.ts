@@ -199,139 +199,6 @@ app.use(express.json());
     res.json({ status: "ok", message: "Auspexi Backend is running" });
   });
 
-  app.get("/api/analytics/map", (req, res) => {
-    const { brandId, platform = "All", timeframe = "current" } = req.query;
-    
-    // Shift centers slightly based on platform to simulate different model biases
-    const biasX = platform === 'Gemini' ? 20 : platform === 'ChatGPT' ? -20 : platform === 'Claude' ? 0 : 0;
-    const biasY = platform === 'Gemini' ? -10 : platform === 'ChatGPT' ? 20 : platform === 'Claude' ? -30 : 0;
-
-    // Simulate "drift" for historical snapshots
-    const driftFactor = timeframe === 'month' ? 1.5 : timeframe === 'week' ? 0.7 : 0;
-    const timeSeed = timeframe === 'month' ? 30 : timeframe === 'week' ? 7 : 1;
-
-    const clusters = [
-      { x: -50 + biasX + (driftFactor * 5), y: 40 + biasY - (driftFactor * 3), label: "Reputational Moat", color: "#ec4899", baseType: "Systemic Anchor" },
-      { x: 60 + biasX - (driftFactor * 2), y: -30 + biasY + (driftFactor * 5), label: "Technical Competence", color: "#06b6d4", baseType: "Signal Point" },
-      { x: -20 + biasX, y: -60 + biasY + (driftFactor * 10), label: "Pricing Perception", color: "#8b5cf6", baseType: "Emergent Trend" },
-    ];
-
-    const points = Array.from({ length: 120 }, (_, i) => {
-      const cluster = clusters[i % clusters.length];
-      const theta = Math.random() * 2 * Math.PI;
-      const r = Math.sqrt(Math.random()) * 50; 
-      
-      // Random deterministic drift based on index and timeframe
-      const individualDrift = Math.sin(i + timeSeed) * driftFactor * 2;
-      
-      return {
-        id: i,
-        x: cluster.x + r * Math.cos(theta) + individualDrift,
-        y: cluster.y + r * Math.sin(theta) - individualDrift,
-        z: (Math.random() * 40 - 20) + (individualDrift * 2),
-        size: Math.floor(Math.random() * 6) + 3,
-        type: cluster.label,
-        groupType: cluster.baseType,
-        source: platform === "All" ? ["Gemini", "ChatGPT", "Claude"][i % 3] : platform,
-        label: [
-          "Security Compliance", "API Latency", "Founder History", 
-          "Tokenomics", "Market Share", "Github Activity",
-          "Patent Filing", "Discord Sentiment", "Reddit Leak",
-          "Enterprise Trust", "Latency Spike", "Model Drift"
-        ][i % 12],
-        distance: Math.random(),
-        sentiment: Math.random() > 0.4 ? 'positive' : 'negative',
-      };
-    });
-    res.json({ 
-      success: true, 
-      points, 
-      metadata: { 
-        engine: "Gemini-Embed-004", 
-        dimensions: 768, 
-        platform,
-        timeframe,
-        aggregatedAt: new Date(Date.now() - (timeSeed * 3600000 * 24)).toISOString(),
-        pathCount: 1240 + (timeSeed * 10)
-      } 
-    });
-  });
-
-  app.get("/api/analytics/sentiment-trace", (req, res) => {
-    // Look for custom prompts in query params
-    const customPromptsRaw = req.query.prompts;
-    let prompts = [
-      "Is Auspexi a secure enterprise choice?",
-      "How does Auspexi compare to legacy SEO?",
-      "Is Auspexi's GEO tech proprietary?",
-      "Founder reputation and reliability"
-    ];
-
-    if (customPromptsRaw && typeof customPromptsRaw === 'string') {
-      try {
-        const decoded = JSON.parse(decodeURIComponent(customPromptsRaw));
-        if (Array.isArray(decoded) && decoded.length > 0) {
-          prompts = decoded;
-        }
-      } catch (e) {
-        console.error("Failed to parse custom prompts for sentiment trace", e);
-      }
-    }
-
-    const days = 7;
-    const now = new Date();
-    
-    const trace = prompts.map(prompt => {
-      const data = Array.from({ length: days }, (_, i) => {
-        const date = new Date(now);
-        date.setDate(now.getDate() - (days - 1 - i));
-        
-        // Slightly randomized but trending upwards
-        const seedValue = (prompt.length % 20) + 40; 
-        const drift = i * 4;
-        const pos = Math.min(100, Math.max(10, seedValue + drift + (Math.random() * 10)));
-        const neg = Math.max(0, 30 - drift + (Math.random() * 5));
-        const neu = 100 - pos - neg;
-
-        return {
-          date: date.toISOString().split('T')[0],
-          positive: parseFloat(pos.toFixed(1)),
-          negative: parseFloat(neg.toFixed(1)),
-          neutral: parseFloat(neu.toFixed(1))
-        };
-      });
-      
-      return { prompt, data };
-    });
-
-    res.json({ success: true, trace });
-  });
-
-  app.get("/api/analytics/pulse", (req, res) => {
-    const { brandId } = req.query;
-    // Generate simulated real-time ingestion pulse with date and zScore
-    const now = new Date();
-    const pulse = Array.from({ length: 30 }, (_, i) => {
-      const date = new Date(now);
-      date.setMinutes(now.getMinutes() - (29 - i) * 30); // 30 min intervals
-      
-      // We want a "drift" pulse - usually calm, with occasional spikes (anomalies)
-      const baseNoise = (Math.random() * 0.5) - 0.25;
-      const spike = (i === 15 || i === 25) ? (Math.random() > 0.5 ? 3.5 : -3.5) : 0;
-      const zScore = parseFloat((baseNoise + spike).toFixed(2));
-      
-      return {
-        date: date.toISOString(),
-        zScore: zScore,
-        isAnomaly: Math.abs(zScore) > 2.5,
-        mentions: Math.floor(Math.random() * 100) + 20,
-        citations: Math.floor(Math.random() * 40) + 10,
-        nodeShift: Math.abs(zScore * 10) // Visual indicator for node movement
-      };
-    });
-    res.json({ success: true, pulse });
-  });
-
   // Mock "Customer Backend" Webhook Endpoints
   app.post("/api/webhooks/auspexi", (req, res) => {
     try {
@@ -437,7 +304,7 @@ app.use(express.json());
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-3.1-pro-preview",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
@@ -505,7 +372,7 @@ app.use(express.json());
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
@@ -547,7 +414,7 @@ app.use(express.json());
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: { responseMimeType: "application/json" }
       });
@@ -581,13 +448,13 @@ app.use(express.json());
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: { responseMimeType: "application/json" }
       });
 
-      const factsRes = JSON.parse(response.text || "[]");
-      res.json({ success: true, facts: factsRes });
+      const facts = JSON.parse(response.text || "[]");
+      res.json({ success: true, facts });
     } catch (err: any) {
       console.error("Extract high entropy facts error:", err);
       res.status(500).json({ error: "Failed to extract facts" });
@@ -605,7 +472,7 @@ app.use(express.json());
       const prompt = `Extract 3 atomic facts from the following text and format as a JSON array of strings. Each string must be a concise, standalone fact.\\nText: ${content.substring(0, 5000)}`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash-exp',
+        model: 'gemini-3.1-pro-preview',
         contents: prompt,
         config: { responseMimeType: 'application/json' }
       });
@@ -665,7 +532,7 @@ app.use(express.json());
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
@@ -709,16 +576,16 @@ app.use(express.json());
            - vulnerabilities: array of strings (specific weaknesses found)
         `;
 
-        const responseComp = await ai.models.generateContent({
-          model: "gemini-2.0-flash-exp",
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
           contents: prompt,
           config: {
             responseMimeType: "application/json",
           }
         });
 
-        const parsedComp = JSON.parse(responseComp.text || "{}");
-        res.json({ success: true, result: { name: hostname, ...parsedComp } });
+        const parsed = JSON.parse(response.text || "{}");
+        res.json({ success: true, result: { name: hostname, ...parsed } });
     } catch (err: any) {
       console.error("Analyze competitor endpoint error:", err);
       res.status(500).json({ error: "Failed to analyze competitor" });
@@ -746,15 +613,15 @@ app.use(express.json());
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
         }
       });
 
-      const parsedRes = JSON.parse(response.text || "{}");
-      res.json({ success: true, result: parsedRes });
+      const parsed = JSON.parse(response.text || "{}");
+      res.json({ success: true, result: parsed });
     } catch (err: any) {
       console.error("Technical Restructure error:", err);
       res.status(500).json({ error: "Failed to restructure text" });
@@ -779,7 +646,7 @@ app.use(express.json());
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
@@ -821,7 +688,7 @@ app.use(express.json());
               CRITICAL: Prefix the report with a realistic external source (e.g., "According to the Forrester 2024 AI Index:", "A recent study by MIT CSAIL found..."). Do NOT author it yourself.
               Make it at least 400 words of dense facts.
             `;
-            const fbRes = await ai.models.generateContent({ model: "gemini-2.0-flash-exp", contents: fallbackPrompt });
+            const fbRes = await ai.models.generateContent({ model: "gemini-2.5-flash", contents: fallbackPrompt });
             crawlerData = fbRes.text || `Raw data found for ${topic}: No detailed data available.`;
       }
       res.json({ success: true, result: crawlerData });
@@ -847,7 +714,7 @@ app.use(express.json());
         ${vaultContext ? `\nCRUCIAL BRAND FACTS FROM VAULT (Include these in your extracted list):\n- ${vaultContext}` : ''}
       `;
 
-      const response = await ai.models.generateContent({ model: "gemini-2.0-flash-exp", contents: extractPrompt});
+      const response = await ai.models.generateContent({ model: "gemini-2.5-flash", contents: extractPrompt});
       res.json({ success: true, result: response.text });
     } catch (err: any) {
        console.error("Agent extract error:", err);
@@ -864,7 +731,7 @@ app.use(express.json());
         Do not write any markdown formatting or explanations. Output ONLY raw JSON.
         Facts: ${facts}
       `;
-      const response = await ai.models.generateContent({ model: "gemini-2.0-flash-exp", contents: schemaPrompt });
+      const response = await ai.models.generateContent({ model: "gemini-2.5-flash", contents: schemaPrompt });
       let text = response.text || "{}";
       text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
       res.json({ success: true, result: text });
@@ -899,7 +766,7 @@ app.use(express.json());
         
         Do not write generic PR fluff. Speak to Technical SEOs and Enterprise Marketing Directors. Use markdown formatting (H2, H3, bullet points). Ensure the final length is at least 500 words.
       `;
-      const response = await ai.models.generateContent({ model: "gemini-2.0-flash-exp", contents: synthesisPrompt });
+      const response = await ai.models.generateContent({ model: "gemini-3.1-pro-preview", contents: synthesisPrompt });
       res.json({ success: true, result: response.text });
      } catch (err: any) {
         console.error("Agent synthesize error:", err);
@@ -912,52 +779,27 @@ app.use(express.json());
       const { userMessage, chatHistory, systemInstruction } = req.body;
       if (!userMessage) return res.status(400).json({ error: "Missing message" });
 
-      console.log(`[Copilot] Processing request for message: ${userMessage.substring(0, 50)}...`);
-
       const ai = getGemini();
 
-      // Map history to the format expected by the SDK
-      const contents = (chatHistory || []).map((msg: any) => ({
-        role: (msg.role === 'assistant' || msg.role === 'model') ? 'model' : 'user',
-        parts: [{ text: msg.content }]
-      }));
-
-      // Add the new message
-      contents.push({ role: 'user', parts: [{ text: userMessage }] });
-
-      const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-exp",
-        contents,
+      const chat = ai.chats.create({
+        model: "gemini-3.1-pro-preview",
         config: {
           systemInstruction,
         }
       });
-
-      if (!response.text) {
-        console.warn("[Copilot] Received empty response from Gemini");
-        throw new Error("Empty response from AI engine");
-      }
+      
+      // We don't have to restore full history if we just send the whole history in message or configure it.
+      // Easiest is just pushing history to the chat model.
+      const conversationContext = chatHistory.map((msg: any) => `${msg.role}: ${msg.content}`).join("\n");
+      
+      const response = await chat.sendMessage({
+         message: `Here is the conversation history:\n${conversationContext}\n\nUser: ${userMessage}`
+      });
 
       res.json({ success: true, result: response.text });
     } catch (err: any) {
-      console.error("Copilot Chat error detailed:", {
-        message: err.message,
-        stack: err.stack,
-        details: err.details || "No extra details"
-      });
-      
-      // Check for specific Gemini errors (e.g. invalid API key)
-      if (err.message?.includes("API_KEY_INVALID")) {
-        return res.status(500).json({ 
-          success: false, 
-          error: "CRITICAL: GEMINI_API_KEY is invalid or missing in server environment." 
-        });
-      }
-
-      res.status(500).json({ 
-        success: false, 
-        error: "SYNC_FAILURE: Failed to communicate with the Citacious Engine." 
-      });
+      console.error("Copilot Chat error:", err);
+      res.status(500).json({ error: "Failed to run copilot chat" });
     }
   });
 
@@ -1007,10 +849,7 @@ Competitors: ${competitors.join(", ")}
 Search Context:
 ${combinedContext.substring(0, 30000)}
 
-Return ONLY a JSON object. 
-IMPORTANT: Your estimates for 'platforms' SHOULD NEVER BE ZERO. Base them on the citation frequency in the context.
-If the context is sparse, use a baseline of 5-15% for the brand if it's mentioned at all.
-
+Return ONLY a JSON object with the following structure, using derived or highly plausible estimates based on the context:
 {
   "brand": <integer percentage for ${brand}>,
   "compA": <integer percentage for ${competitors[0] || 'Competitor A'}>,
@@ -1045,14 +884,14 @@ If the context is sparse, use a baseline of 5-15% for the brand if it's mentione
       let response;
       try {
         response = await ai.models.generateContent({
-          model: "gemini-2.0-flash-exp",
+          model: "gemini-3.1-pro-preview",
           contents: prompt,
           config: { responseMimeType: "application/json" }
         });
       } catch (geminiError: any) {
         console.warn("Primary Gemini model failed, trying fallback:", geminiError.message);
         response = await ai.models.generateContent({
-          model: "gemini-1.5-flash",
+          model: "gemini-2.5-flash",
           contents: prompt,
           config: { responseMimeType: "application/json" }
         });
@@ -1145,14 +984,14 @@ Format the output in clean Markdown.
       let response;
       try {
         response = await ai.models.generateContent({
-          model: "gemini-2.0-flash-exp",
+          model: "gemini-3-flash-preview",
           contents: prompt,
         });
       } catch (geminiError: any) {
         console.warn("Primary Gemini model failed, trying fallback:", geminiError.message);
-        // Fallback to a highly available model
+        // Fallback to a highly available model if the preview model is experiencing high demand (503)
         response = await ai.models.generateContent({
-          model: "gemini-1.5-flash",
+          model: "gemini-2.5-flash",
           contents: prompt,
         });
       }
@@ -1416,15 +1255,15 @@ Format the output in clean Markdown.
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
         }
       });
 
-      const parsedResultData = JSON.parse(response.text || "{}");
-      res.json({ success: true, result: parsedResultData });
+      const parsedResult = JSON.parse(response.text || "{}");
+      res.json({ success: true, result: parsedResult });
     } catch (error: any) {
       console.error("Error in brand monitor:", error);
       res.status(500).json({ error: error.message });
@@ -1947,103 +1786,6 @@ function startEmailFunnelCron() {
 }
 
 async function setupFrontendAndStart() {
-  // --- Dynamic Social Meta Tags Injection ---
-  // This middleware intercepts blog and homepage requests to inject branded meta tags
-  // before the static index.html is served. This ensures social platforms (LinkedIn, X)
-  // see the correct title, description, and branded hero images.
-
-  app.get('/blog/:slug', (req, res, next) => {
-    const { slug } = req.params;
-    const post = blogPosts.find(p => p.slug === slug);
-    if (!post) return next();
-
-    const indexPath = process.env.NODE_ENV === "production" 
-      ? path.join(process.cwd(), 'dist', 'index.html')
-      : path.join(process.cwd(), 'index.html');
-
-    if (fs.existsSync(indexPath)) {
-      try {
-        let html = fs.readFileSync(indexPath, 'utf-8');
-        
-        const title = `${post.title} | Auspexi`;
-        const description = post.excerpt;
-        const image = post.image;
-        const url = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
-
-        // Update basic tags
-        html = html.replace(/<title>.*?<\/title>/i, `<title>${title}</title>`);
-        html = html.replace(/<meta name="description" content=".*?" \/?>/i, `<meta name="description" content="${description}" />`);
-        
-        // Update OG tags (using global matching and case-insensitive)
-        html = html.replace(/<meta property="og:title" content=".*?" \/?>/gi, `<meta property="og:title" content="${title}" />`);
-        html = html.replace(/<meta property="og:description" content=".*?" \/?>/gi, `<meta property="og:description" content="${description}" />`);
-        html = html.replace(/<meta property="og:image" content=".*?" \/?>/gi, `<meta property="og:image" content="${image}" />`);
-        html = html.replace(/<meta property="og:url" content=".*?" \/?>/gi, `<meta property="og:url" content="${url}" />`);
-
-        // Update Twitter tags
-        html = html.replace(/<meta property="(twitter|twitter:title)" content=".*?" \/?>/gi, `<meta property="twitter:title" content="${title}" />`);
-        html = html.replace(/<meta property="(twitter:description)" content=".*?" \/?>/gi, `<meta property="twitter:description" content="${description}" />`);
-        html = html.replace(/<meta property="(twitter:image)" content=".*?" \/?>/gi, `<meta property="twitter:image" content="${image}" />`);
-        html = html.replace(/<meta property="(twitter:url)" content=".*?" \/?>/gi, `<meta property="twitter:url" content="${url}" />`);
-        
-        // Handle name= variant for twitter
-        html = html.replace(/<meta name="twitter:.*?" content=".*?" \/?>/gi, ""); // Clear existing name-based twitter tags to avoid duplication
-        html += `\n    <meta name="twitter:title" content="${title}" />`;
-        html += `\n    <meta name="twitter:description" content="${description}" />`;
-        html += `\n    <meta name="twitter:image" content="${image}" />`;
-
-        res.set('Content-Type', 'text/html');
-        return res.send(html);
-      } catch (err) {
-        console.error("Error injecting blog meta tags:", err);
-        return next();
-      }
-    }
-    next();
-  });
-
-  app.get('/', (req, res, next) => {
-    // Only handle precise root path to avoid interfering with other assets
-    if (req.path !== '/') return next();
-
-    const indexPath = process.env.NODE_ENV === "production" 
-      ? path.join(process.cwd(), 'dist', 'index.html')
-      : path.join(process.cwd(), 'index.html');
-
-    if (fs.existsSync(indexPath)) {
-      try {
-        let html = fs.readFileSync(indexPath, 'utf-8');
-        
-        const title = "Auspexi | Master Brand Visibility in the Era of AI Search";
-        const description = "Leading defensive GEO platform for enterprise brand protection and AI Share of Voice dominance. Auspexi protects and amplifies your brand across Generative Engines.";
-        const image = "https://auspexi.com/auspexi-logo.png"; 
-        const url = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
-
-        // Update basic tags
-        html = html.replace(/<title>.*?<\/title>/i, `<title>${title}</title>`);
-        html = html.replace(/<meta name="description" content=".*?" \/?>/i, `<meta name="description" content="${description}" />`);
-        
-        // Update OG tags
-        html = html.replace(/<meta property="og:title" content=".*?" \/?>/gi, `<meta property="og:title" content="${title}" />`);
-        html = html.replace(/<meta property="og:description" content=".*?" \/?>/gi, `<meta property="og:description" content="${description}" />`);
-        html = html.replace(/<meta property="og:image" content=".*?" \/?>/gi, `<meta property="og:image" content="${image}" />`);
-        html = html.replace(/<meta property="og:url" content=".*?" \/?>/gi, `<meta property="og:url" content="${url}" />`);
-
-        // Update Twitter tags
-        html = html.replace(/<meta property="(twitter|twitter:title)" content=".*?" \/?>/gi, `<meta property="twitter:title" content="${title}" />`);
-        html = html.replace(/<meta property="(twitter:description)" content=".*?" \/?>/gi, `<meta property="twitter:description" content="${description}" />`);
-        html = html.replace(/<meta property="(twitter:image)" content=".*?" \/?>/gi, `<meta property="twitter:image" content="${image}" />`);
-
-        res.set('Content-Type', 'text/html');
-        return res.send(html);
-      } catch (err) {
-        console.error("Error injecting homepage meta tags:", err);
-        return next();
-      }
-    }
-    next();
-  });
-
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const { createServer: createViteServer } = await import("vite");
