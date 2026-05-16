@@ -18,14 +18,14 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: SidebarP
   
   const navItems = [
     { id: 'overview', label: 'AI SOV Overview', icon: LayoutDashboard, requiredTier: 'Basic' },
+    { id: 'competitors', label: 'Competitor Radar', icon: Radar, requiredTier: 'Medium' },
     { id: 'fact-vault', label: 'Fact-Vault', icon: Database, requiredTier: 'Basic' },
     { id: 'content-scorer', label: 'Content Scorer', icon: PenTool, requiredTier: 'Basic' },
-    { id: 'audit-logs', label: 'Audit Logs', icon: ShieldCheck, requiredTier: 'Basic' },
     { id: 'simulator', label: 'SOV Simulator', icon: MonitorPlay, requiredTier: 'Medium' },
     { id: 'brand-monitor', label: 'Brand Monitor', icon: Radar, requiredTier: 'Medium' },
-    { id: 'competitors', label: 'Competitor Radar', icon: Radar, requiredTier: 'Medium' },
     { id: 'technical', label: 'Edge & Schema', icon: Code, requiredTier: 'Premium' },
     { id: 'agents', label: 'Agent Orchestration', icon: Bot, requiredTier: 'Premium' },
+    { id: 'audit-logs', label: 'Audit Logs', icon: ShieldCheck, requiredTier: 'Basic' },
   ];
 
   const hasAccess = (requiredTier: string) => {

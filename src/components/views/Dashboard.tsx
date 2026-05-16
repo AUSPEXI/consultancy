@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
 import { Overview } from '@/components/views/Overview';
@@ -18,6 +18,18 @@ export function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { userData, loading } = useAuth();
+
+  useEffect(() => {
+    const handleVoiceAgentTabChange = (e: Event) => {
+      const customEvent = e as CustomEvent<{ tab: string }>;
+      if (customEvent.detail && customEvent.detail.tab) {
+        setActiveTab(customEvent.detail.tab);
+      }
+    };
+
+    window.addEventListener('change-dashboard-tab', handleVoiceAgentTabChange);
+    return () => window.removeEventListener('change-dashboard-tab', handleVoiceAgentTabChange);
+  }, []);
 
   const renderContent = () => {
     switch (activeTab) {

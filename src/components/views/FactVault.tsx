@@ -3,7 +3,7 @@ import { Database, Lock, Unlock, CheckCircle2, AlertCircle, Plus, X, Loader2, Me
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/firebase';
 import { collection, addDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Type } from '@google/genai';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { AmplifyModal } from '@/components/ui/AmplifyModal';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
@@ -159,8 +159,6 @@ export function FactVault() {
         The user's industry/domain is: "${industry}".
         Generate 3 "High-Entropy Facts" (unique, non-obvious, highly specific data points or statistics that AI models would want to cite) related to this industry.
         For each fact, assign an "Entropy Score" from 0 to 100 (higher means more unique).
-        
-        Return ONLY a JSON array of objects with 'statement' (string) and 'entropyScore' (number).
       `;
 
       const response = await ai.models.generateContent({
@@ -168,10 +166,29 @@ export function FactVault() {
         contents: prompt,
         config: {
           responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                statement: { type: Type.STRING },
+                entropyScore: { type: Type.NUMBER }
+              },
+              required: ["statement", "entropyScore"]
+            }
+          }
         }
       });
 
-      const extractedFacts = JSON.parse(response.text || "[]");
+      let extractedFacts = [];
+      try {
+        let text = response.text || "[]";
+        text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+        extractedFacts = JSON.parse(text);
+      } catch (e) {
+        console.error("Failed to parse Gemini response:", e);
+        extractedFacts = [];
+      }
       
       if (extractedFacts && Array.isArray(extractedFacts)) {
         for (const fact of extractedFacts) {

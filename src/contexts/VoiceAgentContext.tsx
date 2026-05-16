@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useRef, useEffect, ReactNode } from 'react';
 import { GoogleGenAI, LiveServerMessage, Modality, Type } from "@google/genai";
 import { useNavigate } from 'react-router-dom';
-import { collection, getDocs, query, orderBy, limit, addDoc } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, addDoc, where } from 'firebase/firestore';
 import { db, auth } from '@/firebase';
 
 // Base64 to Int16Array
@@ -81,11 +81,29 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
 
   const fetchKnowledgeGraph = async () => {
     try {
-      const q = query(collection(db, 'knowledge_graph'), orderBy('createdAt', 'desc'), limit(50));
+      const currentUserId = auth.currentUser?.uid;
+      let q;
+      if (currentUserId) {
+        // Fetch only facts for this user
+        q = query(
+          collection(db, 'knowledge_graph'), 
+          where('userId', '==', currentUserId)
+        );
+      } else {
+        // Fallback for anonymous or not logged in - don't load random data, just return
+        return;
+      }
+      
       const snapshot = await getDocs(q);
-      const facts = snapshot.docs.map(doc => doc.data().fact);
+      // Sort in memory to avoid requiring a composite index right away
+      const docs = snapshot.docs.map(doc => doc.data() as any);
+      docs.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      
+      const facts = docs.slice(0, 50).map((d: any) => d.fact);
       if (facts.length > 0) {
         knowledgeGraphRef.current = "Here are some learned facts from previous conversations that you should know:\n" + facts.map(f => `- ${f}`).join("\n");
+      } else {
+        knowledgeGraphRef.current = "";
       }
     } catch (err) {
       console.error("Failed to fetch knowledge graph:", err);
@@ -190,7 +208,27 @@ ${conversationText}`,
 
       const ai = new GoogleGenAI({ apiKey });
 
-      const baseInstruction = "You are an Auspexi Sales & Support Representative. Your job is to answer questions about GEO (Generative Engine Optimization) and help onboard users. Auspexi helps brands master visibility in AI search (like ChatGPT, Gemini, Perplexity). Be concise, conversational, and friendly. Do not use markdown or long lists since this is a voice conversation. If the user shows interest in our services, ask for their name and email address so our team can follow up. Once you have their name, email, and understand what they are looking for, call the 'sendCallLog' tool to send this information to the team. If they ask about pricing, features, or want to read the blog, you can use the navigateToPage tool to take them there.";
+      const baseInstruction = `You are "Citacious" (from citation), an Auspexi AI Expert.
+Your job is two-fold:
+1. Public Website (Sales & Support): Answer questions about GEO (Generative Engine Optimization) and help onboard users. If exploring, explain that Auspexi helps brands master visibility in AI search (ChatGPT, Gemini, Perplexity). If they want details, you can use the navigateToPage tool.
+2. The GEO Dashboard (Product Expert): When the user is inside the app, guide them explicitly on how to use it. Here is the App Map of the Dashboard, ordered logically by the optimal User Workflow:
+   1. Overview Tab: The dashboard homepage showing Share of Voice vs top competitors, tracking how often the brand is cited by LLMs.
+   2. Competitor Radar (Competitors Tab): Live extraction of competitor data decay to find weaknesses.
+   3. Fact-Vault: THE MOST IMPORTANT STARTING POINT. Where users store "High-Entropy Facts" (structured data) to feed to AI. It has an auto-research Fact-Grabber tool.
+   4. Content Scorer: Where users paste blog posts to get an AI readiness score and extraction tips.
+   5. SOV Simulator (Simulator Tab): Where users run Prompt Matrices to measure Share of Voice across ChatGPT, Claude, Gemini.
+   6. Brand Monitor: Live tracker for brand mentions on social consensus sites (Reddit, Quora).
+   7. Edge & Schema (Technical Tab): The JSON-LD schema builder.
+   8. Voice Agents / AI Support (Agents Tab): Where users deploy voice agents trained on their facts.
+   9. Audit Logs: Security logs and hallucination detections.
+
+If the user asks where to start, what to do first, or for a tour, ALWAYS recommend jumping into the Fact-Vault first.
+
+COMMUNICATION RULES:
+- Be incredibly conversational, concise, and friendly. DO NOT USE MARKDOWN (like **, #, or bullet points). You are speaking out loud.
+- If they ask how to do something in the dashboard, give them brief step-by-step instructions.
+- If they want to contact sales, ask for their name and email, then call the sendCallLog tool.`;
+      
       const systemInstruction = knowledgeGraphRef.current 
         ? `${baseInstruction}\n\n${knowledgeGraphRef.current}`
         : baseInstruction;
@@ -227,20 +265,25 @@ ${conversationText}`,
                 parameters: {
                   type: Type.OBJECT,
                   properties: {
-                    name: {
-                      type: Type.STRING,
-                      description: "The user's name."
-                    },
-                    email: {
-                      type: Type.STRING,
-                      description: "The user's email address."
-                    },
-                    summary: {
-                      type: Type.STRING,
-                      description: "A detailed summary of the conversation, what the user is looking for, and any specific questions they had."
-                    }
+                    name: { type: Type.STRING, description: "The user's name." },
+                    email: { type: Type.STRING, description: "The user's email address." },
+                    summary: { type: Type.STRING, description: "A detailed summary of the conversation." }
                   },
                   required: ["name", "summary"]
+                }
+              },
+              {
+                name: "changeDashboardTab",
+                description: "Switches the active tab in the user's Dashboard so you can show them different tools.",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: {
+                    tab: {
+                      type: Type.STRING,
+                      description: "The dashboard tab identifier. Allowed values: 'overview', 'fact-vault', 'content-scorer', 'brand-monitor', 'competitors', 'technical', 'agents'"
+                    }
+                  },
+                  required: ["tab"]
                 }
               }
             ]
@@ -354,6 +397,24 @@ ${conversationText}`,
                           response: { result: "Failed to send call log due to a network error." }
                         }]
                       });
+                    });
+                  });
+                } else if (call.name === "changeDashboardTab") {
+                  const tab = (call.args as any).tab;
+                  window.dispatchEvent(new CustomEvent('change-dashboard-tab', { detail: { tab } }));
+                  
+                  // Make sure we are on the dashboard page
+                  if (!window.location.pathname.startsWith("/dashboard")) {
+                    navigate("/dashboard");
+                  }
+
+                  sessionPromise.then((session) => {
+                    session.sendToolResponse({
+                      functionResponses: [{
+                        id: call.id,
+                        name: call.name,
+                        response: { result: `Successfully switched to ${tab} tab in the dashboard.` }
+                      }]
                     });
                   });
                 }

@@ -64,13 +64,15 @@ service cloud.firestore {
     }
 
     function isValidSovMetric(data) {
-      return hasOnlyAllowedFields(['userId', 'date', 'shortDate', 'brand', 'compA', 'compB', 'directTraffic', 'aiCitations']) &&
+      return hasOnlyAllowedFields(['userId', 'date', 'shortDate', 'brand', 'compA', 'compB', 'compC', 'compD', 'directTraffic', 'aiCitations']) &&
              data.userId is string && data.userId.size() > 0 && data.userId.size() < 50 &&
              data.date is string && isValidDateString(data.date) &&
              data.shortDate is string && data.shortDate.size() > 0 && data.shortDate.size() <= 10 &&
              data.brand is number && data.brand >= 0 && data.brand <= 100 &&
              data.compA is number && data.compA >= 0 && data.compA <= 100 &&
              data.compB is number && data.compB >= 0 && data.compB <= 100 &&
+             (!('compC' in data) || (data.compC is number && data.compC >= 0 && data.compC <= 100)) &&
+             (!('compD' in data) || (data.compD is number && data.compD >= 0 && data.compD <= 100)) &&
              data.directTraffic is number && data.directTraffic >= 0 &&
              data.aiCitations is number && data.aiCitations >= 0;
     }
@@ -158,7 +160,7 @@ service cloud.firestore {
     }
 
     match /knowledge_graph/{nodeId} {
-      allow read: if true; // Publicly readable for the voice agent
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin() || !('userId' in resource.data));
       allow create: if isAuthenticated() && isValidKnowledgeGraphNode(request.resource.data);
       allow update: if isAdmin() && isValidKnowledgeGraphNode(request.resource.data);
       allow delete: if isAdmin();
