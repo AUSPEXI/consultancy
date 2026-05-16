@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState } from 'react';
+import { useRef, useMemo, useState, useCallback } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial, Center, OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -16,6 +16,7 @@ interface MapPoint {
 
 function PointCloud({ points: data }: { points: MapPoint[] }) {
   const ref = useRef<THREE.Points>(null!);
+  const [hovered, setHovered] = useState<number | null>(null);
   
   const { positions, colors, anchors } = useMemo(() => {
     const pos = new Float32Array(data.length * 3);
@@ -27,20 +28,20 @@ function PointCloud({ points: data }: { points: MapPoint[] }) {
     data.forEach((p, i) => {
       const x = p.x / 10;
       const y = p.y / 10;
-      const z = (p.z || (Math.random() * 20 - 10)) / 10;
+      const z = (p.z || (Math.random() * 10 - 5)) / 10; // Slightly flatter for better perception 
       
       pos[i * 3] = x;
       pos[i * 3 + 1] = y;
       pos[i * 3 + 2] = z;
 
-      // Make colors more vibrant (increase saturation/brightness)
+      // More distinct colors
       const color = new THREE.Color(p.sentiment === 'positive' ? '#10b981' : '#f43f5e');
       cols[i * 3] = color.r;
       cols[i * 3 + 1] = color.g;
       cols[i * 3 + 2] = color.b;
 
-      // Pick every 15th node as a potential "Cluster Anchor" if it's high quality
-      if (i % 15 === 0) {
+      // Anchor nodes from base types defined in server
+      if (p.type.includes('Anchor') || i % 20 === 0) {
         anchorMap.set(p.label, { x, y, z, sentiment: p.sentiment });
       }
     });
@@ -48,61 +49,90 @@ function PointCloud({ points: data }: { points: MapPoint[] }) {
     return { 
       positions: pos, 
       colors: cols,
-      anchors: Array.from(anchorMap.entries()).map(([label, pos]) => ({ label, ...pos }))
+      anchors: Array.from(anchorMap.entries()).map(([label, pos]) => ({ label, ...pos })).slice(0, 4) // Max 4 to keep focus
     };
   }, [data]);
 
+  const onPointerOver = useCallback((e: any) => {
+    e.stopPropagation();
+    setHovered(e.index);
+  }, []);
+
+  const onPointerOut = useCallback(() => {
+    setHovered(null);
+  }, []);
+
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
-    if (ref.current) {
-       ref.current.rotation.y = t * 0.015;
+    if (ref.current && !hovered) {
+       ref.current.rotation.y = t * 0.01;
     }
   });
 
   return (
     <group>
-      <Points ref={ref} positions={positions} colors={colors} stride={3} frustumCulled={false}>
+      <Points 
+        ref={ref} 
+        positions={positions} 
+        colors={colors} 
+        stride={3} 
+        frustumCulled={false}
+        onPointerOver={onPointerOver}
+        onPointerOut={onPointerOut}
+      >
         <PointMaterial
           transparent
           vertexColors
-          size={0.5}
+          size={0.6}
           sizeAttenuation={true}
           depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          opacity={0.8}
+          blending={THREE.NormalBlending}
+          opacity={0.9}
         />
       </Points>
       
-      {/* Semantic Anchor Monoliths (Bigger, solid identifiers) */}
+      {/* Interactive Hover Label */}
+      {hovered !== null && data[hovered] && (
+        <Html 
+          position={[positions[hovered * 3], positions[hovered * 3 + 1], positions[hovered * 3 + 2]]} 
+          pointerEvents="none"
+          zIndexRange={[100, 0]}
+        >
+          <div className="px-3 py-2 bg-zinc-950/95 border border-pink-500/50 rounded-lg shadow-2xl backdrop-blur-xl min-w-[140px]">
+            <p className="text-[10px] font-black text-pink-500 uppercase tracking-widest mb-1">{data[hovered].sentiment} signal</p>
+            <p className="text-xs font-bold text-white whitespace-nowrap">{data[hovered].label}</p>
+            <div className="mt-2 text-[9px] text-zinc-500 font-mono">
+              SCORE: {Math.round((1 - data[hovered].distance) * 100)}% CLARITY
+            </div>
+          </div>
+        </Html>
+      )}
+
+      {/* Semantic Anchor Pillars (Monolithic structures) */}
       {anchors.map((p, i) => (
         <group key={`anchor-${i}`} position={[p.x, p.y, p.z]}>
+          <mesh position={[0, -2, 0]}>
+            <cylinderGeometry args={[0.02, 0.02, 10, 8]} />
+            <meshBasicMaterial color={p.sentiment === 'positive' ? '#10b981' : '#f43f5e'} transparent opacity={0.1} />
+          </mesh>
           <mesh>
-            <sphereGeometry args={[0.2, 16, 16]} />
+            <boxGeometry args={[0.4, 0.4, 0.4]} />
             <meshStandardMaterial 
               color={p.sentiment === 'positive' ? '#059669' : '#e11d48'} 
               emissive={p.sentiment === 'positive' ? '#10b981' : '#f43f5e'}
-              emissiveIntensity={2}
+              emissiveIntensity={4}
             />
           </mesh>
-          <Html distanceFactor={10} position={[0, 0.4, 0]} center zIndexRange={[100, 0]}>
-            <div className="pointer-events-none px-2 py-1 bg-black/80 backdrop-blur-md border border-white/20 rounded shadow-2xl">
-              <span className="text-[9px] font-black text-white whitespace-nowrap uppercase tracking-widest">{p.label}</span>
+          <Html distanceFactor={12} position={[0, 0.6, 0]} center zIndexRange={[100, 0]}>
+            <div className="pointer-events-none px-3 py-1.5 bg-zinc-900 border-2 border-white/20 rounded shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+              <span className="text-[10px] font-black text-white whitespace-nowrap uppercase tracking-[0.2em]">{p.label}</span>
             </div>
           </Html>
         </group>
       ))}
 
-      {/* Subtle background nodes for depth */}
-      <Points positions={positions} stride={3} frustumCulled={false}>
-        <PointMaterial
-          transparent
-          color="#1e293b"
-          size={0.15}
-          sizeAttenuation={true}
-          depthWrite={false}
-          opacity={0.2}
-        />
-      </Points>
+      {/* Grid Floor for spatial context */}
+      <gridHelper args={[20, 20, '#27272a', '#18181b']} position={[0, -5, 0]} rotation={[0, 0, 0]} />
     </group>
   );
 }
