@@ -38,7 +38,7 @@ export const useGeoAnalytics = (brandId: string, customPrompts: string[] = [], p
     } finally {
       setLoading(false);
     }
-  }, [brandId, JSON.stringify(customPrompts), platform]);
+  }, [brandId, JSON.stringify(customPrompts), platform, timeframe]);
 
   useEffect(() => {
     fetchAnalytics();
