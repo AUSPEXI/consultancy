@@ -6,6 +6,7 @@ import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import ReactMarkdown from 'react-markdown';
 import { db } from '@/firebase';
 import { collection, addDoc } from 'firebase/firestore';
+import { generateContentWithRetry } from '@/lib/gemini-wrapper';
 
 type AgentStatus = 'idle' | 'running' | 'completed' | 'error';
 
@@ -14,6 +15,7 @@ export function Agents() {
   const [topic, setTopic] = useState('');
   const [isOrchestrating, setIsOrchestrating] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [rateLimitWarning, setRateLimitWarning] = useState('');
   
   // Agent States
   const [crawlerStatus, setCrawlerStatus] = useState<AgentStatus>('idle');
@@ -52,6 +54,7 @@ export function Agents() {
     setGeneratedSchema('');
     setFinalArticle('');
     setShowResults(false);
+    setRateLimitWarning('');
   };
 
   const runOrchestration = async () => {
@@ -60,46 +63,38 @@ export function Agents() {
     setIsOrchestrating(true);
     resetState();
     
+    // Legacy callAI wrapper (deprecated, calling the new lib internally)
     const callAI = async (prompt: string, ai: GoogleGenAI, isJson = false) => {
-        let attempts = 0;
-        const maxAttempts = 3;
-        while (attempts < maxAttempts) {
-            try {
-                const response = await ai.models.generateContent({
-                    model: "gemini-2.5-flash",
-                    contents: prompt,
-                    ...(isJson && { config: { responseMimeType: "application/json" } })
-                });
-                return response.text;
-            } catch (error: any) {
-                // Determine if it is a rate limit error (429)
-                const isRateLimit = error?.status === 429 || 
-                                    error?.status === 'RESOURCE_EXHAUSTED' ||
-                                    (error?.message && error.message.includes('429')) ||
-                                    (error?.message && error.message.includes('quota'));
-
-                const isUnavailable = error?.status === 503 ||
-                                      error?.status === 'UNAVAILABLE' ||
-                                      (error?.message && error.message.includes('503')) ||
-                                      (error?.message && error.message.includes('high demand'));
-                                    
-                if (isRateLimit || isUnavailable) {
-                    attempts++;
-                    const waitTime = isRateLimit ? 62000 : 15000; // 62s for sliding window, 15s for temporary 503 spike
-                    console.warn(`API Exception (${isRateLimit ? '429 Quota' : '503 High Demand'}). Retrying attempt ${attempts} of ${maxAttempts}... waiting ${waitTime / 1000} seconds.`);
-                    await new Promise(res => setTimeout(res, waitTime));
-                } else {
-                    throw error;
-                }
-            }
-        }
-        throw new Error("Max retries exceeded for Gemini API");
+       try {
+           return await generateContentWithRetry(ai, prompt, { isJson });
+       } catch (error: any) {
+           if (error.isRateLimit) {
+               setRateLimitWarning(error.message);
+           }
+           throw error;
+       }
     };
 
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
       if (!apiKey) throw new Error("API key is missing");
       const ai = new GoogleGenAI({ apiKey });
+
+      // Fetch Fact-Vault explicitly for extraction
+      let vaultContext = '';
+      if (user) {
+        try {
+          const { query, collection, getDocs, where } = await import('firebase/firestore');
+          const q = query(collection(db, 'knowledge_graph'), where('userId', '==', user.uid));
+          const snapshot = await getDocs(q);
+          const factsArray = snapshot.docs.map(doc => doc.data().fact);
+          if (factsArray.length > 0) {
+            vaultContext = factsArray.join("\n- ");
+          }
+        } catch (e) {
+          console.warn('Failed to fetch vault for extraction', e);
+        }
+      }
 
       // --- STEP 1: Crawler Agent ---
       setCrawlerStatus('running');
@@ -142,7 +137,11 @@ export function Agents() {
         You are the Extraction Agent. Your ONLY job is to extract raw, high-entropy facts from this text.
         Do not write a narrative. Return a bulleted list of raw statistics and facts about "${topic}".
         CRITICAL: If the text attributes a fact to a specific study, group, or author, you MUST include that attribution in your bullet point so the synthesis agent knows who to cite.
-        Text: ${crawlerData}
+        
+        Text Data: 
+        ${crawlerData}
+
+        ${vaultContext ? `\nCRUCIAL BRAND FACTS FROM VAULT (Include these in your extracted list):\n- ${vaultContext}` : ''}
       `;
       const facts = await callAI(extractPrompt, ai, false) || "No facts extracted.";
       setExtractedFacts(facts);
@@ -287,6 +286,16 @@ export function Agents() {
       <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden relative p-4 sm:p-8">
         <div className="max-w-4xl mx-auto">
           
+          {rateLimitWarning && (
+            <div className="mb-6 bg-red-900/20 border border-red-500/30 rounded-lg p-4 flex items-start gap-3">
+              <X className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="text-sm font-semibold text-red-400">API Quota Exhausted</h4>
+                <p className="text-sm text-red-300 mt-1">{rateLimitWarning}</p>
+              </div>
+            </div>
+          )}
+
           {/* Input Section */}
           <div className="mb-12 bg-zinc-950 border border-zinc-800 rounded-xl p-6 shadow-lg">
             <h3 className="text-base font-semibold text-white mb-4">Initialize GEO Content Run</h3>

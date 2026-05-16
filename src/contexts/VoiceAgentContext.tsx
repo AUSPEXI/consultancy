@@ -3,6 +3,7 @@ import { GoogleGenAI, LiveServerMessage, Modality, Type } from "@google/genai";
 import { useNavigate } from 'react-router-dom';
 import { collection, getDocs, query, orderBy, limit, addDoc, where } from 'firebase/firestore';
 import { db, auth } from '@/firebase';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Base64 to Int16Array
 function base64ToInt16Array(base64: string) {
@@ -56,6 +57,7 @@ interface VoiceAgentContextType {
 const VoiceAgentContext = createContext<VoiceAgentContextType | null>(null);
 
 export function VoiceAgentProvider({ children }: { children: ReactNode }) {
+  const { userData } = useAuth();
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -69,7 +71,7 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
   const nextPlayTimeRef = useRef<number>(0);
   const activeSourcesRef = useRef<AudioBufferSourceNode[]>([]);
   const transcriptRef = useRef<{ role: string, text: string }[]>([]);
-  const knowledgeGraphRef = useRef<string>("");
+  const cachedFactsRef = useRef<string[]>([]);
 
   const stopAllSources = () => {
     activeSourcesRef.current.forEach(source => {
@@ -90,21 +92,15 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
           where('userId', '==', currentUserId)
         );
       } else {
-        // Fallback for anonymous or not logged in - don't load random data, just return
         return;
       }
       
       const snapshot = await getDocs(q);
-      // Sort in memory to avoid requiring a composite index right away
       const docs = snapshot.docs.map(doc => doc.data() as any);
       docs.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       
-      const facts = docs.slice(0, 50).map((d: any) => d.fact);
-      if (facts.length > 0) {
-        knowledgeGraphRef.current = "Here are some learned facts from previous conversations that you should know:\n" + facts.map(f => `- ${f}`).join("\n");
-      } else {
-        knowledgeGraphRef.current = "";
-      }
+      const facts = docs.map((d: any) => d.fact);
+      cachedFactsRef.current = facts;
     } catch (err) {
       console.error("Failed to fetch knowledge graph:", err);
     }
@@ -193,6 +189,35 @@ ${conversationText}`,
     };
   };
 
+  const fetchWeeklyMetrics = async () => {
+    try {
+      const currentUserId = auth.currentUser?.uid;
+      if (!currentUserId) return "";
+      
+      const q = query(
+        collection(db, 'sovMetrics'),
+        where('userId', '==', currentUserId),
+        orderBy('date', 'desc'),
+        limit(5)
+      );
+      
+      const snapshot = await getDocs(q);
+      if (snapshot.empty) return "";
+
+      const metrics = snapshot.docs.map(d => d.data());
+      
+      let metricContext = `\n\nPROVE-IT-WORKS METRICS (Last 5 Logs):\nAnalyze these trend changes and cause-effect relationships. You MUST reference these numbers if the user asks how they are performing.\n`;
+      metrics.forEach((m, idx) => {
+        metricContext += `- Date: ${m.date}: Absolute SOV: ${m.aSov}%, Entity Recall Rate: ${m.err}%, Dark AI Traffic: ${m.aiTraffic}, Competitor Gap: ${m.compGap}%\n`;
+      });
+      
+      return metricContext;
+    } catch (err) {
+      console.error("Failed to fetch metrics graph:", err);
+      return "";
+    }
+  };
+
   const connect = async () => {
     try {
       setIsConnecting(true);
@@ -200,6 +225,7 @@ ${conversationText}`,
       transcriptRef.current = []; // Reset transcript for new session
 
       await fetchKnowledgeGraph();
+      const weeklyMetricsContext = await fetchWeeklyMetrics();
 
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
       if (!apiKey) {
@@ -208,26 +234,64 @@ ${conversationText}`,
 
       const ai = new GoogleGenAI({ apiKey });
 
-      const baseInstruction = `You are "Citacious" (from citation), an Auspexi AI Expert.
-Your job is two-fold:
-1. Public Website (Sales & Support): Answer questions about GEO (Generative Engine Optimization) and help onboard users. If exploring, explain that Auspexi helps brands master visibility in AI search (ChatGPT, Gemini, Perplexity). If they want details, you can use the navigateToPage tool.
-2. The GEO Dashboard (Product Expert): When the user is inside the app, guide them explicitly on how to use it. Here is the App Map of the Dashboard, ordered logically by the optimal User Workflow:
-   1. Overview Tab: The dashboard homepage showing Share of Voice vs top competitors, tracking how often the brand is cited by LLMs.
-   2. Competitor Radar (Competitors Tab): Live extraction of competitor data decay to find weaknesses.
-   3. Fact-Vault: THE MOST IMPORTANT STARTING POINT. Where users store "High-Entropy Facts" (structured data) to feed to AI. It has an auto-research Fact-Grabber tool.
-   4. Content Scorer: Where users paste blog posts to get an AI readiness score and extraction tips.
-   5. SOV Simulator (Simulator Tab): Where users run Prompt Matrices to measure Share of Voice across ChatGPT, Claude, Gemini.
-   6. Brand Monitor: Live tracker for brand mentions on social consensus sites (Reddit, Quora).
-   7. Edge & Schema (Technical Tab): The JSON-LD schema builder.
-   8. Voice Agents / AI Support (Agents Tab): Where users deploy voice agents trained on their facts.
-   9. Audit Logs: Security logs and hallucination detections.
+      const customerContext = userData?.brand 
+        ? `\n\nCUSTOMER CONTEXT:\nYou are currently speaking with a representative of "${userData.brand}". ${userData.domain ? `Their domain is ${userData.domain}.` : ''} ${userData.competitors && userData.competitors.length > 0 ? `They are tracking the following competitors: ${userData.competitors.join(", ")}.` : ''} Tailor your advice specifically for their brand and industry whenever possible rather than giving generic examples.${weeklyMetricsContext}`
+        : weeklyMetricsContext;
 
-If the user asks where to start, what to do first, or for a tour, ALWAYS recommend jumping into the Fact-Vault first.
+      const baseInstruction = `You are "Citacious" (from citation), the Resident GEO Expert and Customer Service Agent for Auspexi.${customerContext}
+Your job is two-fold:
+1. Public Website (Sales & Support): Answer questions about GEO (Generative Engine Optimization) and help onboard users. Explain that Auspexi helps brands master visibility in AI search.
+2. The GEO Dashboard (Product Expert): When the user is inside the app, guide them clearly through the Auspexi methodology. 
+
+THE AUSPEXI MASTER WORKFLOW (Order of Operations):
+You MUST understand how the user is supposed to use this platform step-by-step so you can guide them. Let them know there are 8 core phases to mastering Share of Voice:
+
+STEP 1: The Baseline (Overview Tab)
+- Tab: "Overview".
+- Purpose: This is the dashboard homepage. It shows your high-level Share of Voice (SOV) metrics vs top competitors over time. You don't take action here, you just measure the results of your optimizations.
+
+STEP 2: Reconnaissance (Competitor Radar Tab)
+- Tab: "Competitors". 
+- Purpose: Users enter a competitor's URL here FIRST. The AI analyzes where the competitor's data is stale, decaying, or vulnerable to a "Trojan Horse" attack (meaning we can inject our facts into their narrative spaces).
+
+STEP 3: Ammunition (Fact-Vault Tab)
+- Tab: "Facts".
+- Purpose: Now that they know the enemy's weaknesses, they need facts. Tell them to click "Fact-Grabber" in the top right.
+- Action: They enter their business niche. The Fact-Grabber extracts exact "High-Entropy Facts" (unique data). They add these to the vault to serve as AI ammunition.
+
+STEP 4: Refinement (Content Scorer Tab)
+- Tab: "Scoring".
+- Purpose: Paste existing blog posts into the Content Scorer to get an Entity Density Score out of 100 with strict rewrite feedback. Ensure human narrative doesn't wash away machine readability.
+
+STEP 5: Testing (SOV Simulator Tab)
+- Tab: "Simulator".
+- Purpose: Test if the LLMs are actually citing the brand yet.
+- Action: Enter an ORGANIC, real-world question in the Query field (e.g., "What is the best GEO tool?") and their brand name in Target Brand. DO NOT paste raw facts here. The goal is to see if ChatGPT, Gemini, and Claude mention their brand naturally.
+
+STEP 6: Defense (Brand Monitor Tab)
+- Tab: "Monitor".
+- Purpose: Tracks live Reddit and Quora social consensus to prevent "Context Poisoning Risks" (negative public narratives that LLMs pull from).
+
+STEP 7: Indexing (Edge & Schema / Technical Tab)
+- Tab: "Technical".
+- Purpose: Generate rich JSON-LD code (FAQPage, Organization schemas) from their facts to inject into their website's `<head>`. This directly speaks to crawlers.
+
+STEP 8: Creation (Multi-Agent Orchestration / Agents Tab)
+- Tab: "Agents".
+- Purpose: Run a specialized crew of 4 AI Agents to write content from scratch.
+- Action: Enter a topic. The Crawler grabs industry data, Extractor strips hallucinations, Schema agent formats it, and Synthesis writes a blog post using the facts FROM the Fact-Vault.
+
+(Note: There is also an Audit Logs tab that just shows a history of user actions and security alerts, which usually doesn't need to be part of the core workflow).
+
+CRITICAL INSTRUCTIONS:
+- If the user asks where to start, what to do first, or for a tour, ALWAYS recommend Step 1: the Competitor Radar to spot competitor weaknesses.
+- If the user asks how to use the SOV Simulator, explicitly remind them to use an organic question.
+- SYSTEM ERRORS: If the user mentions experiencing a system error, a 503 error, quota limits, or any technical failure, DO NOT try to troubleshoot or act confused. Give a standard customer service reply: "I am so sorry for the inconvenience, you likely hit a quota limit. Please let the Auspexi Support Team know so they can investigate and resolve it immediately."
 
 COMMUNICATION RULES:
-- Be incredibly conversational, concise, and friendly. DO NOT USE MARKDOWN (like **, #, or bullet points). You are speaking out loud.
-- If they ask how to do something in the dashboard, give them brief step-by-step instructions.
-- If they want to contact sales, ask for their name and email, then call the sendCallLog tool.`;
+- Be conversational, concise, and friendly. DO NOT USE MARKDOWN.
+- If they ask how to do something, use the "Step X" details above to explain it succinctly.
+- If they want to contact sales, ask for name and email, then call the sendCallLog tool.`;
       
       const systemInstruction = knowledgeGraphRef.current 
         ? `${baseInstruction}\n\n${knowledgeGraphRef.current}`
@@ -245,6 +309,20 @@ COMMUNICATION RULES:
           outputAudioTranscription: {},
           tools: [{
             functionDeclarations: [
+              {
+                name: "searchFactVault",
+                description: "Searches the user's Fact-Vault database for specific facts or knowledge. Use this when the user asks a specific question about facts, details, or brand-specific knowledge so you don't hallucinate.",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: {
+                    query: {
+                      type: Type.STRING,
+                      description: "The search term or keyword to look for in their facts."
+                    }
+                  },
+                  required: ["query"]
+                }
+              },
               {
                 name: "navigateToPage",
                 description: "Navigates the user's browser to a specific page on the Auspexi website.",
@@ -414,6 +492,27 @@ COMMUNICATION RULES:
                         id: call.id,
                         name: call.name,
                         response: { result: `Successfully switched to ${tab} tab in the dashboard.` }
+                      }]
+                    });
+                  });
+                } else if (call.name === "searchFactVault") {
+                  const queryTerm = ((call.args as any).query || "").toLowerCase();
+                  
+                  // Simple client-side search (keyword matching for precise recall without bloated context)
+                  const matches = cachedFactsRef.current.filter(f => f.toLowerCase().includes(queryTerm));
+                  const topMatches = matches.length > 0 ? matches.slice(0, 3) : cachedFactsRef.current.slice(0, 3);
+                  
+                  const resultText = topMatches.length > 0 
+                    ? "Found these relevant facts in the Fact-Vault:\n" + topMatches.map(f => "- " + f).join("\n") 
+                    : "No specific facts found matching that query. Rely on general knowledge.";
+
+                  // Return to agent immediately
+                  sessionPromise.then((session) => {
+                    session.sendToolResponse({
+                      functionResponses: [{
+                        id: call.id,
+                        name: call.name,
+                        response: { result: resultText }
                       }]
                     });
                   });

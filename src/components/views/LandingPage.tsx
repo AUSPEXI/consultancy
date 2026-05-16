@@ -503,10 +503,10 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               benefits={[
                 { text: "AI SOV Overview & Fact-Vault", checked: true },
                 { text: "Content Scorer Access", checked: true },
-                { text: "10 Facts Extracted / mo", checked: true },
-                { text: "Standard Analytics", checked: true },
-                { text: "Advanced Audit Logging", checked: true },
-                { text: "Hallucination Detection", checked: false },
+                { text: "30-Day Metric Analytics Storage", checked: true },
+                { text: "Track A-SOV (Absolute Share of Voice)", checked: true },
+                { text: "Standard Audit Logging", checked: true },
+                { text: "12-Month Citacious Context Memory", checked: false },
               ]}
             />
             <PricingCard
@@ -517,11 +517,11 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               onClick={() => handleCheckout('Medium')}
               benefits={[
                 { text: "SOV Simulator & Brand Monitor", checked: true },
-                { text: "Competitor Radar", checked: true },
-                { text: "50 Facts Extracted / mo", checked: true },
-                { text: "Basic Hallucination Detection", checked: true },
-                { text: "Built on SOC 2 Compliant Infrastructure", checked: true },
-                { text: "Reddit/Quora Seeding", checked: true },
+                { text: "Competitor Radar & Data Decay Alerts", checked: true },
+                { text: "90-Day Metric Analytics Storage", checked: true },
+                { text: "Track Entity Recall Rate (ERR)", checked: true },
+                { text: "Basic AI Referral Tracking", checked: true },
+                { text: "12-Month Citacious Context Memory", checked: false },
               ]}
             />
             <PricingCard
@@ -531,12 +531,12 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
               CTA="Talk to AI Sales"
               onClick={() => window.location.href = '/voice-agents'}
               benefits={[
+                { text: "Multi-Agent Orchestration Crew", checked: true },
                 { text: "Edge & Schema Generator", checked: true },
-                { text: "Agent Orchestration", checked: true },
-                { text: "Unlimited Facts + CMS Auto-Sync", checked: true },
-                { text: "Advanced Hallucination Detection", checked: true },
-                { text: "Built on SOC 2 Compliant Infrastructure", checked: true },
-                { text: "Active 'Trojan Horse' Overwrites", checked: true },
+                { text: "Unlimited Dashboard Analytics Storage", checked: true },
+                { text: "Complete 'Prove It Works' Metric Suite", checked: true },
+                { text: "12-Month Citacious Context Memory", checked: true },
+                { text: "Vector Embeddings & Context Caching", checked: true },
               ]}
             />
           </div>
