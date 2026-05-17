@@ -226,7 +226,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-black">
         {/* Subtle pink vector grid overlay like on the blog */}
         <div 
-          className="absolute inset-0 opacity-[0.15] pointer-events-none z-[1]"
+          className="absolute inset-0 opacity-[0.35] pointer-events-none z-[1]"
           style={{
             backgroundImage: `linear-gradient(to right, #EC4899 1px, transparent 1px), linear-gradient(to bottom, #EC4899 1px, transparent 1px)`,
             backgroundSize: '40px 40px',
@@ -323,7 +323,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
                     key={i}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ 
-                      opacity: [0.3, 0.6, 0.3],
+                      opacity: [0.6, 1.0, 0.6],
                       y: [0, -10, 0],
                       x: [0, 5, 0],
                     }}
@@ -336,8 +336,8 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
                     style={{ left: node.x, top: node.y }}
                     className="absolute flex items-center gap-2 whitespace-nowrap"
                   >
-                    <div className="w-1.5 h-1.5 rounded-full bg-pink-500 shadow-[0_0_8px_#EC4899]" />
-                    <span className="text-[10px] font-mono tracking-widest text-[#F472B6]/70 uppercase">
+                    <div className="w-2 h-2 rounded-full bg-pink-400 shadow-[0_0_12px_#EC4899]" />
+                    <span className="text-[10px] font-mono font-bold tracking-widest text-[#F472B6] uppercase drop-shadow-[0_0_8px_rgba(236,72,153,0.5)]">
                       {node.label}
                     </span>
                   </motion.div>
