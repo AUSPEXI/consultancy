@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Link, useLocation } from 'react-router-dom';
 import { Mic, X, Square, Volume2, Minus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVoiceAgent } from '@/contexts/VoiceAgentContext';
@@ -8,7 +7,7 @@ import { useVoiceAgent } from '@/contexts/VoiceAgentContext';
 export function FloatingVoiceButton() {
   const [isVisible, setIsVisible] = useState(false);
   const [isCardDismissed, setIsCardDismissed] = useState(true);
-  const pathname = usePathname();
+  const location = useLocation();
   const { isConnected, isSpeaking, disconnect } = useVoiceAgent();
 
   useEffect(() => {
@@ -27,13 +26,13 @@ export function FloatingVoiceButton() {
 
   const { connect } = useVoiceAgent();
   
-  const isDashboardPath = pathname.startsWith('/dashboard') || 
-                         pathname.startsWith('/overview') || 
-                         pathname.startsWith('/fact-vault') ||
-                         pathname.startsWith('/competitors') ||
-                         pathname.startsWith('/content-scorer');
+  const isDashboardPath = location.pathname.startsWith('/dashboard') || 
+                         location.pathname.startsWith('/overview') || 
+                         location.pathname.startsWith('/fact-vault') ||
+                         location.pathname.startsWith('/competitors') ||
+                         location.pathname.startsWith('/content-scorer');
 
-  if (isDashboardPath || pathname !== '/') return null;
+  if (isDashboardPath || location.pathname !== '/') return null;
 
   return (
     <AnimatePresence>

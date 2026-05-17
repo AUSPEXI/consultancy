@@ -1,12 +1,10 @@
-'use client';
-
 import React, { useState } from 'react';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
 import { ChevronDown, Plus, Minus } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const ALL_FAQS = [
   {
@@ -188,7 +186,7 @@ export function FAQPage() {
                 Generative Engine Optimization is a rapidly evolving frontier. Our architects are available for strategic consultations.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/" className="inline-flex items-center justify-center bg-white hover:bg-zinc-200 text-black px-8 py-4 rounded-full font-bold transition-all hover:scale-105">
+                <Link to="/" className="inline-flex items-center justify-center bg-white hover:bg-zinc-200 text-black px-8 py-4 rounded-full font-bold transition-all hover:scale-105">
                   Book Strategic Call
                 </Link>
                 <a href="mailto:sales@auspexi.com" className="inline-flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 text-white px-8 py-4 rounded-full font-bold border border-zinc-700 transition-all">

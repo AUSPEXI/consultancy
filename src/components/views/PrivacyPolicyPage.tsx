@@ -1,5 +1,3 @@
-'use client';
-
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
 import { useAuth } from '@/contexts/AuthContext';

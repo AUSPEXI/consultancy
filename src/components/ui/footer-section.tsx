@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Facebook, Instagram, Linkedin, Moon, Send, Sun, Youtube, MessageSquare } from "lucide-react"
-import Link from "next/link"
+import { Link } from "react-router-dom"
 
 const TiktokIcon = ({ className }: { className?: string }) => (
   <svg
@@ -84,28 +84,28 @@ function Footerdemo() {
           <div>
             <h3 className="mb-4 text-lg font-semibold">Platform</h3>
             <nav className="space-y-2 text-sm">
-              <Link href="/about" className="block transition-colors hover:text-white text-zinc-400">
+              <Link to="/about" className="block transition-colors hover:text-white text-zinc-400">
                 About
               </Link>
-              <Link href="/roadmap" className="block transition-colors hover:text-white text-zinc-400">
+              <Link to="/roadmap" className="block transition-colors hover:text-white text-zinc-400">
                 Roadmap
               </Link>
-              <Link href="/investors" className="block transition-colors hover:text-white text-zinc-400">
+              <Link to="/investors" className="block transition-colors hover:text-white text-zinc-400">
                 Investors
               </Link>
-              <Link href="/#features" className="block transition-colors hover:text-white text-zinc-400">
+              <Link to="/#features" className="block transition-colors hover:text-white text-zinc-400">
                 Features
               </Link>
-              <Link href="/#pricing" className="block transition-colors hover:text-white text-zinc-400">
+              <Link to="/#pricing" className="block transition-colors hover:text-white text-zinc-400">
                 Pricing
               </Link>
-              <Link href="/#strategy" className="block transition-colors hover:text-white text-zinc-400">
+              <Link to="/#strategy" className="block transition-colors hover:text-white text-zinc-400">
                 GEO Strategy
               </Link>
-              <Link href="/voice-agents" className="block transition-colors hover:text-white text-zinc-400">
+              <Link to="/voice-agents" className="block transition-colors hover:text-white text-zinc-400">
                 Voice Agents
               </Link>
-              <Link href="/#testimonials" className="block transition-colors hover:text-white text-zinc-400">
+              <Link to="/#testimonials" className="block transition-colors hover:text-white text-zinc-400">
                 Case Studies
               </Link>
             </nav>
@@ -113,13 +113,13 @@ function Footerdemo() {
           <div>
             <h3 className="mb-4 text-lg font-semibold">Resources</h3>
             <nav className="space-y-2 text-sm">
-              <Link href="/resources" className="block transition-colors hover:text-white text-zinc-400">
+              <Link to="/resources" className="block transition-colors hover:text-white text-zinc-400">
                 Resources
               </Link>
-              <Link href="/blog" className="block transition-colors hover:text-white text-zinc-400">
+              <Link to="/blog" className="block transition-colors hover:text-white text-zinc-400">
                 Blog
               </Link>
-              <Link href="/faq" className="block transition-colors hover:text-white text-zinc-400">
+              <Link to="/faq" className="block transition-colors hover:text-white text-zinc-400">
                 FAQ
               </Link>
               <a href="#" className="block transition-colors hover:text-white text-zinc-400">
@@ -216,10 +216,10 @@ function Footerdemo() {
             © 2026 Auspexi. All rights reserved.
           </p>
           <nav className="flex gap-4 text-sm">
-            <Link href="/privacy" className="transition-colors hover:text-white text-zinc-400">
+            <Link to="/privacy" className="transition-colors hover:text-white text-zinc-400">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="transition-colors hover:text-white text-zinc-400">
+            <Link to="/terms" className="transition-colors hover:text-white text-zinc-400">
               Terms of Service
             </Link>
           </nav>

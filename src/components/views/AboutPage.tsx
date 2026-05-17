@@ -1,9 +1,7 @@
-'use client';
-
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Target, BrainCircuit, LineChart, ShieldCheck, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
 import { useAuth } from '@/contexts/AuthContext';
@@ -71,7 +69,7 @@ export function AboutPage() {
               That&apos;s why we built <strong>Auspexi</strong>. Founded on deep data-science and strategic schema frameworks, Auspexi doesn&apos;t just monitor the algorithms—it ensures your brand becomes the irrefutable, deterministic answer within an AI&apos;s neural network. We don&apos;t guess; we engineer your visibility.
             </p>
             <div className="pt-6">
-              <Link href="/#pricing">
+              <Link to="/#pricing">
                 <Button className="bg-white text-black hover:bg-zinc-200 rounded-full px-8 py-6 text-base font-medium">
                   Secure Your GEO Advantage <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
@@ -187,7 +185,7 @@ export function AboutPage() {
             <p className="text-zinc-400 text-lg mb-10 leading-relaxed">
               The transition to Agentic AI and Generative Search is happening now. Secure your brand's position as the authoritative answer for years to come.
             </p>
-            <Link href="/#pricing">
+            <Link to="/#pricing">
               <Button className="w-full bg-white text-black hover:bg-zinc-200 rounded-xl py-6 text-lg font-medium">
                 Start Your GEO Journey
               </Button>

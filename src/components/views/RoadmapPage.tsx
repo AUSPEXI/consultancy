@@ -1,6 +1,4 @@
-'use client';
-
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Target, BrainCircuit, Globe, Shield, Zap, TrendingUp, Hash } from 'lucide-react';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';

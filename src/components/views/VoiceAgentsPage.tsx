@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';

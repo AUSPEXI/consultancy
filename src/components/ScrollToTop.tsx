@@ -1,13 +1,10 @@
-'use client';
-
 import { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { useLocation } from 'react-router-dom';
 
 export function ScrollToTop() {
-  const pathname = usePathname();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    const hash = window.location.hash;
     if (hash) {
       const id = hash.replace('#', '');
       const element = document.getElementById(id);
@@ -17,9 +14,9 @@ export function ScrollToTop() {
         }, 100);
       }
     } else {
-      window.scrollTo({ top: 0, behavior: 'instant' } as any);
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
-  }, [pathname]);
+  }, [pathname, hash]);
 
   return null;
 }

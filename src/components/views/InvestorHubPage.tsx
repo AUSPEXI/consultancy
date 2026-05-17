@@ -1,7 +1,5 @@
-'use client';
-
 import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { TrendingUp, BarChart3, Globe, ShieldCheck, Zap, ArrowRight, FileText, Lock, CheckCircle2, Layout, Database, Eye, PieChart, Users, Wallet, Rocket, Cpu } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -20,7 +18,7 @@ import {
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
 import { useAuth } from '@/contexts/AuthContext';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { PitchDeckViewer } from '@/components/ui/PitchDeckViewer';
 import { UmapVisualization } from '@/components/ui/UmapVisualization';
 import { cn } from '@/lib/utils';
@@ -1041,7 +1039,7 @@ export function InvestorHubPage() {
           </div>
 
           <div className="mt-12 text-center md:text-left md:ml-40">
-            <Link href="/roadmap" className="inline-flex items-center gap-2 text-pink-400 hover:text-pink-300 font-medium transition-colors">
+            <Link to="/roadmap" className="inline-flex items-center gap-2 text-pink-400 hover:text-pink-300 font-medium transition-colors">
               View the detailed technology roadmap <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
