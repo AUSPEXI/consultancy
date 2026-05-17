@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, Cell, ReferenceArea, ScatterChart, Scatter, ZAxis, PieChart, Pie } from 'recharts';
-import { TrendingUp, Users, Target, MousePointerClick, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, Save, Gauge, HelpCircle } from 'lucide-react';
+import { TrendingUp, Users, Target, MousePointerClick, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, Save, Gauge, HelpCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
@@ -129,7 +129,7 @@ export function Overview() {
   const [isSuggestingAnchors, setIsSuggestingAnchors] = useState(false);
 
   const handleSuggestAnchors = async () => {
-    if (!user || !userData?.brandName || !userData?.domain) {
+    if (!user || !userData?.brand || !userData?.domain) {
       alert("Please ensure your Brand Name and Domain are set in Settings to use Auto-Suggest.");
       return;
     }
@@ -140,7 +140,7 @@ export function Overview() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          brand: userData.brandName,
+          brand: userData.brand,
           domain: userData.domain
         })
       });
@@ -565,6 +565,46 @@ export function Overview() {
   }).sort((a: any, b: any) => b.citations - a.citations).slice(0, 4);
 
   const [copied, setCopied] = useState(false);
+  const [isSyncingCMS, setIsSyncingCMS] = useState(false);
+  const handleSyncCMS = async () => {
+    if (!user || !userData?.cmsWebhookUrl) {
+      alert("Please configure an Outbound Platform Webhook (Your CMS) in Settings to use this feature.");
+      return;
+    }
+    
+    setIsSyncingCMS(true);
+    try {
+      const payload = {
+        shadowLink: generatedShadowLink,
+        jsonLd: {
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": userData.brand || "Your Brand",
+          "url": generatedShadowLink
+        }
+      };
+
+      const resp = await fetch('/api/push-to-cms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          webhookUrl: userData.cmsWebhookUrl,
+          payload
+        })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        alert("Success! Shadow Link and JSON-LD injected into CMS via webhook.");
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (e: any) {
+      alert(`Sync failed: ${e.message}`);
+    } finally {
+      setIsSyncingCMS(false);
+    }
+  };
+
   const handleCopy = () => {
     navigator.clipboard.writeText(generatedShadowLink);
     setCopied(true);
@@ -666,8 +706,9 @@ export function Overview() {
                 <XAxis dataKey="shortDate" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}%`} />
                 <ChartTooltip 
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7' }}
+                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '12px' }}
                   itemStyle={{ color: '#e4e4e7' }}
+                  labelStyle={{ color: '#a1a1aa' }}
                 />
                 <Area type="monotone" dataKey="aSov" name="Our A-SOV" stroke="#ec4899" strokeWidth={2} fillOpacity={1} fill="url(#colorBrand)" />
                 <Area type="monotone" dataKey="compA" name="Top Competitor" stroke="#52525b" strokeWidth={2} fillOpacity={0} fill="transparent" strokeDasharray="4 4" />
@@ -690,7 +731,9 @@ export function Overview() {
                 <YAxis yAxisId="left" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}%`} />
                 <YAxis yAxisId="right" orientation="right" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
                 <ChartTooltip 
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7' }}
+                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '12px' }}
+                  itemStyle={{ color: '#e4e4e7' }}
+                  labelStyle={{ color: '#a1a1aa' }}
                 />
                 <Bar yAxisId="right" dataKey="aiTraffic" name="AI Referral Traffic" fill="#a855f7" fillOpacity={0.2} radius={[4, 4, 0, 0]} />
                 <Line yAxisId="left" type="monotone" dataKey="err" name="Fact Recall Rate" stroke="#a855f7" strokeWidth={2} dot={{ r: 4, fill: '#a855f7', strokeWidth: 0 }} />
@@ -717,7 +760,9 @@ export function Overview() {
                 <YAxis dataKey="subject" type="category" stroke="#a1a1aa" fontSize={10} tickLine={false} axisLine={false} />
                 <ChartTooltip 
                   cursor={{ fill: '#27272a', opacity: 0.1 }}
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7', borderRadius: '12px' }}
+                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '12px' }}
+                  itemStyle={{ color: '#e4e4e7' }}
+                  labelStyle={{ color: '#a1a1aa' }}
                   formatter={(value: any, name: string) => {
                     const abs = Math.abs(value);
                     const label = name === "A" ? "Your Brand" : "Competitor";
@@ -751,7 +796,9 @@ export function Overview() {
                 <YAxis dataKey="name" type="category" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
                 <ChartTooltip 
                   cursor={{ fill: '#27272a', opacity: 0.4 }}
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7' }}
+                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '12px' }}
+                  itemStyle={{ color: '#e4e4e7' }}
+                  labelStyle={{ color: '#a1a1aa', fontWeight: 'bold', marginBottom: '4px' }}
                   formatter={(value) => [`${value}% Share of Voice`, 'Visibility']}
                 />
                 <Bar dataKey="visibility" name="Visibility" radius={[0, 4, 4, 0]}>
@@ -900,6 +947,16 @@ export function Overview() {
                     <div>
                        <h4 className="text-lg font-bold text-white tracking-tight">Configure Semantic Anchors</h4>
                        <p className="text-xs text-zinc-500 mt-1">Define the high-confidence monoliths that ground your brand in the latent space.</p>
+                       <div className="mt-4 p-3 bg-pink-500/5 border border-pink-500/10 rounded-lg">
+                          <p className="text-[10px] text-pink-400 font-bold uppercase tracking-widest mb-1 flex items-center gap-2">
+                             <HelpCircle className="w-3 h-3" /> Strategic Selection Criteria
+                          </p>
+                          <p className="text-[10px] text-zinc-400 leading-relaxed">
+                             Monitor <span className="text-zinc-200">Systemic Anchors</span> for your core technical moats. 
+                             Use <span className="text-zinc-200">Risk Vectors</span> to track sentiment drift on controversial or hallucination-prone topics. 
+                             <span className="text-zinc-200">Emergent Trends</span> are best for tracking new feature adoption across LLM updates.
+                          </p>
+                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                        <button
@@ -1295,7 +1352,9 @@ export function Overview() {
                 <YAxis dataKey="stage" type="category" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
                 <ChartTooltip 
                   cursor={{ fill: '#27272a', opacity: 0.4 }} 
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7', borderRadius: '8px' }} 
+                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '8px' }}
+                  itemStyle={{ color: '#e4e4e7' }}
+                  labelStyle={{ color: '#a1a1aa' }}
                   formatter={(value) => [value, 'Volume']}
                 />
                 <Bar dataKey="amount" barSize={24} radius={[0, 4, 4, 0]}>
@@ -1348,12 +1407,22 @@ export function Overview() {
             <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-500">
               <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex items-center justify-between">
                 <code className="text-emerald-400 text-sm break-all">{generatedShadowLink}</code>
-                <button 
-                  onClick={handleCopy}
-                  className="ml-4 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-md text-xs font-medium transition-colors whitespace-nowrap"
-                >
-                  {copied ? 'Copied!' : 'Copy URL'}
-                </button>
+                <div className="flex gap-2 ml-4">
+                  <button 
+                    onClick={handleCopy}
+                    className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-md text-xs font-medium transition-colors whitespace-nowrap"
+                  >
+                    {copied ? 'Copied!' : 'Copy URL'}
+                  </button>
+                  <button 
+                    onClick={handleSyncCMS}
+                    disabled={isSyncingCMS}
+                    className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-md text-xs font-medium transition-colors whitespace-nowrap flex items-center gap-1.5"
+                  >
+                    {isSyncingCMS ? <Loader2 className="w-3 h-3 animate-spin" /> : <Activity className="w-3 h-3" />}
+                    Sync to CMS
+                  </button>
+                </div>
               </div>
               
               <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4">
