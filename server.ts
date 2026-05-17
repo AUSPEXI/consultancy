@@ -944,6 +944,30 @@ app.use(express.json());
      }
   });
 
+  app.post("/api/push-to-cms", async (req, res) => {
+    try {
+      const { webhookUrl, payload } = req.body;
+      if (!webhookUrl) return res.status(400).json({ error: "No CMS Webhook URL configured" });
+
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event: "auspexi.shadow_link_sync",
+          timestamp: new Date().toISOString(),
+          data: payload
+        })
+      });
+
+      if (!response.ok) throw new Error(`CMS responded with ${response.status}`);
+      
+      res.json({ success: true, message: "Successfully synchronized with CMS" });
+    } catch (err: any) {
+      console.error("CMS Push error:", err);
+      res.status(500).json({ error: err.message || "Failed to push to CMS" });
+    }
+  });
+
   app.post("/api/suggest-anchors", async (req, res) => {
     try {
       const { userId, brand, domain, domainContext } = req.body;
