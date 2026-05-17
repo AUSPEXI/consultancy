@@ -104,7 +104,7 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
           center
         >
           <div 
-            className="px-3 py-2 bg-black/95 border-2 rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.5)] backdrop-blur-2xl min-w-[160px] animate-in fade-in zoom-in duration-200"
+            className="px-3 py-2 bg-black border-2 rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.7)] backdrop-blur-3xl min-w-[160px] animate-in fade-in zoom-in duration-200"
             style={{ borderColor: data[hovered].sentiment === 'positive' ? '#00ffa366' : '#ff003c66' }}
           >
             <div className="flex justify-between items-start mb-1">
@@ -161,7 +161,7 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
           </mesh>
           <Html distanceFactor={15} position={[0, 1, 0]} center zIndexRange={[100, 0]}>
             <div 
-              className="pointer-events-none px-4 py-2 bg-black/90 border-2 rounded shadow-[0_0_25px_rgba(0,0,0,0.9)] transition-all duration-300"
+              className="pointer-events-none px-4 py-2 bg-black border-2 rounded shadow-[0_0_25px_rgba(0,0,0,0.9)] transition-all duration-300"
               style={{ borderColor: p.sentiment === 'positive' ? '#00ffa3' : '#ff003c' }}
             >
               <p 
@@ -177,7 +177,7 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
       ))}
 
       {/* Grid Floor for spatial context */}
-      <gridHelper args={[20, 20, '#27272a', '#18181b']} position={[0, -5, 0]} rotation={[0, 0, 0]} />
+      <gridHelper args={[20, 20, '#ffffff', '#a1a1aa']} position={[0, -5, 0]} rotation={[0, 0, 0]} />
     </group>
   );
 }

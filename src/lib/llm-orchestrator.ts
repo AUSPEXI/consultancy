@@ -6,6 +6,8 @@
  * Guarantees reliable 10K+/day operation
  */
 
+import { GoogleGenAI } from '@google/genai';
+import OpenAI from 'openai';
 import {
   tokenBucketLimiter,
   perUserRateLimiter,
@@ -264,18 +266,40 @@ export class LLMOrchestrator {
   }
 
   private async callOpenAI(model: string, prompt: string, temperature: number): Promise<string> {
-    // Implement OpenAI API call
-    throw new Error('Not implemented - integrate with OpenAI SDK');
+    const key = process.env.OPENAI_API_KEY;
+    if (!key) throw new Error('OPENAI_API_KEY is not set');
+    
+    const openai = new OpenAI({ apiKey: key });
+    const response = await openai.chat.completions.create({
+      model,
+      messages: [{ role: 'user', content: prompt }],
+      temperature,
+    });
+    return response.choices[0].message.content || '';
   }
 
   private async callAnthropic(model: string, prompt: string, temperature: number): Promise<string> {
-    // Implement Anthropic API call
-    throw new Error('Not implemented - integrate with Anthropic SDK');
+    // Anthropic not yet in package.json, so we'll leave it as a throw for now
+    // or we could install it. But let's stick to OpenAI and Gemini as per audit.
+    throw new Error('Anthropic SDK not yet integrated. Please install @anthropic-ai/sdk.');
   }
 
   private async callGemini(model: string, prompt: string, temperature: number): Promise<string> {
-    // Implement Gemini API call
-    throw new Error('Not implemented - integrate with Google Gemini SDK');
+    const key = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+    if (!key) throw new Error('GEMINI_API_KEY is not set');
+
+    const genAI: any = new GoogleGenAI({ apiKey: key });
+    
+    // Using the project's preferred pattern as seen in server.ts
+    const result = await genAI.models.generateContent({
+      model,
+      contents: prompt,
+      config: { 
+        generationConfig: { temperature }
+      }
+    });
+    
+    return result.text || '';
   }
 
   /**

@@ -635,6 +635,30 @@ export function Overview() {
         </div>
       </div>
 
+      {/* Urgent Drift Alert */}
+      <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-rose-500/20 rounded-xl">
+            <Activity className="w-5 h-5 text-rose-500 animate-pulse" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+              Statistically Significant Drift Detected
+              <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-500 text-[10px] font-black uppercase tracking-tighter">-3.2σ Threshold</span>
+            </h3>
+            <p className="text-xs text-rose-400/80 mt-0.5 font-medium">Anomaly detected in "API Latency" clusters within Gemini-2.5-flash latent projections.</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <button className="px-4 py-2 bg-rose-500 text-white text-xs font-bold rounded-lg hover:bg-rose-600 transition-colors">
+            Run Deep Audit
+          </button>
+          <button className="px-4 py-2 bg-zinc-900 text-zinc-400 text-xs font-bold rounded-lg border border-zinc-800 hover:text-white transition-colors">
+            Dismiss
+          </button>
+        </div>
+      </div>
+
       {/* High-Impact Performance Dials (Racing Style) */}
       <TooltipProvider>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -654,7 +678,7 @@ export function Overview() {
                   </div>
                 </div>
               </TooltipTrigger>
-              <TooltipContent className="max-w-[200px] text-center z-[100]">
+              <TooltipContent className="max-w-[200px] text-center z-[200] bg-black border-zinc-800 text-zinc-200 shadow-2xl font-medium">
                 <p>{dial.desc}</p>
               </TooltipContent>
             </UITooltip>
@@ -706,9 +730,9 @@ export function Overview() {
                 <XAxis dataKey="shortDate" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}%`} />
                 <ChartTooltip 
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '12px' }}
-                  itemStyle={{ color: '#e4e4e7' }}
-                  labelStyle={{ color: '#a1a1aa' }}
+                  contentStyle={{ backgroundColor: '#000000', borderColor: '#3f3f46', borderRadius: '12px', color: '#ffffff', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)' }}
+                  itemStyle={{ color: '#ffffff' }}
+                  labelStyle={{ color: '#ffffff', fontWeight: 'bold' }}
                 />
                 <Area type="monotone" dataKey="aSov" name="Our A-SOV" stroke="#ec4899" strokeWidth={2} fillOpacity={1} fill="url(#colorBrand)" />
                 <Area type="monotone" dataKey="compA" name="Top Competitor" stroke="#52525b" strokeWidth={2} fillOpacity={0} fill="transparent" strokeDasharray="4 4" />
@@ -731,9 +755,9 @@ export function Overview() {
                 <YAxis yAxisId="left" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}%`} />
                 <YAxis yAxisId="right" orientation="right" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
                 <ChartTooltip 
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '12px' }}
-                  itemStyle={{ color: '#e4e4e7' }}
-                  labelStyle={{ color: '#a1a1aa' }}
+                  contentStyle={{ backgroundColor: '#000000', borderColor: '#3f3f46', borderRadius: '12px', color: '#ffffff', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)' }}
+                  itemStyle={{ color: '#ffffff' }}
+                  labelStyle={{ color: '#ffffff', fontWeight: 'bold' }}
                 />
                 <Bar yAxisId="right" dataKey="aiTraffic" name="AI Referral Traffic" fill="#a855f7" fillOpacity={0.2} radius={[4, 4, 0, 0]} />
                 <Line yAxisId="left" type="monotone" dataKey="err" name="Fact Recall Rate" stroke="#a855f7" strokeWidth={2} dot={{ r: 4, fill: '#a855f7', strokeWidth: 0 }} />
@@ -760,9 +784,9 @@ export function Overview() {
                 <YAxis dataKey="subject" type="category" stroke="#a1a1aa" fontSize={10} tickLine={false} axisLine={false} />
                 <ChartTooltip 
                   cursor={{ fill: '#27272a', opacity: 0.1 }}
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '12px' }}
-                  itemStyle={{ color: '#e4e4e7' }}
-                  labelStyle={{ color: '#a1a1aa' }}
+                  contentStyle={{ backgroundColor: '#000000', borderColor: '#27272a', borderRadius: '12px', border: '1px solid #27272a', color: '#ffffff', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)' }}
+                  itemStyle={{ color: '#ffffff' }}
+                  labelStyle={{ color: '#ffffff' }}
                   formatter={(value: any, name: string) => {
                     const abs = Math.abs(value);
                     const label = name === "A" ? "Your Brand" : "Competitor";
@@ -796,9 +820,9 @@ export function Overview() {
                 <YAxis dataKey="name" type="category" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
                 <ChartTooltip 
                   cursor={{ fill: '#27272a', opacity: 0.4 }}
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '12px' }}
-                  itemStyle={{ color: '#e4e4e7' }}
-                  labelStyle={{ color: '#a1a1aa', fontWeight: 'bold', marginBottom: '4px' }}
+                  contentStyle={{ backgroundColor: '#000000', borderColor: '#27272a', borderRadius: '12px', border: '1px solid #27272a', color: '#ffffff', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)' }}
+                  itemStyle={{ color: '#ffffff', fontSize: '12px' }}
+                  labelStyle={{ color: '#ffffff', fontWeight: 'bold', marginBottom: '4px', fontSize: '11px' }}
                   formatter={(value) => [`${value}% Share of Voice`, 'Visibility']}
                 />
                 <Bar dataKey="visibility" name="Visibility" radius={[0, 4, 4, 0]}>
@@ -940,114 +964,125 @@ export function Overview() {
             </div>
           </div>
           
-          <div className="h-[400px] w-full relative z-10 border border-zinc-800/50 rounded-2xl bg-zinc-950/20 overflow-hidden">
+          <div className={`${isEditingAnchors ? 'h-auto' : 'h-[400px]'} w-full relative z-10 border border-zinc-800/50 rounded-2xl bg-zinc-950/20 overflow-hidden transition-all duration-500`}>
             {isEditingAnchors ? (
-              <div className="absolute inset-0 z-[60] bg-zinc-950/95 backdrop-blur-xl flex flex-col p-8">
-                 <div className="flex items-center justify-between mb-8">
-                    <div>
-                       <h4 className="text-lg font-bold text-white tracking-tight">Configure Semantic Anchors</h4>
-                       <p className="text-xs text-zinc-500 mt-1">Define the high-confidence monoliths that ground your brand in the latent space.</p>
-                       <div className="mt-4 p-3 bg-pink-500/5 border border-pink-500/10 rounded-lg">
-                          <p className="text-[10px] text-pink-400 font-bold uppercase tracking-widest mb-1 flex items-center gap-2">
-                             <HelpCircle className="w-3 h-3" /> Strategic Selection Criteria
-                          </p>
-                          <p className="text-[10px] text-zinc-400 leading-relaxed">
-                             Monitor <span className="text-zinc-200">Systemic Anchors</span> for your core technical moats. 
-                             Use <span className="text-zinc-200">Risk Vectors</span> to track sentiment drift on controversial or hallucination-prone topics. 
-                             <span className="text-zinc-200">Emergent Trends</span> are best for tracking new feature adoption across LLM updates.
-                          </p>
-                       </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                       <button
-                          onClick={handleSuggestAnchors}
-                          disabled={isSuggestingAnchors}
-                          className="flex items-center gap-2 px-3 py-1.5 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 rounded-lg text-[10px] font-bold text-pink-400 transition-colors"
-                       >
-                          {isSuggestingAnchors ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                          Auto-Suggest
-                       </button>
-                       <button onClick={() => setIsEditingAnchors(false)} className="p-2 hover:bg-zinc-900 rounded-full text-zinc-400">
-                          <X className="w-5 h-5" />
-                       </button>
-                    </div>
-                 </div>
+              <div className="fixed inset-0 z-[100] bg-zinc-950 flex flex-col p-6 sm:p-12 overflow-y-auto backdrop-blur-3xl">
+                 <div className="max-w-5xl mx-auto w-full flex-1">
+                   <div className="flex items-center justify-between mb-8">
+                      <div>
+                         <h4 className="text-2xl font-bold text-white tracking-tight">Configure Semantic Anchors</h4>
+                         <p className="text-sm text-zinc-500 mt-1">Define the high-confidence monoliths that ground your brand in the latent space.</p>
+                         <div className="mt-4 p-4 bg-pink-500/5 border border-pink-500/10 rounded-xl">
+                            <p className="text-xs text-pink-400 font-bold uppercase tracking-widest mb-1 flex items-center gap-2">
+                               <HelpCircle className="w-4 h-4" /> Strategic Selection Criteria
+                            </p>
+                            <p className="text-xs text-zinc-400 leading-relaxed">
+                               Monitor <span className="text-zinc-200">Systemic Anchors</span> for your core technical moats. 
+                               Use <span className="text-zinc-200">Risk Vectors</span> to track sentiment drift on controversial or hallucination-prone topics. 
+                               <span className="text-zinc-200">Emergent Trends</span> are best for tracking new feature adoption across LLM updates.
+                            </p>
+                         </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                         <button
+                            onClick={handleSuggestAnchors}
+                            disabled={isSuggestingAnchors}
+                            className="flex items-center gap-3 px-4 py-2 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 rounded-xl text-xs font-bold text-pink-400 transition-colors"
+                         >
+                            {isSuggestingAnchors ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                            Auto-Suggest
+                         </button>
+                         <button onClick={() => setIsEditingAnchors(false)} className="p-3 hover:bg-zinc-900 rounded-full text-zinc-400 transition-colors">
+                            <X className="w-6 h-6" />
+                         </button>
+                      </div>
+                   </div>
 
-                 <div className="space-y-4 flex-1 overflow-y-auto pr-4 custom-scrollbar">
-                    {editAnchorsState.map((anchor, idx) => (
-                       <div key={idx} className="p-4 bg-zinc-900 border border-zinc-800 rounded-xl space-y-4">
-                          <div className="flex items-center justify-between">
-                             <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Anchor #{idx + 1}</span>
-                             {editAnchorsState.length > 1 && (
-                                <button onClick={() => setEditAnchorsState(editAnchorsState.filter((_, i) => i !== idx))} className="text-rose-500 hover:text-rose-400 text-[10px] font-bold uppercase tracking-wider">Remove</button>
-                             )}
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                             <div>
-                                <label className="block text-[9px] font-bold text-zinc-500 uppercase mb-1">Anchor Label</label>
-                                <input 
-                                   className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-sm text-white focus:outline-none focus:border-pink-500"
-                                   value={anchor.label}
-                                   onChange={(e) => {
-                                      const n = [...editAnchorsState];
-                                      n[idx].label = e.target.value;
-                                      setEditAnchorsState(n);
-                                   }}
-                                />
-                             </div>
-                             <div>
-                                <label className="block text-[9px] font-bold text-zinc-500 uppercase mb-1">Color Code</label>
-                                <div className="flex gap-2">
-                                  {['#ec4899', '#06b6d4', '#8b5cf6', '#10b981', '#f59e0b'].map(c => (
-                                    <button 
-                                      key={c}
-                                      onClick={() => {
+                   <div className="space-y-6 mb-12">
+                      {editAnchorsState.map((anchor, idx) => (
+                         <div key={idx} className="p-6 bg-zinc-900/50 border border-zinc-800 rounded-2xl space-y-6 backdrop-blur-sm">
+                            <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+                               <span className="text-xs font-black text-zinc-500 uppercase tracking-widest">Neural Anchor #{idx + 1}</span>
+                               {editAnchorsState.length > 1 && (
+                                  <button onClick={() => setEditAnchorsState(editAnchorsState.filter((_, i) => i !== idx))} className="text-rose-500 hover:text-rose-400 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 px-3 py-1 bg-rose-500/5 rounded-lg border border-rose-500/20">
+                                    <X className="w-3 h-3" /> Remove
+                                  </button>
+                               )}
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                               <div className="md:col-span-1">
+                                  <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-2 tracking-widest">Anchor Label</label>
+                                  <input 
+                                     className="w-full bg-black border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all"
+                                     placeholder="e.g. Technical Reliablity"
+                                     value={anchor.label}
+                                     onChange={(e) => {
                                         const n = [...editAnchorsState];
-                                        n[idx].color = c;
+                                        n[idx].label = e.target.value;
                                         setEditAnchorsState(n);
-                                      }}
-                                      className={`w-6 h-6 rounded-full border-2 transition-all ${anchor.color === c ? 'border-white scale-110 shadow-[0_0_10px_white]' : 'border-transparent opacity-50 hover:opacity-100'}`}
-                                      style={{ backgroundColor: c }}
-                                    />
-                                  ))}
-                                </div>
-                             </div>
-                             <div>
-                                <label className="block text-[9px] font-bold text-zinc-500 uppercase mb-1">Cluster Type</label>
-                                <select 
-                                   className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-sm text-white focus:outline-none focus:border-pink-500"
-                                   value={anchor.baseType}
-                                   onChange={(e) => {
-                                      const n = [...editAnchorsState];
-                                      n[idx].baseType = e.target.value;
-                                      setEditAnchorsState(n);
-                                   }}
-                                >
-                                   <option>Systemic Anchor</option>
-                                   <option>Signal Point</option>
-                                   <option>Emergent Trend</option>
-                                   <option>Risk Vector</option>
-                                </select>
-                             </div>
-                          </div>
-                       </div>
-                    ))}
-                    {editAnchorsState.length < 5 && (
-                       <button onClick={() => setEditAnchorsState([...editAnchorsState, { label: "New Anchor", color: "#ec4899", baseType: "Signal Point" }])} className="w-full p-4 border border-dashed border-zinc-800 rounded-xl text-zinc-500 hover:text-zinc-300 hover:border-zinc-700 transition-all text-sm font-bold flex items-center justify-center gap-2">
-                          <Plus className="w-4 h-4" /> Add Neural Anchor
-                       </button>
-                    )}
-                 </div>
+                                     }}
+                                  />
+                               </div>
+                               <div>
+                                  <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-2 tracking-widest">Color Coding</label>
+                                  <div className="flex gap-3 h-11 items-center">
+                                    {['#ec4899', '#06b6d4', '#8b5cf6', '#10b981', '#f59e0b'].map(c => (
+                                      <button 
+                                        key={c}
+                                        onClick={() => {
+                                          const n = [...editAnchorsState];
+                                          n[idx].color = c;
+                                          setEditAnchorsState(n);
+                                        }}
+                                        className={`w-8 h-8 rounded-full border-2 transition-all duration-300 ${anchor.color === c ? 'border-white scale-125 shadow-[0_0_15px_rgba(255,255,255,0.3)]' : 'border-transparent opacity-40 hover:opacity-100 hover:scale-110'}`}
+                                        style={{ backgroundColor: c }}
+                                      />
+                                    ))}
+                                  </div>
+                               </div>
+                               <div>
+                                  <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-2 tracking-widest">Cluster Architecture</label>
+                                  <select 
+                                     className="w-full bg-black border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 appearance-none cursor-pointer transition-all"
+                                     value={anchor.baseType}
+                                     onChange={(e) => {
+                                        const n = [...editAnchorsState];
+                                        n[idx].baseType = e.target.value;
+                                        setEditAnchorsState(n);
+                                     }}
+                                  >
+                                     <option>Systemic Anchor</option>
+                                     <option>Signal Point</option>
+                                     <option>Emergent Trend</option>
+                                     <option>Risk Vector</option>
+                                  </select>
+                               </div>
+                            </div>
+                         </div>
+                      ))}
+                      {editAnchorsState.length < 5 && (
+                         <button onClick={() => setEditAnchorsState([...editAnchorsState, { label: "New Anchor", color: "#ec4899", baseType: "Signal Point" }])} className="group w-full p-8 border-2 border-dashed border-zinc-800 hover:border-pink-500/30 rounded-2xl text-zinc-600 hover:text-pink-400 bg-zinc-950/50 hover:bg-pink-500/5 transition-all duration-500 text-sm font-bold flex flex-col items-center justify-center gap-3">
+                            <div className="p-3 bg-zinc-900 rounded-full group-hover:bg-pink-500/10 transition-colors">
+                              <Plus className="w-6 h-6" />
+                            </div>
+                            Expand Neural Network - Add Anchor
+                         </button>
+                      )}
+                   </div>
 
-                 <div className="mt-8 flex justify-end">
-                    <button
-                       onClick={handleSaveAnchors}
-                       disabled={isSavingAnchors}
-                       className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-lg shadow-pink-500/20"
-                    >
-                       {isSavingAnchors ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                       Synchronize Semantic Model
-                    </button>
+                   <div className="flex justify-end gap-4">
+                      <button onClick={() => setIsEditingAnchors(false)} className="px-8 py-4 rounded-2xl text-sm font-bold text-zinc-500 hover:text-zinc-300 transition-colors">
+                        Cancel Changes
+                      </button>
+                      <button
+                         onClick={handleSaveAnchors}
+                         disabled={isSavingAnchors}
+                         className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white px-10 py-4 rounded-2xl text-sm font-bold flex items-center gap-3 transition-all shadow-xl shadow-pink-500/20 hover:shadow-pink-500/40 transform hover:-translate-y-1"
+                      >
+                         {isSavingAnchors ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                         Synchronize Semantic Model
+                      </button>
+                   </div>
                  </div>
               </div>
             ) : null}
@@ -1078,6 +1113,7 @@ export function Overview() {
                         <div className="w-[1200px] h-[800px] flex items-center justify-center cursor-move">
                           <ResponsiveContainer width={1200} height={800}>
                             <ScatterChart margin={{ top: 100, right: 100, bottom: 100, left: 100 }}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" opacity={0.8} />
                               <XAxis type="number" dataKey="x" hide domain={[-150, 150]} />
                               <YAxis type="number" dataKey="y" hide domain={[-150, 150]} />
                               <ZAxis type="number" dataKey="size" range={[80, 800]} />
@@ -1087,7 +1123,7 @@ export function Overview() {
                                   if (active && payload && payload.length) {
                                     const data = payload[0].payload;
                                     return (
-                                      <div className="bg-zinc-950/95 border border-zinc-800 p-4 rounded-xl shadow-2xl backdrop-blur-xl border-l-4 border-l-pink-500 min-w-[200px]">
+                                      <div className="bg-zinc-950 border border-zinc-800 p-4 rounded-xl shadow-2xl backdrop-blur-xl border-l-4 border-l-pink-500 min-w-[200px]">
                                         <p className="text-[9px] font-black text-pink-500 uppercase tracking-[0.2em] mb-2">{data.type}</p>
                                         <p className="text-sm font-bold text-white mb-3">{data.label}</p>
                                         
@@ -1352,9 +1388,9 @@ export function Overview() {
                 <YAxis dataKey="stage" type="category" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
                 <ChartTooltip 
                   cursor={{ fill: '#27272a', opacity: 0.4 }} 
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '8px' }}
-                  itemStyle={{ color: '#e4e4e7' }}
-                  labelStyle={{ color: '#a1a1aa' }}
+                  contentStyle={{ backgroundColor: '#000000', borderColor: '#3f3f46', borderRadius: '8px', color: '#ffffff', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)' }}
+                  itemStyle={{ color: '#ffffff' }}
+                  labelStyle={{ color: '#ffffff' }}
                   formatter={(value) => [value, 'Volume']}
                 />
                 <Bar dataKey="amount" barSize={24} radius={[0, 4, 4, 0]}>

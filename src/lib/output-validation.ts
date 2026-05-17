@@ -171,6 +171,20 @@ export const SimulatorSchema = z.object({
 export type SimulatorResult = z.infer<typeof SimulatorSchema>;
 
 /**
+ * Amplify Schema
+ */
+export const AmplifySchema = z.object({
+  linkedin: z.string().min(10),
+  reddit: z.string().min(10),
+  twitter: z.string().min(10),
+  youtube: z.string().min(10),
+  tiktok: z.string().min(10),
+  instagram: z.string().min(10),
+});
+
+export type AmplifyResult = z.infer<typeof AmplifySchema>;
+
+/**
  * Schema Validation Result
  */
 export interface ValidationResult<T> {
