@@ -1,14 +1,21 @@
-import { GoogleGenAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 class LLMOrchestrator {
-  private genAI: GoogleGenAI;
+  private ai: GoogleGenAI;
 
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       console.warn("GEMINI_API_KEY is missing. AI features will fail.");
     }
-    this.genAI = new GoogleGenAI(apiKey || "");
+    this.ai = new GoogleGenAI({
+      apiKey: apiKey || "",
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        }
+      }
+    });
   }
 
   async executeCall<T>(params: {
@@ -19,13 +26,14 @@ class LLMOrchestrator {
     schema?: any;
   }): Promise<{ success: boolean; data?: T; error?: string; rawOutput?: string }> {
     try {
-      const model = this.genAI.getGenerativeModel({ model: params.model });
+      const response = await this.ai.models.generateContent({
+        model: params.model.includes('gemini') ? params.model : 'gemini-3-flash-preview',
+        contents: params.prompt,
+        config: params.schema ? { responseMimeType: 'application/json' } : undefined
+      });
       
-      const result = await model.generateContent(params.prompt);
-      const response = await result.response;
-      const text = response.text();
+      const text = response.text || "";
 
-      // Simple parsing - usually we want Zod/Validation here but keeping it lean for restoration
       if (params.schema) {
         try {
           // Find JSON in text

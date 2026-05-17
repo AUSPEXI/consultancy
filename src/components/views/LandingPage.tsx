@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { ArrowRight, BrainCircuit, Globe, Shield, Zap, TrendingUp, BarChart3, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 
