@@ -1,13 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, BarChart3, Globe, ShieldCheck, Zap, ArrowRight, FileText, Lock, CheckCircle2, Layout, Database, Eye, PieChart, Users, Wallet, Rocket, Cpu } from 'lucide-react';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, Cell } from 'recharts';
+import { 
+  ResponsiveContainer, 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  Tooltip, 
+  CartesianGrid, 
+  BarChart, 
+  Bar, 
+  Cell,
+  LineChart,
+  Line
+} from 'recharts';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { PitchDeckViewer } from '@/components/ui/PitchDeckViewer';
 import { UmapVisualization } from '@/components/ui/UmapVisualization';
+import { cn } from '@/lib/utils';
 
 const INVESTMENT_HIGHLIGHTS = [
   {
@@ -150,9 +164,6 @@ const PROPRIETARY_STACK = [
   }
 ];
 
-import { cn } from '@/lib/utils';
-import { AreaChart as RechartsAreaChart, Area as RechartsArea, LineChart as RechartsLineChart, Line as RechartsLine, XAxis as RechartsXAxis, YAxis as RechartsYAxis, Tooltip as RechartsTooltip, CartesianGrid as RechartsCartesianGrid } from 'recharts';
-
 function MarginExpansionChart() {
   return (
     <div className="p-8 bg-zinc-900 border border-zinc-800 rounded-3xl">
@@ -175,33 +186,33 @@ function MarginExpansionChart() {
       
       <div className="h-[250px] w-full mb-8">
         <ResponsiveContainer width="100%" height="100%">
-          <RechartsAreaChart data={MARGIN_EXPANSION_DATA}>
+          <AreaChart data={MARGIN_EXPANSION_DATA}>
             <defs>
               <linearGradient id="marginGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#ec4899" stopOpacity={0.2}/>
                 <stop offset="95%" stopColor="#ec4899" stopOpacity={0}/>
               </linearGradient>
             </defs>
-            <RechartsCartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-            <RechartsXAxis 
+            <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+            <XAxis 
               dataKey="quarter" 
               fontSize={10} 
               axisLine={false} 
               tickLine={false} 
               tick={{ fill: '#71717a' }}
             />
-            <RechartsYAxis 
+            <YAxis 
               fontSize={10} 
               axisLine={false} 
               tickLine={false} 
               tick={{ fill: '#71717a' }}
               tickFormatter={(v) => `${v}%`}
             />
-            <RechartsTooltip 
+            <Tooltip 
               contentStyle={{ backgroundColor: '#09090b', border: '1px solid #27272a' }}
               labelStyle={{ fontWeight: 'bold', color: 'white', marginBottom: '4px' }}
             />
-            <RechartsArea 
+            <Area 
               type="monotone" 
               dataKey="margin" 
               stroke="#ec4899" 
@@ -209,7 +220,7 @@ function MarginExpansionChart() {
               fill="url(#marginGrad)" 
               name="Gross Margin"
             />
-            <RechartsArea 
+            <Area 
               type="monotone" 
               dataKey="cost" 
               stroke="#52525b" 
@@ -217,7 +228,7 @@ function MarginExpansionChart() {
               fill="transparent" 
               name="Inference Cost"
             />
-          </RechartsAreaChart>
+          </AreaChart>
         </ResponsiveContainer>
       </div>
 
@@ -388,9 +399,11 @@ export function InvestorHubPage() {
   const isSuperUser = user?.email === 'hopiumcalculator@gmail.com';
 
   // Automatically show data room for super user
-  if (isSuperUser && !showDataRoom) {
-    setShowDataRoom(true);
-  }
+  useEffect(() => {
+    if (isSuperUser && !showDataRoom) {
+      setShowDataRoom(true);
+    }
+  }, [isSuperUser, showDataRoom]);
 
   const handleDownload = () => {
     setHasDownloaded(true);
@@ -419,7 +432,7 @@ export function InvestorHubPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-5xl md:text-7xl font-bold tracking-tight mb-8 font-heading"
+            className="text-4xl md:text-7xl font-bold tracking-tight mb-8 font-heading px-4"
           >
             Building the Infrastructure for the <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-pink-300">AI Search Economy</span>
@@ -507,7 +520,9 @@ export function InvestorHubPage() {
                   <Layout className="w-5 h-5 text-pink-500" />
                   <h3 className="text-lg font-semibold text-white">Latent Space Visualization (UMAP)</h3>
                 </div>
-                <UmapVisualization />
+                <div className="aspect-video w-full border border-zinc-800 rounded-2xl overflow-hidden bg-zinc-950 shadow-2xl relative">
+                  <UmapVisualization />
+                </div>
                 <div className="p-6 bg-zinc-900/30 border border-zinc-800 rounded-2xl">
                   <div className="flex items-center gap-3 mb-4">
                     <Database className="w-5 h-5 text-zinc-500" />

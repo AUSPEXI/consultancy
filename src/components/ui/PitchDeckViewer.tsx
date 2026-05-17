@@ -39,30 +39,27 @@ export function PitchDeckViewer() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   const next = () => setCurrentSlide((s) => (s + 1) % SLIDES.length);
   const prev = () => setCurrentSlide((s) => (s - 1 + SLIDES.length) % SLIDES.length);
 
   const toggleFullscreen = () => {
-    const element = document.getElementById('pitch-deck-container');
-    if (!element) return;
-
-    if (!document.fullscreenElement) {
-      element.requestFullscreen().catch((err) => {
-        console.error(`Error attempting to enable fullscreen mode: ${err.message}`);
-      });
-    } else {
-      document.exitFullscreen();
-    }
+    setIsFullscreen(!isFullscreen);
   };
 
   return (
     <div 
       id="pitch-deck-container"
-      className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl relative group"
+      className={`${
+        isFullscreen 
+          ? 'fixed inset-0 z-[10000] rounded-0 bg-black' 
+          : 'bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl relative'
+      } overflow-hidden group transition-all duration-500`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="aspect-[16/9] relative overflow-hidden bg-zinc-950">
+      <div className={`${isFullscreen ? 'h-full w-full' : 'aspect-[16/9]'} relative overflow-hidden bg-zinc-950`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
@@ -76,9 +73,9 @@ export function PitchDeckViewer() {
               alt={SLIDES[currentSlide].title}
               className="object-cover w-full h-full opacity-30"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent p-12 flex flex-col justify-end">
-              <h4 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">{SLIDES[currentSlide].title}</h4>
-              <p className="text-zinc-300 text-lg max-w-2xl leading-relaxed">{SLIDES[currentSlide].content}</p>
+            <div className={`absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent ${isFullscreen ? 'p-16 md:p-32' : 'p-6 md:p-12'} flex flex-col justify-end`}>
+              <h4 className={`${isFullscreen ? 'text-4xl md:text-6xl mb-8' : 'text-xl md:text-4xl mb-4'} font-bold text-white tracking-tight leading-tight`}>{SLIDES[currentSlide].title}</h4>
+              <p className={`${isFullscreen ? 'text-lg md:text-2xl max-w-4xl' : 'text-xs md:text-lg max-w-2xl'} text-zinc-300 leading-relaxed`}>{SLIDES[currentSlide].content}</p>
             </div>
           </motion.div>
         </AnimatePresence>
@@ -98,8 +95,8 @@ export function PitchDeckViewer() {
           <ChevronRight className="w-6 h-6" />
         </button>
 
-        {/* Slide Counter */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 z-20">
+      {/* Slide Counter Overlay */}
+      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
           {SLIDES.map((_, i) => (
             <div 
               key={i} 
@@ -109,22 +106,32 @@ export function PitchDeckViewer() {
         </div>
       </div>
 
-      <div className="p-4 border-t border-zinc-800 flex items-center justify-between bg-zinc-900/50">
+      <div className={`${isFullscreen ? 'absolute bottom-0 left-0 right-0' : ''} p-4 border-t border-zinc-800 flex items-center justify-between bg-zinc-900 shadow-xl z-50`}>
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-pink-500/10 rounded-lg">
+          <div className="p-2 bg-pink-500/10 rounded-lg hidden sm:block">
             <Maximize2 className="w-4 h-4 text-pink-400" />
           </div>
-          <span className="text-sm font-medium text-white">Auspexi Series A Deck</span>
-          <span className="text-xs font-mono text-zinc-500 ml-2">
+          <span className="text-xs md:text-sm font-medium text-white truncate max-w-[120px] sm:max-w-none">Auspexi Series A Deck</span>
+          <span className="text-[10px] md:text-xs font-mono text-zinc-500 ml-1">
             {currentSlide + 1} / {SLIDES.length}
           </span>
         </div>
-        <button 
-          onClick={toggleFullscreen}
-          className="flex items-center gap-2 text-xs font-bold text-zinc-500 hover:text-white transition-colors uppercase tracking-widest bg-zinc-800/50 px-3 py-1.5 rounded-md border border-zinc-700/50"
-        >
-          <ExternalLink className="w-3 h-3" /> Fullscreen Mode
-        </button>
+        <div className="flex gap-2">
+          {isFullscreen && (
+            <button 
+              onClick={() => setIsFullscreen(false)}
+              className="flex items-center gap-2 text-[10px] font-bold text-white transition-colors uppercase tracking-widest bg-pink-600 px-3 py-1.5 rounded-md"
+            >
+              Exit
+            </button>
+          )}
+          <button 
+            onClick={toggleFullscreen}
+            className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 hover:text-white transition-colors uppercase tracking-widest bg-zinc-800/50 px-3 py-1.5 rounded-md border border-zinc-700/50"
+          >
+            <ExternalLink className="w-3 h-3" /> {isFullscreen ? 'Restore' : 'Fullscreen'}
+          </button>
+        </div>
       </div>
     </div>
   );

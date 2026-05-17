@@ -19,6 +19,16 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
   const [hovered, setHovered] = useState<number | null>(null);
   const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
 
+  const getSentimentLabel = (index: number) => {
+    if (index % 10 === 0) return "Grounding Point";
+    return data[index].sentiment === 'positive' ? "Positive Node" : "Risk Node";
+  };
+
+  const getSentimentColor = (index: number) => {
+    if (index % 10 === 0) return "#eab308";
+    return data[index].sentiment === 'positive' ? "#10b981" : "#f43f5e";
+  };
+
   const onPointerOver = useCallback((e: any) => {
     e.stopPropagation();
     const index = e.index;
@@ -42,7 +52,7 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
     const cols = new Float32Array(data.length * 3);
     
     // Identified major clusters/anchors in the data
-    const anchorMap = new Map<string, { x: number, y: number, z: number, sentiment: string }>();
+    const anchorMap = new Map<string, { x: number, y: number, z: number, sentiment: string, isYellow: boolean }>();
 
     data.forEach((p, i) => {
       const x = p.x / 10;
@@ -53,22 +63,29 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
       pos[i * 3 + 1] = y;
       pos[i * 3 + 2] = z;
 
-      // Primary Green and Red for high visibility
-      const color = new THREE.Color(p.sentiment === 'positive' ? '#10b981' : '#f43f5e');
+      // Primary Green and Red for high visibility, but yellow for high-value nodes
+      let nodeColor = p.sentiment === 'positive' ? '#10b981' : '#f43f5e';
+      
+      // Every 10th node is a "Grounding Point" (Yellow)
+      if (i % 10 === 0) {
+        nodeColor = '#eab308'; // Tailwind yellow-500
+      }
+
+      const color = new THREE.Color(nodeColor);
       cols[i * 3] = color.r;
       cols[i * 3 + 1] = color.g;
       cols[i * 3 + 2] = color.b;
 
       // Anchor nodes from base types defined in server
-      if (p.type && (p.type.includes('Anchor') || i % 20 === 0)) {
-        anchorMap.set(p.label, { x, y, z, sentiment: p.sentiment });
+      if (p.type && (p.type.includes('Anchor') || i % 15 === 0)) {
+        anchorMap.set(p.label, { x, y, z, sentiment: p.sentiment, isYellow: true });
       }
     });
     
     return { 
       positions: pos, 
       colors: cols,
-      anchors: Array.from(anchorMap.entries()).map(([label, pos]) => ({ label, ...pos })).slice(0, 4) // Max 4 to keep focus
+      anchors: Array.from(anchorMap.entries()).map(([label, pos]) => ({ label, ...pos })).slice(0, 5) // Max 5
     };
   }, [data]);
 
@@ -110,14 +127,14 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
         >
           <div 
             className="px-3 py-2 bg-black/90 border-2 rounded-lg shadow-2xl backdrop-blur-xl min-w-[160px] animate-in fade-in zoom-in duration-100 pointer-events-none"
-            style={{ borderColor: data[hovered].sentiment === 'positive' ? '#10b98166' : '#f43f5e66' }}
+            style={{ borderColor: `${getSentimentColor(hovered)}66` }}
           >
             <div className="flex justify-between items-start mb-1">
               <p 
                 className="text-[9px] font-black uppercase tracking-[0.15em]"
-                style={{ color: data[hovered].sentiment === 'positive' ? '#10b981' : '#f43f5e' }}
+                style={{ color: getSentimentColor(hovered) }}
               >
-                {data[hovered].sentiment} Node
+                {getSentimentLabel(hovered)}
               </p>
               <div className="flex gap-0.5">
                 {[1,2,3].map(i => (
@@ -146,34 +163,42 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
           {/* Grounding line to grid */}
           <mesh position={[0, (-5 - p.y) / 2, 0]}>
             <cylinderGeometry args={[0.005, 0.05, Math.abs(-5 - p.y), 4]} />
-            <meshBasicMaterial color={p.sentiment === 'positive' ? '#00ffa3' : '#ff003c'} transparent opacity={0.2} />
+            <meshBasicMaterial color={p.isYellow ? '#eab308' : (p.sentiment === 'positive' ? '#00ffa3' : '#ff003c')} transparent opacity={0.2} />
           </mesh>
           
           {/* Grounding Ring on Grid */}
           <mesh position={[0, -5 - p.y, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <ringGeometry args={[0.4, 0.45, 32]} />
-            <meshBasicMaterial color={p.sentiment === 'positive' ? '#00ffa3' : '#ff003c'} transparent opacity={0.3} />
+            <meshBasicMaterial color={p.isYellow ? '#eab308' : (p.sentiment === 'positive' ? '#00ffa3' : '#ff003c')} transparent opacity={0.3} />
+          </mesh>
+          
+          {/* Internal Glowing Core */}
+          <mesh>
+            <sphereGeometry args={[0.15, 16, 16]} />
+            <meshBasicMaterial color={p.isYellow ? '#eab308' : (p.sentiment === 'positive' ? '#00ffa3' : '#ff003c')} />
           </mesh>
 
           {/* Floating Monolith */}
-          <mesh>
-            <boxGeometry args={[0.4, 0.8, 0.4]} />
+          <mesh position={[0, 0.2, 0]}>
+            <boxGeometry args={[0.3, 0.6, 0.3]} />
             <meshStandardMaterial 
-              color={p.sentiment === 'positive' ? '#065f46' : '#991b1b'} 
-              emissive={p.sentiment === 'positive' ? '#00ffa3' : '#ff003c'}
-              emissiveIntensity={2}
+              color={p.isYellow ? '#715808' : (p.sentiment === 'positive' ? '#065f46' : '#991b1b')} 
+              emissive={p.isYellow ? '#eab308' : (p.sentiment === 'positive' ? '#00ffa3' : '#ff003c')}
+              emissiveIntensity={3}
+              transparent
+              opacity={0.9}
             />
           </mesh>
-          <Html distanceFactor={15} position={[0, 1, 0]} center zIndexRange={[100, 0]}>
+          <Html distanceFactor={15} position={[0, 1.2, 0]} center zIndexRange={[100, 0]}>
             <div 
-              className="pointer-events-none px-4 py-2 bg-black border-2 rounded shadow-[0_0_25px_rgba(0,0,0,0.9)] transition-all duration-300"
-              style={{ borderColor: p.sentiment === 'positive' ? '#00ffa3' : '#ff003c' }}
+              className="pointer-events-none px-4 py-2 bg-black/80 backdrop-blur-md border rounded shadow-[0_0_25px_rgba(0,0,0,0.9)] transition-all duration-300 border-2"
+              style={{ borderColor: p.isYellow ? '#eab308' : (p.sentiment === 'positive' ? '#00ffa3' : '#ff003c') }}
             >
               <p 
-                className="text-[8px] font-black uppercase tracking-[0.3em] mb-0.5 opacity-60"
-                style={{ color: p.sentiment === 'positive' ? '#00ffa3' : '#ff003c' }}
+                className="text-[8px] font-black uppercase tracking-[0.3em] mb-0.5 opacity-80"
+                style={{ color: p.isYellow ? '#eab308' : (p.sentiment === 'positive' ? '#00ffa3' : '#ff003c') }}
               >
-                Anchor
+                {p.isYellow ? 'Master Anchor' : 'Semantic Anchor'}
               </p>
               <span className="text-xs font-bold text-white whitespace-nowrap tracking-tight">{p.label}</span>
             </div>
