@@ -124,10 +124,13 @@ function AppContent() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/roadmap" element={<RoadmapPage />} />
           <Route path="/investors" element={<InvestorHubPage />} />
+          <Route path="/strategy" element={<Navigate to="/#strategy" replace />} />
+          <Route path="/testimonials" element={<Navigate to="/#testimonials" replace />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/terms" element={<TermsOfServicePage />} />
           <Route path="/og-preview/:slug" element={<OGPreviewPage />} />
           <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/" />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
       {!location.pathname.startsWith('/dashboard') && <FloatingVoiceButton />}

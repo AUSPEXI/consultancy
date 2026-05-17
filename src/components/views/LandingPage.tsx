@@ -205,6 +205,18 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
     }
   ];
 
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace('#', '');
+      const element = document.getElementById(id);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
+  }, [location.hash]);
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30 overflow-x-hidden">
       {/* Navigation */}
@@ -630,10 +642,10 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 relative overflow-hidden">
-        {isDesktop && <DottedSurface className="absolute inset-0 z-0 opacity-50" />}
-        <div className="absolute inset-0 bg-zinc-800/10 z-0"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-zinc-800/20 rounded-full blur-[120px] pointer-events-none z-0"></div>
+      <section className="py-32 relative overflow-hidden min-h-[500px] bg-[#0c0c0e]">
+        {isDesktop && <DottedSurface className="absolute inset-0 z-[-1] opacity-70" />}
+        <div className="absolute inset-0 bg-zinc-900/40 z-[-2]"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-pink-500/5 rounded-full blur-[120px] pointer-events-none z-[-2]"></div>
         
         <div className="max-w-4xl mx-auto px-6 relative z-10 text-center">
           <h2 className="text-4xl md:text-6xl font-bold font-heading mb-6">Ready to dominate AI search?</h2>
