@@ -1,0 +1,147 @@
+import { useState } from 'react';
+import { MonitorPlay, Loader2, Bot, Sparkles } from 'lucide-react';
+import { GoogleGenAI, Type } from '@google/genai';
+import { useAuth } from '@/contexts/AuthContext';
+import { checkTierAccess } from '@/constants/tiers';
+import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
+import { logAuditAction } from '@/lib/audit';
+import { logSimulatorResult } from '@/lib/metrics';
+
+export function Simulator() {
+  const { tier, role, user } = useAuth();
+  const [query, setQuery] = useState('');
+  const [brand, setBrand] = useState('');
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [results, setResults] = useState<any>(null);
+
+  if (role !== 'admin' && !checkTierAccess(tier, 'Medium')) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold font-heading mb-2">Multi-Engine SOV Simulator</h1>
+          <p className="text-zinc-400">Simulate how different LLMs respond to high-intent queries and track your Share of Voice.</p>
+        </div>
+        <UpgradePrompt 
+          title="Simulator Locked" 
+          description="Upgrade to the Medium tier to access the Multi-Engine SOV Simulator and see exactly how ChatGPT, Claude, Gemini, and Perplexity view your brand."
+          requiredTier="Medium"
+        />
+      </div>
+    );
+  }
+
+  const handleSimulate = async () => {
+    if (!query.trim() || !brand.trim()) return;
+    setIsSimulating(true);
+    setResults(null);
+
+    try {
+      const res = await fetch('/api/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, brand })
+      });
+      const data = await res.json();
+      
+      if (!data.success) throw new Error(data.error);
+
+      const parsedResult = data.result;
+      setResults(parsedResult);
+      if (user) {
+        await logAuditAction(user.uid, 'Ran SOV Simulation', { query, brand, sovScore: parsedResult.sovScore });
+        await logSimulatorResult(user.uid, parsedResult.sovScore);
+      }
+    } catch (error) {
+      console.error("Error simulating:", error);
+      alert("Failed to run simulation. Please try again.");
+    } finally {
+      setIsSimulating(false);
+    }
+  };
+
+  const EngineCard = ({ name, data }: { name: string, data: any }) => (
+    <div className={`bg-zinc-900 border ${data.mentionedBrand ? 'border-emerald-500/50' : 'border-zinc-800'} rounded-xl p-5 relative overflow-hidden`}>
+      {data.mentionedBrand && (
+        <div className="absolute top-0 right-0 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-bl-lg">
+          Brand Cited
+        </div>
+      )}
+      <div className="flex items-center gap-2 mb-3">
+        <Bot className={`w-5 h-5 ${data.mentionedBrand ? 'text-emerald-400' : 'text-zinc-500'}`} />
+        <h3 className="font-semibold text-white">{name}</h3>
+      </div>
+      <p className="text-sm text-zinc-400 leading-relaxed">
+        {data.response}
+      </p>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold font-heading mb-2 flex items-center gap-3">
+          <MonitorPlay className="w-8 h-8 text-pink-500" />
+          Multi-Engine SOV Simulator
+        </h1>
+        <p className="text-zinc-400">Test high-intent queries across engines to see if your brand is recommended.</p>
+      </div>
+
+      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-zinc-400 mb-1">Target Brand</label>
+            <input
+              type="text"
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+              placeholder="e.g., Auspexi"
+              className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-pink-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-zinc-400 mb-1">User Query</label>
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="e.g., Best GEO marketing platform"
+              className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-pink-500"
+            />
+          </div>
+        </div>
+        <button
+          onClick={handleSimulate}
+          disabled={isSimulating || !query.trim() || !brand.trim()}
+          className="w-full py-3 bg-pink-600 hover:bg-pink-700 text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSimulating ? (
+            <><Loader2 className="w-5 h-5 animate-spin" /> Running Simulation...</>
+          ) : (
+            <><Sparkles className="w-5 h-5" /> Simulate Engines</>
+          )}
+        </button>
+      </div>
+
+      {results && (
+        <div className="space-y-6">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-white">Simulated AI Share of Voice (SOV)</h3>
+              <p className="text-sm text-zinc-400">Percentage of engines that cited your brand for this query.</p>
+            </div>
+            <div className="text-4xl font-bold text-pink-400">
+              {results.sovScore}%
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <EngineCard name="ChatGPT (OpenAI)" data={results.chatgpt} />
+            <EngineCard name="Claude (Anthropic)" data={results.claude} />
+            <EngineCard name="Gemini (Google)" data={results.gemini} />
+            <EngineCard name="Perplexity" data={results.perplexity} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
