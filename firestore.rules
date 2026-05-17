@@ -1,0 +1,221 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+    
+    function uidUnchanged() {
+      return !('userId' in request.resource.data) || request.resource.data.userId == request.auth.uid;
+    }
+    
+    function uidNotModified() {
+      return !('userId' in request.resource.data) || request.resource.data.userId == resource.data.userId;
+    }
+    
+    function checkRequired(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidDateString(dateStr) {
+      return dateStr is string && dateStr.matches("^\\d{4}-\\d{2}-\\d{2}.*$");
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 'role' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+          (request.auth.token.email == "hopiumcalculator@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    function isValidUser(data) {
+      return (!('email' in data) || data.email == null || (data.email is string && isValidEmail(data.email))) &&
+             (!('name' in data) || (data.name is string && data.name.size() <= 100)) &&
+             (!('role' in data) || data.role in ['admin', 'user']) &&
+             (!('uid' in data) || (data.uid is string)) &&
+             (!('tier' in data) || data.tier in ['Free', 'Basic', 'Pro', 'Business', 'Enterprise', 'PipelineOffer']) &&
+             (!('brand' in data) || (data.brand is string && data.brand.size() <= 100)) &&
+             (!('domain' in data) || (data.domain is string && data.domain.size() <= 100)) &&
+             (!('cmsWebhookUrl' in data) || (data.cmsWebhookUrl is string && data.cmsWebhookUrl.size() <= 500)) &&
+             (!('competitors' in data) || (data.competitors is list && data.competitors.size() <= 6)) &&
+             (!('keywords' in data) || (data.keywords is list && data.keywords.size() <= 10)) &&
+             (!('connectedSocials' in data) || (data.connectedSocials is list && data.connectedSocials.size() <= 10)) &&
+             (!('sentimentPrompts' in data) || (data.sentimentPrompts is list && data.sentimentPrompts.size() <= 20)) &&
+             (!('createdAt' in data) || (data.createdAt is string && isValidDateString(data.createdAt))) &&
+             (!('onboardingCompleted' in data) || data.onboardingCompleted is bool);
+    }
+
+    function isValidSovMetric(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() < 50 &&
+             data.date is string && isValidDateString(data.date) &&
+             (!('shortDate' in data) || (data.shortDate is string && data.shortDate.size() > 0 && data.shortDate.size() <= 20)) &&
+             data.aSov is number && data.aSov >= -100 && data.aSov <= 200 &&
+             (!('err' in data) || (data.err is number && data.err >= 0)) &&
+             (!('compGap' in data) || data.compGap is number) &&
+             (!('compA' in data) || data.compA is number) &&
+             (!('compB' in data) || data.compB is number) &&
+             (!('compC' in data) || data.compC is number) &&
+             (!('compD' in data) || data.compD is number) &&
+             (!('aiTraffic' in data) || data.aiTraffic is number) &&
+             (!('platforms' in data) || data.platforms is map) &&
+             (!('radar' in data) || data.radar is list) &&
+             (!('sentiment' in data) || data.sentiment is list) &&
+             (!('topUrls' in data) || data.topUrls is list);
+    }
+
+    function isValidFact(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() < 50 &&
+             data.statement is string && data.statement.size() > 0 && data.statement.size() <= 2000 &&
+             (!('entropyScore' in data) || (data.entropyScore is number && data.entropyScore >= 0 && data.entropyScore <= 100)) &&
+             (!('cliffhangerActive' in data) || data.cliffhangerActive is bool) &&
+             (!('category' in data) || (data.category is string && data.category.size() <= 100)) &&
+             (!('createdAt' in data) || (data.createdAt is string && isValidDateString(data.createdAt)));
+    }
+
+    function isValidCompetitor(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() < 50 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             (!('url' in data) || (data.url is string && data.url.size() <= 500)) &&
+             (!('decayScore' in data) || (data.decayScore is number && data.decayScore >= 0)) &&
+             (!('lastUpdated' in data) || (data.lastUpdated is string && isValidDateString(data.lastUpdated))) &&
+             (!('vulnerabilities' in data) || (data.vulnerabilities is list && data.vulnerabilities.size() <= 50)) &&
+             (!('decayStatus' in data) || data.decayStatus in ['healthy', 'decaying', 'stale']) &&
+             (!('trojanHorseOpportunity' in data) || data.trojanHorseOpportunity is bool);
+    }
+
+    function isValidLead(data) {
+      return data.email is string && isValidEmail(data.email) &&
+             data.domain is string && data.domain.size() > 0 && data.domain.size() <= 100 &&
+             (!('source' in data) || (data.source is string && data.source.size() <= 100)) &&
+              data.status in ['new', 'contacted'] &&
+             (!('createdAt' in data) || (data.createdAt is string && isValidDateString(data.createdAt)));
+    }
+
+    function isValidKnowledgeGraphNode(data) {
+      return data.userId is string && data.userId.size() <= 50 &&
+             data.topic is string && data.topic.size() > 0 && data.topic.size() <= 500 &&
+             data.fact is string && data.fact.size() > 0 && data.fact.size() <= 5000 &&
+             (!('source' in data) || (data.source is string && data.source.size() <= 500)) &&
+             (!('createdAt' in data) || (data.createdAt is string && isValidDateString(data.createdAt)));
+    }
+
+    function isValidArticle(data) {
+      return data.userId is string && data.userId.size() <= 50 &&
+             data.topic is string && data.topic.size() <= 500 &&
+             data.article is string && data.article.size() <= 50000 &&
+             (!('facts' in data) || data.facts is string) &&
+             (!('schema' in data) || data.schema is string) &&
+             (!('brand' in data) || data.brand is string) &&
+             (!('timestamp' in data) || (data.timestamp is string && isValidDateString(data.timestamp)));
+    }
+
+    function isValidLatentSpace(data) {
+      return data.userId is string && data.userId.size() <= 50 &&
+             data.points is list && data.points.size() <= 1000;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && isValidUser(request.resource.data) && ((isOwner(userId) && (!('role' in request.resource.data) || request.resource.data.role == 'user')) || isAdmin());
+      allow update: if isAuthenticated() && isValidUser(request.resource.data) && ((isOwner(userId) && (!('role' in request.resource.data) || ('role' in resource.data && request.resource.data.role == resource.data.role))) || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    match /sovMetrics/{metricId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && isValidSovMetric(request.resource.data) && uidUnchanged();
+      allow update: if isAuthenticated() && isDocOwner() && isValidSovMetric(request.resource.data) && uidNotModified();
+      allow delete: if isDocOwner();
+    }
+
+    match /facts/{factId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && isValidFact(request.resource.data) && uidUnchanged();
+      allow update: if isAuthenticated() && isDocOwner() && isValidFact(request.resource.data) && uidNotModified();
+      allow delete: if isDocOwner();
+    }
+
+    match /competitors/{competitorId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && isValidCompetitor(request.resource.data) && uidUnchanged();
+      allow update: if isAuthenticated() && isDocOwner() && isValidCompetitor(request.resource.data) && uidNotModified();
+      allow delete: if isDocOwner();
+    }
+
+    match /leads/{leadId} {
+      allow read: if isAdmin();
+      allow create: if isValidLead(request.resource.data) && request.resource.data.status == 'new';
+      allow update: if isAdmin() && isValidLead(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /audit_logs/{logId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid || isAdmin();
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isDocOwner(); // Allow delete for resetting
+      allow update: if false; // Still immutable
+    }
+    
+    // Alias for audit_logs
+    match /auditLogs/{logId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid) || isAdmin();
+      allow write: if isAuthenticated() && (request.resource == null || request.resource.data.userId == request.auth.uid) && (resource == null || resource.data.userId == request.auth.uid);
+    }
+
+    match /knowledge_graph/{nodeId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin() || !('userId' in resource.data));
+      allow create: if isAuthenticated() && isValidKnowledgeGraphNode(request.resource.data) && uidUnchanged();
+      allow update: if isAuthenticated() && isDocOwner() && isValidKnowledgeGraphNode(request.resource.data) && uidNotModified();
+      allow delete: if isDocOwner() || isAdmin();
+    }
+
+    match /articles/{articleId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && isValidArticle(request.resource.data) && uidUnchanged();
+      allow update: if isAuthenticated() && isDocOwner() && isValidArticle(request.resource.data) && uidNotModified();
+      allow delete: if isDocOwner();
+    }
+
+    match /latent_space/{mapId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && isValidLatentSpace(request.resource.data) && uidUnchanged();
+      allow update: if isAuthenticated() && isDocOwner() && isValidLatentSpace(request.resource.data) && uidNotModified();
+      allow delete: if isDocOwner();
+    }
+
+    // Temporary rules for internal components that might use these collections
+    match /competitorScans/{id} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid) && (request.resource == null || request.resource.data.userId == request.auth.uid);
+    }
+    match /contentScans/{id} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid) && (request.resource == null || request.resource.data.userId == request.auth.uid);
+    }
+    match /mentions/{id} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid) && (request.resource == null || request.resource.data.userId == request.auth.uid);
+    }
+    match /scrapes/{id} {
+       allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid) && (request.resource == null || request.resource.data.userId == request.auth.uid);
+    }
+  }
+}
