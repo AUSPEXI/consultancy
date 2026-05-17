@@ -35,7 +35,8 @@ interface LLMCallOptions {
   userId: string;
   provider: 'openai' | 'anthropic' | 'gemini';
   model: string;
-  prompt: string;
+  prompt?: string;
+  contents?: any[]; // For chat history or multi-part contents
   temperature?: number;
   maxRetries?: number;
   schema?: any; // Zod schema for validation
@@ -67,6 +68,7 @@ export class LLMOrchestrator {
       provider,
       model,
       prompt,
+      contents,
       temperature = 0.7,
       maxRetries = 3,
       schema,
@@ -95,10 +97,12 @@ export class LLMOrchestrator {
     let rawOutput: string;
     let retriesAttempted = 0;
 
+    const finalPrompt = prompt || (contents ? JSON.stringify(contents) : '');
+
     try {
       rawOutput = await callWithExponentialBackoff(
         async () => {
-          const response = await this.callProvider(provider, model, prompt, temperature);
+          const response = await this.callProvider(provider, model, finalPrompt, temperature, contents);
           return response;
         },
         provider,
@@ -249,7 +253,8 @@ export class LLMOrchestrator {
     provider: string,
     model: string,
     prompt: string,
-    temperature: number
+    temperature: number,
+    contents?: any[]
   ): Promise<string> {
     // This should be implemented with actual SDK calls
     // Shown here as a template
@@ -259,7 +264,7 @@ export class LLMOrchestrator {
       case 'anthropic':
         return this.callAnthropic(model, prompt, temperature);
       case 'gemini':
-        return this.callGemini(model, prompt, temperature);
+        return this.callGemini(model, prompt, temperature, contents);
       default:
         throw new Error(`Unknown provider: ${provider}`);
     }
@@ -284,7 +289,7 @@ export class LLMOrchestrator {
     throw new Error('Anthropic SDK not yet integrated. Please install @anthropic-ai/sdk.');
   }
 
-  private async callGemini(model: string, prompt: string, temperature: number): Promise<string> {
+  private async callGemini(model: string, prompt: string, temperature: number, contents?: any[]): Promise<string> {
     const key = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
     if (!key) throw new Error('GEMINI_API_KEY is not set');
 
@@ -293,7 +298,7 @@ export class LLMOrchestrator {
     // Using the project's preferred pattern as seen in server.ts
     const result = await genAI.models.generateContent({
       model,
-      contents: prompt,
+      contents: contents || prompt,
       config: { 
         generationConfig: { temperature }
       }
