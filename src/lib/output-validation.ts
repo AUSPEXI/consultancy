@@ -189,7 +189,7 @@ export type AmplifyResult = z.infer<typeof AmplifySchema>;
  */
 const AnchorObjectSchema = z.object({
   label: z.string().min(1).max(100),
-  color: z.string().regex(/^#[0-9a-fA-F]{6}$|rgba?\(.*\)/, 'Invalid color format'),
+  color: z.string().regex(/^#[0-9a-fA-F]{3}$|^#[0-9a-fA-F]{6}$|rgba?\(.*\)/, 'Invalid color format'),
   baseType: z.string().min(1),
 });
 

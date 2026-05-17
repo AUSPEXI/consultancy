@@ -297,19 +297,16 @@ export class LLMOrchestrator {
     throw new Error('Anthropic SDK not yet integrated. Please install @anthropic-ai/sdk.');
   }
 
-  private async callGemini(model: string, prompt: string, temperature: number, contents?: any[]): Promise<string> {
-    const key = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+  private async callGemini(modelName: string, prompt: string, temperature: number, contents?: any[]): Promise<string> {
+    const key = process.env.GEMINI_API_KEY;
     if (!key) throw new Error('GEMINI_API_KEY is not set');
 
     const genAI: any = new GoogleGenAI({ apiKey: key });
     
-    // Determine if we should request JSON mime type
-    // If prompt mentions JSON or we are using a schema later, it's safer
     const isJsonRequested = prompt.toLowerCase().includes('json') || prompt.toLowerCase().includes('schema');
 
-    // Using the project's preferred pattern as seen in server.ts
     const result = await genAI.models.generateContent({
-      model,
+      model: modelName,
       contents: contents || prompt,
       config: { 
         generationConfig: { temperature },

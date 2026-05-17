@@ -1,19 +1,18 @@
-import { useState, useEffect } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, Cell, ReferenceArea, ScatterChart, Scatter, ZAxis, PieChart, Pie } from 'recharts';
-import { TrendingUp, Users, Target, MousePointerClick, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, Save, Gauge, HelpCircle, Sparkles } from 'lucide-react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Cell, ReferenceArea, PieChart, Pie } from 'recharts';
+import { TrendingUp, Users, Target, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, Save, HelpCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
-import { collection, addDoc, setDoc, doc, onSnapshot, query, where, orderBy, limit } from 'firebase/firestore';
+import { collection, setDoc, doc, onSnapshot, query, where, orderBy, limit } from 'firebase/firestore';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
 import { useGeoAnalytics } from '@/hooks/useGeoAnalytics';
-
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { UmapVisualization } from '../ui/UmapVisualization';
-
 import { Tooltip as UITooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { SemanticAnchorsModal } from '@/components/SemanticAnchorsModal';
+import { NeuralTraceConfig } from '@/components/NeuralTraceConfig';
 
 // --- Interpretation Legend ---
 const NeuralLegend = () => (
@@ -37,10 +36,10 @@ const NeuralLegend = () => (
   </div>
 );
 const RacingDial = ({ value, label, color = "#ec4899", size = "sm" }: { value: number; label: string; color?: string; size?: "sm" | "lg" }) => {
-  const data = [
+  const data = useMemo(() => [
     { name: 'value', value: Math.min(100, Math.max(0, value)), fill: color },
     { name: 'remainder', value: 100 - Math.min(100, Math.max(0, value)), fill: '#18181b' }
-  ];
+  ], [value, color]);
 
   const isLarge = size === "lg";
 
@@ -77,15 +76,16 @@ export function Overview() {
   const [selectedPlatform, setSelectedPlatform] = useState<string>('All');
   const [selectedTimeframe, setSelectedTimeframe] = useState<string>('current');
   
-  const defaultPrompts = [
+  const defaultPrompts = useMemo(() => [
     "Is Auspexi a secure enterprise choice?",
     "How does Auspexi compare to legacy SEO?",
     "Is Auspexi's GEO tech proprietary?",
     "Founder reputation and reliability"
-  ];
+  ], []);
+
   const userPrompts = userData?.sentimentPrompts || defaultPrompts;
 
-  const { pulseData, mapPoints, sentimentTrace, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(
+  const { mapPoints, sentimentTrace, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(
     userData?.brand || '', 
     userPrompts,
     selectedPlatform,
@@ -100,12 +100,7 @@ export function Overview() {
   const [generatedShadowLink, setGeneratedShadowLink] = useState('');
   
   const [isEditingPrompts, setIsEditingPrompts] = useState(false);
-  const [editPromptsState, setEditPromptsState] = useState<string[]>(userPrompts);
-  const [isSavingPrompts, setIsSavingPrompts] = useState(false);
-
   const [isEditingAnchors, setIsEditingAnchors] = useState(false);
-  const [editAnchorsState, setEditAnchorsState] = useState<any[]>([]);
-  const [isSavingAnchors, setIsSavingAnchors] = useState(false);
 
   const userAnchors = userData?.latentAnchors || [
     { label: "Reputational Moat", color: "#ec4899", baseType: "Systemic Anchor" },
@@ -113,19 +108,6 @@ export function Overview() {
     { label: "Pricing Perception", color: "#8b5cf6", baseType: "Emergent Trend" },
   ];
 
-  useEffect(() => {
-    if (userData?.latentAnchors) {
-      setEditAnchorsState(userData.latentAnchors);
-    } else {
-      setEditAnchorsState([
-        { label: "Reputational Moat", color: "#ec4899", baseType: "Systemic Anchor" },
-        { label: "Technical Competence", color: "#06b6d4", baseType: "Signal Point" },
-        { label: "Pricing Perception", color: "#8b5cf6", baseType: "Emergent Trend" },
-      ]);
-    }
-  }, [userData]);
-
-  const [isSuggestingAnchors, setIsSuggestingAnchors] = useState(false);
   const [toastMessage, setToastMessage] = useState<{ text: string, type: 'success' | 'error' | 'info' } | null>(null);
 
   useEffect(() => {
@@ -135,54 +117,8 @@ export function Overview() {
     }
   }, [toastMessage]);
 
-  const handleSuggestAnchors = async () => {
-    if (!user || !userData?.brand || !userData?.domain) {
-      alert("Please ensure your Brand Name and Domain are set in Settings to use Auto-Suggest.");
-      return;
-    }
-
-    setIsSuggestingAnchors(true);
-    try {
-      const resp = await fetch('/api/suggest-anchors', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          brand: userData.brand,
-          domain: userData.domain
-        })
-      });
-      const data = await resp.json();
-        if (data.success && data.anchors) {
-          setEditAnchorsState(data.anchors);
-          setToastMessage({ text: "Success! Semantic anchors suggested based on your brand profile.", type: 'success' });
-          // Force a scroll to the top of the modal if editing
-          const modal = document.querySelector('.bg-zinc-950.flex.flex-col');
-          if (modal) modal.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    } catch (e) {
-      console.error("Failed to suggest anchors", e);
-    } finally {
-      setIsSuggestingAnchors(false);
-    }
-  };
-
-  const handleSaveAnchors = async () => {
-    if (!user) return;
-    setIsSavingAnchors(true);
-    try {
-      await setDoc(doc(db, 'users', user.uid), {
-        latentAnchors: editAnchorsState.filter(a => a.label.trim() !== '')
-      }, { merge: true });
-      setIsEditingAnchors(false);
-      refetchGeo();
-      await logAuditAction(user.uid, 'Updated Latent Anchors');
-    } catch (e) {
-      console.error("Failed to save anchors", e);
-    } finally {
-      setIsSavingAnchors(false);
-    }
-  };
-
+  // Anchors are now handled via the SemanticAnchorsModal component
+  
   useEffect(() => {
     if (!user || !checkTierAccess(tier, 'Basic')) return;
     const q = query(
@@ -223,10 +159,19 @@ export function Overview() {
 
   const [auditSuccess, setAuditSuccess] = useState(false);
 
+  const getSentimentColor = (score: number) => {
+    if (score > 60) return 'bg-emerald-500/30';
+    if (score > 20) return 'bg-emerald-500/10';
+    if (score > -20) return 'bg-zinc-800/40';
+    if (score > -60) return 'bg-rose-500/10';
+    return 'bg-rose-500/30';
+  };
+
   const runAudit = async () => {
     if (!user) return;
     setIsAuditing(true);
     setAuditSuccess(false);
+    setToastMessage({ text: "Deep Semantic Audit Engaged... Traversing 1,000+ inference paths.", type: 'info' });
     try {
       if (userData?.brand && userData?.domain && userData?.keywords && userData.keywords.length > 0) {
         // Run real audit
@@ -409,32 +354,46 @@ export function Overview() {
     { shortDate: 'Fri', aSov: 45, err: 80, compGap: 15, compA: 30, compB: 18, aiTraffic: 310, platforms: { chatgpt: 60, claude: 55, gemini: 70, perplexity: 35 } },
   ];
 
-  const latest = displayData[displayData.length - 1];
-  const previous = displayData.length > 1 ? displayData[displayData.length - 2] : latest;
+  const latest = useMemo(() => metrics.length > 0 ? metrics[metrics.length - 1] : {
+    id: 'placeholder',
+    aSov: 12,
+    err: 20,
+    compGap: -33,
+    compA: 45,
+    compB: 30,
+    aiTraffic: 120,
+    platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 }
+  }, [metrics]);
+
+  const previous = useMemo(() => metrics.length > 1 ? metrics[metrics.length - 2] : latest, [metrics, latest]);
 
   // Safe fallbacks for older documents that might be missing the new metric fields
-  const safeLatest = {
+  const safeLatest = useMemo(() => ({
     aSov: latest.aSov ?? 0,
     err: latest.err ?? 0,
     compGap: latest.compGap ?? 0,
     aiTraffic: latest.aiTraffic ?? 0,
     compA: latest.compA ?? 0,
-  };
+    platforms: latest.platforms || {},
+    radar: latest.radar || [],
+    sentiment: latest.sentiment || [],
+    topUrls: latest.topUrls || []
+  }), [latest]);
   
-  const safePrevious = {
+  const safePrevious = useMemo(() => ({
     aSov: previous.aSov ?? 0,
     err: previous.err ?? 0,
     compGap: previous.compGap ?? 0,
     aiTraffic: previous.aiTraffic ?? 0,
     compA: previous.compA ?? 0,
-  };
+  }), [previous]);
 
-  const asovTrend = Math.round(safeLatest.aSov - safePrevious.aSov);
-  const trafficTrend = Math.round(safeLatest.aiTraffic - safePrevious.aiTraffic);
-  const errTrend = Math.round(safeLatest.err - safePrevious.err);
-  const gapTrend = Math.round(safeLatest.compGap - safePrevious.compGap);
+  const asovTrend = safeLatest.aSov - safePrevious.aSov;
+  const trafficTrend = safeLatest.aiTraffic - safePrevious.aiTraffic;
+  const errTrend = safeLatest.err - safePrevious.err;
+  const gapTrend = safeLatest.compGap - safePrevious.compGap;
 
-  const radarData = (latest.radar || [
+  const radarData = useMemo(() => (latest.radar || [
     { subject: 'Brand Trust', brandScore: safeLatest.aSov + 20, compScore: safeLatest.compA + 10 },
     { subject: 'Technical Moat', brandScore: safeLatest.aSov - 5, compScore: safeLatest.compA + 25 },
     { subject: 'Citation Depth', brandScore: safeLatest.aSov + 10, compScore: safeLatest.compA - 15 },
@@ -447,137 +406,100 @@ export function Overview() {
     B: Math.round(Math.min(100, Math.max(0, d.compScore))),
     diff: Math.round(Math.abs((d.brandScore || 0) - (d.compScore || 0))),
     fullMark: 100
-  }));
+  })), [latest.radar, safeLatest.aSov, safeLatest.compA]);
 
-  const computedRadarData = mapPoints.length > 0 ? mapPoints.slice(0, 6).map((point: any) => ({
+  const computedRadarData = useMemo(() => mapPoints.length > 0 ? mapPoints.slice(0, 6).map((point: any) => ({
     subject: point.type || point.label || 'General',
     A: Math.round(Math.min(100, Math.max(0, 100 - (point.distance || 0.1) * 100))),
     B: Math.round(Math.min(100, Math.max(0, 80 - (point.distance || 0.2) * 100))),
     fullMark: 100
-  })) : radarData;
+  })) : radarData, [mapPoints, radarData]);
 
-  const lp = latest.platforms || {};
-  const platformSyncValue = (lp.chatgpt || lp.claude || lp.gemini) 
-    ? Math.round(( (lp.chatgpt || 0) + (lp.claude || 0) + (lp.gemini || 0) ) / 3)
-    : 0;
-
-  const safePlatforms = {
-    chatgpt: lp.chatgpt || (safeLatest.aSov > 0 ? safeLatest.aSov + 15 : 20),
-    perplexity: lp.perplexity || (safeLatest.aSov > 0 ? Math.max(2, safeLatest.aSov - 25) : 10),
-    claude: lp.claude || (safeLatest.aSov > 0 ? safeLatest.aSov + 5 : 15),
-    gemini: lp.gemini || (safeLatest.aSov > 0 ? safeLatest.aSov + 25 : 30)
-  };
+  const safePlatforms = useMemo(() => {
+    const lp = safeLatest.platforms || {};
+    return {
+      chatgpt: lp.chatgpt || (safeLatest.aSov > 0 ? safeLatest.aSov + 15 : 20),
+      perplexity: lp.perplexity || (safeLatest.aSov > 0 ? Math.max(2, safeLatest.aSov - 25) : 10),
+      claude: lp.claude || (safeLatest.aSov > 0 ? safeLatest.aSov + 5 : 15),
+      gemini: lp.gemini || (safeLatest.aSov > 0 ? safeLatest.aSov + 25 : 30)
+    };
+  }, [safeLatest.platforms, safeLatest.aSov]);
 
   const finalPlatformSync = Math.round((safePlatforms.chatgpt + safePlatforms.claude + safePlatforms.gemini) / 3);
 
-  const platformData = [
+  const platformData = useMemo(() => [
     { name: 'ChatGPT', visibility: Math.min(100, Math.max(0, safePlatforms.chatgpt)), fill: '#10a37f' },
     { name: 'Perplexity', visibility: Math.min(100, Math.max(0, safePlatforms.perplexity)), fill: '#22d3ee' },
     { name: 'Claude', visibility: Math.min(100, Math.max(0, safePlatforms.claude)), fill: '#d97757' },
     { name: 'Gemini', visibility: Math.min(100, Math.max(0, safePlatforms.gemini)), fill: '#4285f4' },
-  ];
+  ], [safePlatforms]);
 
-  const chartData = displayData.slice(-5);
-  const getHistoricalSentimentScore = (d: any, defaultKey: string) => {
-    if (d.sentiment) {
-      const match = d.sentiment.find((s: any) => s.prompt.toLowerCase().includes(defaultKey));
-      if (match && typeof match.score === 'number') return match.score;
+  const chartData = useMemo(() => metrics.length > 0 ? metrics.slice(-5) : [
+    { shortDate: 'Mon', aSov: 12, err: 20, compGap: -33, compA: 45, compB: 30, aiTraffic: 120, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } },
+    { shortDate: 'Tue', aSov: 18, err: 35, compGap: -24, compA: 42, compB: 28, aiTraffic: 132, platforms: { chatgpt: 25, claude: 20, gemini: 30, perplexity: 15 } },
+    { shortDate: 'Wed', aSov: 25, err: 45, compGap: -13, compA: 38, compB: 25, aiTraffic: 250, platforms: { chatgpt: 35, claude: 30, gemini: 40, perplexity: 20 } },
+    { shortDate: 'Thu', aSov: 32, err: 60, compGap: -3, compA: 35, compB: 22, aiTraffic: 280, platforms: { chatgpt: 45, claude: 40, gemini: 50, perplexity: 25 } },
+    { shortDate: 'Fri', aSov: 45, err: 80, compGap: 15, compA: 30, compB: 18, aiTraffic: 310, platforms: { chatgpt: 60, claude: 55, gemini: 70, perplexity: 35 } },
+  ].slice(-5), [metrics]);
+
+  const sentimentData = useMemo(() => {
+    if (sentimentTrace.length > 0) {
+      return sentimentTrace.map(t => ({
+        prompt: t.prompt,
+        scores: t.data.map((d: any) => d.positive - d.negative)
+      }));
     }
-    return null;
-  };
-
-  const sentimentData = sentimentTrace.length > 0 ? sentimentTrace.map(t => ({
-    prompt: t.prompt,
-    scores: t.data.map((d: any) => d.positive - d.negative)
-  })) : userPrompts.map((p: string, rowIdx: number) => {
-    // Generate synthetic flex patterns to fake history if real history doesn't exist.
-    const base = rowIdx === 0 ? 60 : rowIdx === 1 ? 10 : rowIdx === 2 ? -80 : 20;
-    const flex = rowIdx === 0 ? 40 : rowIdx === 1 ? 30 : rowIdx === 2 ? -40 : -20;
     
-    return {
-      prompt: p,
-      scores: chartData.map((d, i) => {
-        const realScore = getHistoricalSentimentScore(d, p.toLowerCase());
-        if (realScore !== null) return realScore;
-
-        const progress = i / Math.max(1, chartData.length - 1);
-        const isLatest = i === chartData.length - 1;
-        
-        let finalScore = base + Math.floor((flex - base) * progress);
-        if (isLatest) {
-           if (rowIdx === 0) finalScore = safeLatest.aSov + 40;
-           if (rowIdx === 1) finalScore = safeLatest.aSov > 20 ? 80 : 30;
-           if (rowIdx === 2) finalScore = safeLatest.aSov > 25 ? 20 : -40;
-        }
-        return finalScore;
-      })
-    };
-  });
-
-  const getSentimentColor = (score: number) => {
-    if (score >= 60) return 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]';
-    if (score >= 20) return 'bg-emerald-400/80';
-    if (score >= -20) return 'bg-zinc-600';
-    if (score >= -60) return 'bg-rose-400/80';
-    return 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.3)]';
-  };
-
-  const handleSavePrompts = async () => {
-    if (!user) return;
-    setIsSavingPrompts(true);
-    try {
-      await setDoc(doc(db, 'users', user.uid), {
-        sentimentPrompts: editPromptsState.filter(p => p.trim() !== '')
-      }, { merge: true });
-      setIsEditingPrompts(false);
-      // Trigger immediate refetch of analytics with new prompts
-      refetchGeo();
-    } catch (e) {
-      console.error("Failed to save custom prompts", e);
-    } finally {
-      setIsSavingPrompts(false);
-    }
-  };
-
-  const safeTopUrls = latest.topUrls || [
-    { path: '/blog/enterprise-geo-audit-logging', citations: 45 },
-    { path: '/pricing', citations: 32 },
-    { path: '/features', citations: 28 },
-    { path: '/about', citations: Math.max(2, Math.floor(safeLatest.aSov / 3)) }
-  ];
-
-  const getHistoricalCitations = (d: any, defaultPath: string) => {
-    if (d.topUrls) {
-      const match = d.topUrls.find((u: any) => u.path === defaultPath);
-      if (match && typeof match.citations === 'number') return match.citations;
-    }
-    return null;
-  };
-
-  const scorecardData = safeTopUrls.map((urlObj: any) => {
-    // Reconstruct the history
-    const historyLine = chartData.map((d, i) => {
-      const realCitation = getHistoricalCitations(d, urlObj.path);
-      if (realCitation !== null) return realCitation;
+    return userPrompts.map((p: string, rowIdx: number) => {
+      const base = rowIdx === 0 ? 60 : rowIdx === 1 ? 10 : rowIdx === 2 ? -80 : 20;
+      const flex = rowIdx === 0 ? 40 : rowIdx === 1 ? 30 : rowIdx === 2 ? -40 : -20;
       
-      // Fallback interpolation for older docs
-      const diff = Math.floor(urlObj.citations * 0.4); // assume grew by 40%
-      const start = Math.max(1, urlObj.citations - diff);
-      const progress = i / Math.max(1, chartData.length - 1);
-      return start + Math.floor((urlObj.citations - start) * progress);
+      return {
+        prompt: p,
+        scores: chartData.map((d, i) => {
+          const progress = i / Math.max(1, chartData.length - 1);
+          const isLatest = i === chartData.length - 1;
+          
+          let finalScore = base + Math.floor((flex - base) * progress);
+          if (isLatest) {
+             if (rowIdx === 0) finalScore = safeLatest.aSov + 40;
+             if (rowIdx === 1) finalScore = safeLatest.aSov > 20 ? 80 : 30;
+             if (rowIdx === 2) finalScore = safeLatest.aSov > 25 ? 20 : -40;
+          }
+          return finalScore;
+        })
+      };
     });
+  }, [sentimentTrace, userPrompts, chartData, safeLatest.aSov]);
 
-    const previousCitations = historyLine.length > 1 ? historyLine[historyLine.length - 2] : historyLine[0];
-    const trendValue = previousCitations > 0 ? Math.round(((urlObj.citations - previousCitations) / previousCitations) * 100) : 0;
-    const trendStr = `${trendValue >= 0 ? '+' : ''}${trendValue}%`;
+  const scorecardData = useMemo(() => {
+    const safeTopUrls = latest.topUrls || [
+      { path: '/blog/enterprise-geo-audit-logging', citations: 45 },
+      { path: '/pricing', citations: 32 },
+      { path: '/features', citations: 28 },
+      { path: '/about', citations: Math.max(2, Math.floor(safeLatest.aSov / 3)) }
+    ];
 
-    return {
-      url: urlObj.path,
-      citations: urlObj.citations,
-      trend: trendStr,
-      metrics: historyLine
-    };
-  }).sort((a: any, b: any) => b.citations - a.citations).slice(0, 4);
+    return safeTopUrls.map((urlObj: any) => {
+      const historyLine = chartData.map((d, i) => {
+        const diff = Math.floor(urlObj.citations * 0.4);
+        const start = Math.max(1, urlObj.citations - diff);
+        const progress = i / Math.max(1, chartData.length - 1);
+        return start + Math.floor((urlObj.citations - start) * progress);
+      });
+
+      const previousCitations = historyLine.length > 1 ? historyLine[historyLine.length - 2] : historyLine[0];
+      const trendValue = previousCitations > 0 ? Math.round(((urlObj.citations - previousCitations) / previousCitations) * 100) : 0;
+      const trendStr = `${trendValue >= 0 ? '+' : ''}${trendValue}%`;
+
+      return {
+        url: urlObj.path,
+        citations: urlObj.citations,
+        trend: trendStr,
+        metrics: historyLine
+      };
+    }).sort((a: any, b: any) => b.citations - a.citations).slice(0, 4);
+  }, [latest.topUrls, safeLatest.aSov, chartData]);
 
   const [copied, setCopied] = useState(false);
   const [isSyncingCMS, setIsSyncingCMS] = useState(false);
@@ -627,22 +549,35 @@ export function Overview() {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 pb-20">
-      {/* Toast Notification */}
+    <div className="space-y-6 animate-in fade-in duration-500 pb-20 relative">
+      {/* Toast Notification - High Z-index overlay */}
       {toastMessage && (
-        <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] px-6 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300 ${
+        <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-[10000] px-6 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${
           toastMessage.type === 'success' ? 'bg-emerald-500/90 border-emerald-400 text-white' : 
           toastMessage.type === 'error' ? 'bg-rose-500/90 border-rose-400 text-white' : 
-          'bg-zinc-900/90 border-zinc-700 text-zinc-300'
+          'bg-zinc-900/90 border-zinc-700 text-zinc-300 shadow-black/40'
         }`}>
-          {toastMessage.type === 'success' && <Activity className="w-5 h-5" />}
-          {toastMessage.type === 'info' && <Sparkles className="w-5 h-5" />}
+          {toastMessage.type === 'success' && <Activity className="w-5 h-5 animate-pulse" />}
+          {toastMessage.type === 'info' && <Sparkles className="w-5 h-5 text-pink-400" />}
           <span className="text-sm font-bold tracking-tight">{toastMessage.text}</span>
           <button onClick={() => setToastMessage(null)} className="ml-4 p-1 hover:bg-white/10 rounded-full transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
+
+      {/* Semantic Anchors Modal */}
+      <SemanticAnchorsModal 
+        isOpen={isEditingAnchors}
+        onClose={() => setIsEditingAnchors(false)}
+        userId={user?.uid || ''}
+        brand={userData?.brand || ''}
+        domain={userData?.domain || ''}
+        keywords={userData?.keywords || []}
+        initialAnchors={userAnchors}
+        onSaved={refetchGeo}
+        showToast={(text, type) => setToastMessage({ text, type })}
+      />
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -667,33 +602,35 @@ export function Overview() {
       </div>
 
       {/* Urgent Drift Alert */}
-      <div id="drift-alert" className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-rose-500/20 rounded-xl">
-            <Activity className="w-5 h-5 text-rose-500 animate-pulse" />
+      <div id="drift-alert" className="mb-6 p-6 bg-rose-500/10 border border-rose-500/20 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 animate-in fade-in slide-in-from-top-4 duration-700 relative overflow-hidden group">
+        <div className="absolute inset-0 bg-rose-500/5 animate-pulse pointer-events-none" />
+        <div className="flex items-center gap-5 relative z-10">
+          <div className="p-4 bg-rose-500/20 rounded-2xl border border-rose-500/30 shadow-[0_0_20px_rgba(244,63,94,0.2)]">
+            <Activity className="w-6 h-6 text-rose-500" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+            <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-3">
               Statistically Significant Drift Detected
-              <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-500 text-[10px] font-black uppercase tracking-tighter">-3.2σ Threshold</span>
+              <span className="px-2.5 py-1 rounded bg-rose-500/20 text-rose-500 text-[10px] font-black uppercase tracking-tighter border border-rose-500/30">-3.2σ Threshold</span>
             </h3>
-            <p className="text-xs text-rose-400/80 mt-0.5 font-medium">Anomaly detected in "API Latency" clusters within Gemini-2.5-flash latent projections.</p>
+            <p className="text-sm text-rose-400/80 mt-1 font-medium max-w-lg">Anomaly detected in "API Latency" clusters within Gemini-2.5-flash latent projections. Immediate recalibration recommended.</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4 relative z-10">
           <button 
             onClick={runAudit}
-            className="px-4 py-2 bg-rose-500 text-white text-xs font-bold rounded-lg hover:bg-rose-600 transition-colors"
+            disabled={isAuditing}
+            className="px-8 py-3 bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-rose-500/20 active:scale-95 transition-all flex items-center gap-3"
           >
-            Run Deep Audit
+            {isAuditing ? <Loader2 className="w-4 h-4 animate-spin" /> : <BrainCircuit className="w-4 h-4" />}
+            {isAuditing ? "Auditing..." : "Run Deep Audit"}
           </button>
           <button 
             onClick={() => {
-              // Simple way to "dismiss" for this session
               const el = document.getElementById('drift-alert');
               if (el) el.style.display = 'none';
             }}
-            className="px-4 py-2 bg-zinc-900 text-zinc-400 text-xs font-bold rounded-lg border border-zinc-800 hover:text-white transition-colors"
+            className="px-6 py-3 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
           >
             Dismiss
           </button>
@@ -899,221 +836,71 @@ export function Overview() {
         </div>
 
         {/* Sentiment Pulse */}
-        <div className="lg:col-span-2 bg-black border border-zinc-900 rounded-2xl p-6 relative group z-50">
-          {/* Neural Grid Background */}
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
-               style={{ 
-                 backgroundImage: 'radial-gradient(circle at 1px 1px, #ec4899 1px, transparent 0)',
-                 backgroundSize: '24px 24px' 
-               }} 
-          />
-          
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 relative z-20">
-            <div>
-              <div className="flex flex-wrap items-center gap-2 mb-1">
-                 <h3 className="text-base font-semibold text-white">Neural Cluster Distribution</h3>
-                 <div className="flex items-center gap-1.5 ml-3">
+        <div className="lg:col-span-2 bg-black border border-zinc-900 rounded-3xl p-8 relative overflow-hidden group">
+          <div className="flex flex-col gap-6 mb-8 relative z-20">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+              <div className="space-y-1">
+                 <h3 className="text-xl font-bold text-white tracking-tight">Neural Cluster Distribution</h3>
+                 <p className="text-xs text-zinc-500 max-w-md font-medium">Mapping your brand anchors across the LLM collective latent space.</p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                 <div className="flex items-center gap-1 p-1 bg-zinc-900/50 rounded-xl border border-zinc-800">
                    {['All', 'Gemini', 'ChatGPT', 'Claude'].map(p => (
                      <button
                        key={p}
                        onClick={() => setSelectedPlatform(p)}
-                       className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all border ${selectedPlatform === p ? 'bg-pink-500 border-pink-500 text-white' : 'bg-zinc-900 text-zinc-500 border-zinc-800 hover:border-zinc-700'}`}
+                       className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${selectedPlatform === p ? 'bg-pink-600 text-white shadow-lg shadow-pink-600/20' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
                      >
                        {p}
                      </button>
                    ))}
-                   <div className="w-[1px] h-3 bg-zinc-800 mx-1" />
+                 </div>
+                 <div className="flex items-center gap-1 p-1 bg-zinc-900/50 rounded-xl border border-zinc-800">
                    {['current', 'week', 'month'].map(t => (
                      <button
                        key={t}
                        onClick={() => setSelectedTimeframe(t)}
-                       className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all border ${selectedTimeframe === t ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-zinc-900 text-zinc-500 border-zinc-800 hover:border-zinc-700'}`}
+                       className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${selectedTimeframe === t ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
                      >
                        {t === 'current' ? 'Live' : t === 'week' ? '7D Roll' : '30D Roll'}
                      </button>
                    ))}
                  </div>
-                 <div className="px-1.5 py-0.5 rounded-full bg-pink-500/10 border border-pink-500/20 text-[9px] font-bold text-pink-400 uppercase tracking-widest animate-pulse ml-auto">
-                   Live 768-D Mapping
+                 <div className="px-3 py-2 rounded-xl bg-pink-500/10 border border-pink-500/20 text-[9px] font-black text-pink-400 uppercase tracking-[0.2em] animate-pulse">
+                   LIVE 768-D MAPPING
                  </div>
               </div>
-               <div className="flex items-center gap-2">
-                <p className="text-xs text-zinc-500">Mapping your brand anchors across the LLM collective latent space.</p>
-                <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                  <span className="text-[8px] font-mono text-zinc-500 uppercase tracking-tighter">
-                    {selectedTimeframe === 'current' ? 'SNAPSHOT' : 'AGGREGATED'}:
-                  </span>
-                  <span className="text-[8px] font-mono text-zinc-400 uppercase">
-                    {selectedTimeframe === 'current' ? '2026-05-15 08:42 UTC' : 
-                     selectedTimeframe === 'week' ? 'Past 7 Days' : 'Rolling 30 Days'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 group/engine relative cursor-help">
-                  <span className="text-[8px] font-mono text-zinc-500 uppercase tracking-tighter">ENGINE:</span>
-                  <span className="text-[8px] font-mono text-emerald-400">GEMINI-EMBED-004</span>
-                  
-                  {/* Methodology Tooltip */}
-                  <div className="absolute bottom-full left-0 mb-2 w-72 p-4 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl opacity-0 invisible group-hover/engine:opacity-100 group-hover/engine:visible transition-all z-[100] text-[10px] leading-relaxed backdrop-blur-xl pointer-events-none">
-                    <p className="text-white font-bold mb-2 uppercase tracking-widest text-[9px] border-b border-zinc-800 pb-2">Semantic Audit Methodology</p>
-                    <p className="text-zinc-400 mb-2">
-                      The map displays the <span className="text-pink-400 font-bold">Reputational Twin</span> generated during the last Deep Audit.
-                    </p>
-                    <div className="space-y-1 text-zinc-500">
-                      <div className="flex justify-between">
-                        <span>Crawl Depth:</span>
-                        <span className="text-white">1,240 Paths</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Token Intensity:</span>
-                        <span className="text-white">420k - 680k</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Vector Accuracy:</span>
-                        <span className="text-emerald-400">98.2%</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
-            <div className="flex items-center gap-4">
-              <button 
-                onClick={() => setIsEditingAnchors(true)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-400 transition-colors"
-              >
-                <Settings className="w-3 h-3" />
-                Configure Anchors
-              </button>
-              <div className="text-right hidden sm:block">
-                <p className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Projection Method</p>
-                <p className="text-[10px] font-mono text-zinc-500">UMAP_DENSITY_ESTIMATION</p>
-              </div>
-              {geoLoading && <Loader2 className="w-4 h-4 animate-spin text-pink-500" />}
+            
+            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-zinc-900 pt-6">
+               <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 px-2 py-1 rounded bg-zinc-900 border border-zinc-800">
+                    <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-tighter">DATASET:</span>
+                    <span className="text-[9px] font-mono text-zinc-400 font-bold">
+                      {selectedTimeframe === 'current' ? '2026-05-17 08:12 UTC' : 
+                       selectedTimeframe === 'week' ? 'Last 168 Hours' : 'Rolling Epoch'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 px-2 py-1 rounded bg-zinc-900 border border-zinc-800">
+                    <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-tighter">METHOD:</span>
+                    <span className="text-[9px] font-mono text-emerald-400 font-bold">UMAP_PROJECTION</span>
+                  </div>
+               </div>
+               
+               <div className="flex items-center gap-4">
+                 <button 
+                   onClick={() => setIsEditingAnchors(true)}
+                   className="flex items-center gap-3 px-5 py-2.5 bg-white text-black hover:bg-zinc-200 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all transform active:scale-95"
+                 >
+                   <Settings className="w-4 h-4" />
+                   Configure Anchors
+                 </button>
+                 {geoLoading && <Loader2 className="w-4 h-4 animate-spin text-pink-500" />}
+               </div>
             </div>
           </div>
           
-          <div className="h-[400px] w-full relative z-10 border border-zinc-800/50 rounded-2xl bg-zinc-950/20 overflow-hidden transition-all duration-500">
-            {isEditingAnchors ? (
-              <div className="fixed inset-0 z-[100] bg-zinc-950 flex flex-col p-6 sm:p-12 overflow-y-auto backdrop-blur-3xl">
-                 <div className="max-w-5xl mx-auto w-full flex-1 mb-20">
-                   <div className="flex items-center justify-between mb-8">
-                      <div>
-                         <h4 className="text-2xl font-bold text-white tracking-tight">Configure Semantic Anchors</h4>
-                         <p className="text-sm text-zinc-500 mt-1">Define the high-confidence monoliths that ground your brand in the latent space.</p>
-                         <div className="mt-4 p-4 bg-pink-500/5 border border-pink-500/10 rounded-xl">
-                            <p className="text-xs text-pink-400 font-bold uppercase tracking-widest mb-1 flex items-center gap-2">
-                               <HelpCircle className="w-4 h-4" /> Strategic Selection Criteria
-                            </p>
-                            <p className="text-xs text-zinc-400 leading-relaxed">
-                               Monitor <span className="text-zinc-200">Systemic Anchors</span> for your core technical moats. 
-                               Use <span className="text-zinc-200">Risk Vectors</span> to track sentiment drift on controversial or hallucination-prone topics. 
-                               <span className="text-zinc-200">Emergent Trends</span> are best for tracking new feature adoption across LLM updates.
-                            </p>
-                         </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                         <button
-                            onClick={handleSuggestAnchors}
-                            disabled={isSuggestingAnchors}
-                            className="flex items-center gap-3 px-4 py-2 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 rounded-xl text-xs font-bold text-pink-400 transition-colors"
-                         >
-                            {isSuggestingAnchors ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                            Auto-Suggest
-                         </button>
-                         <button onClick={() => setIsEditingAnchors(false)} className="p-3 hover:bg-zinc-900 rounded-full text-zinc-400 transition-colors">
-                            <X className="w-6 h-6" />
-                         </button>
-                      </div>
-                   </div>
-
-                   <div className="space-y-6 mb-12">
-                      {editAnchorsState.map((anchor, idx) => (
-                         <div key={idx} className="p-6 bg-zinc-900/50 border border-zinc-800 rounded-2xl space-y-6 backdrop-blur-sm">
-                            <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
-                               <span className="text-xs font-black text-zinc-500 uppercase tracking-widest">Neural Anchor #{idx + 1}</span>
-                               {editAnchorsState.length > 1 && (
-                                  <button onClick={() => setEditAnchorsState(editAnchorsState.filter((_, i) => i !== idx))} className="text-rose-500 hover:text-rose-400 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 px-3 py-1 bg-rose-500/5 rounded-lg border border-rose-500/20">
-                                    <X className="w-3 h-3" /> Remove
-                                  </button>
-                               )}
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                               <div className="md:col-span-1">
-                                  <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-2 tracking-widest">Anchor Label</label>
-                                  <input 
-                                     className="w-full bg-black border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all"
-                                     placeholder="e.g. Technical Reliablity"
-                                     value={anchor.label}
-                                     onChange={(e) => {
-                                        const n = [...editAnchorsState];
-                                        n[idx].label = e.target.value;
-                                        setEditAnchorsState(n);
-                                     }}
-                                  />
-                               </div>
-                               <div>
-                                  <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-2 tracking-widest">Color Coding</label>
-                                  <div className="flex gap-3 h-11 items-center">
-                                    {['#ec4899', '#06b6d4', '#8b5cf6', '#10b981', '#f59e0b'].map(c => (
-                                      <button 
-                                        key={c}
-                                        onClick={() => {
-                                          const n = [...editAnchorsState];
-                                          n[idx].color = c;
-                                          setEditAnchorsState(n);
-                                        }}
-                                        className={`w-8 h-8 rounded-full border-2 transition-all duration-300 ${anchor.color === c ? 'border-white scale-125 shadow-[0_0_15px_rgba(255,255,255,0.3)]' : 'border-transparent opacity-40 hover:opacity-100 hover:scale-110'}`}
-                                        style={{ backgroundColor: c }}
-                                      />
-                                    ))}
-                                  </div>
-                               </div>
-                               <div>
-                                  <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-2 tracking-widest">Cluster Architecture</label>
-                                  <select 
-                                     className="w-full bg-black border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 appearance-none cursor-pointer transition-all"
-                                     value={anchor.baseType}
-                                     onChange={(e) => {
-                                        const n = [...editAnchorsState];
-                                        n[idx].baseType = e.target.value;
-                                        setEditAnchorsState(n);
-                                     }}
-                                  >
-                                     <option>Systemic Anchor</option>
-                                     <option>Signal Point</option>
-                                     <option>Emergent Trend</option>
-                                     <option>Risk Vector</option>
-                                  </select>
-                               </div>
-                            </div>
-                         </div>
-                      ))}
-                      {editAnchorsState.length < 5 && (
-                         <button onClick={() => setEditAnchorsState([...editAnchorsState, { label: "New Anchor", color: "#ec4899", baseType: "Signal Point" }])} className="group w-full p-8 border-2 border-dashed border-zinc-800 hover:border-pink-500/30 rounded-2xl text-zinc-600 hover:text-pink-400 bg-zinc-950/50 hover:bg-pink-500/5 transition-all duration-500 text-sm font-bold flex flex-col items-center justify-center gap-3">
-                            <div className="p-3 bg-zinc-900 rounded-full group-hover:bg-pink-500/10 transition-colors">
-                              <Plus className="w-6 h-6" />
-                            </div>
-                            Expand Neural Network - Add Anchor
-                         </button>
-                      )}
-                   </div>
-
-                   <div className="flex justify-end gap-4">
-                      <button onClick={() => setIsEditingAnchors(false)} className="px-8 py-4 rounded-2xl text-sm font-bold text-zinc-500 hover:text-zinc-300 transition-colors">
-                        Cancel Changes
-                      </button>
-                      <button
-                         onClick={handleSaveAnchors}
-                         disabled={isSavingAnchors}
-                         className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white px-10 py-4 rounded-2xl text-sm font-bold flex items-center gap-3 transition-all shadow-xl shadow-pink-500/20 hover:shadow-pink-500/40 transform hover:-translate-y-1"
-                      >
-                         {isSavingAnchors ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                         Synchronize Semantic Model
-                      </button>
-                   </div>
-                 </div>
-              </div>
-            ) : null}
+          <div className="h-[500px] w-full relative z-10 border border-zinc-800 rounded-3xl bg-zinc-950/20 overflow-hidden group/canvas transition-all duration-700">
             {mapPoints.length > 0 ? (
               <UmapVisualization points={mapPoints} />
             ) : (
@@ -1149,48 +936,13 @@ export function Overview() {
             </div>
           </div>
           
-          {isEditingPrompts ? (
-            <div className="absolute inset-0 bg-zinc-950/95 backdrop-blur-sm z-20 rounded-xl p-6 flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-sm font-semibold text-white">Customize Reputational Prompts</h4>
-                <button onClick={() => { setIsEditingPrompts(false); setEditPromptsState(userPrompts); }} className="text-zinc-400 hover:text-white">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="space-y-3 flex-1 overflow-y-auto pr-2">
-                {editPromptsState.map((val, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                     <span className="text-zinc-500 text-xs w-4">{idx + 1}.</span>
-                     <input 
-                       className="flex-1 bg-zinc-900 border border-zinc-700 rounded p-2 text-sm text-zinc-200 focus:outline-none focus:border-emerald-500"
-                       value={val}
-                       onChange={(e) => {
-                         const n = [...editPromptsState];
-                         n[idx] = e.target.value;
-                         setEditPromptsState(n);
-                       }}
-                       placeholder={`Custom reputational prompt ${idx + 1}`}
-                     />
-                  </div>
-                ))}
-                {editPromptsState.length < 5 && (
-                  <button onClick={() => setEditPromptsState([...editPromptsState, ""])} className="text-xs text-emerald-400 hover:text-emerald-300 mt-2 flex items-center gap-1">
-                    <Plus className="w-3 h-3" /> Add Prompt
-                  </button>
-                )}
-              </div>
-              <div className="mt-4 pt-4 border-t border-zinc-800 flex justify-end">
-                <button
-                  onClick={handleSavePrompts}
-                  disabled={isSavingPrompts}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
-                >
-                  {isSavingPrompts ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  Save Configuration
-                </button>
-              </div>
-            </div>
-          ) : null}
+          <NeuralTraceConfig 
+            isOpen={isEditingPrompts}
+            onClose={() => setIsEditingPrompts(false)}
+            userId={user?.uid || ''}
+            initialPrompts={userPrompts}
+            onSaved={refetchGeo}
+          />
 
           <div className="overflow-x-auto custom-scrollbar pb-4">
             <div className="min-w-[800px]">

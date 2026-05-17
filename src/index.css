@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -6,6 +6,36 @@
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-heading: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  .prose blockquote {
+    @apply border-l-4 border-pink-500/50 bg-pink-500/5 py-4 px-6 rounded-r-xl font-normal italic text-zinc-300;
+  }
+  .prose h2 {
+    @apply text-3xl font-bold tracking-tight text-white mb-6 mt-12;
+  }
+  .prose h3 {
+    @apply text-2xl font-semibold tracking-tight text-zinc-100 mb-4 mt-8;
+  }
+  .prose p {
+    @apply leading-relaxed text-zinc-400 mb-6;
+  }
+  .prose strong {
+    @apply text-zinc-200 font-semibold;
+  }
+  .prose code {
+    @apply bg-zinc-800/50 text-zinc-300 px-1.5 py-0.5 rounded text-[0.9em] font-mono border border-zinc-700/50;
+  }
+  .prose pre {
+    @apply bg-zinc-900 border border-zinc-800 rounded-xl p-6 overflow-x-auto;
+  }
+  .prose ul, .prose ol {
+    @apply mb-6 space-y-2 text-zinc-400;
+  }
+  .prose li {
+    @apply pl-1;
+  }
 }
 
 @layer base {

@@ -6,6 +6,8 @@ import { blogPosts } from '@/data/blogPosts';
 import { BlogHero } from '@/components/BlogHero';
 import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 
 export function BlogPostPage() {
   const { slug } = useParams();
@@ -46,12 +48,14 @@ export function BlogPostPage() {
           </div>
           
           <div className="prose prose-invert prose-zinc max-w-none prose-headings:font-heading prose-headings:font-bold prose-a:text-pink-400 hover:prose-a:text-pink-300 prose-img:rounded-xl">
-            <p className="lead text-xl text-zinc-300 mb-8">
+            <p className="lead text-xl text-zinc-300 mb-8 font-medium">
               {post.excerpt}
             </p>
             
             {post.content ? (
-              <div dangerouslySetInnerHTML={{ __html: post.content }} />
+              <div className="markdown-body">
+                <ReactMarkdown rehypePlugins={[rehypeRaw]}>{post.content}</ReactMarkdown>
+              </div>
             ) : (
               <>
                 <h2>The Shift from SEO to GEO</h2>

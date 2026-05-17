@@ -3,21 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { LandingPage } from '@/components/views/LandingPage';
-import { Dashboard } from '@/components/views/Dashboard';
-import { BlogPage } from '@/components/views/BlogPage';
-import { BlogPostPage } from '@/components/views/BlogPostPage';
-import OGPreviewPage from '@/components/views/OGPreviewPage';
-import { FAQPage } from '@/components/views/FAQPage';
-import { VoiceAgentsPage } from '@/components/views/VoiceAgentsPage';
-import { AboutPage } from '@/components/views/AboutPage';
-import { RoadmapPage } from '@/components/views/RoadmapPage';
-import { InvestorHubPage } from '@/components/views/InvestorHubPage';
-import { ResourcesPage } from '@/components/views/ResourcesPage';
-import { PrivacyPolicyPage } from '@/components/views/PrivacyPolicyPage';
-import { TermsOfServicePage } from '@/components/views/TermsOfServicePage';
 import { useAuth } from '@/contexts/AuthContext';
 import { VoiceAgentProvider } from '@/contexts/VoiceAgentContext';
 import { doc, setDoc } from 'firebase/firestore';
@@ -25,6 +13,31 @@ import { db } from '@/firebase';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { FloatingVoiceButton } from '@/components/ui/floating-voice-button';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
+
+// Lazy load route components
+const Dashboard = lazy(() => import('@/components/views/Dashboard').then(m => ({ default: m.Dashboard })));
+const BlogPage = lazy(() => import('@/components/views/BlogPage').then(m => ({ default: m.BlogPage })));
+const BlogPostPage = lazy(() => import('@/components/views/BlogPostPage').then(m => ({ default: m.BlogPostPage })));
+const FAQPage = lazy(() => import('@/components/views/FAQPage').then(m => ({ default: m.FAQPage })));
+const VoiceAgentsPage = lazy(() => import('@/components/views/VoiceAgentsPage').then(m => ({ default: m.VoiceAgentsPage })));
+const AboutPage = lazy(() => import('@/components/views/AboutPage').then(m => ({ default: m.AboutPage })));
+const RoadmapPage = lazy(() => import('@/components/views/RoadmapPage').then(m => ({ default: m.RoadmapPage })));
+const InvestorHubPage = lazy(() => import('@/components/views/InvestorHubPage').then(m => ({ default: m.InvestorHubPage })));
+const ResourcesPage = lazy(() => import('@/components/views/ResourcesPage').then(m => ({ default: m.ResourcesPage })));
+const PrivacyPolicyPage = lazy(() => import('@/components/views/PrivacyPolicyPage').then(m => ({ default: m.PrivacyPolicyPage })));
+const TermsOfServicePage = lazy(() => import('@/components/views/TermsOfServicePage').then(m => ({ default: m.TermsOfServicePage })));
+const OGPreviewPage = lazy(() => import('@/components/views/OGPreviewPage'));
+
+function LoadingFallback() {
+  return (
+    <div className="flex h-screen bg-zinc-950 items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-pink-500"></div>
+        <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest animate-pulse">Syncing Hub...</p>
+      </div>
+    </div>
+  );
+}
 
 function AppContent() {
   const { user, loading, signInWithGoogle } = useAuth();
@@ -100,21 +113,23 @@ function AppContent() {
   return (
     <VoiceAgentProvider>
       <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<LandingPage onLoginClick={signInWithGoogle} />} />
-        <Route path="/blog" element={<BlogPage />} />
-        <Route path="/blog/:slug" element={<BlogPostPage />} />
-        <Route path="/faq" element={<FAQPage />} />
-        <Route path="/resources" element={<ResourcesPage />} />
-        <Route path="/voice-agents" element={<VoiceAgentsPage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/roadmap" element={<RoadmapPage />} />
-        <Route path="/investors" element={<InvestorHubPage />} />
-        <Route path="/privacy" element={<PrivacyPolicyPage />} />
-        <Route path="/terms" element={<TermsOfServicePage />} />
-        <Route path="/og-preview/:slug" element={<OGPreviewPage />} />
-        <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/" />} />
-      </Routes>
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
+          <Route path="/" element={<LandingPage onLoginClick={signInWithGoogle} />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
+          <Route path="/faq" element={<FAQPage />} />
+          <Route path="/resources" element={<ResourcesPage />} />
+          <Route path="/voice-agents" element={<VoiceAgentsPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/roadmap" element={<RoadmapPage />} />
+          <Route path="/investors" element={<InvestorHubPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms" element={<TermsOfServicePage />} />
+          <Route path="/og-preview/:slug" element={<OGPreviewPage />} />
+          <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/" />} />
+        </Routes>
+      </Suspense>
       {!location.pathname.startsWith('/dashboard') && <FloatingVoiceButton />}
     </VoiceAgentProvider>
   );

@@ -24,7 +24,7 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
     const index = e.index;
     if (index !== undefined) {
       if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
-      setHovered(index);
+      setHovered((prev) => prev === index ? prev : index);
       onHoverChange?.(true);
     }
   }, [onHoverChange]);
@@ -34,7 +34,7 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
     hoverTimeout.current = setTimeout(() => {
       setHovered(null);
       onHoverChange?.(false);
-    }, 250); // Increased debounce to 250ms for stability
+    }, 100); 
   }, [onHoverChange]);
 
   const { positions, colors, anchors } = useMemo(() => {
@@ -53,9 +53,8 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
       pos[i * 3 + 1] = y;
       pos[i * 3 + 2] = z;
 
-      // Extreme saturation for maximum contrast - Primary Green and Primary Red
-      // Using very specific HSL values for better OLED / High-Contrast viewing
-      const color = new THREE.Color(p.sentiment === 'positive' ? '#00cc66' : '#cc0033');
+      // Primary Green and Red for high visibility
+      const color = new THREE.Color(p.sentiment === 'positive' ? '#10b981' : '#f43f5e');
       cols[i * 3] = color.r;
       cols[i * 3 + 1] = color.g;
       cols[i * 3 + 2] = color.b;
@@ -107,15 +106,16 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
           pointerEvents="none"
           zIndexRange={[100, 0]}
           center
+          distanceFactor={12}
         >
           <div 
-            className="px-3 py-2 bg-black border-2 rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.7)] backdrop-blur-3xl min-w-[160px] animate-in fade-in zoom-in duration-200"
-            style={{ borderColor: data[hovered].sentiment === 'positive' ? '#00ffa366' : '#ff003c66' }}
+            className="px-3 py-2 bg-black/90 border-2 rounded-lg shadow-2xl backdrop-blur-xl min-w-[160px] animate-in fade-in zoom-in duration-100 pointer-events-none"
+            style={{ borderColor: data[hovered].sentiment === 'positive' ? '#10b98166' : '#f43f5e66' }}
           >
             <div className="flex justify-between items-start mb-1">
               <p 
                 className="text-[9px] font-black uppercase tracking-[0.15em]"
-                style={{ color: data[hovered].sentiment === 'positive' ? '#00ffa3' : '#ff003c' }}
+                style={{ color: data[hovered].sentiment === 'positive' ? '#10b981' : '#f43f5e' }}
               >
                 {data[hovered].sentiment} Node
               </p>
@@ -133,7 +133,7 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
               </div>
               <div className="flex justify-between text-[9px]">
                 <span className="text-zinc-500 font-mono">SOURCE:</span>
-                <span className="font-mono text-zinc-300 underline decoration-zinc-700 underline-offset-2">Gemini-Embed-004</span>
+                <span className="font-mono text-zinc-300">GEO_SYNC</span>
               </div>
             </div>
           </div>

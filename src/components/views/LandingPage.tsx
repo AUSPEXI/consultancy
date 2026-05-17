@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { motion } from 'motion/react';
 import { SparklesCore } from '@/components/ui/sparkles';
-import { SplineScene } from '@/components/ui/splite';
 import { BentoGrid, BentoCard } from '@/components/ui/bento-grid';
 import { GlowingEffect } from '@/components/ui/glowing-effect';
 import { PricingCard } from '@/components/ui/dark-gradient-pricing';
@@ -19,6 +18,12 @@ import { Link, useLocation } from 'react-router-dom';
 import { blogPosts } from '@/data/blogPosts';
 import { BlogHero } from '@/components/BlogHero';
 import { cn } from '@/lib/utils';
+
+// Lazy load heavy interactive components
+const SplineScene = lazy(() => import('@/components/ui/splite').then(m => ({ default: m.SplineScene })));
+
+// Memoized feature card to prevent re-renders during interactions
+const MemoizedBentoCard = React.memo(BentoCard);
 
 export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
   const { user } = useAuth();
@@ -287,10 +292,16 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
             {/* Right Column - LATENT SPACE VIZ */}
             <div className="md:col-span-7 relative h-[400px] md:h-[600px] w-full flex items-center justify-end">
               <div className="absolute inset-0 w-[120%] -right-[10%] h-full z-10">
-                <SplineScene 
-                  scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-                  className="w-full h-full"
-                />
+                <Suspense fallback={
+                  <div className="w-full h-full bg-black flex items-center justify-center">
+                    <div className="animate-pulse bg-zinc-900 w-3/4 h-3/4 rounded-full blur-3xl opacity-20" />
+                  </div>
+                }>
+                  <SplineScene 
+                    scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                    className="w-full h-full"
+                  />
+                </Suspense>
               </div>
               
               {/* Floating Latent Space Node Annotations */}
@@ -361,11 +372,11 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
             </p>
           </div>
           
-          <BentoGrid className="lg:grid-rows-3 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:grid-rows-3 max-w-5xl mx-auto">
             {features.map((feature) => (
-              <BentoCard key={feature.name} {...feature} className={feature.className + " dark"} />
+              <MemoizedBentoCard key={feature.name} {...feature} className={feature.className + " dark"} />
             ))}
-          </BentoGrid>
+          </div>
         </div>
       </section>
 
