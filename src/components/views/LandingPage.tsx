@@ -537,60 +537,68 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
             <PricingCard
               tier="Starter"
               price={currency === 'USD' ? "$99/mo" : "£79/mo"}
-              bestFor="For individuals exploring AI visibility"
+              bestFor="For individuals & early-stage founders exploring AI visibility"
               CTA="Start Now"
               onClick={() => handleCheckout('Basic')}
               benefits={[
-                { text: "Track 1 Brand, 5 Keywords", checked: true },
-                { text: "Citacious AI Copilot (Standard)", checked: true },
-                { text: "Fact-Vault Access", checked: true },
-                { text: "Basic GEO Sentiment Analysis", checked: true },
-                { text: "Weekly Brand Pulse", checked: true },
+                { text: "Track 1 Brand, 5 Target Keywords", checked: true },
+                { text: "Fact-Vault (1GB Secure Storage)", checked: true },
+                { text: "Basic Latent Space Visibility Map", checked: true },
+                { text: "7-Day Sentiment Pulse History", checked: true },
+                { text: "Weekly Brand SoV Performance Report", checked: true },
+                { text: "Standard Citacious AI Copilot", checked: true },
+                { text: "Z-Score Drift Alerting (Basic)", checked: false },
               ]}
             />
             <PricingCard
               tier="Pro"
               price={currency === 'USD' ? "$199/mo" : "£159/mo"}
-              bestFor="For lean marketing teams"
+              bestFor="For growth teams & marketing managers"
               CTA="Start Pro"
               onClick={() => handleCheckout('Pro')}
               benefits={[
-                { text: "Track 3 Brands, 10 Keywords", checked: true },
-                { text: "Full 768-D Latent Map Preview", checked: true },
-                { text: "6 Competitor Tracking", checked: true },
-                { text: "Z-Score Anomaly Alerts", checked: true },
-                { text: "Content Scorer Advanced", checked: true },
-                { text: "12-Month Citacious Memory", checked: true },
+                { text: "Track 3 Brands, 25 Keywords", checked: true },
+                { text: "Full 768-D Latent Map (Master View)", checked: true },
+                { text: "10-Competitor Sentiment Radar", checked: true },
+                { text: "Z-Score Anomaly & Drift Alerts", checked: true },
+                { text: "Fact-Vault (5GB) + Auto-Extraction", checked: true },
+                { text: "Content Scorer Pro (Direct Fixes)", checked: true },
+                { text: "12-Month Citacious Context Memory", checked: true },
+                { text: "Priority Edge Schema Deployment", checked: true },
               ]}
             />
             <PricingCard
               tier="Business"
               price={currency === 'USD' ? "$499/mo" : "£399/mo"}
-              bestFor="For mid-market SaaS & brands"
+              bestFor="For mid-market SaaS & high-growth brands"
               CTA="Start Business"
               onClick={() => handleCheckout('Business')}
               benefits={[
-                { text: "Track 50 Keywords", checked: true },
-                { text: "Autonomous Social Seeding", checked: true },
-                { text: "Z-Score Predictive Alerts", checked: true },
-                { text: "Reddit & LinkedIn Automation", checked: true },
-                { text: "Unlimited Brand Tracking", checked: true },
-                { text: "Full API Access (Beta)", checked: true },
+                { text: "Track 10 Brands, 100 Keywords", checked: true },
+                { text: "Autonomous Social Seeding (Omnichannel)", checked: true },
+                { text: "Reddit & LinkedIn Fact-Maxing Bot", checked: true },
+                { text: "Advanced Competitor Overwrite Strategy", checked: true },
+                { text: "Unlimited Fact-Vault Capacity", checked: true },
+                { text: "Full API Access for GEO Integrations", checked: true },
+                { text: "Predictive Sentiment Modeling", checked: true },
+                { text: "Weekly Strategic Analyst Session", checked: true },
               ]}
             />
             <PricingCard
               tier="Enterprise"
               price={currency === 'USD' ? "$2,500+/mo" : "£2,000+/mo"}
-              bestFor="For Fortune 500 market leaders"
+              bestFor="For Fortune 500 market leaders & agencies"
               CTA="Talk to AI Sales"
-              onClick={() => window.location.href = '/voice-agents'}
+              onClick={() => window.location.href = 'mailto:sales@auspexi.com'}
               benefits={[
                 { text: "Unlimited Keywords & Competitors", checked: true },
-                { text: "Custom SLM Fine-tuning", checked: true },
-                { text: "Full 768-D Latent Map Access", checked: true },
-                { text: "Dedicated ML Engineer (Retainer)", checked: true },
-                { text: "SOC2 Compliance Integration", checked: true },
-                { text: "Private pgvector Instance", checked: true },
+                { text: "Custom SLM Fine-tuning (Private Cloud)", checked: true },
+                { text: "Dedicated ML Engineer Retainer", checked: true },
+                { text: "SOC2 Compliance & SSO Integration", checked: true },
+                { text: "Historical Context Overwrite Cluster", checked: true },
+                { text: "Private pgvector Instance (50M+)", checked: true },
+                { text: "Custom Board-Ready Reporting", checked: true },
+                { text: "Whitelabel GEO Dashboard", checked: true },
               ]}
             />
           </div>
