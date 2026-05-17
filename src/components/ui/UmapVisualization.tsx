@@ -15,9 +15,28 @@ interface MapPoint {
 }
 
 function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHoverChange?: (hovered: boolean) => void }) {
-  const ref = useRef<THREE.Points>(null!);
+  const pointRef = useRef<THREE.Points>(null!);
   const [hovered, setHovered] = useState<number | null>(null);
-  
+  const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const onPointerOver = useCallback((e: any) => {
+    e.stopPropagation();
+    const index = e.index;
+    if (index !== undefined) {
+      if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+      setHovered(index);
+      onHoverChange?.(true);
+    }
+  }, [onHoverChange]);
+
+  const onPointerOut = useCallback(() => {
+    if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+    hoverTimeout.current = setTimeout(() => {
+      setHovered(null);
+      onHoverChange?.(false);
+    }, 250); // Increased debounce to 250ms for stability
+  }, [onHoverChange]);
+
   const { positions, colors, anchors } = useMemo(() => {
     const pos = new Float32Array(data.length * 3);
     const cols = new Float32Array(data.length * 3);
@@ -25,7 +44,7 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
     // Identified major clusters/anchors in the data
     const anchorMap = new Map<string, { x: number, y: number, z: number, sentiment: string }>();
 
-      data.forEach((p, i) => {
+    data.forEach((p, i) => {
       const x = p.x / 10;
       const y = p.y / 10;
       const z = (p.z || 0) / 10;
@@ -54,21 +73,6 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
     };
   }, [data]);
 
-  const onPointerOver = useCallback((e: any) => {
-    e.stopPropagation();
-    const index = e.index;
-    if (index !== undefined) {
-      setHovered(index);
-      onHoverChange?.(true);
-    }
-  }, [onHoverChange]);
-
-  const onPointerOut = useCallback((e: any) => {
-    // To prevent flicker when moving between points, we only clear if we are truly leaving
-    setHovered(null);
-    onHoverChange?.(false);
-  }, [onHoverChange]);
-
   useFrame((state) => {
     // Rotation is now handled by OrbitControls to avoid conflict
   });
@@ -76,13 +80,14 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[], onHov
   return (
     <group>
       <Points 
-        ref={ref} 
+        ref={pointRef} 
         positions={positions} 
         colors={colors} 
         stride={3} 
         frustumCulled={false}
         onPointerOver={onPointerOver}
         onPointerOut={onPointerOut}
+        limit={data.length}
       >
         <PointMaterial
           transparent

@@ -74,7 +74,6 @@ const RacingDial = ({ value, label, color = "#ec4899", size = "sm" }: { value: n
 
 export function Overview() {
   const { user, tier, userData, role } = useAuth();
-  const [latentView, setLatentView] = useState<'2d' | '3d'>('2d');
   const [selectedPlatform, setSelectedPlatform] = useState<string>('All');
   const [selectedTimeframe, setSelectedTimeframe] = useState<string>('current');
   
@@ -127,6 +126,14 @@ export function Overview() {
   }, [userData]);
 
   const [isSuggestingAnchors, setIsSuggestingAnchors] = useState(false);
+  const [toastMessage, setToastMessage] = useState<{ text: string, type: 'success' | 'error' | 'info' } | null>(null);
+
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => setToastMessage(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
 
   const handleSuggestAnchors = async () => {
     if (!user || !userData?.brand || !userData?.domain) {
@@ -145,9 +152,13 @@ export function Overview() {
         })
       });
       const data = await resp.json();
-      if (data.success && data.anchors) {
-        setEditAnchorsState(data.anchors);
-      }
+        if (data.success && data.anchors) {
+          setEditAnchorsState(data.anchors);
+          setToastMessage({ text: "Success! Semantic anchors suggested based on your brand profile.", type: 'success' });
+          // Force a scroll to the top of the modal if editing
+          const modal = document.querySelector('.bg-zinc-950.flex.flex-col');
+          if (modal) modal.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     } catch (e) {
       console.error("Failed to suggest anchors", e);
     } finally {
@@ -248,6 +259,9 @@ export function Overview() {
           }, { merge: true });
           await logAuditAction(user.uid, 'Ran Real SOV Audit', { date: dateStr });
           setAuditSuccess(true);
+          setToastMessage({ text: "Audit Complete! Fresh metrics have been synchronized with your Neural Twin.", type: 'success' });
+          // Trigger a refresh of all dependent data
+          refetchGeo();
         } else {
           throw new Error(data.error || 'Failed to run audit');
         }
@@ -348,6 +362,7 @@ export function Overview() {
         }, { merge: true });
         await logAuditAction(user.uid, 'Ran Simulated SOV Audit', { date: dateStr });
         setAuditSuccess(true);
+        setToastMessage({ text: "Simulated Audit Complete! Data generated for demo purposes.", type: 'info' });
       }
       setTimeout(() => setAuditSuccess(false), 3000);
     } catch (error) {
@@ -612,7 +627,23 @@ export function Overview() {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500 pb-20">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] px-6 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300 ${
+          toastMessage.type === 'success' ? 'bg-emerald-500/90 border-emerald-400 text-white' : 
+          toastMessage.type === 'error' ? 'bg-rose-500/90 border-rose-400 text-white' : 
+          'bg-zinc-900/90 border-zinc-700 text-zinc-300'
+        }`}>
+          {toastMessage.type === 'success' && <Activity className="w-5 h-5" />}
+          {toastMessage.type === 'info' && <Sparkles className="w-5 h-5" />}
+          <span className="text-sm font-bold tracking-tight">{toastMessage.text}</span>
+          <button onClick={() => setToastMessage(null)} className="ml-4 p-1 hover:bg-white/10 rounded-full transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Executive Performance Hub</h1>
@@ -636,7 +667,7 @@ export function Overview() {
       </div>
 
       {/* Urgent Drift Alert */}
-      <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
+      <div id="drift-alert" className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
         <div className="flex items-center gap-4">
           <div className="p-3 bg-rose-500/20 rounded-xl">
             <Activity className="w-5 h-5 text-rose-500 animate-pulse" />
@@ -650,10 +681,20 @@ export function Overview() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button className="px-4 py-2 bg-rose-500 text-white text-xs font-bold rounded-lg hover:bg-rose-600 transition-colors">
+          <button 
+            onClick={runAudit}
+            className="px-4 py-2 bg-rose-500 text-white text-xs font-bold rounded-lg hover:bg-rose-600 transition-colors"
+          >
             Run Deep Audit
           </button>
-          <button className="px-4 py-2 bg-zinc-900 text-zinc-400 text-xs font-bold rounded-lg border border-zinc-800 hover:text-white transition-colors">
+          <button 
+            onClick={() => {
+              // Simple way to "dismiss" for this session
+              const el = document.getElementById('drift-alert');
+              if (el) el.style.display = 'none';
+            }}
+            className="px-4 py-2 bg-zinc-900 text-zinc-400 text-xs font-bold rounded-lg border border-zinc-800 hover:text-white transition-colors"
+          >
             Dismiss
           </button>
         </div>
@@ -882,19 +923,6 @@ export function Overview() {
                      </button>
                    ))}
                    <div className="w-[1px] h-3 bg-zinc-800 mx-1" />
-                   <button 
-                     onClick={() => setLatentView('2d')}
-                     className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all ${latentView === '2d' ? 'bg-zinc-900 text-pink-400 border border-pink-500/30' : 'bg-zinc-900 text-zinc-500 border border-zinc-800'}`}
-                   >
-                     2D
-                   </button>
-                   <button 
-                     onClick={() => setLatentView('3d')}
-                     className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all ${latentView === '3d' ? 'bg-zinc-900 text-pink-400 border border-pink-500/30' : 'bg-zinc-900 text-zinc-500 border border-zinc-800'}`}
-                   >
-                     3D
-                   </button>
-                   <div className="w-[1px] h-3 bg-zinc-800 mx-1" />
                    {['current', 'week', 'month'].map(t => (
                      <button
                        key={t}
@@ -964,10 +992,10 @@ export function Overview() {
             </div>
           </div>
           
-          <div className={`${isEditingAnchors ? 'h-auto' : 'h-[400px]'} w-full relative z-10 border border-zinc-800/50 rounded-2xl bg-zinc-950/20 overflow-hidden transition-all duration-500`}>
+          <div className="h-[400px] w-full relative z-10 border border-zinc-800/50 rounded-2xl bg-zinc-950/20 overflow-hidden transition-all duration-500">
             {isEditingAnchors ? (
               <div className="fixed inset-0 z-[100] bg-zinc-950 flex flex-col p-6 sm:p-12 overflow-y-auto backdrop-blur-3xl">
-                 <div className="max-w-5xl mx-auto w-full flex-1">
+                 <div className="max-w-5xl mx-auto w-full flex-1 mb-20">
                    <div className="flex items-center justify-between mb-8">
                       <div>
                          <h4 className="text-2xl font-bold text-white tracking-tight">Configure Semantic Anchors</h4>
@@ -1087,96 +1115,7 @@ export function Overview() {
               </div>
             ) : null}
             {mapPoints.length > 0 ? (
-              latentView === '2d' ? (
-                <TransformWrapper
-                  initialScale={1}
-                  initialPositionX={0}
-                  initialPositionY={0}
-                  minScale={0.5}
-                  maxScale={4}
-                >
-                  {({ zoomIn, zoomOut, resetTransform }) => (
-                    <>
-                      <div className="absolute top-4 right-4 z-20 flex gap-1">
-                        <button onClick={() => zoomIn()} className="p-1.5 bg-zinc-900/80 backdrop-blur-md border border-zinc-800 rounded text-white hover:bg-zinc-800 transition-colors">
-                          <Plus className="w-3 h-3" />
-                        </button>
-                        <button onClick={() => zoomOut()} className="p-1.5 bg-zinc-900/80 backdrop-blur-md border border-zinc-800 rounded text-white hover:bg-zinc-800 transition-colors">
-                          <Activity className="w-3 h-3 -rotate-90" />
-                        </button>
-                        <button onClick={() => resetTransform()} className="p-1.5 bg-zinc-900/80 backdrop-blur-md border border-zinc-800 rounded text-white hover:bg-zinc-800 transition-colors">
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                      
-                      <TransformComponent wrapperStyle={{ width: "100%", height: "100%" }}>
-                        <div className="w-[1200px] h-[800px] flex items-center justify-center cursor-move">
-                          <ResponsiveContainer width={1200} height={800}>
-                            <ScatterChart margin={{ top: 100, right: 100, bottom: 100, left: 100 }}>
-                              <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" opacity={0.8} />
-                              <XAxis type="number" dataKey="x" hide domain={[-150, 150]} />
-                              <YAxis type="number" dataKey="y" hide domain={[-150, 150]} />
-                              <ZAxis type="number" dataKey="size" range={[80, 800]} />
-                              <ChartTooltip 
-                                cursor={{ strokeDasharray: '3 3', stroke: '#ec4899', strokeOpacity: 0.3 }}
-                                content={({ active, payload }) => {
-                                  if (active && payload && payload.length) {
-                                    const data = payload[0].payload;
-                                    return (
-                                      <div className="bg-zinc-950 border border-zinc-800 p-4 rounded-xl shadow-2xl backdrop-blur-xl border-l-4 border-l-pink-500 min-w-[200px]">
-                                        <p className="text-[9px] font-black text-pink-500 uppercase tracking-[0.2em] mb-2">{data.type}</p>
-                                        <p className="text-sm font-bold text-white mb-3">{data.label}</p>
-                                        
-                                        <div className="space-y-2">
-                                          <div className="flex justify-between items-center text-[10px]">
-                                            <span className="text-zinc-500">SEMANTIC STRENGTH</span>
-                                            <span className="text-white font-mono">{Math.round((1 - data.distance) * 100)}%</span>
-                                          </div>
-                                          <div className="h-1 w-full bg-zinc-900 rounded-full overflow-hidden">
-                                             <div className={`h-full ${data.sentiment === 'positive' ? 'bg-emerald-500' : 'bg-pink-500'} rounded-full`} style={{ width: `${(1 - data.distance) * 100}%` }} />
-                                          </div>
-                                        </div>
-
-                                        <div className="flex justify-between items-center mt-4 pt-4 border-t border-zinc-800/50">
-                                           <div className="flex items-center gap-1.5">
-                                             <div className={`w-1.5 h-1.5 rounded-full ${data.sentiment === 'positive' ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-pink-500 shadow-[0_0_8px_#ec4899]'}`} />
-                                             <span className={`text-[10px] font-bold uppercase ${data.sentiment === 'positive' ? 'text-emerald-400' : 'text-pink-400'}`}>
-                                               {data.sentiment === 'positive' ? 'Positive Citation' : 'Risk Detected'}
-                                             </span>
-                                           </div>
-                                           <span className="text-[9px] text-zinc-600 font-mono">ID: {data.id}</span>
-                                        </div>
-                                      </div>
-                                    );
-                                  }
-                                  return null;
-                                }}
-                              />
-                              <Scatter name="Latent Nodes" data={mapPoints}>
-                                {mapPoints.map((entry: any, index: number) => (
-                                  <Cell 
-                                    key={`cell-${index}`} 
-                                    fill={entry.sentiment === 'positive' ? '#10b981' : '#ec4899'} 
-                                    fillOpacity={0.4}
-                                    stroke={entry.sentiment === 'positive' ? '#10b981' : '#ec4899'}
-                                    strokeWidth={1}
-                                    className="transition-all duration-300"
-                                    style={{ 
-                                      filter: `blur(${entry.distance * 1.5}px) drop-shadow(0 0 15px ${entry.sentiment === 'positive' ? '#10b98144' : '#ec489944'})`
-                                    }}
-                                  />
-                                ))}
-                              </Scatter>
-                            </ScatterChart>
-                          </ResponsiveContainer>
-                        </div>
-                      </TransformComponent>
-                    </>
-                  )}
-                </TransformWrapper>
-              ) : (
-                <UmapVisualization points={mapPoints} />
-              )
+              <UmapVisualization points={mapPoints} />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center border border-dashed border-zinc-800 rounded-2xl">
                 <BrainCircuit className="w-10 h-10 text-zinc-800 mb-4" />
