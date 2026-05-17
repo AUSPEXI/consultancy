@@ -21,7 +21,8 @@ import {
   FactExtractionSchema, 
   BrandMonitorSchema, 
   SimulatorSchema,
-  AmplifySchema 
+  AmplifySchema,
+  AnchorsSchema 
 } from './src/lib/output-validation';
 import { vectorStore } from './src/lib/vector-db';
 
@@ -1052,18 +1053,18 @@ app.use(express.json());
       `;
 
       const result = await llmOrchestrator.executeCall<any>({
-        userId,
+        userId: userId || 'anonymous',
         provider: 'gemini',
         model: 'gemini-1.5-flash',
-        prompt
+        prompt,
+        schema: AnchorsSchema
       });
 
       if (!result.success) {
         return res.status(500).json({ error: result.error, validationErrors: result.validationErrors });
       }
 
-      const anchors = JSON.parse(result.rawOutput || "[]");
-      res.json({ success: true, anchors });
+      res.json({ success: true, anchors: result.data });
     } catch (err: any) {
       console.error("Suggest anchors error:", err);
       res.status(500).json({ error: "Failed to suggest anchors" });
