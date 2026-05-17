@@ -1,6 +1,0 @@
-{
-  "name": "Auspexi | Generative Engine Optimization",
-  "description": "The enterprise standard for Generative Engine Optimization (GEO). Protecting brand reputation and securing Share of Voice across ChatGPT, Gemini, and Claude through proprietary latent space mapping.",
-  "requestFramePermissions": ["microphone"],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
