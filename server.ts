@@ -708,12 +708,10 @@ app.use(express.json());
 
   app.post("/api/simulate", async (req, res) => {
     try {
-      const { query, brand } = req.body;
+      const { query, brand, userId = 'anonymous' } = req.body;
       if (!query || !brand) {
         return res.status(400).json({ error: "Missing query or brand" });
       }
-
-      const ai = getGemini();
 
       const prompt = `
         You are an advanced AI simulation engine.
@@ -731,16 +729,19 @@ app.use(express.json());
         - sovScore: number (0 to 100, based on how many mentioned the brand)
       `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-1.5-pro",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-        }
+      const result = await llmOrchestrator.executeCall<any>({
+        userId,
+        provider: 'gemini',
+        model: 'gemini-1.5-pro',
+        prompt,
+        schema: SimulatorSchema
       });
 
-      const parsed = JSON.parse(response.text || "{}");
-      res.json({ success: true, result: parsed });
+      if (!result.success) {
+        return res.status(500).json({ error: result.error, validationErrors: result.validationErrors });
+      }
+
+      res.json({ success: true, result: result.data });
     } catch (err: any) {
       console.error("Simulation endpoint error:", err);
       res.status(500).json({ error: "Failed to run simulation" });
@@ -749,7 +750,7 @@ app.use(express.json());
 
   app.post("/api/analyze-competitor", async (req, res) => {
     try {
-      const { hostname } = req.body;
+      const { hostname, userId = 'anonymous' } = req.body;
       if (!hostname) return res.status(400).json({ error: "Missing hostname" });
 
       const exa = getExa();
@@ -759,8 +760,6 @@ app.use(express.json());
         ? exaRes.results.map((r: any) => `Title: ${r.title}\nText: ${r.text}`).join("\n\n")
         : "No direct scraping data available. Analyze the domain logically based on typical corporate decay patterns.";
         
-      const ai = getGemini();
-
       const prompt = `
           You are an expert Generative Engine Optimization (GEO) agent.
           Analyze the competitor at the following domain: ${hostname}
@@ -776,15 +775,18 @@ app.use(express.json());
            - vulnerabilities: array of strings (specific weaknesses found)
         `;
 
-        const responseComp = await ai.models.generateContent({
-          model: "gemini-1.5-pro",
-          contents: prompt,
-          config: {
-            responseMimeType: "application/json",
-          }
+        const result = await llmOrchestrator.executeCall<any>({
+          userId,
+          provider: 'gemini',
+          model: 'gemini-1.5-pro',
+          prompt
         });
 
-        const parsedComp = JSON.parse(responseComp.text || "{}");
+        if (!result.success) {
+          return res.status(500).json({ error: result.error });
+        }
+
+        const parsedComp = JSON.parse(result.rawOutput || "{}");
         res.json({ success: true, result: { name: hostname, ...parsedComp } });
     } catch (err: any) {
       console.error("Analyze competitor endpoint error:", err);
@@ -794,11 +796,9 @@ app.use(express.json());
 
   app.post("/api/technical-restructure", async (req, res) => {
     try {
-      const { text } = req.body;
+      const { text, userId = 'anonymous' } = req.body;
       if (!text) return res.status(400).json({ error: "Missing text to restructure" });
 
-      const ai = getGemini();
-      
       const prompt = `
         You are an expert Generative Engine Optimization (GEO) agent.
         Analyze the following text. Identify the most "dense" or "fluffy" paragraph that contains data, pricing, or comparisons trapped in a narrative format.
@@ -812,15 +812,18 @@ app.use(express.json());
         - 'htmlTable' (string): The raw HTML code for the table (just the <table> element and its contents, use Tailwind classes like 'w-full text-left text-xs text-zinc-300' for the table, 'bg-zinc-800/50' for thead, and 'p-2' for th/td).
       `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-        }
+      const result = await llmOrchestrator.executeCall<any>({
+        userId,
+        provider: 'gemini',
+        model: 'gemini-1.5-flash',
+        prompt
       });
 
-      const parsedRes = JSON.parse(response.text || "{}");
+      if (!result.success) {
+        return res.status(500).json({ error: result.error });
+      }
+
+      const parsedRes = JSON.parse(result.rawOutput || "{}");
       res.json({ success: true, result: parsedRes });
     } catch (err: any) {
       console.error("Technical Restructure error:", err);
@@ -830,11 +833,9 @@ app.use(express.json());
 
   app.post("/api/technical-schema", async (req, res) => {
     try {
-      const { factText } = req.body;
+      const { factText, userId = 'anonymous' } = req.body;
       if (!factText) return res.status(400).json({ error: "Missing factText" });
 
-      const ai = getGemini();
-      
       const prompt = `
         You are an expert Technical SEO and GEO agent.
         Convert the following fact or statement into a highly structured JSON-LD Schema (FAQPage, Organization, or Product, whichever fits best).
@@ -845,15 +846,18 @@ app.use(express.json());
         Return ONLY a valid JSON object representing the JSON-LD schema. Do not wrap in markdown blocks.
       `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-        }
+      const result = await llmOrchestrator.executeCall<any>({
+        userId,
+        provider: 'gemini',
+        model: 'gemini-1.5-flash',
+        prompt
       });
 
-      res.json({ success: true, schema: response.text });
+      if (!result.success) {
+        return res.status(500).json({ error: result.error });
+      }
+
+      res.json({ success: true, schema: result.rawOutput });
     } catch (err: any) {
       console.error("Technical Schema error:", err);
       res.status(500).json({ error: "Failed to generate schema" });
@@ -888,8 +892,13 @@ app.use(express.json());
               CRITICAL: Prefix the report with a realistic external source (e.g., "According to the Forrester 2024 AI Index:", "A recent study by MIT CSAIL found..."). Do NOT author it yourself.
               Make it at least 400 words of dense facts.
             `;
-            const fbRes = await ai.models.generateContent({ model: "gemini-1.5-flash", contents: fallbackPrompt });
-            crawlerData = fbRes.text || `Raw data found for ${topic}: No detailed data available.`;
+        const result = await llmOrchestrator.executeCall<string>({
+          userId: 'agent-user',
+          provider: 'gemini',
+          model: 'gemini-1.5-flash',
+          prompt: fallbackPrompt
+        });
+        crawlerData = result.rawOutput || `Raw data found for ${topic}: No detailed data available.`;
       }
       res.json({ success: true, result: crawlerData });
     } catch (err: any) {
@@ -914,8 +923,13 @@ app.use(express.json());
         ${vaultContext ? `\nCRUCIAL BRAND FACTS FROM VAULT (Include these in your extracted list):\n- ${vaultContext}` : ''}
       `;
 
-      const response = await ai.models.generateContent({ model: "gemini-1.5-flash", contents: extractPrompt});
-      res.json({ success: true, result: response.text });
+      const result = await llmOrchestrator.executeCall<string>({
+        userId: 'agent-user',
+        provider: 'gemini',
+        model: 'gemini-1.5-flash',
+        prompt: extractPrompt
+      });
+      res.json({ success: true, result: result.rawOutput });
     } catch (err: any) {
        console.error("Agent extract error:", err);
        res.status(500).json({ error: "Failed to extract" });
@@ -931,8 +945,13 @@ app.use(express.json());
         Do not write any markdown formatting or explanations. Output ONLY raw JSON.
         Facts: ${facts}
       `;
-      const response = await ai.models.generateContent({ model: "gemini-1.5-flash", contents: schemaPrompt });
-      let text = response.text || "{}";
+      const result = await llmOrchestrator.executeCall<string>({
+        userId: 'agent-user',
+        provider: 'gemini',
+        model: 'gemini-1.5-flash',
+        prompt: schemaPrompt
+      });
+      let text = result.rawOutput || "{}";
       text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
       res.json({ success: true, result: text });
      } catch (err: any) {
@@ -943,8 +962,7 @@ app.use(express.json());
 
   app.post("/api/agent/synthesize", async (req, res) => {
      try {
-        const { topic, facts, brandName } = req.body;
-        const ai = getGemini();
+        const { topic, facts, brandName, userId = 'agent-user' } = req.body;
         const synthesisPrompt = `
         You are the Synthesis Agent writing on behalf of the brand "${brandName || 'Auspexi'}". 
         Write a comprehensive, deep-dive blog post (minimum 500 words) about "${topic}".
@@ -966,8 +984,20 @@ app.use(express.json());
         
         Do not write generic PR fluff. Speak to Technical SEOs and Enterprise Marketing Directors. Use markdown formatting (H2, H3, bullet points). Ensure the final length is at least 500 words.
       `;
-      const response = await ai.models.generateContent({ model: "gemini-1.5-pro", contents: synthesisPrompt });
-      res.json({ success: true, result: response.text });
+
+      const result = await llmOrchestrator.executeCall<string>({
+        userId,
+        provider: 'gemini',
+        model: 'gemini-1.5-pro',
+        prompt: synthesisPrompt,
+        temperature: 0.7
+      });
+
+      if (!result.success) {
+        return res.status(500).json({ error: result.error });
+      }
+
+      res.json({ success: true, result: result.rawOutput });
      } catch (err: any) {
         console.error("Agent synthesize error:", err);
         res.status(500).json({ error: "Failed to synthesize" });
@@ -1042,12 +1072,10 @@ app.use(express.json());
 
   app.post("/api/copilot-chat", async (req, res) => {
     try {
-      const { userMessage, chatHistory, systemInstruction } = req.body;
+      const { userMessage, chatHistory, systemInstruction, userId = 'copilot-user' } = req.body;
       if (!userMessage) return res.status(400).json({ error: "Missing message" });
 
       console.log(`[Copilot] Processing request for: "${userMessage.substring(0, 50)}..."`);
-
-      const ai = getGemini();
 
       // IMPORTANT: Gemini history MUST start with a 'user' message.
       let historyToMap = chatHistory || [];
@@ -1066,20 +1094,16 @@ app.use(express.json());
       }
 
       // Add the current message
+      // Note: For Gemini SDK Chat, we can pass history and then send message.
+      // But through orchestrator, we'll pass the whole contents array.
+
       const contents = [...cleanedHistory, { role: 'user', parts: [{ text: userMessage }] }];
 
-      // Stringify contents for the orchestrator (or handle array in orchestra if needed)
-      // Since orchestrator expects string prompt, let's format it.
-      const formattedPrompt = `
-        System Instruction: ${systemInstruction || 'You are an AI branding expert.'}
-        History: ${JSON.stringify(contents)}
-      `;
-
       const result = await llmOrchestrator.executeCall<string>({
-        userId: 'copilot-user', // Use a generic or session ID
+        userId,
         provider: 'gemini',
         model: 'gemini-1.5-pro',
-        prompt: formattedPrompt,
+        contents,
         temperature: 0.7
       });
 
@@ -1101,6 +1125,11 @@ app.use(express.json());
         error: errorMessage
       });
     }
+  });
+
+  app.get("/api/orchestrator/status", (req, res) => {
+    const { userId = 'anonymous' } = req.query as any;
+    res.json(llmOrchestrator.getStatus(userId));
   });
 
   app.post("/api/run-daily-audit", async (req, res) => {
@@ -1284,22 +1313,19 @@ Tone: Professional, data-driven, and consultative. Use terms like "Cite-Magnet,"
 Format the output in clean Markdown.
 `;
 
-      let response;
-      try {
-        response = await ai.models.generateContent({
-          model: "gemini-1.5-pro",
-          contents: prompt,
-        });
-      } catch (geminiError: any) {
-        console.warn("Primary Gemini model failed, trying fallback:", geminiError.message);
-        // Fallback to a highly available model
-        response = await ai.models.generateContent({
-          model: "gemini-1.5-flash",
-          contents: prompt,
-        });
+      const result = await llmOrchestrator.executeCall<string>({
+        userId: email,
+        provider: 'gemini',
+        model: 'gemini-1.5-pro',
+        prompt,
+        temperature: 0.7
+      });
+
+      if (!result.success) {
+        return res.status(500).json({ error: result.error });
       }
 
-      const reportMarkdown = response.text || "";
+      const reportMarkdown = result.rawOutput || "";
       const reportHtml = await marked.parse(reportMarkdown);
       const appUrl = process.env.APP_URL || `http://localhost:${PORT}`;
 
@@ -2038,13 +2064,20 @@ function startEmailFunnelCron() {
               }
             `;
 
-            const modelRes = await ai.models.generateContent({
-              model: "gemini-1.5-flash",
-              contents: prompt,
-              config: { responseMimeType: "application/json" }
+            const result = await llmOrchestrator.executeCall<any>({
+              userId: userDoc.id,
+              provider: 'gemini',
+              model: 'gemini-1.5-flash',
+              prompt,
+              schema: SOVMetricsSchema
             });
             
-            const aiData = JSON.parse(modelRes.text || "{}");
+            if (!result.success) {
+              console.error(`Orchestrator failed for ${userDoc.id}:`, result.error);
+              continue;
+            }
+            
+            const aiData = result.data;
             
             // Save to Firestore using Admin SDK
             const expiresAtDate = new Date();
