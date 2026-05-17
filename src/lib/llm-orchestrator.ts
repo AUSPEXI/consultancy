@@ -24,11 +24,13 @@ import {
   FactExtractionSchema,
   BrandMonitorSchema,
   SimulatorSchema,
+  AnchorsSchema,
   type SOVMetrics,
   type ContentScorerResult,
   type FactExtraction,
   type BrandMonitorResult,
   type SimulatorResult,
+  type AnchorsResult,
 } from './output-validation';
 
 interface LLMCallOptions {
@@ -133,7 +135,13 @@ export class LLMOrchestrator {
         // Parse JSON first
         let parsedOutput: any;
         try {
-          parsedOutput = JSON.parse(rawOutput);
+          // Robustly find and extract JSON from potential markdown/text
+          let cleanedOutput = rawOutput.trim();
+          if (cleanedOutput.includes('```')) {
+            const match = cleanedOutput.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+            if (match) cleanedOutput = match[1];
+          }
+          parsedOutput = JSON.parse(cleanedOutput);
         } catch {
           return {
             success: false,
@@ -295,12 +303,17 @@ export class LLMOrchestrator {
 
     const genAI: any = new GoogleGenAI({ apiKey: key });
     
+    // Determine if we should request JSON mime type
+    // If prompt mentions JSON or we are using a schema later, it's safer
+    const isJsonRequested = prompt.toLowerCase().includes('json') || prompt.toLowerCase().includes('schema');
+
     // Using the project's preferred pattern as seen in server.ts
     const result = await genAI.models.generateContent({
       model,
       contents: contents || prompt,
       config: { 
-        generationConfig: { temperature }
+        generationConfig: { temperature },
+        responseMimeType: isJsonRequested ? "application/json" : undefined
       }
     });
     

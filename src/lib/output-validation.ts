@@ -185,6 +185,27 @@ export const AmplifySchema = z.object({
 export type AmplifyResult = z.infer<typeof AmplifySchema>;
 
 /**
+ * Anchors Schema
+ */
+const AnchorObjectSchema = z.object({
+  label: z.string().min(1).max(100),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$|rgba?\(.*\)/, 'Invalid color format'),
+  baseType: z.string().min(1),
+});
+
+export const AnchorsSchema = z.union([
+  z.array(AnchorObjectSchema),
+  z.object({
+    anchors: z.array(AnchorObjectSchema)
+  })
+]).transform((val) => {
+  if (Array.isArray(val)) return val;
+  return val.anchors;
+});
+
+export type AnchorsResult = z.infer<typeof AnchorsSchema>;
+
+/**
  * Schema Validation Result
  */
 export interface ValidationResult<T> {
@@ -321,6 +342,6 @@ export function detectLikelyHallucination(data: SOVMetrics): boolean {
  * Used when LLM output fails validation
  */
 export function createRetryPrompt(originalPrompt: string, errors: string | string[]): string {
-  const errorSummary = Array.isArray(errors) ? errors.join('\n').substring(0, 200) : errors.substring(0, 200);
-  return `${originalPrompt}\n\nIMPORTANT: Your previous response had these issues:\n${errorSummary}\n\nPlease generate a corrected response that strictly adheres to the specified JSON schema. Be precise with numbers (0-100 ranges). No approximations.`;
+  const errorSummary = Array.isArray(errors) ? errors.join('\n').substring(0, 300) : errors.substring(0, 300);
+  return `${originalPrompt}\n\nIMPORTANT: Your previous response had these issues:\n${errorSummary}\n\nPlease generate a corrected response that strictly adheres to the requested JSON format and specified schema requirements.`;
 }
