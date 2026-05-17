@@ -1,9 +1,11 @@
+'use client';
+
 import React from 'react';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
 import { useAuth } from '@/contexts/AuthContext';
 import { BookOpen, FileText, Video, Download, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 const resources = [
   {
