@@ -636,13 +636,18 @@ app.use(express.json());
         ]
       `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
-        contents: prompt,
-        config: { responseMimeType: "application/json" }
+      const result = await llmOrchestrator.executeCall<any>({
+        userId: 'anonymous',
+        provider: 'gemini',
+        model: 'gemini-1.5-flash',
+        prompt
       });
 
-      const factsRes = JSON.parse(response.text || "[]");
+      if (!result.success) {
+        return res.status(500).json({ error: result.error });
+      }
+
+      const factsRes = JSON.parse(result.rawOutput || "[]");
       res.json({ success: true, facts: factsRes });
     } catch (err: any) {
       console.error("Extract high entropy facts error:", err);
@@ -660,12 +665,18 @@ app.use(express.json());
       const ai = getGemini();
       const prompt = `Extract 3 atomic facts from the following text and format as a JSON array of strings. Each string must be a concise, standalone fact.\\nText: ${content.substring(0, 5000)}`;
 
-      const response = await ai.models.generateContent({
+      const result = await llmOrchestrator.executeCall<any>({
+        userId,
+        provider: 'gemini',
         model: 'gemini-1.5-flash',
-        contents: prompt,
-        config: { responseMimeType: 'application/json' }
+        prompt
       });
-      const facts = JSON.parse(response.text || '[]');
+
+      if (!result.success) {
+        return res.status(500).json({ error: result.error });
+      }
+
+      const facts = JSON.parse(result.rawOutput || '[]');
       res.json({ success: true, facts });
     } catch (err: any) {
       console.error("Extract facts endpoint error:", err);
@@ -992,7 +1003,6 @@ app.use(express.json());
       const { userId, brand, domain, domainContext } = req.body;
       if (!brand || !domain) return res.status(400).json({ error: "Brand and domain required" });
 
-      const ai = getGemini();
       const prompt = `
         You are an expert Generative Engine Optimization (GEO) strategist.
         Analyze the following brand and domain data to suggest 3-5 "Semantic Anchors" for their Latent Space Map.
@@ -1011,13 +1021,18 @@ app.use(express.json());
         Return ONLY a JSON array of anchor objects.
       `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
-        contents: prompt,
-        config: { responseMimeType: "application/json" }
+      const result = await llmOrchestrator.executeCall<any>({
+        userId,
+        provider: 'gemini',
+        model: 'gemini-1.5-flash',
+        prompt
       });
 
-      const anchors = JSON.parse(response.text || "[]");
+      if (!result.success) {
+        return res.status(500).json({ error: result.error, validationErrors: result.validationErrors });
+      }
+
+      const anchors = JSON.parse(result.rawOutput || "[]");
       res.json({ success: true, anchors });
     } catch (err: any) {
       console.error("Suggest anchors error:", err);
@@ -1053,37 +1068,26 @@ app.use(express.json());
       // Add the current message
       const contents = [...cleanedHistory, { role: 'user', parts: [{ text: userMessage }] }];
 
-      let response;
-      try {
-        response = await ai.models.generateContent({
-          model: "gemini-3.1-pro-preview",
-          contents,
-          config: {
-            systemInstruction
-          }
-        });
-      } catch (geminiError: any) {
-        console.warn("[Copilot] Primary model failed, trying flash:", geminiError.message);
-        try {
-          response = await ai.models.generateContent({
-            model: "gemini-3-flash-preview",
-            contents,
-            config: {
-              systemInstruction
-            }
-          });
-        } catch (fallbackError: any) {
-           console.error("[Copilot] Fallback also failed:", fallbackError.message);
-           throw fallbackError;
-        }
+      // Stringify contents for the orchestrator (or handle array in orchestra if needed)
+      // Since orchestrator expects string prompt, let's format it.
+      const formattedPrompt = `
+        System Instruction: ${systemInstruction || 'You are an AI branding expert.'}
+        History: ${JSON.stringify(contents)}
+      `;
+
+      const result = await llmOrchestrator.executeCall<string>({
+        userId: 'copilot-user', // Use a generic or session ID
+        provider: 'gemini',
+        model: 'gemini-1.5-pro',
+        prompt: formattedPrompt,
+        temperature: 0.7
+      });
+
+      if (!result.success) {
+        return res.status(500).json({ error: result.error });
       }
 
-      if (!response.text) {
-        console.warn("[Copilot] Empty response from Gemini");
-        throw new Error("Received an empty response from the branding engine.");
-      }
-
-      res.json({ success: true, result: response.text });
+      res.json({ success: true, result: result.rawOutput });
     } catch (err: any) {
       console.error("[Copilot CRITICAL] Chat Error:", err);
       
@@ -1553,16 +1557,19 @@ Format the output in clean Markdown.
         - actionPlan: string (what the brand should do to inject positive counter-narratives)
       `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-        }
+      const result = await llmOrchestrator.executeCall<any>({
+        userId: 'monitor-user',
+        provider: 'gemini',
+        model: 'gemini-1.5-flash',
+        prompt,
+        schema: BrandMonitorSchema
       });
 
-      const parsedResultData = JSON.parse(response.text || "{}");
-      res.json({ success: true, result: parsedResultData });
+      if (!result.success) {
+        return res.status(500).json({ error: result.error, validationErrors: result.validationErrors });
+      }
+
+      res.json({ success: true, result: result.data });
     } catch (error: any) {
       console.error("Error in brand monitor:", error);
       res.status(500).json({ error: error.message });
