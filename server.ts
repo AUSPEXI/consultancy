@@ -14,6 +14,17 @@ import { blogPosts } from "./src/data/blogPosts.ts";
 import cron from "node-cron";
 import admin from 'firebase-admin';
 
+import { llmOrchestrator } from './src/lib/llm-orchestrator';
+import { 
+  SOVMetricsSchema, 
+  ContentScorerSchema, 
+  FactExtractionSchema, 
+  BrandMonitorSchema, 
+  SimulatorSchema,
+  AmplifySchema 
+} from './src/lib/output-validation';
+import { vectorStore } from './src/lib/vector-db';
+
 dotenv.config();
 
 // Initialize Firebase Admin for Backend Operations (Data Engine)
@@ -98,6 +109,7 @@ const aiLimiter = rateLimit({
 // Layer 1: Input Validation Schema
 const amplifyRequestSchema = z.object({
   fact: z.string().min(5, "Fact is too short.").max(50000, "Fact is too long. Maximum 50000 characters allowed."),
+  userId: z.string().optional()
 });
 
 // Layer 2: Prompt Injection Detection
@@ -445,7 +457,7 @@ app.use(express.json());
       if (!parsed.success) {
         return res.status(400).json({ error: "Invalid request data", details: parsed.error.issues });
       }
-      const { fact } = parsed.data;
+      const { fact, userId = 'anonymous' } = parsed.data;
 
       // Layer 2: Prompt Injection Detection
       if (detectPromptInjection(fact)) {
@@ -453,7 +465,6 @@ app.use(express.json());
         return res.status(400).json({ error: "Security Policy Violation: Invalid input pattern detected." });
       }
 
-      const ai = getGemini();
       const prompt = `
         You are an expert Generative Engine Optimization (GEO) and social media strategist.
         Take the following core fact and rewrite it into 6 distinct social media posts optimized for maximum engagement and AI citation indexing.
@@ -473,17 +484,20 @@ app.use(express.json());
         The values should be the generated text for each platform.
       `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-        }
+      const result = await llmOrchestrator.executeCall<any>({
+        userId,
+        provider: 'gemini',
+        model: 'gemini-1.5-flash',
+        prompt,
+        schema: AmplifySchema
       });
 
+      if (!result.success) {
+        return res.status(500).json({ error: result.error, validationErrors: result.validationErrors });
+      }
+
       // Layer 3: Output Filtering
-      const rawOutput = response.text || "{}";
-      const filteredOutput = filterSensitiveData(rawOutput);
+      const filteredOutput = filterSensitiveData(JSON.stringify(result.data));
 
       res.json(JSON.parse(filteredOutput));
     } catch (error: any) {
@@ -498,8 +512,6 @@ app.use(express.json());
       if (!content || !userId) {
         return res.status(400).json({ error: "Missing content or userId" });
       }
-
-      const ai = getGemini();
 
       // Retrieve User's Facts for Cross-Referencing
       let userFactsStr = "";
@@ -541,16 +553,19 @@ app.use(express.json());
         }
       `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-1.5-pro",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-        }
+      const result = await llmOrchestrator.executeCall<any>({
+        userId,
+        provider: 'gemini',
+        model: 'gemini-1.5-pro',
+        prompt,
+        schema: ContentScorerSchema
       });
 
-      const data = JSON.parse(response.text || '{}');
-      res.json({ success: true, result: data });
+      if (!result.success) {
+        return res.status(500).json({ error: result.error, validationErrors: result.validationErrors });
+      }
+
+      res.json({ success: true, result: result.data });
     } catch (err: any) {
       console.error("Content Scorer endpoint error:", err);
       res.status(500).json({ error: err.message });
@@ -559,14 +574,13 @@ app.use(express.json());
 
   app.post("/api/research-facts", async (req, res) => {
     try {
-      const { industry } = req.body;
+      const { industry, userId = 'anonymous' } = req.body;
       if (!industry) return res.status(400).json({ error: "Missing industry" });
 
       const exa = getExa();
       const searchRes = await exa.searchAndContents(`Latest statistics, data points, and factual insights about the ${industry} industry`, { numResults: 3, text: true });
       const exaContext = searchRes.results.map((r: any) => `URL: ${r.url}\\nText: ${r.text}`).join("\\n\\n").substring(0, 5000);
 
-      const ai = getGemini();
       const prompt = `
         You are an expert Generative Engine Optimization (GEO) agent and Fact-Grabber research assistant.
         The user's industry/domain is: "${industry}".
@@ -583,14 +597,19 @@ app.use(express.json());
         ]
       `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
-        contents: prompt,
-        config: { responseMimeType: "application/json" }
+      const result = await llmOrchestrator.executeCall<any>({
+        userId,
+        provider: 'gemini',
+        model: 'gemini-1.5-flash',
+        prompt,
+        schema: FactExtractionSchema
       });
 
-      const facts = JSON.parse(response.text || "[]");
-      res.json({ success: true, facts });
+      if (!result.success) {
+        return res.status(500).json({ error: result.error, validationErrors: result.validationErrors });
+      }
+
+      res.json({ success: true, facts: result.data });
     } catch (err: any) {
       console.error("Research facts endpoint error:", err);
       res.status(500).json({ error: "Failed to research facts" });
@@ -1098,7 +1117,6 @@ app.use(express.json());
       const sentimentSchema = promptsToUse.map((p: string) => `{ "prompt": "${p.replace(/"/g, '\\"')}", "score": <int -100 to 100> }`).join(",\n    ");
 
       const exa = getExa();
-      const ai = getGemini();
 
       // 1. Search Exa for the keywords
       let combinedContext = "";
@@ -1131,11 +1149,13 @@ IMPORTANT: Your estimates for 'platforms' SHOULD NEVER BE ZERO. Base them on the
 If the context is sparse, use a baseline of 5-15% for the brand if it's mentioned at all.
 
 {
-  "brand": <integer percentage for ${brand}>,
+  "aSov": <integer percentage for ${brand}>,
   "compA": <integer percentage for ${competitors[0] || 'Competitor A'}>,
   "compB": <integer percentage for ${competitors[1] || 'Competitor B'}>,
+  "compGap": <integer percentage difference between brand and compA>,
+  "aiTraffic": <integer count indicative of traffic source strength>,
   "aiCitations": <integer count of explicit brand citations>,
-  "entityRecall": <integer 0-100 indicating how robustly AI remembers brand facts>,
+  "err": <integer 0-100 indicating how robustly AI remembers brand facts>,
   "platforms": {
     "chatgpt": <integer 0-100>,
     "perplexity": <integer 0-100>,
@@ -1161,36 +1181,35 @@ If the context is sparse, use a baseline of 5-15% for the brand if it's mentione
 }
 `;
 
-      let response;
-      try {
-        response = await ai.models.generateContent({
-          model: "gemini-1.5-pro",
-          contents: prompt,
-          config: { responseMimeType: "application/json" }
-        });
-      } catch (geminiError: any) {
-        console.warn("Primary Gemini model failed, trying fallback:", geminiError.message);
-        response = await ai.models.generateContent({
-          model: "gemini-1.5-flash",
-          contents: prompt,
-          config: { responseMimeType: "application/json" }
+      const result = await llmOrchestrator.executeCall<any>({
+        userId,
+        provider: 'gemini',
+        model: 'gemini-1.5-pro',
+        prompt,
+        schema: SOVMetricsSchema
+      });
+
+      if (!result.success) {
+        return res.status(500).json({ 
+          error: result.error, 
+          validationErrors: result.validationErrors,
+          rawOutput: result.rawOutput 
         });
       }
 
-      const rawOutput = response.text || "{}";
-      const parsedData = JSON.parse(rawOutput);
+      const parsedData = result.data;
 
       res.json({ 
         success: true, 
         metrics: {
-          aSov: parsedData.brand || 12,
-          err: parsedData.entityRecall || 20,
+          aSov: parsedData.aSov || 12,
+          err: parsedData.err || 20,
           compA: parsedData.compA || 40,
           compB: parsedData.compB || 30,
           compC: parsedData.compC || 0,
           compD: parsedData.compD || 0,
-          compGap: (parsedData.brand || 12) - (parsedData.compA || 40),
-          aiTraffic: (parsedData.aiCitations || 2) * 15 + Math.floor(Math.random() * 50),
+          compGap: parsedData.compGap || ((parsedData.aSov || 12) - (parsedData.compA || 40)),
+          aiTraffic: parsedData.aiTraffic || ((parsedData.aiCitations || 2) * 15 + Math.floor(Math.random() * 50)),
           platforms: parsedData.platforms || { chatgpt: 15, perplexity: 10, claude: 12, gemini: 20 },
           radar: parsedData.radar || [],
           sentiment: parsedData.sentiment || [],
@@ -2182,8 +2201,18 @@ async function setupFrontendAndStart() {
   }
 
   if (!process.env.VERCEL && !process.env.NETLIFY && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
-    const serverInstance = app.listen(PORT, "0.0.0.0", () => {
+    const serverInstance = app.listen(PORT, "0.0.0.0", async () => {
       console.log(`Server running on http://localhost:${PORT}`);
+      
+      // Initialize Vector DB Schema if DATABASE_URL is present
+      if (process.env.DATABASE_URL) {
+        try {
+          await vectorStore.initializeSchema();
+          console.log("Vector DB Schema initialized successfully.");
+        } catch (err) {
+          console.error("Failed to initialize Vector DB Schema. Ensure pgvector is installed:", err);
+        }
+      }
     });
 
     const { createProxyMiddleware } = await import('http-proxy-middleware');
@@ -2210,13 +2239,6 @@ async function setupFrontendAndStart() {
         
         console.log('[WS Proxy] Rewritten Path:', newPath);
         return newPath;
-      },
-      logLevel: 'debug',
-      onProxyReqWs: (proxyReq, req, socket, options, head) => {
-        console.log('[WS Proxy] Proxying WebSocket to:', options.target + proxyReq.path);
-      },
-      onError: (err, req, res) => {
-        console.error('[WS Proxy] Error:', err);
       }
     });
 
