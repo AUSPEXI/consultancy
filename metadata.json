@@ -1,0 +1,12 @@
+{
+  "name": "Auspexi",
+  "description": "GEO Analytics & Semantic Authority Platform. Charting the 768-D Latent Space for brand reputation.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
