@@ -298,23 +298,24 @@ export class LLMOrchestrator {
   }
 
   private async callGemini(modelName: string, prompt: string, temperature: number, contents?: any[]): Promise<string> {
-    const key = process.env.GEMINI_API_KEY;
+    const key = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
     if (!key) throw new Error('GEMINI_API_KEY is not set');
 
-    const genAI: any = new GoogleGenAI({ apiKey: key });
+    const genAI = new GoogleGenAI(key);
     
     const isJsonRequested = prompt.toLowerCase().includes('json') || prompt.toLowerCase().includes('schema');
 
-    const result = await genAI.models.generateContent({
+    const model = genAI.getGenerativeModel({ 
       model: modelName,
-      contents: contents || prompt,
-      config: { 
-        generationConfig: { temperature },
+      generationConfig: { 
+        temperature,
         responseMimeType: isJsonRequested ? "application/json" : undefined
       }
     });
     
-    return result.text || '';
+    const result = await model.generateContent(contents || prompt);
+    const response = await result.response;
+    return response.text() || '';
   }
 
   /**

@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { motion } from 'motion/react';
 import { SparklesCore } from '@/components/ui/sparkles';
@@ -8,13 +9,14 @@ import { Footerdemo } from '@/components/ui/footer-section';
 import { TestimonialsColumn } from '@/components/ui/testimonials-columns-1';
 import { ImageZoom } from '@/components/ui/image-zoom';
 import { DottedSurface } from '@/components/ui/dotted-surface';
-import { ArrowRight, Bot, Target, Zap, Search, BarChart3, ShieldAlert, CheckCircle2, Database, Mic, Brain, Blocks, Activity, Hash } from 'lucide-react';
+import { ArrowRight, Bot, Target, Zap, Search, BarChart3, ShieldAlert, CheckCircle2, Database, Mic, Brain, Blocks, Activity, Hash, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LeadCaptureModal } from '@/components/ui/lead-capture-modal';
 import { useAuth } from '@/contexts/AuthContext';
 import { PublicHeader } from '@/components/ui/public-header';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { blogPosts } from '@/data/blogPosts';
 import { BlogHero } from '@/components/BlogHero';
 import { cn } from '@/lib/utils';
@@ -25,9 +27,10 @@ const SplineScene = lazy(() => import('@/components/ui/splite').then(m => ({ def
 // Memoized feature card to prevent re-renders during interactions
 const MemoizedBentoCard = React.memo(BentoCard);
 
-export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
-  const { user } = useAuth();
-  const location = useLocation();
+export function LandingPage() {
+  const { user, signInWithGoogle } = useAuth();
+  const pathname = usePathname();
+  const onLoginClick = signInWithGoogle;
   const [email, setEmail] = useState('');
   const [domain, setDomain] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -206,8 +209,9 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
   ];
 
   useEffect(() => {
-    if (location.hash) {
-      const id = location.hash.replace('#', '');
+    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+    if (hash) {
+      const id = hash.replace('#', '');
       const element = document.getElementById(id);
       if (element) {
         setTimeout(() => {
@@ -215,7 +219,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
         }, 100);
       }
     }
-  }, [location.hash]);
+  }, [pathname]);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30 overflow-x-hidden">
@@ -226,13 +230,13 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-black">
         {/* Subtle pink vector grid overlay like on the blog */}
         <div 
-          className="absolute inset-0 opacity-[0.35] pointer-events-none z-[1]"
+          className="absolute inset-0 opacity-[0.9] pointer-events-none z-[1]"
           style={{
-            backgroundImage: `linear-gradient(to right, #EC4899 1px, transparent 1px), linear-gradient(to bottom, #EC4899 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(to right, rgba(236, 72, 153, 0.4) 1px, transparent 1px), linear-gradient(to bottom, rgba(236, 72, 153, 0.4) 1px, transparent 1px)`,
             backgroundSize: '40px 40px',
             backgroundPosition: 'left top',
-            WebkitMaskImage: 'radial-gradient(circle at center, black 10%, transparent 80%)',
-            maskImage: 'radial-gradient(circle at center, black 10%, transparent 80%)',
+            WebkitMaskImage: 'radial-gradient(circle at center, black 30%, transparent 90%)',
+            maskImage: 'radial-gradient(circle at center, black 30%, transparent 90%)',
           }}
         />
 
@@ -323,7 +327,7 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
                     key={i}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ 
-                      opacity: [0.6, 1.0, 0.6],
+                      opacity: [0.85, 1.0, 0.85],
                       y: [0, -10, 0],
                       x: [0, 5, 0],
                     }}
@@ -336,8 +340,8 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
                     style={{ left: node.x, top: node.y }}
                     className="absolute flex items-center gap-2 whitespace-nowrap"
                   >
-                    <div className="w-2 h-2 rounded-full bg-pink-400 shadow-[0_0_12px_#EC4899]" />
-                    <span className="text-[10px] font-mono font-bold tracking-widest text-[#F472B6] uppercase drop-shadow-[0_0_8px_rgba(236,72,153,0.5)]">
+                    <div className="w-2.5 h-2.5 rounded-full bg-pink-400 shadow-[0_0_20px_#EC4899,0_0_40px_#EC4899]" />
+                    <span className="text-[12px] font-mono font-bold tracking-widest text-pink-50 text-white uppercase drop-shadow-[0_0_15px_rgba(236,72,153,1)] px-2 py-0.5 rounded-sm bg-pink-600/40 backdrop-blur-[4px] border border-pink-400">
                       {node.label}
                     </span>
                   </motion.div>
@@ -536,57 +540,70 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <PricingCard
               tier="Starter"
-              price={currency === 'USD' ? "$99/mo" : "£79/mo"}
+              price={currency === 'USD' ? "$149/mo" : "£119/mo"}
               bestFor="For individuals & early-stage founders exploring AI visibility"
               CTA="Start Now"
               onClick={() => handleCheckout('Basic')}
               benefits={[
                 { text: "Track 1 Brand, 5 Target Keywords", checked: true },
+                { text: "Monthly Citacious Pulse Snapshot", checked: true },
                 { text: "Fact-Vault (1GB Secure Storage)", checked: true },
                 { text: "Basic Latent Space Visibility Map", checked: true },
                 { text: "7-Day Sentiment Pulse History", checked: true },
                 { text: "Weekly Brand SoV Performance Report", checked: true },
                 { text: "Standard Citacious AI Copilot", checked: true },
+                { text: "LLM Inference & Embedding Costs Inc.", checked: true },
+                { text: "Automated Edge Schema Injection", checked: true },
+                { text: "Personal Citacious Onboarding (Self-Serve)", checked: true },
                 { text: "Z-Score Drift Alerting (Basic)", checked: false },
+                { text: "Reddit/LinkedIn Automation", checked: false },
               ]}
             />
             <PricingCard
               tier="Pro"
-              price={currency === 'USD' ? "$199/mo" : "£159/mo"}
+              price={currency === 'USD' ? "$499/mo" : "£399/mo"}
               bestFor="For growth teams & marketing managers"
               CTA="Start Pro"
               onClick={() => handleCheckout('Pro')}
               benefits={[
-                { text: "Track 3 Brands, 25 Keywords", checked: true },
-                { text: "Full 768-D Latent Map (Master View)", checked: true },
-                { text: "10-Competitor Sentiment Radar", checked: true },
+                { text: "Track 5 Brands, 50 Keywords", checked: true },
+                { text: "Full Neural Latent Map (Master View)", checked: true },
+                { text: "25-Competitor Sentiment Radar", checked: true },
                 { text: "Z-Score Anomaly & Drift Alerts", checked: true },
-                { text: "Fact-Vault (5GB) + Auto-Extraction", checked: true },
+                { text: "Fact-Vault (10GB) + Auto-Extraction", checked: true },
                 { text: "Content Scorer Pro (Direct Fixes)", checked: true },
+                { text: "Priority Report Generation (10/mo)", checked: true },
+                { text: "Competitor Hallucination Monitoring", checked: true },
                 { text: "12-Month Citacious Context Memory", checked: true },
-                { text: "Priority Edge Schema Deployment", checked: true },
+                { text: "Historical Context Overwrite (Basic)", checked: true },
+                { text: "RAG Fact-Consistency Checker", checked: true },
+                { text: "Weekly Automated Strategy Briefs", checked: true },
               ]}
             />
             <PricingCard
               tier="Business"
-              price={currency === 'USD' ? "$499/mo" : "£399/mo"}
+              price={currency === 'USD' ? "$1,899/mo" : "£1,499/mo"}
               bestFor="For mid-market SaaS & high-growth brands"
               CTA="Start Business"
               onClick={() => handleCheckout('Business')}
               benefits={[
-                { text: "Track 10 Brands, 100 Keywords", checked: true },
+                { text: "Track 25 Brands, 250 Keywords", checked: true },
                 { text: "Autonomous Social Seeding (Omnichannel)", checked: true },
                 { text: "Reddit & LinkedIn Fact-Maxing Bot", checked: true },
                 { text: "Advanced Competitor Overwrite Strategy", checked: true },
-                { text: "Unlimited Fact-Vault Capacity", checked: true },
+                { text: "Fact-Vault (50GB) + Bulk Import", checked: true },
                 { text: "Full API Access for GEO Integrations", checked: true },
+                { text: "White-Glove Implementation Support", checked: true },
+                { text: "Monthly Domain Reputation Scrub", checked: true },
                 { text: "Predictive Sentiment Modeling", checked: true },
                 { text: "Weekly Strategic Analyst Session", checked: true },
+                { text: "Enterprise LLM Priority Access", checked: true },
+                { text: "Multi-User Team Management", checked: true },
               ]}
             />
             <PricingCard
               tier="Enterprise"
-              price={currency === 'USD' ? "$2,500+/mo" : "£2,000+/mo"}
+              price={currency === 'USD' ? "Custom" : "Custom"}
               bestFor="For Fortune 500 market leaders & agencies"
               CTA="Talk to AI Sales"
               onClick={() => window.location.href = 'mailto:sales@auspexi.com'}
@@ -596,17 +613,42 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
                 { text: "Dedicated ML Engineer Retainer", checked: true },
                 { text: "SOC2 Compliance & SSO Integration", checked: true },
                 { text: "Historical Context Overwrite Cluster", checked: true },
-                { text: "Private pgvector Instance (50M+)", checked: true },
+                { text: "Private Neural Vector Instance", checked: true },
                 { text: "Custom Board-Ready Reporting", checked: true },
                 { text: "Whitelabel GEO Dashboard", checked: true },
+                { text: "SLA Guaranteed Response Times", checked: true },
+                { text: "24/7 Strategic Support Account Manager", checked: true },
+                { text: "Custom Data Moat Strategy Blueprint", checked: true },
               ]}
             />
           </div>
 
-          <div className="mt-12 text-center text-sm text-zinc-500 max-w-2xl mx-auto bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-6">
-            <p className="mb-3">
-              <strong className="text-zinc-300">Flexible Billing:</strong> All plans are month-to-month. You can cancel anytime after your first month's subscription. No long-term contracts.
-            </p>
+          <div className="mt-12 text-center text-sm text-zinc-500 max-w-3xl mx-auto bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+              <div>
+                <p className="mb-3 flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5" />
+                  <span><strong className="text-zinc-300">Inclusive AI Costs:</strong> No separate API keys required. All LLM inference, embedding generation, and RAG operations are covered by your subscription.</span>
+                </p>
+                <p className="mb-3 flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5" />
+                  <span><strong className="text-zinc-300">Flexible Billing:</strong> All plans are month-to-month. Cancel anytime after your first month without penalty.</span>
+                </p>
+              </div>
+              <div>
+                <p className="mb-3 flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5" />
+                  <span><strong className="text-zinc-300">Data Security:</strong> Your Fact-Vault and Latent Map are isolated. We never use your proprietary brand facts to train public models.</span>
+                </p>
+                <p className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5" />
+                  <span><strong className="text-zinc-300">Auto-Scaling:</strong> Tiers automatically scale based on keywords. You'll be notified before any automatic upgrades occur.</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 text-center text-xs text-zinc-500">
             <p>
               <strong className="text-zinc-300">Promotional Pricing:</strong> One-time deals and promotional rates are locked in for active subscriptions. If you cancel and sign back up, standard pricing will apply.
             </p>
@@ -624,14 +666,14 @@ export function LandingPage({ onLoginClick }: { onLoginClick: () => void }) {
                 Latest tactics and research on Generative Engine Optimization.
               </p>
             </div>
-            <Link to="/blog" className="flex items-center justify-center border border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+            <Link href="/blog" className="flex items-center justify-center border border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 px-4 py-2 rounded-md text-sm font-medium transition-colors">
               View all articles
             </Link>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {blogPosts.slice(0, 3).map((post, i) => (
-              <Link to={`/blog/${post.slug}`} key={i} className="group cursor-pointer flex flex-col">
+              <Link href={`/blog/${post.slug}`} key={i} className="group cursor-pointer flex flex-col">
                 <div className="w-full flex min-h-[220px] rounded-xl overflow-hidden mb-4 border border-zinc-800 relative bg-[#0B0E14]">
                   <BlogHero title={post.title} category={post.category} compact={true} />
                 </div>

@@ -1,6 +1,8 @@
+'use client';
+
 import React, { createContext, useContext, useState, useRef, useEffect, ReactNode } from 'react';
 import { GoogleGenAI, LiveServerMessage, Modality, Type } from "@google/genai";
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { collection, getDocs, query, orderBy, limit, addDoc, where } from 'firebase/firestore';
 import { db, auth } from '@/firebase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -62,7 +64,7 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -424,7 +426,7 @@ ${customerContext}`;
                   else if (page === "voice-agents") path = "/voice-agents";
                   else if (page === "about") path = "/about";
 
-                  navigate(path + hash);
+                  router.push(path + hash);
 
                   // If there's a hash, we might need to scroll manually after a short delay
                   if (hash) {
@@ -480,7 +482,7 @@ ${customerContext}`;
                   
                   // Make sure we are on the dashboard page
                   if (!window.location.pathname.startsWith("/dashboard")) {
-                    navigate("/dashboard");
+                    router.push("/dashboard");
                   }
 
                   sessionPromise.then((session) => {

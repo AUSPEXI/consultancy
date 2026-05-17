@@ -22,22 +22,17 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 		const AMOUNTX = 40;
 		const AMOUNTY = 60;
 
+		const container = containerRef.current;
+		const width = container.clientWidth || window.innerWidth;
+		const height = container.clientHeight || 500;
+
 		// Scene setup
 		const scene = new THREE.Scene();
 		scene.fog = new THREE.Fog(0x09090b, 2000, 10000);
 
-		const updateSize = () => {
-			if (!containerRef.current) return;
-			const width = containerRef.current.clientWidth;
-			const height = containerRef.current.clientHeight;
-			camera.aspect = width / height;
-			camera.updateProjectionMatrix();
-			renderer.setSize(width, height);
-		};
-
 		const camera = new THREE.PerspectiveCamera(
 			60,
-			containerRef.current.clientWidth / containerRef.current.clientHeight,
+			width / height,
 			1,
 			10000,
 		);
@@ -49,9 +44,23 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 		});
 		renderer.setPixelRatio(window.devicePixelRatio);
 		renderer.setClearColor(scene.fog.color, 0);
+		renderer.setSize(width, height);
 
-		containerRef.current.appendChild(renderer.domElement);
-		updateSize();
+		container.appendChild(renderer.domElement);
+
+		const updateSize = () => {
+			const w = container.clientWidth;
+			const h = container.clientHeight;
+			if (w === 0 || h === 0) return;
+			camera.aspect = w / h;
+			camera.updateProjectionMatrix();
+			renderer.setSize(w, h);
+		};
+
+		const resizeObserver = new ResizeObserver(() => {
+			updateSize();
+		});
+		resizeObserver.observe(container);
 
 		// Create particles
 		const particles: THREE.Points[] = [];
@@ -68,8 +77,12 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 				const z = iy * SEPARATION - (AMOUNTY * SEPARATION) / 2;
 
 				positions.push(x, y, z);
-				// Hardcode light colors for dark background (values between 0 and 1)
-				colors.push(0.8, 0.8, 0.8);
+				
+				// Pinkish gradient colors for the dots
+				const r = 0.9 + Math.random() * 0.1;
+				const g = 0.2 + Math.random() * 0.1;
+				const b = 0.5 + Math.random() * 0.1;
+				colors.push(r, g, b);
 			}
 		}
 
@@ -80,10 +93,10 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 
 		// Create material
 		const material = new THREE.PointsMaterial({
-			size: 8,
+			size: 10,
 			vertexColors: true,
 			transparent: true,
-			opacity: 0.8,
+			opacity: 0.9,
 			sizeAttenuation: true,
 		});
 
@@ -164,6 +177,7 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 
 		// Cleanup function
 		return () => {
+			resizeObserver.disconnect();
 			window.removeEventListener('resize', handleResize);
 			document.removeEventListener('mousemove', onDocumentMouseMove);
 			cancelAnimationFrame(animationId);
