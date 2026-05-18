@@ -14,7 +14,7 @@ import { blogPosts } from "./src/data/blogPosts.ts";
 import cron from "node-cron";
 import admin from 'firebase-admin';
 
-import { llmOrchestrator } from './src/lib/llm-orchestrator';
+import { llmOrchestrator } from './src/lib/llm-orchestrator.ts';
 import { 
   SOVMetricsSchema, 
   ContentScorerSchema, 
@@ -23,8 +23,8 @@ import {
   SimulatorSchema,
   AmplifySchema,
   AnchorsSchema 
-} from './src/lib/output-validation';
-import { vectorStore } from './src/lib/vector-db';
+} from './src/lib/output-validation.ts';
+import { vectorStore } from './src/lib/vector-db.ts';
 
 dotenv.config();
 
