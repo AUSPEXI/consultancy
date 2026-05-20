@@ -123,7 +123,7 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
       const conversationText = transcript.map(t => `${t.role}: ${t.text}`).join("\n");
       
       const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
+        model: "gemini-3.5-flash",
         contents: `Analyze the following conversation between a user and an Auspexi AI agent. 
 Extract any NEW, USEFUL facts, frequently asked questions, or insights about the user's needs or Auspexi's services that the agent should remember for future conversations.
 Do not extract personal information (like names or emails).
