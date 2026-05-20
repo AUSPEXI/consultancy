@@ -662,7 +662,7 @@ export function LandingPageClient() {
 
       {/* CTA Section */}
       <section className="py-32 relative overflow-hidden min-h-[500px] bg-[#0c0c0e]">
-        {isDesktop && <DottedSurface className="absolute inset-0 z-[-1] opacity-70" />}
+        {isDesktop && <DottedSurface className="absolute inset-0 z-0 opacity-70" />}
         <div className="absolute inset-0 bg-zinc-900/40 z-[-2]"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-pink-500/5 rounded-full blur-[120px] pointer-events-none z-[-2]"></div>
 
