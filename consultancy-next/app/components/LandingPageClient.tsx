@@ -21,7 +21,10 @@ import { blogPosts } from '@/data/blogPosts';
 import { BlogHero } from '@/components/BlogHero';
 import { cn } from '@/lib/utils';
 
+// Lazy load heavy interactive components
 const SplineScene = lazy(() => import('@/components/ui/splite').then(m => ({ default: m.SplineScene })));
+
+// Memoized feature card to prevent re-renders during interactions
 const MemoizedBentoCard = React.memo(BentoCard);
 
 export function LandingPageClient() {
@@ -47,7 +50,9 @@ export function LandingPageClient() {
     fetch('https://ipapi.co/json/')
       .then(res => res.json())
       .then(data => {
-        if (data.country_code === 'US') setCurrency('USD');
+        if (data.country_code === 'US') {
+          setCurrency('USD');
+        }
       })
       .catch(err => console.error('Error fetching IP data:', err));
   }, []);
@@ -57,6 +62,7 @@ export function LandingPageClient() {
       router.push('/dashboard');
       return;
     }
+
     try {
       setIsCheckingOut(true);
       const response = await fetch('/api/create-checkout-session', {
@@ -64,6 +70,7 @@ export function LandingPageClient() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tier, userId: user.uid }),
       });
+
       const data = await response.json();
       if (data.url) {
         window.open(data.url, '_blank');
@@ -207,6 +214,7 @@ export function LandingPageClient() {
             maskImage: 'radial-gradient(circle at center, black 30%, transparent 90%)',
           }}
         />
+
         <div className="absolute inset-0 w-full h-full z-0 opacity-40">
           <SparklesCore
             id="tsparticlesfullpage"
@@ -240,12 +248,14 @@ export function LandingPageClient() {
               <p className="text-xl text-zinc-400 mb-6 leading-relaxed">
                 Traditional SEO is dying. Auspexi is the premier Generative Engine Optimization (GEO) platform that ensures your brand is cited, recommended, and prioritized by AI models like Gemini, ChatGPT, and Claude.
               </p>
+
               <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 mb-8 backdrop-blur-sm">
                 <h3 className="text-white font-semibold mb-2">What is Generative Engine Optimization (GEO)?</h3>
                 <p className="text-sm text-zinc-300 leading-relaxed">
                   Generative Engine Optimization (GEO) is the process of optimizing your brand&apos;s content so that it is cited as the primary source of truth by AI models like ChatGPT, Google Gemini, Claude, and Perplexity.
                 </p>
               </div>
+
               <div className="flex flex-col gap-3 w-full max-w-md relative z-20">
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Input
@@ -282,6 +292,7 @@ export function LandingPageClient() {
                   />
                 </Suspense>
               </div>
+
               <div className="absolute inset-0 z-30 pointer-events-none overflow-hidden">
                 {latentNodes.map((node, i) => (
                   <motion.div
@@ -308,6 +319,7 @@ export function LandingPageClient() {
                   </motion.div>
                 ))}
               </div>
+
               <div className="absolute inset-0 bg-transparent z-[20] pointer-events-none [mask-image:radial-gradient(circle_at_center,transparent_30%,black_100%)]" />
             </div>
           </div>
@@ -345,6 +357,7 @@ export function LandingPageClient() {
               Everything you need to dominate AI Answer Engines and secure your Share of Voice.
             </p>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:grid-rows-3 max-w-5xl mx-auto">
             {features.map((feature) => (
               <MemoizedBentoCard key={feature.name} {...feature} className={feature.className + " dark"} />
@@ -378,13 +391,16 @@ export function LandingPageClient() {
               A complete suite of tools engineered specifically for the nuances of LLM architecture. Here is exactly what you are buying.
             </p>
           </div>
+
           <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-3 lg:gap-4 xl:max-h-[34rem] xl:grid-rows-2 max-w-5xl mx-auto">
             <li className="min-h-[14rem] list-none md:[grid-area:1/1/2/7] xl:[grid-area:1/1/2/5]">
               <div className="relative h-full rounded-[1.25rem] border border-zinc-800 p-2 md:rounded-[1.5rem] md:p-3 bg-zinc-950">
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
                 <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
                   <div className="space-y-3">
-                    <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4"><BarChart3 className="w-5 h-5 text-zinc-300" /></div>
+                    <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
+                      <BarChart3 className="w-5 h-5 text-zinc-300" />
+                    </div>
                     <h3 className="text-xl font-semibold text-white">Multi-Engine SOV Simulator</h3>
                     <p className="text-zinc-400 text-sm">Test high-intent queries across ChatGPT, Claude, Gemini, and Perplexity to track your exact Share of Voice.</p>
                   </div>
@@ -396,7 +412,9 @@ export function LandingPageClient() {
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
                 <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
                   <div className="space-y-3">
-                    <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4"><Target className="w-5 h-5 text-zinc-300" /></div>
+                    <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
+                      <Target className="w-5 h-5 text-zinc-300" />
+                    </div>
                     <h3 className="text-xl font-semibold text-white">AI Content Scorer</h3>
                     <p className="text-zinc-400 text-sm">Analyze your content&apos;s &ldquo;AI-Readability&rdquo; and get actionable recommendations to increase citation likelihood.</p>
                   </div>
@@ -408,7 +426,9 @@ export function LandingPageClient() {
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
                 <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
                   <div className="space-y-3">
-                    <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4"><ShieldAlert className="w-5 h-5 text-zinc-300" /></div>
+                    <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
+                      <ShieldAlert className="w-5 h-5 text-zinc-300" />
+                    </div>
                     <h3 className="text-xl font-semibold text-white">Consensus Platform Monitor</h3>
                     <p className="text-zinc-400 text-sm">Scan Reddit, Quora, and forums to detect and neutralize &ldquo;Context Poisoning&rdquo; in vector embeddings before the next LLM training run.</p>
                   </div>
@@ -420,7 +440,9 @@ export function LandingPageClient() {
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
                 <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
                   <div className="space-y-3">
-                    <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4"><Database className="w-5 h-5 text-zinc-300" /></div>
+                    <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
+                      <Database className="w-5 h-5 text-zinc-300" />
+                    </div>
                     <h3 className="text-xl font-semibold text-white">JSON-LD Cite-Magnet Generator</h3>
                     <p className="text-zinc-400 text-sm">Automatically format your high-entropy facts into the exact schema markup that AI crawlers prefer.</p>
                   </div>
@@ -432,7 +454,9 @@ export function LandingPageClient() {
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
                 <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
                   <div className="space-y-3">
-                    <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4"><Search className="w-5 h-5 text-zinc-300" /></div>
+                    <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
+                      <Search className="w-5 h-5 text-zinc-300" />
+                    </div>
                     <h3 className="text-xl font-semibold text-white">Knowledge Decay Tracking</h3>
                     <p className="text-zinc-400 text-sm">Monitor your historical context in AI models and replace outdated information with your fresh insights.</p>
                   </div>
@@ -452,6 +476,7 @@ export function LandingPageClient() {
               See how forward-thinking brands are using Auspexi to dominate the new era of search.
             </p>
           </div>
+
           <div className="flex justify-center gap-6 [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)] h-[600px]">
             <TestimonialsColumn testimonials={testimonials.slice(0, 2)} duration={15} />
             <TestimonialsColumn testimonials={testimonials.slice(2, 4)} className="hidden md:block" duration={19} />
@@ -468,6 +493,7 @@ export function LandingPageClient() {
             <p className="text-zinc-400 max-w-2xl mx-auto text-lg mb-8">
               Invest in your brand&apos;s future visibility. Cancel anytime after your first month.
             </p>
+
             <div className="flex items-center justify-center gap-3">
               <span className={cn("text-sm font-medium", currency === 'USD' ? "text-white" : "text-zinc-500")}>USD</span>
               <button
@@ -479,26 +505,122 @@ export function LandingPageClient() {
               <span className={cn("text-sm font-medium", currency === 'GBP' ? "text-white" : "text-zinc-500")}>GBP</span>
             </div>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <PricingCard tier="Starter" price={currency === 'USD' ? "$149/mo" : "£119/mo"} bestFor="For individuals & early-stage founders exploring AI visibility" CTA="Start Now" onClick={() => handleCheckout('Basic')} benefits={[{ text: "Track 1 Brand, 5 Target Keywords", checked: true },{ text: "Monthly Citacious Pulse Snapshot", checked: true },{ text: "Fact-Vault (1GB Secure Storage)", checked: true },{ text: "Basic Latent Space Visibility Map", checked: true },{ text: "7-Day Sentiment Pulse History", checked: true },{ text: "Weekly Brand SoV Performance Report", checked: true },{ text: "Standard Citacious AI Copilot", checked: true },{ text: "LLM Inference & Embedding Costs Inc.", checked: true },{ text: "Automated Edge Schema Injection", checked: true },{ text: "Personal Citacious Onboarding (Self-Serve)", checked: true },{ text: "Z-Score Drift Alerting (Basic)", checked: false },{ text: "Reddit/LinkedIn Automation", checked: false }]} />
-            <PricingCard tier="Pro" price={currency === 'USD' ? "$499/mo" : "£399/mo"} bestFor="For growth teams & marketing managers" CTA="Start Pro" onClick={() => handleCheckout('Pro')} benefits={[{ text: "Track 5 Brands, 50 Keywords", checked: true },{ text: "Full Neural Latent Map (Master View)", checked: true },{ text: "25-Competitor Sentiment Radar", checked: true },{ text: "Z-Score Anomaly & Drift Alerts", checked: true },{ text: "Fact-Vault (10GB) + Auto-Extraction", checked: true },{ text: "Content Scorer Pro (Direct Fixes)", checked: true },{ text: "Priority Report Generation (10/mo)", checked: true },{ text: "Competitor Hallucination Monitoring", checked: true },{ text: "12-Month Citacious Context Memory", checked: true },{ text: "Historical Context Overwrite (Basic)", checked: true },{ text: "RAG Fact-Consistency Checker", checked: true },{ text: "Weekly Automated Strategy Briefs", checked: true }]} />
-            <PricingCard tier="Business" price={currency === 'USD' ? "$1,899/mo" : "£1,499/mo"} bestFor="For mid-market SaaS & high-growth brands" CTA="Start Business" onClick={() => handleCheckout('Business')} benefits={[{ text: "Track 25 Brands, 250 Keywords", checked: true },{ text: "Autonomous Social Seeding (Omnichannel)", checked: true },{ text: "Reddit & LinkedIn Fact-Maxing Bot", checked: true },{ text: "Advanced Competitor Overwrite Strategy", checked: true },{ text: "Fact-Vault (50GB) + Bulk Import", checked: true },{ text: "Full API Access for GEO Integrations", checked: true },{ text: "White-Glove Implementation Support", checked: true },{ text: "Monthly Domain Reputation Scrub", checked: true },{ text: "Predictive Sentiment Modeling", checked: true },{ text: "Weekly Strategic Analyst Session", checked: true },{ text: "Enterprise LLM Priority Access", checked: true },{ text: "Multi-User Team Management", checked: true }]} />
-            <PricingCard tier="Enterprise" price={currency === 'USD' ? "Custom" : "Custom"} bestFor="For Fortune 500 market leaders & agencies" CTA="Talk to AI Sales" onClick={() => window.location.href = 'mailto:sales@auspexi.com'} benefits={[{ text: "Unlimited Keywords & Competitors", checked: true },{ text: "Custom SLM Fine-tuning (Private Cloud)", checked: true },{ text: "Dedicated ML Engineer Retainer", checked: true },{ text: "SOC2 Compliance & SSO Integration", checked: true },{ text: "Historical Context Overwrite Cluster", checked: true },{ text: "Private Neural Vector Instance", checked: true },{ text: "Custom Board-Ready Reporting", checked: true },{ text: "Whitelabel GEO Dashboard", checked: true },{ text: "SLA Guaranteed Response Times", checked: true },{ text: "24/7 Strategic Support Account Manager", checked: true },{ text: "Custom Data Moat Strategy Blueprint", checked: true }]} />
+            <PricingCard
+              tier="Starter"
+              price={currency === 'USD' ? "$149/mo" : "£119/mo"}
+              bestFor="For individuals & early-stage founders exploring AI visibility"
+              CTA="Start Now"
+              onClick={() => handleCheckout('Basic')}
+              benefits={[
+                { text: "Track 1 Brand, 5 Target Keywords", checked: true },
+                { text: "Monthly Citacious Pulse Snapshot", checked: true },
+                { text: "Fact-Vault (1GB Secure Storage)", checked: true },
+                { text: "Basic Latent Space Visibility Map", checked: true },
+                { text: "7-Day Sentiment Pulse History", checked: true },
+                { text: "Weekly Brand SoV Performance Report", checked: true },
+                { text: "Standard Citacious AI Copilot", checked: true },
+                { text: "LLM Inference & Embedding Costs Inc.", checked: true },
+                { text: "Automated Edge Schema Injection", checked: true },
+                { text: "Personal Citacious Onboarding (Self-Serve)", checked: true },
+                { text: "Z-Score Drift Alerting (Basic)", checked: false },
+                { text: "Reddit/LinkedIn Automation", checked: false },
+              ]}
+            />
+            <PricingCard
+              tier="Pro"
+              price={currency === 'USD' ? "$499/mo" : "£399/mo"}
+              bestFor="For growth teams & marketing managers"
+              CTA="Start Pro"
+              onClick={() => handleCheckout('Pro')}
+              benefits={[
+                { text: "Track 5 Brands, 50 Keywords", checked: true },
+                { text: "Full Neural Latent Map (Master View)", checked: true },
+                { text: "25-Competitor Sentiment Radar", checked: true },
+                { text: "Z-Score Anomaly & Drift Alerts", checked: true },
+                { text: "Fact-Vault (10GB) + Auto-Extraction", checked: true },
+                { text: "Content Scorer Pro (Direct Fixes)", checked: true },
+                { text: "Priority Report Generation (10/mo)", checked: true },
+                { text: "Competitor Hallucination Monitoring", checked: true },
+                { text: "12-Month Citacious Context Memory", checked: true },
+                { text: "Historical Context Overwrite (Basic)", checked: true },
+                { text: "RAG Fact-Consistency Checker", checked: true },
+                { text: "Weekly Automated Strategy Briefs", checked: true },
+              ]}
+            />
+            <PricingCard
+              tier="Business"
+              price={currency === 'USD' ? "$1,899/mo" : "£1,499/mo"}
+              bestFor="For mid-market SaaS & high-growth brands"
+              CTA="Start Business"
+              onClick={() => handleCheckout('Business')}
+              benefits={[
+                { text: "Track 25 Brands, 250 Keywords", checked: true },
+                { text: "Autonomous Social Seeding (Omnichannel)", checked: true },
+                { text: "Reddit & LinkedIn Fact-Maxing Bot", checked: true },
+                { text: "Advanced Competitor Overwrite Strategy", checked: true },
+                { text: "Fact-Vault (50GB) + Bulk Import", checked: true },
+                { text: "Full API Access for GEO Integrations", checked: true },
+                { text: "White-Glove Implementation Support", checked: true },
+                { text: "Monthly Domain Reputation Scrub", checked: true },
+                { text: "Predictive Sentiment Modeling", checked: true },
+                { text: "Weekly Strategic Analyst Session", checked: true },
+                { text: "Enterprise LLM Priority Access", checked: true },
+                { text: "Multi-User Team Management", checked: true },
+              ]}
+            />
+            <PricingCard
+              tier="Enterprise"
+              price={currency === 'USD' ? "Custom" : "Custom"}
+              bestFor="For Fortune 500 market leaders & agencies"
+              CTA="Talk to AI Sales"
+              onClick={() => window.location.href = 'mailto:sales@auspexi.com'}
+              benefits={[
+                { text: "Unlimited Keywords & Competitors", checked: true },
+                { text: "Custom SLM Fine-tuning (Private Cloud)", checked: true },
+                { text: "Dedicated ML Engineer Retainer", checked: true },
+                { text: "SOC2 Compliance & SSO Integration", checked: true },
+                { text: "Historical Context Overwrite Cluster", checked: true },
+                { text: "Private Neural Vector Instance", checked: true },
+                { text: "Custom Board-Ready Reporting", checked: true },
+                { text: "Whitelabel GEO Dashboard", checked: true },
+                { text: "SLA Guaranteed Response Times", checked: true },
+                { text: "24/7 Strategic Support Account Manager", checked: true },
+                { text: "Custom Data Moat Strategy Blueprint", checked: true },
+              ]}
+            />
           </div>
+
           <div className="mt-12 text-center text-sm text-zinc-500 max-w-3xl mx-auto bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
               <div>
-                <p className="mb-3 flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5" /><span><strong className="text-zinc-300">Inclusive AI Costs:</strong> No separate API keys required. All LLM inference, embedding generation, and RAG operations are covered by your subscription.</span></p>
-                <p className="mb-3 flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5" /><span><strong className="text-zinc-300">Flexible Billing:</strong> All plans are month-to-month. Cancel anytime after your first month without penalty.</span></p>
+                <p className="mb-3 flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5" />
+                  <span><strong className="text-zinc-300">Inclusive AI Costs:</strong> No separate API keys required. All LLM inference, embedding generation, and RAG operations are covered by your subscription.</span>
+                </p>
+                <p className="mb-3 flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5" />
+                  <span><strong className="text-zinc-300">Flexible Billing:</strong> All plans are month-to-month. Cancel anytime after your first month without penalty.</span>
+                </p>
               </div>
               <div>
-                <p className="mb-3 flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5" /><span><strong className="text-zinc-300">Data Security:</strong> Your Fact-Vault and Latent Map are isolated. We never use your proprietary brand facts to train public models.</span></p>
-                <p className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5" /><span><strong className="text-zinc-300">Auto-Scaling:</strong> Tiers automatically scale based on keywords. You&apos;ll be notified before any automatic upgrades occur.</span></p>
+                <p className="mb-3 flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5" />
+                  <span><strong className="text-zinc-300">Data Security:</strong> Your Fact-Vault and Latent Map are isolated. We never use your proprietary brand facts to train public models.</span>
+                </p>
+                <p className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 mt-0.5" />
+                  <span><strong className="text-zinc-300">Auto-Scaling:</strong> Tiers automatically scale based on keywords. You&apos;ll be notified before any automatic upgrades occur.</span>
+                </p>
               </div>
             </div>
           </div>
+
           <div className="mt-8 text-center text-xs text-zinc-500">
-            <p><strong className="text-zinc-300">Promotional Pricing:</strong> One-time deals and promotional rates are locked in for active subscriptions. If you cancel and sign back up, standard pricing will apply.</p>
+            <p>
+              <strong className="text-zinc-300">Promotional Pricing:</strong> One-time deals and promotional rates are locked in for active subscriptions. If you cancel and sign back up, standard pricing will apply.
+            </p>
           </div>
         </div>
       </section>
@@ -509,12 +631,15 @@ export function LandingPageClient() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">GEO Strategy Insights</h2>
-              <p className="text-zinc-400 max-w-2xl text-lg">Latest tactics and research on Generative Engine Optimization.</p>
+              <p className="text-zinc-400 max-w-2xl text-lg">
+                Latest tactics and research on Generative Engine Optimization.
+              </p>
             </div>
             <Link href="/blog" className="flex items-center justify-center border border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 px-4 py-2 rounded-md text-sm font-medium transition-colors">
               View all articles
             </Link>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {blogPosts.slice(0, 3).map((post, i) => (
               <Link href={`/blog/${post.slug}`} key={i} className="group cursor-pointer flex flex-col">
@@ -526,7 +651,9 @@ export function LandingPageClient() {
                   <span>•</span>
                   <span>{post.date}</span>
                 </div>
-                <h3 className="text-xl font-semibold text-zinc-200 group-hover:text-white transition-colors leading-snug">{post.title}</h3>
+                <h3 className="text-xl font-semibold text-zinc-200 group-hover:text-white transition-colors leading-snug">
+                  {post.title}
+                </h3>
               </Link>
             ))}
           </div>
@@ -538,14 +665,19 @@ export function LandingPageClient() {
         {isDesktop && <DottedSurface className="absolute inset-0 z-[-1] opacity-70" />}
         <div className="absolute inset-0 bg-zinc-900/40 z-[-2]"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-pink-500/5 rounded-full blur-[120px] pointer-events-none z-[-2]"></div>
+
         <div className="max-w-4xl mx-auto px-6 relative z-10 text-center">
           <h2 className="text-4xl md:text-6xl font-bold font-heading mb-6">Ready to dominate AI search?</h2>
           <p className="text-xl text-zinc-300 mb-10 max-w-2xl mx-auto">
             Join the top brands that are already securing their Share of Voice in the Generative Engine era.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button onClick={() => handleOpenModal('trial')} size="lg" className="w-full sm:w-auto bg-white hover:bg-zinc-200 text-black text-lg px-8 h-14 rounded-xl">Start Your Free Trial</Button>
-            <Button onClick={() => handleOpenModal('demo')} size="lg" variant="outline" className="w-full sm:w-auto border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 text-lg px-8 h-14 rounded-xl bg-zinc-900/50 backdrop-blur-sm">Book a Demo</Button>
+            <Button onClick={() => handleOpenModal('trial')} size="lg" className="w-full sm:w-auto bg-white hover:bg-zinc-200 text-black text-lg px-8 h-14 rounded-xl">
+              Start Your Free Trial
+            </Button>
+            <Button onClick={() => handleOpenModal('demo')} size="lg" variant="outline" className="w-full sm:w-auto border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 text-lg px-8 h-14 rounded-xl bg-zinc-900/50 backdrop-blur-sm">
+              Book a Demo
+            </Button>
           </div>
         </div>
       </section>
