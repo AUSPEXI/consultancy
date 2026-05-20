@@ -1,78 +1,25 @@
-'use client'
-
-import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
 
 export function PublicHeader() {
-  const { user } = useAuth();
-  const pathname = usePathname();
-  const router = useRouter();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
-    if (pathname === '/') {
-      e.preventDefault();
-      const element = document.getElementById(hash.replace('#', ''));
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-        window.history.pushState(null, '', hash);
-      }
-    }
-    setIsMenuOpen(false);
-  };
-
   return (
-    <nav className="fixed top-0 w-full z-50 border-b border-zinc-800/50 bg-zinc-950/80 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        <div className="md:hidden flex items-center">
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-zinc-300 hover:text-white">
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-
-        <Link href="/" className="flex items-center gap-2">
-          <img src="/auspexi-logo.png" alt="Auspexi" className="w-14 h-14 object-contain shrink-0" />
-          <span className="font-heading font-bold text-2xl tracking-tight text-white hidden sm:block">Auspexi</span>
+    <header className="fixed top-0 left-0 right-0 z-50 bg-zinc-950/70 backdrop-blur-md border-b border-zinc-900 h-20 flex items-center px-6">
+      <div className="max-w-7xl w-full mx-auto flex justify-between items-center">
+        <Link href="/" className="font-heading text-xl font-bold tracking-widest text-white">
+          AUSPEXI
         </Link>
-
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-          <Link href="/#features" onClick={(e) => handleNavClick(e, '#features')} className="hover:text-white transition-colors">Features</Link>
-          <Link href="/#pricing" onClick={(e) => handleNavClick(e, '#pricing')} className="hover:text-white transition-colors">Pricing</Link>
-          <Link href="/about" className="hover:text-white transition-colors">About</Link>
-          <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
-          <Link href="/faq" className="hover:text-white transition-colors">FAQ</Link>
-        </div>
-
+        <nav className="hidden md:flex items-center gap-8">
+          <Link href="/about" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">About</Link>
+          <Link href="/blog" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Blog</Link>
+          <Link href="/faq" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">FAQ</Link>
+          <Link href="/resources" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Resources</Link>
+          <Link href="/roadmap" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Roadmap</Link>
+        </nav>
         <div className="flex items-center gap-4">
-          {user ? (
-            <Link href="/dashboard">
-              <Button className="bg-zinc-800 hover:bg-zinc-700 text-white border-0">Dashboard</Button>
-            </Link>
-          ) : (
-            <>
-              <button onClick={() => router.push('/dashboard')} className="hidden md:block text-sm font-medium text-zinc-300 hover:text-white transition-colors">Sign In</button>
-              <Button onClick={() => router.push('/dashboard')} className="bg-white hover:bg-zinc-200 text-black border-0">Get Started</Button>
-            </>
-          )}
+          <Link href="/dashboard" className="px-5 py-2 rounded-full border border-zinc-800 text-sm font-semibold text-white bg-zinc-950 hover:bg-zinc-900 transition-all font-sans">
+            Dashboard
+          </Link>
         </div>
       </div>
-
-      {isMenuOpen && (
-        <div className="md:hidden absolute top-16 left-0 w-full bg-zinc-950 border-b border-zinc-800/50 p-4 flex flex-col gap-4 shadow-xl">
-          <Link href="/#features" onClick={(e) => handleNavClick(e, '#features')} className="text-zinc-300 hover:text-white font-medium">Features</Link>
-          <Link href="/#pricing" onClick={(e) => handleNavClick(e, '#pricing')} className="text-zinc-300 hover:text-white font-medium">Pricing</Link>
-          <Link href="/about" onClick={() => setIsMenuOpen(false)} className="text-zinc-300 hover:text-white font-medium">About</Link>
-          <Link href="/blog" onClick={() => setIsMenuOpen(false)} className="text-zinc-300 hover:text-white font-medium">Blog</Link>
-          <Link href="/faq" onClick={() => setIsMenuOpen(false)} className="text-zinc-300 hover:text-white font-medium">FAQ</Link>
-          {!user && (
-            <button onClick={() => { router.push('/dashboard'); setIsMenuOpen(false); }} className="text-left text-zinc-300 hover:text-white font-medium">Sign In</button>
-          )}
-        </div>
-      )}
-    </nav>
+    </header>
   );
 }
