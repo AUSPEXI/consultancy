@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     const result = await llmOrchestrator.executeCall<any>({
       userId,
       provider: 'gemini',
-      model: 'gemini-1.5-pro',
+      model: 'gemini-3.1-pro-preview',
       prompt,
       schema: ContentScorerSchema,
     });

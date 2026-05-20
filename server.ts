@@ -488,7 +488,7 @@ app.use(express.json());
       const result = await llmOrchestrator.executeCall<any>({
         userId,
         provider: 'gemini',
-        model: 'gemini-1.5-flash',
+        model: 'gemini-3.5-flash',
         prompt,
         schema: AmplifySchema
       });
@@ -557,7 +557,7 @@ app.use(express.json());
       const result = await llmOrchestrator.executeCall<any>({
         userId,
         provider: 'gemini',
-        model: 'gemini-1.5-pro',
+        model: 'gemini-3.1-pro-preview',
         prompt,
         schema: ContentScorerSchema
       });
@@ -601,7 +601,7 @@ app.use(express.json());
       const result = await llmOrchestrator.executeCall<any>({
         userId,
         provider: 'gemini',
-        model: 'gemini-1.5-flash',
+        model: 'gemini-3.5-flash',
         prompt,
         schema: FactExtractionSchema
       });
@@ -640,7 +640,7 @@ app.use(express.json());
       const result = await llmOrchestrator.executeCall<any>({
         userId: 'anonymous',
         provider: 'gemini',
-        model: 'gemini-1.5-flash',
+        model: 'gemini-3.5-flash',
         prompt
       });
 
@@ -669,7 +669,7 @@ app.use(express.json());
       const result = await llmOrchestrator.executeCall<any>({
         userId,
         provider: 'gemini',
-        model: 'gemini-1.5-flash',
+        model: 'gemini-3.5-flash',
         prompt
       });
 
@@ -733,7 +733,7 @@ app.use(express.json());
       const result = await llmOrchestrator.executeCall<any>({
         userId,
         provider: 'gemini',
-        model: 'gemini-1.5-pro',
+        model: 'gemini-3.1-pro-preview',
         prompt,
         schema: SimulatorSchema
       });
@@ -779,7 +779,7 @@ app.use(express.json());
         const result = await llmOrchestrator.executeCall<any>({
           userId,
           provider: 'gemini',
-          model: 'gemini-1.5-pro',
+          model: 'gemini-3.1-pro-preview',
           prompt
         });
 
@@ -816,7 +816,7 @@ app.use(express.json());
       const result = await llmOrchestrator.executeCall<any>({
         userId,
         provider: 'gemini',
-        model: 'gemini-1.5-flash',
+        model: 'gemini-3.5-flash',
         prompt
       });
 
@@ -850,7 +850,7 @@ app.use(express.json());
       const result = await llmOrchestrator.executeCall<any>({
         userId,
         provider: 'gemini',
-        model: 'gemini-1.5-flash',
+        model: 'gemini-3.5-flash',
         prompt
       });
 
@@ -896,7 +896,7 @@ app.use(express.json());
         const result = await llmOrchestrator.executeCall<string>({
           userId: 'agent-user',
           provider: 'gemini',
-          model: 'gemini-1.5-flash',
+          model: 'gemini-3.5-flash',
           prompt: fallbackPrompt
         });
         crawlerData = result.rawOutput || `Raw data found for ${topic}: No detailed data available.`;
@@ -927,7 +927,7 @@ app.use(express.json());
       const result = await llmOrchestrator.executeCall<string>({
         userId: 'agent-user',
         provider: 'gemini',
-        model: 'gemini-1.5-flash',
+        model: 'gemini-3.5-flash',
         prompt: extractPrompt
       });
       res.json({ success: true, result: result.rawOutput });
@@ -949,7 +949,7 @@ app.use(express.json());
       const result = await llmOrchestrator.executeCall<string>({
         userId: 'agent-user',
         provider: 'gemini',
-        model: 'gemini-1.5-flash',
+        model: 'gemini-3.5-flash',
         prompt: schemaPrompt
       });
       let text = result.rawOutput || "{}";
@@ -989,7 +989,7 @@ app.use(express.json());
       const result = await llmOrchestrator.executeCall<string>({
         userId,
         provider: 'gemini',
-        model: 'gemini-1.5-pro',
+        model: 'gemini-3.1-pro-preview',
         prompt: synthesisPrompt,
         temperature: 0.7
       });
@@ -1055,7 +1055,7 @@ app.use(express.json());
       const result = await llmOrchestrator.executeCall<any>({
         userId: userId || 'anonymous',
         provider: 'gemini',
-        model: 'gemini-1.5-flash',
+        model: 'gemini-3.5-flash',
         prompt,
         schema: AnchorsSchema
       });
@@ -1103,7 +1103,7 @@ app.use(express.json());
       const result = await llmOrchestrator.executeCall<string>({
         userId,
         provider: 'gemini',
-        model: 'gemini-1.5-pro',
+        model: 'gemini-3.1-pro-preview',
         contents,
         temperature: 0.7
       });
@@ -1218,7 +1218,7 @@ If the context is sparse, use a baseline of 5-15% for the brand if it's mentione
       const result = await llmOrchestrator.executeCall<any>({
         userId,
         provider: 'gemini',
-        model: 'gemini-1.5-pro',
+        model: 'gemini-3.1-pro-preview',
         prompt,
         schema: SOVMetricsSchema
       });
@@ -1327,7 +1327,7 @@ Format the output in clean Markdown.
       const result = await llmOrchestrator.executeCall<string>({
         userId: email,
         provider: 'gemini',
-        model: 'gemini-1.5-pro',
+        model: 'gemini-3.1-pro-preview',
         prompt,
         temperature: 0.7
       });
@@ -1597,7 +1597,7 @@ Format the output in clean Markdown.
       const result = await llmOrchestrator.executeCall<any>({
         userId: 'monitor-user',
         provider: 'gemini',
-        model: 'gemini-1.5-flash',
+        model: 'gemini-3.5-flash',
         prompt,
         schema: BrandMonitorSchema
       });
@@ -2078,7 +2078,7 @@ function startEmailFunnelCron() {
             const result = await llmOrchestrator.executeCall<any>({
               userId: userDoc.id,
               provider: 'gemini',
-              model: 'gemini-1.5-flash',
+              model: 'gemini-3.5-flash',
               prompt,
               schema: SOVMetricsSchema
             });
