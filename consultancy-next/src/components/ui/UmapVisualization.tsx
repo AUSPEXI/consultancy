@@ -171,12 +171,23 @@ export function UmapVisualization() {
     return () => cancelAnimationFrame(animationId);
   }, [selectedModel]);
 
-  // Adjust canvas bounds on start
+  // Match canvas resolution to container size
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    canvas.width = 600;
-    canvas.height = 400;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const resize = () => {
+      const panel = canvas.parentElement;
+      if (!panel) return;
+      canvas.width = panel.offsetWidth || 600;
+      canvas.height = panel.offsetHeight || 400;
+    };
+
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas.parentElement!);
+    return () => ro.disconnect();
   }, []);
 
   return (

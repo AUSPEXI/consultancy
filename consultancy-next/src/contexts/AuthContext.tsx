@@ -102,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       unsubscribeAuth()
       if (unsubscribeUserDoc) unsubscribeUserDoc()
     }
-  }, [loading])
+  }, [])
 
   const handleSignInWithGoogle = async () => {
     try {
