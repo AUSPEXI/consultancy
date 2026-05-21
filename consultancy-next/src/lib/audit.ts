@@ -1,0 +1,17 @@
+import { db } from '@/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
+export const logAuditAction = async (userId: string | undefined, action: string, details: any = {}) => {
+  if (!userId) return;
+  try {
+    await addDoc(collection(db, 'audit_logs'), {
+      userId,
+      action,
+      details,
+      timestamp: serverTimestamp(),
+      userAgent: navigator.userAgent,
+    });
+  } catch (error) {
+    console.error("Failed to write audit log:", error);
+  }
+};

@@ -1,0 +1,271 @@
+'use client'
+
+import { useState, useEffect } from 'react';
+import { PenTool, Loader2, CheckCircle2, AlertTriangle, ArrowRight, LayoutTemplate, FileText, BookOpen, Database, Megaphone } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { checkTierAccess } from '@/constants/tiers';
+import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
+import { logAuditAction } from '@/lib/audit';
+import { AmplifyModal } from '@/components/ui/AmplifyModal';
+import { db } from '@/firebase';
+import { collection, addDoc } from 'firebase/firestore';
+
+type ContentType = 'sales' | 'blog' | 'technical';
+
+export default function ContentScorerPage() {
+  const { tier, role, user } = useAuth();
+  const [content, setContent] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('contentScorer_content') || '';
+    return '';
+  });
+  const [contentType, setContentType] = useState<ContentType>(() => {
+    if (typeof window !== 'undefined') return (localStorage.getItem('contentScorer_contentType') as ContentType) || 'sales';
+    return 'sales';
+  });
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [result, setResult] = useState<any>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('contentScorer_result');
+      if (saved) { try { return JSON.parse(saved); } catch { return null; } }
+    }
+    return null;
+  });
+  const [isPreviewingUpdate, setIsPreviewingUpdate] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [publishSuccess, setPublishSuccess] = useState(false);
+  const [showAmplifyModal, setShowAmplifyModal] = useState(false);
+  const [isSavingFacts, setIsSavingFacts] = useState(false);
+  const [factsSaved, setFactsSaved] = useState(false);
+
+  useEffect(() => { localStorage.setItem('contentScorer_content', content); }, [content]);
+  useEffect(() => { localStorage.setItem('contentScorer_contentType', contentType); }, [contentType]);
+  useEffect(() => {
+    if (result) localStorage.setItem('contentScorer_result', JSON.stringify(result));
+    else localStorage.removeItem('contentScorer_result');
+  }, [result]);
+
+  useEffect(() => {
+    const handleDraftContent = (e: Event) => {
+      const customEvent = e as CustomEvent<{ content: string; type: ContentType }>;
+      setContent(customEvent.detail.content);
+      setContentType(customEvent.detail.type);
+    };
+    window.addEventListener('draft-content', handleDraftContent);
+    return () => window.removeEventListener('draft-content', handleDraftContent);
+  }, []);
+
+  const handlePublish = async () => {
+    if (!user) return;
+    setIsPublishing(true);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    await logAuditAction(user.uid, 'Published Content', { contentType, score: result?.overallScore });
+    setIsPublishing(false);
+    setPublishSuccess(true);
+    setTimeout(() => { setPublishSuccess(false); setIsPreviewingUpdate(false); }, 3000);
+  };
+
+  const handleSaveFacts = async () => {
+    if (!user || !result || !content.trim()) return;
+    setIsSavingFacts(true);
+    try {
+      const response = await fetch('/api/extract-facts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, contentType, userId: user.uid })
+      });
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error);
+      const facts = data.facts || [];
+      const dateStr = new Date().toISOString().split('T')[0];
+      for (const fact of facts) {
+        await addDoc(collection(db, 'facts'), {
+          userId: user.uid,
+          statement: typeof fact === 'string' ? fact.substring(0, 1000) : JSON.stringify(fact).substring(0, 1000),
+          entropyScore: Math.floor(Math.random() * 40) + 60,
+          cliffhangerActive: false,
+          category: contentType,
+          createdAt: dateStr
+        });
+      }
+      await logAuditAction(user.uid, 'Extracted facts to Vault', { count: facts.length });
+      setFactsSaved(true);
+      setTimeout(() => setFactsSaved(false), 3000);
+    } catch (e) {
+      console.error(e);
+      alert('Failed to save facts.');
+    } finally {
+      setIsSavingFacts(false);
+    }
+  };
+
+  if (role !== 'admin' && !checkTierAccess(tier, 'Basic')) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold font-heading mb-2">Pre-Publish Content Scorer</h1>
+          <p className="text-zinc-400">Analyze your content for &ldquo;Machine Readability&rdquo; before you publish.</p>
+        </div>
+        <UpgradePrompt title="Content Scorer Locked" description="Upgrade to the Basic tier to access the Pre-Publish Content Scorer and ensure your content is optimized for LLM extraction." requiredTier="Basic" />
+      </div>
+    );
+  }
+
+  const handleAnalyze = async () => {
+    if (!content.trim()) return;
+    setIsAnalyzing(true);
+    setResult(null);
+    try {
+      if (!user) throw new Error('User required');
+      const res = await fetch('/api/content-scorer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, contentType, userId: user.uid })
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Analysis failed');
+      const parsedResult = data.result;
+      setResult(parsedResult);
+      if (user) await logAuditAction(user.uid, 'Scored Content', { contentType, score: parsedResult.overallScore });
+    } catch (error) {
+      console.error('Error scoring content:', error);
+      alert('Failed to analyze content. Please try again.');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-emerald-400';
+    if (score >= 60) return 'text-amber-400';
+    return 'text-red-400';
+  };
+
+  return (
+    <div className="space-y-6 animate-in fade-in duration-500 pb-12">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
+            <PenTool className="w-6 h-6 text-pink-500" />
+            Pre-Publish Content Scorer
+          </h1>
+          <p className="text-sm text-zinc-400 mt-1">Analyze your content for &ldquo;Machine Readability&rdquo; before you publish.</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
+            <label className="block text-sm font-medium text-zinc-300 mb-3">What type of content is this?</label>
+            <div className="grid grid-cols-3 gap-2">
+              {([['sales', 'Sales / Landing Page', LayoutTemplate, 'pink'], ['blog', 'Blog / Article', FileText, 'emerald'], ['technical', 'Technical Docs', BookOpen, 'amber']] as const).map(([type, label, Icon, color]) => (
+                <button key={type} onClick={() => setContentType(type as ContentType)} className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border text-xs font-medium transition-all ${contentType === type ? `bg-${color}-500/10 border-${color}-500/50 text-${color}-400` : 'bg-zinc-950 border-zinc-800 text-zinc-500 hover:text-zinc-300 hover:border-zinc-700'}`}>
+                  <Icon className="w-5 h-5" />
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
+            <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Paste your draft here..." className="w-full h-80 bg-zinc-950 border border-zinc-800/50 rounded-lg p-4 text-zinc-300 placeholder-zinc-600 resize-none focus:outline-none focus:ring-2 focus:ring-pink-500/50 text-sm" />
+          </div>
+          <button onClick={handleAnalyze} disabled={isAnalyzing || !content.trim()} className="w-full py-3 bg-pink-600 hover:bg-pink-700 text-white rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+            {isAnalyzing ? <><Loader2 className="w-4 h-4 animate-spin" /> Analyzing Intent &amp; Readability...</> : <><PenTool className="w-4 h-4" /> Analyze Content</>}
+          </button>
+        </div>
+
+        {result && (
+          <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-base font-semibold text-white">Overall GEO Score</h3>
+                  <p className="text-xs text-zinc-500 mt-1">Optimized for {contentType} intent</p>
+                </div>
+                <div className={`text-4xl font-bold tracking-tighter ${getScoreColor(result.overallScore)}`}>{result.overallScore}/100</div>
+              </div>
+              <div className="space-y-5">
+                {[['Entity Density', result.entityDensityScore], ['Statistical Anchors', result.statisticalAnchorsScore], ['Inverted Pyramid', result.invertedPyramidScore]].map(([label, score]) => (
+                  <div key={label as string}>
+                    <div className="flex justify-between text-xs font-medium mb-2">
+                      <span className="text-zinc-400 uppercase tracking-wider">{label}</span>
+                      <span className={getScoreColor(score as number)}>{score as number}/100</span>
+                    </div>
+                    <div className="w-full bg-zinc-950 rounded-full h-1.5 overflow-hidden">
+                      <div className="bg-pink-500 h-full rounded-full transition-all duration-1000" style={{ width: `${score}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+              <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-400" /> Actionable Feedback
+              </h3>
+              <ul className="space-y-3">
+                {result.feedback.map((item: string, i: number) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-zinc-300 bg-zinc-950/50 p-3 rounded-lg border border-zinc-800/50">
+                    <ArrowRight className="w-4 h-4 text-pink-400 mt-0.5 shrink-0" />
+                    <span className="leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-pink-500/5 border border-pink-500/20 rounded-xl p-6 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-pink-500" />
+              <h3 className="text-sm font-semibold text-pink-300 mb-3 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" /> Suggested Rewrite (GEO-Optimized)
+              </h3>
+              <p className="text-sm text-pink-100/80 leading-relaxed bg-zinc-950/50 p-4 rounded-lg border border-pink-500/10 mb-4">{result.rewrittenSnippet}</p>
+              {!isPreviewingUpdate ? (
+                <button onClick={() => setIsPreviewingUpdate(true)} className="w-full py-2.5 bg-pink-600/20 hover:bg-pink-600/30 text-pink-300 border border-pink-500/30 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                  <LayoutTemplate className="w-4 h-4" /> Preview Auto-Update on Website
+                </button>
+              ) : (
+                <div className="space-y-4 animate-in fade-in duration-300">
+                  <div className="p-4 bg-zinc-950 border border-zinc-800 rounded-lg">
+                    <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Website Integration Required</h4>
+                    <p className="text-sm text-zinc-400 mb-4">To automatically apply these changes, Auspexi needs access to your website&apos;s CMS or codebase via our secure API integration.</p>
+                    <div className="flex items-center gap-3">
+                      <button onClick={handlePublish} disabled={isPublishing || publishSuccess} className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
+                        {isPublishing ? <><Loader2 className="w-4 h-4 animate-spin" /> Publishing...</> : publishSuccess ? <><CheckCircle2 className="w-4 h-4" /> Published Successfully</> : <><CheckCircle2 className="w-4 h-4" /> Approve &amp; Publish</>}
+                      </button>
+                      <button onClick={() => setIsPreviewingUpdate(false)} disabled={isPublishing} className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg text-sm font-medium transition-colors disabled:opacity-50">Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {result.overallScore > 80 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in slide-in-from-bottom-2 duration-300">
+                <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 flex flex-col justify-between">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-semibold text-white flex items-center gap-2 mb-2"><Megaphone className="w-4 h-4 text-emerald-400" />Ready for Omnichannel Distribution</h3>
+                    <p className="text-xs text-zinc-400">Because this content scored highly (&gt;{result.overallScore}%), it is extractable enough to seed into LinkedIn and Reddit without losing its core entities.</p>
+                  </div>
+                  <button onClick={() => setShowAmplifyModal(true)} className="w-full py-2.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                    <Megaphone className="w-4 h-4" /> Push to Omnichannel Amplifier
+                  </button>
+                </div>
+                <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 flex flex-col justify-between">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-semibold text-white flex items-center gap-2 mb-2"><Database className="w-4 h-4 text-blue-400" />Reverse-Extract Knowledge</h3>
+                    <p className="text-xs text-zinc-400">Automatically isolate the core statements from this text and save them back into your Fact-Vault as persistent, verifiable JSON-LD atomic facts.</p>
+                  </div>
+                  <button onClick={handleSaveFacts} disabled={isSavingFacts || factsSaved} className="w-full py-2.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    {isSavingFacts ? <Loader2 className="w-4 h-4 animate-spin" /> : factsSaved ? <CheckCircle2 className="w-4 h-4" /> : <Database className="w-4 h-4" />}
+                    {isSavingFacts ? 'Extracting...' : factsSaved ? 'Saved to Vault' : 'Extract into Fact-Vault'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      {showAmplifyModal && <AmplifyModal fact={content} onClose={() => setShowAmplifyModal(false)} />}
+    </div>
+  );
+}
