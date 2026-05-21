@@ -59,7 +59,7 @@ export const PricingCard = ({
         className={cn(
           "relative flex h-full flex-col rounded-3xl border p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl",
           isPopular 
-            ? "border-pink-500/50 bg-zinc-900/80 shadow-[0_0_40px_-10px_rgba(236,72,153,0.15)]" 
+            ? "border-transparent bg-zinc-900/80 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]"
             : "border-white/10 bg-zinc-950/50 hover:border-white/20",
           className
         )}

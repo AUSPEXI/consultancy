@@ -22,7 +22,7 @@ export default function BlogPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogPosts.map((post) => (
-              <Link href={`/blog/${post.slug}`} key={post.slug} className="group cursor-pointer bg-zinc-900/30 border border-zinc-800 rounded-2xl overflow-hidden hover:border-zinc-700 transition-colors flex flex-col">
+              <Link href={`/blog/${post.slug}`} key={post.slug} className="group cursor-pointer bg-zinc-900/30 rounded-2xl overflow-hidden flex flex-col shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
                 <div className="w-full flex min-h-[220px] overflow-hidden border-b border-zinc-800 relative bg-[#0B0E14]">
                   <BlogHero title={post.title} category={post.category} compact={true} />
                 </div>

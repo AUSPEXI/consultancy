@@ -396,7 +396,7 @@ export function LandingPageClient() {
             <li className="min-h-[14rem] list-none md:[grid-area:1/1/2/7] xl:[grid-area:1/1/2/5]">
               <div className="relative h-full rounded-[1.25rem] border border-zinc-800 p-2 md:rounded-[1.5rem] md:p-3 bg-zinc-950">
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
-                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
                   <div className="space-y-3">
                     <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
                       <BarChart3 className="w-5 h-5 text-zinc-300" />
@@ -410,7 +410,7 @@ export function LandingPageClient() {
             <li className="min-h-[14rem] list-none md:[grid-area:1/7/2/13] xl:[grid-area:2/1/3/5]">
               <div className="relative h-full rounded-[1.25rem] border border-zinc-800 p-2 md:rounded-[1.5rem] md:p-3 bg-zinc-950">
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
-                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
                   <div className="space-y-3">
                     <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
                       <Target className="w-5 h-5 text-zinc-300" />
@@ -424,7 +424,7 @@ export function LandingPageClient() {
             <li className="min-h-[14rem] list-none md:[grid-area:2/1/3/7] xl:[grid-area:1/5/3/8]">
               <div className="relative h-full rounded-[1.25rem] border border-zinc-800 p-2 md:rounded-[1.5rem] md:p-3 bg-zinc-950">
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
-                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
                   <div className="space-y-3">
                     <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
                       <ShieldAlert className="w-5 h-5 text-zinc-300" />
@@ -438,7 +438,7 @@ export function LandingPageClient() {
             <li className="min-h-[14rem] list-none md:[grid-area:2/7/3/13] xl:[grid-area:1/8/2/13]">
               <div className="relative h-full rounded-[1.25rem] border border-zinc-800 p-2 md:rounded-[1.5rem] md:p-3 bg-zinc-950">
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
-                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
                   <div className="space-y-3">
                     <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
                       <Database className="w-5 h-5 text-zinc-300" />
@@ -452,7 +452,7 @@ export function LandingPageClient() {
             <li className="min-h-[14rem] list-none md:[grid-area:3/1/4/13] xl:[grid-area:2/8/3/13]">
               <div className="relative h-full rounded-[1.25rem] border border-zinc-800 p-2 md:rounded-[1.5rem] md:p-3 bg-zinc-950">
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
-                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
                   <div className="space-y-3">
                     <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
                       <Search className="w-5 h-5 text-zinc-300" />
@@ -592,7 +592,7 @@ export function LandingPageClient() {
             />
           </div>
 
-          <div className="mt-12 text-center text-sm text-zinc-500 max-w-3xl mx-auto bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-6">
+          <div className="mt-12 text-center text-sm text-zinc-500 max-w-3xl mx-auto bg-zinc-900/30 rounded-xl p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
               <div>
                 <p className="mb-3 flex items-start gap-2">
@@ -643,7 +643,7 @@ export function LandingPageClient() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {blogPosts.slice(0, 3).map((post, i) => (
               <Link href={`/blog/${post.slug}`} key={i} className="group cursor-pointer flex flex-col">
-                <div className="w-full flex min-h-[220px] rounded-xl overflow-hidden mb-4 border border-zinc-800 relative bg-[#0B0E14]">
+                <div className="w-full flex min-h-[220px] rounded-xl overflow-hidden mb-4 relative bg-[#0B0E14] shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
                   <BlogHero title={post.title} category={post.category} compact={true} />
                 </div>
                 <div className="flex items-center gap-3 text-xs font-medium text-zinc-500 mb-2">

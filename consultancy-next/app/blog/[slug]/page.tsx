@@ -44,7 +44,7 @@ export default function BlogPostPage() {
               <span>•</span>
               <span>{post.date}</span>
             </div>
-            <div className="w-full min-h-[300px] md:min-h-[400px] flex rounded-2xl overflow-hidden border border-zinc-805 relative bg-[#0B0E14] group">
+            <div className="w-full min-h-[300px] md:min-h-[400px] flex rounded-2xl overflow-hidden relative bg-[#0B0E14] group shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
               <BlogHero title={post.title} category={post.category} compact={false} />
             </div>
           </div>
