@@ -249,7 +249,7 @@ export function LandingPageClient() {
                 Traditional SEO is dying. Auspexi is the premier Generative Engine Optimization (GEO) platform that ensures your brand is cited, recommended, and prioritized by AI models like Gemini, ChatGPT, and Claude.
               </p>
 
-              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 mb-8 backdrop-blur-sm">
+              <div className="bg-zinc-900/50 rounded-xl p-5 mb-8 backdrop-blur-sm shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
                 <h3 className="text-white font-semibold mb-2">What is Generative Engine Optimization (GEO)?</h3>
                 <p className="text-sm text-zinc-300 leading-relaxed">
                   Generative Engine Optimization (GEO) is the process of optimizing your brand&apos;s content so that it is cited as the primary source of truth by AI models like ChatGPT, Google Gemini, Claude, and Perplexity.
