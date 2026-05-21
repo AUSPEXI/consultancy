@@ -4,7 +4,7 @@ import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock,
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
@@ -18,7 +18,6 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const { user, logout, tier } = useAuth();
-  const router = useRouter();
   const pathname = usePathname();
 
   // Derive role from email since Next.js AuthContext doesn't expose role directly
@@ -88,14 +87,12 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             const isActive = pathname.includes(item.path);
             const isLocked = !hasAccess(item.requiredTier as UserTier);
             return (
-              <button
+              <Link
                 key={item.id}
-                onClick={() => {
-                  router.push(item.path);
-                  setIsOpen(false);
-                }}
+                href={item.path}
+                onClick={() => setIsOpen(false)}
                 className={cn(
-                  "w-full flex items-center justify-between px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+                  "flex items-center justify-between px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
                   isActive
                     ? "bg-zinc-800 text-white"
                     : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
@@ -106,7 +103,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                   {item.label}
                 </div>
                 {isLocked && <Lock className="w-3.5 h-3.5 text-zinc-500" />}
-              </button>
+              </Link>
             );
           })}
         </nav>
@@ -149,13 +146,11 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             Back to Website
           </Link>
           {isAdmin && (
-            <button
-              onClick={() => {
-                router.push('/dashboard/superuser');
-                setIsOpen(false);
-              }}
+            <Link
+              href="/dashboard/superuser"
+              onClick={() => setIsOpen(false)}
               className={cn(
-                "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+                "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
                 pathname.includes('/dashboard/superuser')
                   ? "bg-pink-500/10 text-pink-400 border border-pink-500/20"
                   : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
@@ -163,15 +158,13 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             >
               <ShieldAlert className="w-5 h-5" />
               Superuser Control
-            </button>
+            </Link>
           )}
-          <button
-            onClick={() => {
-              router.push('/dashboard/settings');
-              setIsOpen(false);
-            }}
+          <Link
+            href="/dashboard/settings"
+            onClick={() => setIsOpen(false)}
             className={cn(
-              "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+              "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
               pathname.includes('/dashboard/settings')
                 ? "bg-zinc-800 text-white"
                 : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
@@ -179,7 +172,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           >
             <Settings className="w-5 h-5" />
             Settings
-          </button>
+          </Link>
           <button
             onClick={logout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 transition-colors"

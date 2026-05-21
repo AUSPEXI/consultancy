@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { GoogleGenAI, Type, Modality } from '@google/genai';
 import { Bot, X, Send, Maximize2, Minimize2, Sparkles, Mic, MicOff, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc, query, orderBy, limit, where } from 'firebase/firestore';
 import { db, auth } from '@/firebase';
 
 // Lazy initialization of Gemini API
@@ -130,32 +130,30 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
         const user = auth.currentUser;
         if (!user) return;
 
-        // Fetch Knowledge Graph for THIS user
         const qFacts = query(
           collection(db, 'knowledge_graph'),
           where('userId', '==', user.uid),
           limit(50)
         );
-        const snapshotFacts = await getDocs(qFacts);
-        const docs = snapshotFacts.docs.map(doc => doc.data());
-        // Sort client-side to avoid needing a composite index
-        docs.sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-
-        const facts = docs.slice(0, 30).map((d: any) => d.fact);
-
-        // Fetch latest metrics for THIS user
         const qMetrics = query(
           collection(db, 'sovMetrics'),
           where('userId', '==', user.uid),
           orderBy('date', 'desc'),
           limit(1)
         );
-        const snapshotMetrics = await getDocs(qMetrics);
-        const latestMetrics = snapshotMetrics.empty ? null : snapshotMetrics.docs[0].data();
 
-        // Fetch user data for anchors
-        const userDoc = await getDocs(query(collection(db, 'users'), where('uid', '==', user.uid), limit(1)));
-        const latentAnchors = !userDoc.empty ? userDoc.docs[0].data()?.latentAnchors : null;
+        const [snapshotFacts, snapshotMetrics, userDocSnap] = await Promise.all([
+          getDocs(qFacts),
+          getDocs(qMetrics),
+          getDoc(doc(db, 'users', user.uid)),
+        ]);
+
+        const docs = snapshotFacts.docs.map(d => d.data());
+        docs.sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+        const facts = docs.slice(0, 30).map((d: any) => d.fact);
+
+        const latestMetrics = snapshotMetrics.empty ? null : snapshotMetrics.docs[0].data();
+        const latentAnchors = userDocSnap.exists() ? userDocSnap.data()?.latentAnchors : null;
 
         let context = "";
         if (facts.length > 0) {

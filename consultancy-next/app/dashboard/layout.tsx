@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { Header } from '@/components/dashboard/Header';
-import { Copilot } from '@/components/dashboard/Copilot';
 import { Loader2 } from 'lucide-react';
+
+const Copilot = dynamic(() => import('@/components/dashboard/Copilot').then(m => ({ default: m.Copilot })), { ssr: false });
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
