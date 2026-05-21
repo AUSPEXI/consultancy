@@ -46,8 +46,11 @@ const BentoCard = ({
     key={name}
     className={cn(
       "group relative flex flex-col justify-center overflow-hidden rounded-xl",
-      // dark styles (defaulting to dark for this app)
       "bg-zinc-900/50 border border-zinc-800 backdrop-blur-sm",
+      // Neon tube effect: white inner ring + pink outer ring, brightens on hover
+      "shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_0_0_3px_rgba(236,72,153,0.15),0_0_28px_-4px_rgba(236,72,153,0.06)]",
+      "hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12),0_0_0_3px_rgba(236,72,153,0.45),0_0_32px_-4px_rgba(236,72,153,0.18)]",
+      "transition-shadow duration-300",
       className,
     )}
   >
