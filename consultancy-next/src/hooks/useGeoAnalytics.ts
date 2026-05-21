@@ -20,7 +20,7 @@ export const useGeoAnalytics = (brandId: string, customPrompts: string[] = [], p
   });
 
   const fetchAnalytics = useCallback(async () => {
-    if (!brandId) return;
+    if (!brandId) { setLoading(false); return; }
     setLoading(true);
     try {
       const authParam = userId ? `&userId=${userId}` : '';

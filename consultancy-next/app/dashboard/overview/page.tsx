@@ -74,7 +74,7 @@ export default function OverviewPage() {
 
   const userPrompts = userData?.sentimentPrompts || defaultPrompts;
 
-  const { mapPoints, sentimentTrace, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(
+  const { pulseData, mapPoints, sentimentTrace, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(
     userData?.brand || '',
     userPrompts,
     selectedPlatform,
@@ -93,6 +93,7 @@ export default function OverviewPage() {
   const [auditSuccess, setAuditSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isSyncingCMS, setIsSyncingCMS] = useState(false);
+  const [driftDismissed, setDriftDismissed] = useState(false);
 
   const userAnchors = userData?.latentAnchors || [
     { label: "Reputational Moat", color: "#ec4899", baseType: "Systemic Anchor" },
@@ -170,13 +171,14 @@ export default function OverviewPage() {
           await setDoc(doc(db, 'sovMetrics', `${user.uid}_${dateStr}`), { userId: user.uid, date: dateStr, shortDate: today.toLocaleDateString('en-US', { weekday: 'short' }), expiresAt: expiresAtDate, ...data.metrics }, { merge: true });
           await logAuditAction(user.uid, 'Ran Real SOV Audit', { date: dateStr });
           setAuditSuccess(true);
-          setToastMessage({ text: "Audit Complete! Fresh metrics have been synchronized with your Neural Twin.", type: 'success' });
+          setDriftDismissed(true);
+          setToastMessage({ text: "Audit Complete! Fresh metrics synchronized with your Neural Twin.", type: 'success' });
           refetchGeo();
         } else {
           throw new Error(data.error || 'Failed to run audit');
         }
       } else {
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 1500));
         const lastDate = metrics.length > 0 ? new Date(metrics[metrics.length - 1].date) : new Date();
         if (metrics.length > 0) lastDate.setDate(lastDate.getDate() + 1);
         const dateStr = lastDate.toISOString().split('T')[0];
@@ -185,6 +187,8 @@ export default function OverviewPage() {
         const prevErr = metrics.length > 0 ? metrics[metrics.length - 1].err : 20;
         const prevAiTraffic = metrics.length > 0 ? metrics[metrics.length - 1].aiTraffic : 120;
         const prevCompA = metrics.length > 0 ? metrics[metrics.length - 1].compA : 45;
+
+        const historicalWrites: Promise<any>[] = [];
         if (metrics.length === 0) {
           for (let i = 5; i > 0; i--) {
             const historyDate = new Date();
@@ -192,20 +196,26 @@ export default function OverviewPage() {
             const hDateStr = historyDate.toISOString().split('T')[0];
             const hShortDate = historyDate.toLocaleDateString('en-US', { weekday: 'short' });
             const hAsov = Math.max(5, prevAsov - (i * 2));
-            await setDoc(doc(db, 'sovMetrics', `${user.uid}_${hDateStr}`), { userId: user.uid, date: hDateStr, shortDate: hShortDate, aSov: hAsov, err: Math.max(5, prevErr - (i * 3)), compA: prevCompA + 5, compB: 30, aiTraffic: Math.max(10, prevAiTraffic - (i * 20)), platforms: { chatgpt: hAsov + 5, perplexity: Math.max(0, hAsov - 10), claude: hAsov + 2, gemini: hAsov + 10 } }, { merge: true });
+            historicalWrites.push(setDoc(doc(db, 'sovMetrics', `${user.uid}_${hDateStr}`), { userId: user.uid, date: hDateStr, shortDate: hShortDate, aSov: hAsov, err: Math.max(5, prevErr - (i * 3)), compA: prevCompA + 5, compB: 30, aiTraffic: Math.max(10, prevAiTraffic - (i * 20)), platforms: { chatgpt: hAsov + 5, perplexity: Math.max(0, hAsov - 10), claude: hAsov + 2, gemini: hAsov + 10 } }, { merge: true }));
           }
         }
+        await Promise.all(historicalWrites);
+
         const newAsov = Math.min(100, Math.max(5, prevAsov + (Math.random() > 0.5 ? Math.floor(Math.random() * 12) : -Math.floor(Math.random() * 5))));
         const newCompA = Math.max(0, Math.min(100, prevCompA + (Math.random() > 0.6 ? Math.floor(Math.random() * 5) : -Math.floor(Math.random() * 8))));
         const simulatedPlatforms = { chatgpt: Math.min(100, Math.max(5, newAsov + Math.floor(Math.random() * 20))), perplexity: Math.min(100, Math.max(0, newAsov - Math.floor(Math.random() * 15))), claude: Math.min(100, Math.max(5, newAsov + Math.floor(Math.random() * 10))), gemini: Math.min(100, Math.max(5, newAsov + Math.floor(Math.random() * 25))) };
-        await setDoc(doc(db, 'sovMetrics', `${user.uid}_${dateStr}`), { userId: user.uid, date: dateStr, shortDate, aSov: newAsov, err: Math.min(100, Math.max(0, prevErr + Math.floor(Math.random() * 15) - 5)), compGap: newAsov - newCompA, compA: newCompA, compB: Math.max(0, (metrics.length > 0 ? (metrics[metrics.length - 1].compB || 30) : 30) - Math.floor(Math.random() * 5)), aiTraffic: prevAiTraffic + Math.floor(Math.random() * 60) - 10, platforms: simulatedPlatforms }, { merge: true });
-        await logAuditAction(user.uid, 'Ran Simulated SOV Audit', { date: dateStr });
+        await Promise.all([
+          setDoc(doc(db, 'sovMetrics', `${user.uid}_${dateStr}`), { userId: user.uid, date: dateStr, shortDate, aSov: newAsov, err: Math.min(100, Math.max(0, prevErr + Math.floor(Math.random() * 15) - 5)), compGap: newAsov - newCompA, compA: newCompA, compB: Math.max(0, (metrics.length > 0 ? (metrics[metrics.length - 1].compB || 30) : 30) - Math.floor(Math.random() * 5)), aiTraffic: prevAiTraffic + Math.floor(Math.random() * 60) - 10, platforms: simulatedPlatforms }, { merge: true }),
+          logAuditAction(user.uid, 'Ran Simulated SOV Audit', { date: dateStr }),
+        ]);
         setAuditSuccess(true);
-        setToastMessage({ text: "Simulated Audit Complete! Data generated for demo purposes.", type: 'info' });
+        setDriftDismissed(true);
+        setToastMessage({ text: "Simulated Audit Complete! Add your brand in Settings to run a live audit.", type: 'info' });
       }
       setTimeout(() => setAuditSuccess(false), 3000);
     } catch (error) {
-      handleFirestoreError(error, OperationType.CREATE, 'sovMetrics');
+      console.error('[Audit Error]', error);
+      setToastMessage({ text: "Audit failed. Please check your connection and try again.", type: 'error' });
     } finally {
       setIsAuditing(false);
     }
@@ -332,23 +342,38 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      <div id="drift-alert" className="mb-6 p-6 bg-rose-500/10 border border-rose-500/20 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group">
-        <div className="absolute inset-0 bg-rose-500/5 animate-pulse pointer-events-none" />
-        <div className="flex items-center gap-5 relative z-10">
-          <div className="p-4 bg-rose-500/20 rounded-2xl border border-rose-500/30 shadow-[0_0_20px_rgba(244,63,94,0.2)]"><Activity className="w-6 h-6 text-rose-500" /></div>
-          <div>
-            <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-3">Statistically Significant Drift Detected<span className="px-2.5 py-1 rounded bg-rose-500/20 text-rose-500 text-[10px] font-black uppercase tracking-tighter border border-rose-500/30">-3.2σ Threshold</span></h3>
-            <p className="text-sm text-rose-400/80 mt-1 font-medium max-w-lg">Anomaly detected in "API Latency" clusters within Gemini-2.5-flash latent projections. Immediate recalibration recommended.</p>
+      {!driftDismissed && (() => {
+        const latestAnomaly = pulseData.filter((p: any) => p.isAnomaly).sort((a: any, b: any) => Math.abs(b.zScore) - Math.abs(a.zScore))[0];
+        const showDrift = latestAnomaly || metrics.length === 0;
+        const zScore = latestAnomaly ? latestAnomaly.zScore.toFixed(1) : '-3.2';
+        const driftLabel = latestAnomaly ? `${Math.abs(latestAnomaly.zScore).toFixed(1)}σ Anomaly` : '-3.2σ Threshold';
+        const driftMsg = latestAnomaly
+          ? `Live anomaly detected (z=${zScore}) in your latent projections. Immediate recalibration recommended to protect your SOV.`
+          : 'Anomaly detected in "API Latency" clusters within Gemini-2.5-flash latent projections. Run an audit to establish your baseline and protect your A-SOV.';
+        if (!showDrift) return null;
+        return (
+          <div className="mb-6 p-6 bg-rose-500/10 border border-rose-500/20 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+            <div className="absolute inset-0 bg-rose-500/5 animate-pulse pointer-events-none" />
+            <div className="flex items-center gap-5 relative z-10">
+              <div className="p-4 bg-rose-500/20 rounded-2xl border border-rose-500/30 shadow-[0_0_20px_rgba(244,63,94,0.2)]"><Activity className="w-6 h-6 text-rose-500" /></div>
+              <div>
+                <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-3">
+                  Statistically Significant Drift Detected
+                  <span className="px-2.5 py-1 rounded bg-rose-500/20 text-rose-500 text-[10px] font-black uppercase tracking-tighter border border-rose-500/30">{driftLabel}</span>
+                </h3>
+                <p className="text-sm text-rose-400/80 mt-1 font-medium max-w-lg">{driftMsg}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 relative z-10">
+              <button onClick={runAudit} disabled={isAuditing} className="px-8 py-3 bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-rose-500/20 active:scale-95 transition-all flex items-center gap-3">
+                {isAuditing ? <Loader2 className="w-4 h-4 animate-spin" /> : <BrainCircuit className="w-4 h-4" />}
+                {isAuditing ? "Auditing..." : "Run Deep Audit"}
+              </button>
+              <button onClick={() => setDriftDismissed(true)} className="px-6 py-3 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Dismiss</button>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-4 relative z-10">
-          <button onClick={runAudit} disabled={isAuditing} className="px-8 py-3 bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-rose-500/20 active:scale-95 transition-all flex items-center gap-3">
-            {isAuditing ? <Loader2 className="w-4 h-4 animate-spin" /> : <BrainCircuit className="w-4 h-4" />}
-            {isAuditing ? "Auditing..." : "Run Deep Audit"}
-          </button>
-          <button onClick={() => { const el = document.getElementById('drift-alert'); if (el) el.style.display = 'none'; }} className="px-6 py-3 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Dismiss</button>
-        </div>
-      </div>
+        );
+      })()}
 
       <TooltipProvider>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
