@@ -500,11 +500,7 @@ export default function OverviewPage() {
             </div>
           </div>
           <div className="h-[500px] w-full relative z-10 border border-zinc-800 rounded-3xl bg-zinc-950/20 overflow-hidden">
-            {mapPoints.length > 0 ? (<UmapVisualization />) : (
-              <div className="w-full h-full flex flex-col items-center justify-center border border-dashed border-zinc-800 rounded-2xl">
-                <BrainCircuit className="w-10 h-10 text-zinc-800 mb-4" /><p className="text-zinc-500 text-sm font-medium">Synchronizing Neural Field...</p><p className="text-zinc-600 text-[10px] uppercase tracking-widest mt-2">Loading Latent Embeddings</p>
-              </div>
-            )}
+            <UmapVisualization />
           </div>
           <NeuralLegend />
         </div>
