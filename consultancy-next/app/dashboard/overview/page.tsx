@@ -169,10 +169,12 @@ export default function OverviewPage() {
           const expiresAtDate = new Date();
           expiresAtDate.setDate(expiresAtDate.getDate() + 90);
           await setDoc(doc(db, 'sovMetrics', `${user.uid}_${dateStr}`), { userId: user.uid, date: dateStr, shortDate: today.toLocaleDateString('en-US', { weekday: 'short' }), expiresAt: expiresAtDate, ...data.metrics }, { merge: true });
-          await logAuditAction(user.uid, 'Ran Real SOV Audit', { date: dateStr });
+          // Stop spinner immediately — onSnapshot already updated the UI; let audit log + geo refetch run silently
+          setIsAuditing(false);
           setAuditSuccess(true);
           setDriftDismissed(true);
           setToastMessage({ text: "Audit Complete! Fresh metrics synchronized with your Neural Twin.", type: 'success' });
+          logAuditAction(user.uid, 'Ran Real SOV Audit', { date: dateStr });
           refetchGeo();
         } else {
           throw new Error(data.error || 'Failed to run audit');
@@ -204,13 +206,13 @@ export default function OverviewPage() {
         const newAsov = Math.min(100, Math.max(5, prevAsov + (Math.random() > 0.5 ? Math.floor(Math.random() * 12) : -Math.floor(Math.random() * 5))));
         const newCompA = Math.max(0, Math.min(100, prevCompA + (Math.random() > 0.6 ? Math.floor(Math.random() * 5) : -Math.floor(Math.random() * 8))));
         const simulatedPlatforms = { chatgpt: Math.min(100, Math.max(5, newAsov + Math.floor(Math.random() * 20))), perplexity: Math.min(100, Math.max(0, newAsov - Math.floor(Math.random() * 15))), claude: Math.min(100, Math.max(5, newAsov + Math.floor(Math.random() * 10))), gemini: Math.min(100, Math.max(5, newAsov + Math.floor(Math.random() * 25))) };
-        await Promise.all([
-          setDoc(doc(db, 'sovMetrics', `${user.uid}_${dateStr}`), { userId: user.uid, date: dateStr, shortDate, aSov: newAsov, err: Math.min(100, Math.max(0, prevErr + Math.floor(Math.random() * 15) - 5)), compGap: newAsov - newCompA, compA: newCompA, compB: Math.max(0, (metrics.length > 0 ? (metrics[metrics.length - 1].compB || 30) : 30) - Math.floor(Math.random() * 5)), aiTraffic: prevAiTraffic + Math.floor(Math.random() * 60) - 10, platforms: simulatedPlatforms }, { merge: true }),
-          logAuditAction(user.uid, 'Ran Simulated SOV Audit', { date: dateStr }),
-        ]);
+        await setDoc(doc(db, 'sovMetrics', `${user.uid}_${dateStr}`), { userId: user.uid, date: dateStr, shortDate, aSov: newAsov, err: Math.min(100, Math.max(0, prevErr + Math.floor(Math.random() * 15) - 5)), compGap: newAsov - newCompA, compA: newCompA, compB: Math.max(0, (metrics.length > 0 ? (metrics[metrics.length - 1].compB || 30) : 30) - Math.floor(Math.random() * 5)), aiTraffic: prevAiTraffic + Math.floor(Math.random() * 60) - 10, platforms: simulatedPlatforms }, { merge: true });
+        // Stop spinner as soon as data lands — audit log can write silently
+        setIsAuditing(false);
         setAuditSuccess(true);
         setDriftDismissed(true);
         setToastMessage({ text: "Simulated Audit Complete! Add your brand in Settings to run a live audit.", type: 'info' });
+        logAuditAction(user.uid, 'Ran Simulated SOV Audit', { date: dateStr });
       }
       setTimeout(() => setAuditSuccess(false), 3000);
     } catch (error) {
