@@ -335,7 +335,7 @@ export function LandingPageClient() {
               Listen to what the AI itself has to say about the shift from traditional search to Generative Engines.
             </p>
           </div>
-          <div className="aspect-video rounded-2xl overflow-hidden border border-zinc-800 shadow-2xl bg-zinc-900 relative group">
+          <div className="aspect-video rounded-2xl overflow-hidden bg-zinc-900 relative group shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
             <video
               controls
               className="w-full h-full object-cover"
