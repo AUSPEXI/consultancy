@@ -102,7 +102,7 @@ export const PricingCard = ({
 
         <Button
           className={cn(
-            "w-full rounded-xl h-14 text-base font-bold transition-all duration-300 mt-auto",
+            "w-full rounded-xl h-14 text-base font-bold transition-all duration-300 mt-auto shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]",
             isPopular
               ? "bg-pink-600 text-white hover:bg-pink-500 hover:shadow-lg hover:shadow-pink-500/25"
               : "bg-white text-black hover:bg-zinc-200"

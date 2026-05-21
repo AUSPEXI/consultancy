@@ -635,7 +635,7 @@ export function LandingPageClient() {
                 Latest tactics and research on Generative Engine Optimization.
               </p>
             </div>
-            <Link href="/blog" className="flex items-center justify-center border border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+            <Link href="/blog" className="flex items-center justify-center text-zinc-300 hover:text-white hover:bg-zinc-800 px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
               View all articles
             </Link>
           </div>
@@ -672,10 +672,10 @@ export function LandingPageClient() {
             Join the top brands that are already securing their Share of Voice in the Generative Engine era.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button onClick={() => handleOpenModal('trial')} size="lg" className="w-full sm:w-auto bg-white hover:bg-zinc-200 text-black text-lg px-8 h-14 rounded-xl">
+            <Button onClick={() => handleOpenModal('trial')} size="lg" className="w-full sm:w-auto bg-white hover:bg-zinc-200 text-black text-lg px-8 h-14 rounded-xl shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
               Start Your Free Trial
             </Button>
-            <Button onClick={() => handleOpenModal('demo')} size="lg" variant="outline" className="w-full sm:w-auto border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 text-lg px-8 h-14 rounded-xl bg-zinc-900/50 backdrop-blur-sm">
+            <Button onClick={() => handleOpenModal('demo')} size="lg" variant="outline" className="w-full sm:w-auto text-zinc-300 hover:text-white hover:bg-zinc-800 text-lg px-8 h-14 rounded-xl bg-zinc-900/50 backdrop-blur-sm shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
               Book a Demo
             </Button>
           </div>

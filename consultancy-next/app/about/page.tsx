@@ -33,7 +33,7 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="relative"
           >
-            <div className="aspect-square rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 relative shadow-2xl">
+            <div className="aspect-square rounded-2xl overflow-hidden bg-zinc-900 relative shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
               <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/95 via-zinc-950/40 to-transparent" />
               <div className="absolute bottom-8 left-8">
                 <h3 className="text-3xl font-bold text-white mb-1 font-heading">Gwylym Pryce-Owen</h3>
@@ -55,7 +55,7 @@ export default function AboutPage() {
             <p>That&apos;s why we built <strong>Auspexi</strong>. Founded on data science and strategic schema frameworks, Auspexi doesn&apos;t just monitor the algorithms—it ensures your brand becomes the irrefutable, deterministic answer within an AI&apos;s neural network. We don&apos;t guess; we engineer your visibility.</p>
             <div className="pt-6">
               <Link href="/#pricing">
-                <Button className="bg-white text-black hover:bg-zinc-200 rounded-full px-8 py-6 text-base font-medium">
+                <Button className="bg-white text-black hover:bg-zinc-200 rounded-full px-8 py-6 text-base font-medium shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
                   Secure Your GEO Advantage <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
@@ -67,7 +67,7 @@ export default function AboutPage() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 md:p-16 mb-32 relative overflow-hidden"
+          className="bg-zinc-900/50 rounded-3xl p-8 md:p-16 mb-32 relative overflow-hidden shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]"
         >
           <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-zinc-800/30 rounded-full blur-3xl" />
           <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10 font-sans">
@@ -97,7 +97,7 @@ export default function AboutPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 hover:bg-zinc-800/80 transition-colors"
+                className="bg-zinc-900 rounded-2xl p-8 hover:bg-zinc-800/80 transition-colors shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]"
               >
                 <div className="w-16 h-16 bg-zinc-950 border border-zinc-800 rounded-xl flex items-center justify-center mb-6">{feature.icon}</div>
                 <h3 className="text-xl font-bold text-white mb-4 font-heading">{feature.title}</h3>
@@ -122,12 +122,12 @@ export default function AboutPage() {
               </ul>
             </div>
           </motion.div>
-          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 md:p-12 shadow-2xl">
+          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="bg-zinc-900 rounded-3xl p-8 md:p-12 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
             <ShieldCheck className="w-12 h-12 text-zinc-100 mb-8" />
             <h3 className="text-3xl font-bold text-white mb-6 font-heading">Don&apos;t Get Left Behind</h3>
             <p className="text-zinc-400 text-lg mb-10 leading-relaxed font-sans">The transition to Agentic AI and Generative Search is happening now. Secure your brand&apos;s position as the authoritative answer for years to come.</p>
             <Link href="/#pricing">
-              <Button className="w-full bg-white text-black hover:bg-zinc-200 rounded-xl py-6 text-lg font-medium">Start Your GEO Journey</Button>
+              <Button className="w-full bg-white text-black hover:bg-zinc-200 rounded-xl py-6 text-lg font-medium shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">Start Your GEO Journey</Button>
             </Link>
           </motion.div>
         </div>

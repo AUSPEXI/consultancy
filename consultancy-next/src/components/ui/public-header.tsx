@@ -38,7 +38,7 @@ export function PublicHeader() {
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard"
-            className="hidden md:inline-flex px-5 py-2 rounded-full border border-zinc-700 text-sm font-semibold text-white bg-zinc-900 hover:bg-zinc-800 transition-all"
+            className="hidden md:inline-flex px-5 py-2 rounded-full text-sm font-semibold text-white bg-zinc-900 hover:bg-zinc-800 transition-all shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]"
           >
             Dashboard
           </Link>

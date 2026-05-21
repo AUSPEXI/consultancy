@@ -77,7 +77,7 @@ export default function FAQPage() {
 
                   <div className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${openIndex === index ? 'max-h-[500px] pb-8 opacity-100' : 'max-h-0 opacity-0'}`}>
                     <div className="pt-2 border-t border-zinc-800/50">
-                      <p className="text-zinc-400 leading-relaxed text-sm italic bg-zinc-950/30 p-4 rounded-xl border border-zinc-800/30 font-sans">
+                      <p className="text-zinc-400 leading-relaxed text-sm italic bg-zinc-950/30 p-4 rounded-xl font-sans shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
                         {faq.answer}
                       </p>
                       <div className="mt-4 flex items-center gap-2 opacity-35">
@@ -95,7 +95,7 @@ export default function FAQPage() {
             <div className="mt-8 flex justify-center">
               <button
                 onClick={() => setShowAll(true)}
-                className="px-8 py-3 bg-zinc-900 hover:bg-zinc-800 text-white font-bold rounded-full border border-zinc-800 transition-all hover:scale-105 active:scale-95"
+                className="px-8 py-3 bg-zinc-900 hover:bg-zinc-800 text-white font-bold rounded-full transition-all hover:scale-105 active:scale-95 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]"
               >
                 Show All {ALL_FAQS.length} Questions
               </button>
@@ -104,7 +104,7 @@ export default function FAQPage() {
 
           <div className="mt-24 relative">
             <div className="absolute inset-0 bg-pink-500/5 blur-3xl rounded-full" />
-            <div className="relative bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 md:p-12 text-center overflow-hidden">
+            <div className="relative bg-zinc-900/50 rounded-3xl p-8 md:p-12 text-center overflow-hidden shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
               <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
                 <ChevronDown className="w-32 h-32 text-pink-500" />
               </div>

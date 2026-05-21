@@ -83,12 +83,12 @@ export default function BlogPostPage() {
               </div>
             )}
 
-            <div className="bg-zinc-900/50 border border-zinc-850 rounded-xl p-8 my-12 text-center">
+            <div className="bg-zinc-900/50 rounded-xl p-8 my-12 text-center shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
               <h3 className="text-2xl font-bold mb-4 mt-0">Ready to dominate AI search?</h3>
               <p className="text-zinc-400 mb-6">
                 Start extracting high-entropy facts and tracking your Share of Voice today.
               </p>
-              <Link href="/" className="inline-flex items-center justify-center bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+              <Link href="/" className="inline-flex items-center justify-center bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
                 Start Your Free Trial
               </Link>
             </div>
