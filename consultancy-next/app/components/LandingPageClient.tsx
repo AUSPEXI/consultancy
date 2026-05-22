@@ -376,7 +376,7 @@ export function LandingPageClient() {
             </p>
           </div>
           <ImageZoom
-            src="/geo-infographic.png"
+            src="/geo-infographic.svg"
             alt="Generative Engine Optimization Roadmap"
           />
         </div>
