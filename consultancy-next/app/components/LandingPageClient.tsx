@@ -27,6 +27,39 @@ const SplineScene = lazy(() => import('@/components/ui/splite').then(m => ({ def
 // Memoized feature card to prevent re-renders during interactions
 const MemoizedBentoCard = React.memo(BentoCard);
 
+function VideoPlayer() {
+  const [playing, setPlaying] = useState(false);
+  return (
+    <div className="aspect-video rounded-2xl overflow-hidden bg-zinc-900 relative group shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+      <video
+        controls
+        className="w-full h-full object-cover"
+        onPlay={() => setPlaying(true)}
+      >
+        <source src="/Generative_Engine_Optimization_AI_Video.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      {/* Branded placeholder shown until the video starts */}
+      {!playing && (
+        <div
+          className="absolute inset-0 cursor-pointer"
+          onClick={(e) => {
+            setPlaying(true);
+            const video = (e.currentTarget.previousElementSibling as HTMLVideoElement);
+            video?.play();
+          }}
+        >
+          <img
+            src="/video-placeholder.svg"
+            alt="Why GEO Matters Now"
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function LandingPageClient() {
   const { user } = useAuth();
   const [email, setEmail] = useState('');
@@ -335,16 +368,7 @@ export function LandingPageClient() {
               Listen to what the AI itself has to say about the shift from traditional search to Generative Engines.
             </p>
           </div>
-          <div className="aspect-video rounded-2xl overflow-hidden bg-zinc-900 relative group shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
-            <video
-              controls
-              className="w-full h-full object-cover"
-              poster="/video-placeholder.svg"
-            >
-              <source src="/Generative_Engine_Optimization_AI_Video.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
+          <VideoPlayer />
         </div>
       </section>
 
