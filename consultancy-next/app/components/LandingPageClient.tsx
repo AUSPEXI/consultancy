@@ -56,6 +56,8 @@ function VideoPlayer() {
           />
         </div>
       )}
+      {/* Mask NotebookLM watermark in bottom-right corner */}
+      <div className="absolute bottom-0 right-0 w-40 h-10 bg-zinc-950 z-20 pointer-events-none" />
     </div>
   );
 }
