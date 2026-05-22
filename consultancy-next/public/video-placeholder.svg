@@ -1,0 +1,162 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#09090b"/>
+      <stop offset="100%" style="stop-color:#18181b"/>
+    </linearGradient>
+
+    <!-- Pink radial glow behind play button -->
+    <radialGradient id="glowCenter" cx="50%" cy="50%" r="30%">
+      <stop offset="0%" style="stop-color:#ec4899;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#ec4899;stop-opacity:0"/>
+    </radialGradient>
+
+    <!-- Soft edge vignette -->
+    <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" style="stop-color:#000000;stop-opacity:0"/>
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:0.6"/>
+    </radialGradient>
+
+    <!-- Pink line gradient -->
+    <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ec4899;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#ec4899;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#ec4899;stop-opacity:0"/>
+    </linearGradient>
+
+    <!-- Play button glow filter -->
+    <filter id="playGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Label glow filter -->
+    <filter id="labelGlow" x="-20%" y="-50%" width="140%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="url(#bgGrad)"/>
+
+  <!-- Dot grid pattern (subtle) -->
+  <pattern id="dotGrid" width="32" height="32" patternUnits="userSpaceOnUse">
+    <circle cx="1" cy="1" r="0.8" fill="#3f3f46" opacity="0.5"/>
+  </pattern>
+  <rect width="1280" height="720" fill="url(#dotGrid)"/>
+
+  <!-- Center glow -->
+  <rect width="1280" height="720" fill="url(#glowCenter)"/>
+
+  <!-- Horizontal rule lines (tech grid feel) -->
+  <line x1="0" y1="180" x2="1280" y2="180" stroke="#27272a" stroke-width="1"/>
+  <line x1="0" y1="360" x2="1280" y2="360" stroke="#27272a" stroke-width="1"/>
+  <line x1="0" y1="540" x2="1280" y2="540" stroke="#27272a" stroke-width="1"/>
+  <!-- Vertical rules -->
+  <line x1="320" y1="0" x2="320" y2="720" stroke="#27272a" stroke-width="1"/>
+  <line x1="640" y1="0" x2="640" y2="720" stroke="#27272a" stroke-width="1"/>
+  <line x1="960" y1="0" x2="960" y2="720" stroke="#27272a" stroke-width="1"/>
+
+  <!-- Pink accent horizontal line (center) -->
+  <rect x="0" y="359" width="1280" height="2" fill="url(#lineGrad)" opacity="0.4"/>
+
+  <!-- Left panel: data nodes (decorative) -->
+  <g opacity="0.6">
+    <!-- Node cluster top-left -->
+    <circle cx="120" cy="160" r="4" fill="#ec4899" opacity="0.7"/>
+    <circle cx="180" cy="200" r="3" fill="#ec4899" opacity="0.5"/>
+    <circle cx="90" cy="230" r="5" fill="#ec4899" opacity="0.4"/>
+    <circle cx="160" cy="280" r="3" fill="#a855f7" opacity="0.5"/>
+    <circle cx="220" cy="240" r="4" fill="#a855f7" opacity="0.3"/>
+    <!-- Connecting lines -->
+    <line x1="120" y1="160" x2="180" y2="200" stroke="#ec4899" stroke-width="0.8" opacity="0.3"/>
+    <line x1="180" y1="200" x2="160" y2="280" stroke="#ec4899" stroke-width="0.8" opacity="0.3"/>
+    <line x1="90" y1="230" x2="160" y2="280" stroke="#a855f7" stroke-width="0.8" opacity="0.3"/>
+    <line x1="160" y1="280" x2="220" y2="240" stroke="#a855f7" stroke-width="0.8" opacity="0.3"/>
+    <!-- Labels -->
+    <text x="130" y="155" font-family="monospace" font-size="9" fill="#ec4899" opacity="0.6">SOV_VECTOR</text>
+    <text x="95" y="248" font-family="monospace" font-size="9" fill="#a855f7" opacity="0.5">LATENT_ANCHOR</text>
+  </g>
+
+  <!-- Right panel: data nodes (decorative) -->
+  <g opacity="0.6">
+    <circle cx="1100" cy="180" r="4" fill="#10b981" opacity="0.7"/>
+    <circle cx="1160" cy="230" r="3" fill="#10b981" opacity="0.5"/>
+    <circle cx="1080" cy="260" r="5" fill="#10b981" opacity="0.4"/>
+    <circle cx="1140" cy="310" r="3" fill="#ec4899" opacity="0.5"/>
+    <circle cx="1200" cy="270" r="4" fill="#ec4899" opacity="0.3"/>
+    <line x1="1100" y1="180" x2="1160" y2="230" stroke="#10b981" stroke-width="0.8" opacity="0.3"/>
+    <line x1="1160" y1="230" x2="1140" y2="310" stroke="#10b981" stroke-width="0.8" opacity="0.3"/>
+    <line x1="1080" y1="260" x2="1140" y2="310" stroke="#ec4899" stroke-width="0.8" opacity="0.3"/>
+    <line x1="1140" y1="310" x2="1200" y2="270" stroke="#ec4899" stroke-width="0.8" opacity="0.3"/>
+    <text x="1060" y="252" font-family="monospace" font-size="9" fill="#10b981" opacity="0.6">ERR_NODE</text>
+    <text x="1145" y="328" font-family="monospace" font-size="9" fill="#ec4899" opacity="0.5">CITE_MAGNET</text>
+  </g>
+
+  <!-- Bottom data strip (infographic feel) -->
+  <g opacity="0.5">
+    <rect x="80" y="580" width="200" height="1" fill="#3f3f46"/>
+    <text x="80" y="598" font-family="monospace" font-size="9" fill="#71717a">A-SOV INDEX</text>
+    <text x="80" y="614" font-family="monospace" font-size="14" font-weight="bold" fill="#ec4899">+340%</text>
+    <text x="80" y="630" font-family="monospace" font-size="8" fill="#52525b">vs. traditional SEO</text>
+  </g>
+  <g opacity="0.5">
+    <rect x="360" y="580" width="200" height="1" fill="#3f3f46"/>
+    <text x="360" y="598" font-family="monospace" font-size="9" fill="#71717a">ENTITY RECALL RATE</text>
+    <text x="360" y="614" font-family="monospace" font-size="14" font-weight="bold" fill="#10b981">98.2%</text>
+    <text x="360" y="630" font-family="monospace" font-size="8" fill="#52525b">verified citation rate</text>
+  </g>
+  <g opacity="0.5">
+    <rect x="640" y="580" width="200" height="1" fill="#3f3f46"/>
+    <text x="640" y="598" font-family="monospace" font-size="9" fill="#71717a">LATENT DIM.</text>
+    <text x="640" y="614" font-family="monospace" font-size="14" font-weight="bold" fill="#a855f7">768-D</text>
+    <text x="640" y="630" font-family="monospace" font-size="8" fill="#52525b">Gemini native embeddings</text>
+  </g>
+  <g opacity="0.5">
+    <rect x="920" y="580" width="200" height="1" fill="#3f3f46"/>
+    <text x="920" y="598" font-family="monospace" font-size="9" fill="#71717a">LLM MODELS COVERED</text>
+    <text x="920" y="614" font-family="monospace" font-size="14" font-weight="bold" fill="#60a5fa">5+</text>
+    <text x="920" y="630" font-family="monospace" font-size="8" fill="#52525b">GPT · Gemini · Claude · Perplexity</text>
+  </g>
+
+  <!-- Top brand badge -->
+  <g>
+    <rect x="48" y="40" width="130" height="32" rx="16" fill="#18181b" stroke="#3f3f46" stroke-width="1"/>
+    <circle cx="67" cy="56" r="6" fill="#ec4899"/>
+    <text x="80" y="61" font-family="monospace" font-size="11" font-weight="bold" fill="#ffffff" letter-spacing="2">AUSPEXI</text>
+  </g>
+
+  <!-- Top right live badge -->
+  <g>
+    <rect x="1104" y="40" width="128" height="32" rx="16" fill="#18181b" stroke="#3f3f46" stroke-width="1"/>
+    <circle cx="1123" cy="56" r="4" fill="#10b981"/>
+    <text x="1133" y="61" font-family="monospace" font-size="10" fill="#10b981" letter-spacing="1">GEO · LIVE</text>
+  </g>
+
+  <!-- Play button outer ring glow -->
+  <circle cx="640" cy="340" r="80" fill="#ec4899" opacity="0.05"/>
+  <circle cx="640" cy="340" r="68" fill="#ec4899" opacity="0.05"/>
+
+  <!-- Play button outer ring border -->
+  <circle cx="640" cy="340" r="64" fill="none" stroke="#ec4899" stroke-width="1.5" opacity="0.4"/>
+
+  <!-- Play button main circle -->
+  <circle cx="640" cy="340" r="52" fill="#18181b" stroke="#ec4899" stroke-width="2" filter="url(#playGlow)"/>
+
+  <!-- Play triangle -->
+  <polygon points="628,322 628,358 664,340" fill="#ec4899"/>
+
+  <!-- Main title -->
+  <text x="640" y="444" font-family="'Inter', system-ui, sans-serif" font-size="28" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="1">WHY GEO MATTERS NOW</text>
+
+  <!-- Subtitle -->
+  <text x="640" y="476" font-family="'Inter', system-ui, sans-serif" font-size="14" fill="#71717a" text-anchor="middle" letter-spacing="0.5">The shift from keyword search to agentic AI navigation · an Auspexi explainer</text>
+
+  <!-- Pink underline beneath title -->
+  <rect x="540" y="452" width="200" height="2" rx="1" fill="#ec4899" opacity="0.6"/>
+
+  <!-- Vignette overlay -->
+  <rect width="1280" height="720" fill="url(#vignette)"/>
+</svg>

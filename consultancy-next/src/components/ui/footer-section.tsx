@@ -73,7 +73,7 @@ export function Footerdemo() {
               <Link href="/investors" className="block transition-colors hover:text-white">Investors</Link>
               <Link href="/#features" className="block transition-colors hover:text-white">Features</Link>
               <Link href="/#pricing" className="block transition-colors hover:text-white">Pricing</Link>
-              <Link href="/#strategy" className="block transition-colors hover:text-white">GEO Strategy</Link>
+              <a href="/#strategy" className="block transition-colors hover:text-white">GEO Strategy</a>
               <Link href="/voice-agents" className="block transition-colors hover:text-white">Voice Agents</Link>
               <Link href="/#testimonials" className="block transition-colors hover:text-white">Case Studies</Link>
             </nav>
@@ -86,8 +86,7 @@ export function Footerdemo() {
               <Link href="/resources" className="block transition-colors hover:text-white">Resources</Link>
               <Link href="/blog" className="block transition-colors hover:text-white">Blog</Link>
               <Link href="/faq" className="block transition-colors hover:text-white">FAQ</Link>
-              <a href="#" className="block transition-colors hover:text-white">API Reference</a>
-              <a href="#" className="block transition-colors hover:text-white">Community</a>
+              <a href="https://www.reddit.com/user/Gold-Charge-6536/" target="_blank" rel="noopener noreferrer" className="block transition-colors hover:text-white">Community (Reddit)</a>
             </nav>
           </div>
 

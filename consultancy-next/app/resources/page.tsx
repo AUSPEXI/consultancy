@@ -3,16 +3,58 @@
 import React from 'react';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
-import { BookOpen, FileText, Video, Download, ArrowRight } from 'lucide-react';
+import { BookOpen, FileText, Video, Download, ArrowRight, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 const resources = [
-  { title: "The Ultimate Guide to GEO", description: "Learn how Generative Engine Optimization is replacing traditional SEO and how to adapt your strategy.", type: "E-Book", icon: BookOpen, link: "#" },
-  { title: "AI Search Ranking Factors 2026", description: "A comprehensive analysis of what drives visibility in ChatGPT, Gemini, and Claude.", type: "Report", icon: FileText, link: "#" },
-  { title: "Mastering Cite-Magnets", description: "Video tutorial on creating high-entropy facts that AI models love to cite.", type: "Video", icon: Video, link: "#" },
-  { title: "GEO Audit Checklist", description: "A step-by-step checklist to evaluate your website's readiness for AI search engines.", type: "Template", icon: Download, link: "#" },
-  { title: "The Trojan Horse Strategy", description: "Case study on how to replace competitors as the preferred source in AI memory.", type: "Case Study", icon: FileText, link: "#" },
-  { title: "Omnichannel Seeding Playbook", description: "How to distribute your facts across high-authority platforms for maximum AI consensus.", type: "Guide", icon: BookOpen, link: "#" }
+  {
+    title: "The CEO's Guide to GEO",
+    description: "Why Generative Engine Optimization is your next growth lever, and how to build the business case for AI visibility investment.",
+    type: "Guide",
+    icon: BookOpen,
+    link: "/blog/ceo-guide-to-geo-growth-lever",
+    available: true,
+  },
+  {
+    title: "The 2026 State of AI Search",
+    description: "Data insights from 10,000 brand audits — what's driving visibility in ChatGPT, Gemini, Claude, and Perplexity right now.",
+    type: "Report",
+    icon: FileText,
+    link: "/blog/2026-state-of-ai-search-brand-erasure",
+    available: true,
+  },
+  {
+    title: "Engineering the Latent Space Moat",
+    description: "A deep dive into Auspexi's 768-D neural mapping methodology and why it redefines what GEO really means.",
+    type: "Technical",
+    icon: FileText,
+    link: "/blog/engineering-the-768-d-latent-space-moat",
+    available: true,
+  },
+  {
+    title: "GEO Audit Checklist",
+    description: "A step-by-step checklist to evaluate your website's readiness for AI search engines and identify quick wins.",
+    type: "Template",
+    icon: Download,
+    link: null,
+    available: false,
+  },
+  {
+    title: "Mastering Cite-Magnets",
+    description: "How to create high-entropy facts and structured data that AI models love to cite as the irrefutable source of truth.",
+    type: "Video",
+    icon: Video,
+    link: null,
+    available: false,
+  },
+  {
+    title: "Omnichannel Seeding Playbook",
+    description: "How to distribute your brand facts across high-authority platforms to build AI model consensus at scale.",
+    type: "Guide",
+    icon: BookOpen,
+    link: null,
+    available: false,
+  }
 ];
 
 export default function ResourcesPage() {
@@ -27,24 +69,38 @@ export default function ResourcesPage() {
           <div className="mb-16 text-center">
             <h1 className="text-4xl md:text-6xl font-bold font-heading mb-6">Resources</h1>
             <p className="text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-              Guides, reports, and tools to help you master Generative Engine Optimization and dominate AI search.
+              Guides, reports, and tools to master Generative Engine Optimization and dominate AI search.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {resources.map((resource, index) => (
-              <div key={index} className="bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 hover:bg-zinc-900/50 transition-colors group flex flex-col h-full">
+              <div
+                key={index}
+                className={`bg-zinc-900/30 border rounded-2xl p-6 flex flex-col h-full transition-colors group ${resource.available ? 'border-zinc-800 hover:bg-zinc-900/50' : 'border-zinc-900 opacity-70'}`}
+              >
                 <div className="w-12 h-12 rounded-lg bg-pink-500/10 flex items-center justify-center mb-6 text-pink-400">
                   <resource.icon className="w-6 h-6" />
                 </div>
-                <div className="mb-4">
+                <div className="mb-4 flex items-center gap-2">
                   <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-300 font-mono">{resource.type}</span>
+                  {!resource.available && (
+                    <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-zinc-800/60 text-zinc-500 font-mono flex items-center gap-1">
+                      <Lock className="w-2.5 h-2.5" /> Coming Soon
+                    </span>
+                  )}
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-zinc-100 font-heading">{resource.title}</h3>
                 <p className="text-zinc-400 mb-6 flex-1 text-sm leading-relaxed">{resource.description}</p>
-                <a href={resource.link} className="inline-flex items-center text-pink-400 font-medium hover:text-pink-300 transition-colors mt-auto text-sm">
-                  Access Resource <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </a>
+                {resource.available && resource.link ? (
+                  <a href={resource.link} className="inline-flex items-center text-pink-400 font-medium hover:text-pink-300 transition-colors mt-auto text-sm">
+                    Read Now <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </a>
+                ) : (
+                  <span className="inline-flex items-center text-zinc-600 text-sm mt-auto cursor-default">
+                    <Lock className="w-3.5 h-3.5 mr-2" /> Available Soon
+                  </span>
+                )}
               </div>
             ))}
           </div>

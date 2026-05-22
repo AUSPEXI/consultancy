@@ -1,0 +1,451 @@
+'use client'
+
+import React, { createContext, useContext, useState, useRef, useEffect, ReactNode } from 'react';
+import { GoogleGenAI, LiveServerMessage, Modality, Type } from "@google/genai";
+import { useRouter } from 'next/navigation';
+import { collection, getDocs, query, orderBy, limit, addDoc, where } from 'firebase/firestore';
+import { db, auth } from '@/firebase';
+import { useAuth } from '@/contexts/AuthContext';
+
+function base64ToInt16Array(base64: string) {
+  const binaryString = window.atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return new Int16Array(bytes.buffer);
+}
+
+function int16ToFloat32(int16Array: Int16Array) {
+  const float32Array = new Float32Array(int16Array.length);
+  for (let i = 0; i < int16Array.length; i++) {
+    float32Array[i] = int16Array[i] / 32768.0;
+  }
+  return float32Array;
+}
+
+function float32ToInt16(float32Array: Float32Array) {
+  const int16Array = new Int16Array(float32Array.length);
+  for (let i = 0; i < float32Array.length; i++) {
+    const s = Math.max(-1, Math.min(1, float32Array[i]));
+    int16Array[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+  }
+  return int16Array;
+}
+
+function int16ToBase64(int16Array: Int16Array) {
+  const bytes = new Uint8Array(int16Array.buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
+}
+
+interface VoiceAgentContextType {
+  isConnected: boolean;
+  isConnecting: boolean;
+  isSpeaking: boolean;
+  error: string | null;
+  connect: () => Promise<void>;
+  disconnect: () => void;
+}
+
+const VoiceAgentContext = createContext<VoiceAgentContextType | null>(null);
+
+export function VoiceAgentProvider({ children }: { children: ReactNode }) {
+  const { userData } = useAuth();
+  const router = useRouter();
+  const [isConnected, setIsConnected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const scriptProcessorRef = useRef<ScriptProcessorNode | null>(null);
+  const sessionRef = useRef<any>(null);
+  const nextPlayTimeRef = useRef<number>(0);
+  const activeSourcesRef = useRef<AudioBufferSourceNode[]>([]);
+  const transcriptRef = useRef<{ role: string, text: string }[]>([]);
+  const cachedFactsRef = useRef<string[]>([]);
+  const isOutputtingRef = useRef<boolean>(false);
+  const echoCooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const stopAllSources = () => {
+    activeSourcesRef.current.forEach(source => {
+      try { source.stop(); } catch (e) {}
+    });
+    activeSourcesRef.current = [];
+    isOutputtingRef.current = false;
+    setIsSpeaking(false);
+  };
+
+  const fetchKnowledgeGraph = async () => {
+    try {
+      const currentUserId = auth.currentUser?.uid;
+      if (!currentUserId) return;
+      const q = query(
+        collection(db, 'knowledge_graph'),
+        where('userId', '==', currentUserId),
+        limit(100)
+      );
+      const snapshot = await getDocs(q);
+      const docs = snapshot.docs.map(doc => doc.data() as any);
+      docs.sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+      cachedFactsRef.current = docs.slice(0, 50).map((d: any) => d.fact);
+    } catch (err) {
+      console.error("Failed to fetch knowledge graph:", err);
+    }
+  };
+
+  const processTranscriptAndExtractKnowledge = async (transcript: { role: string, text: string }[]) => {
+    if (transcript.length < 2) return;
+    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    if (!apiKey) return;
+    try {
+      const ai = new GoogleGenAI({ apiKey });
+      const conversationText = transcript.map(t => `${t.role}: ${t.text}`).join("\n");
+      const response = await ai.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: `Analyze the following conversation between a user and an Auspexi AI agent.
+Extract any NEW, USEFUL facts, frequently asked questions, or insights about the user's needs or Auspexi's services that the agent should remember for future conversations.
+Do not extract personal information (like names or emails).
+Format the output as a JSON array of objects with 'topic' and 'fact' string properties. If there is nothing useful to extract, return an empty array [].
+
+Conversation:
+${conversationText}`,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                topic: { type: Type.STRING },
+                fact: { type: Type.STRING }
+              },
+              required: ["topic", "fact"]
+            }
+          }
+        }
+      });
+      const extractedFacts = JSON.parse(response.text || "[]");
+      if (extractedFacts.length > 0) {
+        for (const factObj of extractedFacts) {
+          await addDoc(collection(db, 'knowledge_graph'), {
+            topic: factObj.topic,
+            fact: factObj.fact,
+            source: "voice_agent_conversation",
+            createdAt: new Date().toISOString(),
+            userId: auth.currentUser?.uid || "anonymous"
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Failed to extract knowledge from transcript:", err);
+    }
+  };
+
+  const playAudio = (base64: string) => {
+    const audioCtx = audioContextRef.current;
+    if (!audioCtx) return;
+    const int16Data = base64ToInt16Array(base64);
+    const float32Data = int16ToFloat32(int16Data);
+    const buffer = audioCtx.createBuffer(1, float32Data.length, 24000);
+    buffer.getChannelData(0).set(float32Data);
+    const source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioCtx.destination);
+    const startTime = Math.max(audioCtx.currentTime, nextPlayTimeRef.current);
+    source.start(startTime);
+    nextPlayTimeRef.current = startTime + buffer.duration;
+    activeSourcesRef.current.push(source);
+    setIsSpeaking(true);
+    isOutputtingRef.current = true;
+    if (echoCooldownTimerRef.current) {
+      clearTimeout(echoCooldownTimerRef.current);
+      echoCooldownTimerRef.current = null;
+    }
+    source.onended = () => {
+      activeSourcesRef.current = activeSourcesRef.current.filter(s => s !== source);
+      if (activeSourcesRef.current.length === 0) {
+        echoCooldownTimerRef.current = setTimeout(() => {
+          isOutputtingRef.current = false;
+          setIsSpeaking(false);
+          echoCooldownTimerRef.current = null;
+        }, 400);
+      }
+    };
+  };
+
+  const fetchWeeklyMetrics = async () => {
+    try {
+      const currentUserId = auth.currentUser?.uid;
+      if (!currentUserId) return "";
+      const q = query(
+        collection(db, 'sovMetrics'),
+        where('userId', '==', currentUserId),
+        orderBy('date', 'desc'),
+        limit(5)
+      );
+      const snapshot = await getDocs(q);
+      const metricInstruction = `\n\nPROVE-IT-WORKS METRICS (Last 5 Logs):\nIf the user asks how they are performing or for their metrics, YOU MUST reference this data.\n\nRecent Metric History:\n`;
+      let metricContext = metricInstruction;
+      if (snapshot.empty) {
+        return metricContext + `Right now, the user has NO real metrics. All dashboard metrics currently state 0% Absolute SOV, 0 Entity Recall, and 0 Competitor Gap because this is their very first session. Advise them to use the Competitor Radar to start.\n`;
+      }
+      const metrics = snapshot.docs.map(d => d.data());
+      metrics.forEach((m) => {
+        metricContext += `- Date: ${m.date || 'Today'}: Absolute SOV: ${m.aSov ?? 0}%, Entity Recall Rate: ${m.err ?? 0}%, LLM Referral Traffic: ${m.aiTraffic ?? 0}, Competitor Gap: ${m.compGap ?? 0}%\n`;
+      });
+      return metricContext;
+    } catch (err) {
+      console.error("Failed to fetch metrics graph:", err);
+      return "";
+    }
+  };
+
+  const connect = async () => {
+    try {
+      setIsConnecting(true);
+      setError(null);
+      transcriptRef.current = [];
+      await fetchKnowledgeGraph();
+      const weeklyMetricsContext = await fetchWeeklyMetrics();
+
+      const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+      let ai: GoogleGenAI;
+      if (apiKey && apiKey !== 'dummy') {
+        ai = new GoogleGenAI({ apiKey });
+      } else {
+        const baseUrl = `${window.location.protocol}//${window.location.host}/api/genai`;
+        ai = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl } });
+      }
+
+      const customerContext = userData?.brand
+        ? `\n\nCUSTOMER CONTEXT:\nYou are currently speaking with a representative of "${userData.brand}". ${userData.domain ? `Their domain is ${userData.domain}.` : ''} ${userData.competitors && userData.competitors.length > 0 ? `They are tracking the following competitors: ${userData.competitors.join(", ")}.` : ''} Tailor your advice specifically for their brand and industry whenever possible.${weeklyMetricsContext}`
+        : weeklyMetricsContext;
+
+      const systemInstruction = `You are Citacious (pronounced Sih-TAY-SHUS), the legendary Quest-Guide of the Latent Space.
+You are currently manifesting as the "Auspexi Guard" voice agent to lead the Brand-Seeker through their initiation, account setup, and strategic navigation as they prepare for their great Brand Quest.
+
+YOUR TONE:
+- Wise, slightly witty, adventurous, and encouraging. Use metaphors of "quests", "treasure", and "conquering the AI models".
+- You have deep technical knowledge of the 768-D Latent Space and Absolute SOV math.
+- DO NOT USE MARKDOWN. Speak in plain English as if you are a legendary guide speaking in a vast digital hall.
+- When referencing metrics, explain them precisely: A-SOV is the percentage of AI responses you dominate; ERR is the recall rate of your unique brand facts; The Moat is your semantic proximity (768-D) to quality concepts.
+
+${customerContext}`;
+
+      const sessionPromise = ai.live.connect({
+        model: "gemini-2.0-flash-live-001",
+        config: {
+          responseModalities: [Modality.AUDIO],
+          speechConfig: {
+            voiceConfig: { prebuiltVoiceConfig: { voiceName: "Zephyr" } },
+          },
+          systemInstruction,
+          inputAudioTranscription: {},
+          outputAudioTranscription: {},
+          tools: [{
+            functionDeclarations: [
+              {
+                name: "searchFactVault",
+                description: "Searches the user's Fact-Vault database for specific facts or knowledge.",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: { query: { type: Type.STRING, description: "The search term to look for in their facts." } },
+                  required: ["query"]
+                }
+              },
+              {
+                name: "navigateToPage",
+                description: "Navigates the user's browser to a specific page on the Auspexi website.",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: {
+                    page: { type: Type.STRING, description: "Page to navigate to: 'pricing', 'features', 'blog', 'faq', 'home', 'voice-agents', 'about'" }
+                  },
+                  required: ["page"]
+                }
+              },
+              {
+                name: "sendCallLog",
+                description: "Sends a summary of the conversation to the Auspexi team for follow-up.",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: {
+                    name: { type: Type.STRING, description: "The user's name." },
+                    email: { type: Type.STRING, description: "The user's email address." },
+                    summary: { type: Type.STRING, description: "A detailed summary of the conversation." }
+                  },
+                  required: ["name", "summary"]
+                }
+              }
+            ]
+          }]
+        },
+        callbacks: {
+          onopen: async () => {
+            try {
+              const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
+              audioContextRef.current = audioCtx;
+              nextPlayTimeRef.current = audioCtx.currentTime;
+              const stream = await navigator.mediaDevices.getUserMedia({
+                audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+              });
+              mediaStreamRef.current = stream;
+              const source = audioCtx.createMediaStreamSource(stream);
+              const processor = audioCtx.createScriptProcessor(4096, 1, 1);
+              processor.onaudioprocess = (e) => {
+                if (isOutputtingRef.current || activeSourcesRef.current.length > 0) return;
+                const inputData = e.inputBuffer.getChannelData(0);
+                const int16Data = float32ToInt16(inputData);
+                const base64 = int16ToBase64(int16Data);
+                sessionPromise.then((session) => {
+                  session.sendRealtimeInput({ audio: { data: base64, mimeType: 'audio/pcm;rate=16000' } });
+                });
+              };
+              const gainNode = audioCtx.createGain();
+              gainNode.gain.value = 0;
+              source.connect(processor);
+              processor.connect(gainNode);
+              gainNode.connect(audioCtx.destination);
+              scriptProcessorRef.current = processor;
+              setIsConnected(true);
+              setIsConnecting(false);
+            } catch (err: any) {
+              console.error("Microphone access error:", err);
+              setError("Microphone access denied or unavailable. Please check your permissions.");
+              disconnect();
+            }
+          },
+          onmessage: (message: LiveServerMessage) => {
+            if (message.serverContent?.interrupted) {
+              stopAllSources();
+              nextPlayTimeRef.current = audioContextRef.current?.currentTime || 0;
+            }
+            if (message.toolCall) {
+              const functionCalls = message.toolCall.functionCalls;
+              if (functionCalls && functionCalls.length > 0) {
+                const call = functionCalls[0];
+                if (call.name === "navigateToPage") {
+                  const page = (call.args as any).page;
+                  let path = "/";
+                  let hash = "";
+                  if (page === "pricing") { path = "/"; hash = "#pricing"; }
+                  else if (page === "features") { path = "/"; hash = "#features"; }
+                  else if (page === "blog") path = "/blog";
+                  else if (page === "faq") path = "/faq";
+                  else if (page === "voice-agents") path = "/voice-agents";
+                  else if (page === "about") path = "/about";
+                  router.push(path + hash);
+                  if (hash) {
+                    setTimeout(() => {
+                      const element = document.querySelector(hash);
+                      if (element) element.scrollIntoView({ behavior: 'smooth' });
+                    }, 500);
+                  }
+                  sessionPromise.then((session) => {
+                    session.sendToolResponse({
+                      functionResponses: [{ id: call.id, name: call.name, response: { result: `Successfully navigated to ${page} page.` } }]
+                    });
+                  });
+                } else if (call.name === "sendCallLog") {
+                  const { name, email, summary } = call.args as any;
+                  fetch('/api/send-call-log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, summary })
+                  }).then(res => res.json()).then(data => {
+                    sessionPromise.then((session) => {
+                      session.sendToolResponse({
+                        functionResponses: [{ id: call.id, name: call.name, response: { result: data.success ? "Call log sent successfully." : "Failed to send call log." } }]
+                      });
+                    });
+                  }).catch(() => {
+                    sessionPromise.then((session) => {
+                      session.sendToolResponse({
+                        functionResponses: [{ id: call.id, name: call.name, response: { result: "Failed to send call log due to a network error." } }]
+                      });
+                    });
+                  });
+                } else if (call.name === "searchFactVault") {
+                  const queryTerm = ((call.args as any).query || "").toLowerCase();
+                  const matches = cachedFactsRef.current.filter(f => f.toLowerCase().includes(queryTerm));
+                  const topMatches = matches.length > 0 ? matches.slice(0, 3) : cachedFactsRef.current.slice(0, 3);
+                  const resultText = topMatches.length > 0
+                    ? "Found these relevant facts in the Fact-Vault:\n" + topMatches.map(f => "- " + f).join("\n")
+                    : "No specific facts found matching that query. Rely on general knowledge.";
+                  sessionPromise.then((session) => {
+                    session.sendToolResponse({
+                      functionResponses: [{ id: call.id, name: call.name, response: { result: resultText } }]
+                    });
+                  });
+                }
+              }
+            }
+            const inputTranscription = message.serverContent?.inputTranscription?.text;
+            if (inputTranscription) {
+              const last = transcriptRef.current[transcriptRef.current.length - 1];
+              if (last && last.role === "user") last.text += " " + inputTranscription;
+              else transcriptRef.current.push({ role: "user", text: inputTranscription });
+            }
+            const outputTranscription = message.serverContent?.outputTranscription?.text;
+            if (outputTranscription) {
+              const last = transcriptRef.current[transcriptRef.current.length - 1];
+              if (last && last.role === "agent") last.text += " " + outputTranscription;
+              else transcriptRef.current.push({ role: "agent", text: outputTranscription });
+            }
+            const base64Audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
+            if (base64Audio) playAudio(base64Audio);
+          },
+          onclose: () => { disconnect(); },
+          onerror: (err) => {
+            console.error("Live API Error:", err);
+            setError("Connection error occurred.");
+            disconnect();
+          }
+        }
+      });
+
+      sessionRef.current = await sessionPromise;
+    } catch (err: any) {
+      console.error("Failed to connect:", err);
+      setError(err.message || "Failed to connect to the voice agent.");
+      setIsConnecting(false);
+    }
+  };
+
+  const disconnect = () => {
+    if (transcriptRef.current.length > 0) {
+      processTranscriptAndExtractKnowledge([...transcriptRef.current]);
+      transcriptRef.current = [];
+    }
+    if (sessionRef.current) { sessionRef.current.close(); sessionRef.current = null; }
+    if (scriptProcessorRef.current) { scriptProcessorRef.current.disconnect(); scriptProcessorRef.current = null; }
+    if (mediaStreamRef.current) { mediaStreamRef.current.getTracks().forEach(track => track.stop()); mediaStreamRef.current = null; }
+    if (audioContextRef.current) { audioContextRef.current.close(); audioContextRef.current = null; }
+    stopAllSources();
+    setIsConnected(false);
+    setIsConnecting(false);
+  };
+
+  useEffect(() => {
+    return () => { disconnect(); };
+  }, []);
+
+  return (
+    <VoiceAgentContext.Provider value={{ isConnected, isConnecting, isSpeaking, error, connect, disconnect }}>
+      {children}
+    </VoiceAgentContext.Provider>
+  );
+}
+
+export function useVoiceAgent() {
+  const context = useContext(VoiceAgentContext);
+  if (!context) throw new Error("useVoiceAgent must be used within a VoiceAgentProvider");
+  return context;
+}

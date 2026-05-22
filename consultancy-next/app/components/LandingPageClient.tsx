@@ -339,7 +339,7 @@ export function LandingPageClient() {
             <video
               controls
               className="w-full h-full object-cover"
-              poster="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1200&auto=format&fit=crop"
+              poster="/video-placeholder.svg"
             >
               <source src="/Generative_Engine_Optimization_AI_Video.mp4" type="video/mp4" />
               Your browser does not support the video tag.
