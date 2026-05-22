@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import {
   TrendingUp, BarChart3, Globe, ShieldCheck, Zap, ArrowRight,
   FileText, Lock, CheckCircle2, Layout, Database, Eye, PieChart,
-  Users, Wallet, Rocket, Cpu
+  Users, Wallet, Rocket, Cpu, Flame, Sprout, Building2, Code2,
+  ChevronRight
 } from 'lucide-react';
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip,
@@ -349,6 +350,189 @@ function InvestorCalculator() {
   );
 }
 
+const PRESEED_FUNDS = [
+  { name: 'Founder Runway', value: 40, color: '#ec4899', description: 'Minimal founder salaries to go full-time, no distractions' },
+  { name: 'Product & Infra', value: 30, color: '#f472b6', description: 'Cloud hosting, AI API costs, dev tooling, pgvector cluster' },
+  { name: 'First Customers', value: 20, color: '#a78bfa', description: 'High-touch outreach, demos, content to land first 20-50 subscribers' },
+  { name: 'Legal & Ops', value: 10, color: '#3f3f46', description: 'Company structure, founder agreements, accounting' },
+];
+
+const SEED_FUNDS = [
+  { name: 'Team Building', value: 45, color: '#ec4899', description: '2-3 strategic hires: data scientist, growth marketer, content lead' },
+  { name: 'Data & Infra', value: 25, color: '#f472b6', description: 'Scale pgvector to 50M+ embeddings, real-time monitoring, SLM R&D begins' },
+  { name: 'Market Authority', value: 20, color: '#a78bfa', description: 'GEO research publications, conference presence, thought leadership' },
+  { name: 'Enterprise Outreach', value: 10, color: '#3f3f46', description: 'Enterprise CRM, sales tools, pilot programs with agency partners' },
+];
+
+const WHAT_EXISTS_NOW = [
+  "Full GEO audit & citation scoring engine deployed",
+  "768-D latent space mapping with pgvector backend live",
+  "Multi-agent content optimizer & Fact-Vault architecture built",
+  "Competitor decay detection & SOV simulator operational",
+  "4-phase GEO workflow defined and battle-tested",
+  "Brand sentiment Z-score drift detection running",
+  "Dashboard, blog, investor hub and public site complete",
+  "GEO strategy proven — need capital to prove the market",
+];
+
+function PreSeedCalculator() {
+  const [raise, setRaise] = useState(200000);
+
+  const MONTHLY_BURN = 9500;
+  const CAC = 650;
+  const AVG_MRR = 149;
+
+  const marketingBudget = raise * 0.20;
+  const customers = Math.floor(marketingBudget / CAC);
+  const runwayMonths = Math.floor(raise / MONTHLY_BURN);
+  const projectedARR = customers * AVG_MRR * 12;
+
+  return (
+    <div className={`p-8 bg-zinc-900 rounded-3xl ${NEON}`}>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h3 className="text-xl font-bold text-white mb-1">Pre-seed Model</h3>
+          <p className="text-xs text-zinc-500 uppercase tracking-widest">What your capital unlocks</p>
+        </div>
+        <Flame className="w-6 h-6 text-pink-500" />
+      </div>
+
+      <div className="space-y-4 mb-8">
+        <div className="flex justify-between">
+          <label className="text-sm font-medium text-zinc-300">Round Size</label>
+          <span className="text-sm font-bold text-white">${(raise / 1000).toFixed(0)}k</span>
+        </div>
+        <input
+          type="range" min="50000" max="500000" step="25000"
+          value={raise} onChange={(e) => setRaise(Number(e.target.value))}
+          className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-pink-500"
+        />
+        <div className="flex justify-between text-[10px] text-zinc-600 font-mono">
+          <span>$50k</span><span>$500k</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className={`p-5 bg-zinc-950 rounded-2xl ${NEON}`}>
+          <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Runway</p>
+          <p className="text-2xl font-bold text-white">{runwayMonths} mo</p>
+          <p className="text-[10px] text-zinc-600">At $9.5k/mo burn</p>
+        </div>
+        <div className={`p-5 bg-zinc-950 rounded-2xl ${NEON}`}>
+          <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">First Subscribers</p>
+          <p className="text-2xl font-bold text-white">{customers}</p>
+          <p className="text-[10px] text-zinc-600">At $650 high-touch CAC</p>
+        </div>
+        <div className="p-5 col-span-2 bg-pink-500/10 border border-pink-500/30 rounded-2xl">
+          <p className="text-[10px] font-bold text-pink-400 tracking-widest uppercase mb-1">Projected ARR at Runway End</p>
+          <p className="text-3xl font-bold text-pink-500">${(projectedARR / 1000).toFixed(0)}k</p>
+          <p className="text-[10px] text-pink-500/70 mt-1">{customers} subscribers × $149/mo avg × 12</p>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Use of Funds</h4>
+        {PRESEED_FUNDS.map((f, i) => (
+          <div key={i} className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: f.color }} />
+            <div className="flex-grow">
+              <div className="flex justify-between mb-1">
+                <span className="text-xs font-bold text-white">{f.name}</span>
+                <span className="text-xs text-zinc-500">{f.value}% · ${Math.round(raise * f.value / 100 / 1000)}k</span>
+              </div>
+              <p className="text-[10px] text-zinc-600 leading-relaxed">{f.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SeedCalculator() {
+  const [raise, setRaise] = useState(1000000);
+
+  const BASE_BURN = 9500;
+  const HIRE_COST = 4500;
+  const HIRES = raise < 750000 ? 1 : raise < 1250000 ? 2 : 3;
+  const MONTHLY_BURN = BASE_BURN + HIRES * HIRE_COST + 3000;
+  const CAC = 380;
+  const AVG_MRR = 199;
+
+  const marketingBudget = raise * 0.20;
+  const organicMultiplier = 1.8;
+  const customers = Math.floor((marketingBudget / CAC) * organicMultiplier);
+  const runwayMonths = Math.floor(raise / MONTHLY_BURN);
+  const projectedARR = customers * AVG_MRR * 12;
+
+  return (
+    <div className={`p-8 bg-zinc-900 rounded-3xl ${NEON}`}>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h3 className="text-xl font-bold text-white mb-1">Seed Model</h3>
+          <p className="text-xs text-zinc-500 uppercase tracking-widest">Dominance through data and authority</p>
+        </div>
+        <Sprout className="w-6 h-6 text-emerald-500" />
+      </div>
+
+      <div className="space-y-4 mb-8">
+        <div className="flex justify-between">
+          <label className="text-sm font-medium text-zinc-300">Round Size</label>
+          <span className="text-sm font-bold text-white">${(raise / 1000000).toFixed(2)}M</span>
+        </div>
+        <input
+          type="range" min="500000" max="2000000" step="100000"
+          value={raise} onChange={(e) => setRaise(Number(e.target.value))}
+          className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-pink-500"
+        />
+        <div className="flex justify-between text-[10px] text-zinc-600 font-mono">
+          <span>$500k</span><span>$2M</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className={`p-5 bg-zinc-950 rounded-2xl ${NEON}`}>
+          <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Team Hires</p>
+          <p className="text-2xl font-bold text-white">{HIRES}</p>
+          <p className="text-[10px] text-zinc-600">Strategic roles</p>
+        </div>
+        <div className={`p-5 bg-zinc-950 rounded-2xl ${NEON}`}>
+          <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Runway</p>
+          <p className="text-2xl font-bold text-white">{runwayMonths} mo</p>
+          <p className="text-[10px] text-zinc-600">${(MONTHLY_BURN / 1000).toFixed(1)}k/mo burn</p>
+        </div>
+        <div className={`p-5 bg-zinc-950 rounded-2xl ${NEON}`}>
+          <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Subscribers</p>
+          <p className="text-2xl font-bold text-white">{customers}</p>
+          <p className="text-[10px] text-zinc-600">Paid + organic</p>
+        </div>
+      </div>
+
+      <div className="p-5 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl mb-8">
+        <p className="text-[10px] font-bold text-emerald-400 tracking-widest uppercase mb-1">Projected ARR entering Series A</p>
+        <p className="text-3xl font-bold text-emerald-400">${(projectedARR / 1000).toFixed(0)}k</p>
+        <p className="text-[10px] text-emerald-500/70 mt-1">{customers} subscribers × $199/mo avg × 12 — Series A ready</p>
+      </div>
+
+      <div className="space-y-3">
+        <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Use of Funds</h4>
+        {SEED_FUNDS.map((f, i) => (
+          <div key={i} className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: f.color }} />
+            <div className="flex-grow">
+              <div className="flex justify-between mb-1">
+                <span className="text-xs font-bold text-white">{f.name}</span>
+                <span className="text-xs text-zinc-500">{f.value}% · ${Math.round(raise * f.value / 100 / 1000)}k</span>
+              </div>
+              <p className="text-[10px] text-zinc-600 leading-relaxed">{f.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function InvestorHubPage() {
   const { user } = useAuth();
   const [showDataRoom, setShowDataRoom] = useState(false);
@@ -371,44 +555,145 @@ export default function InvestorHubPage() {
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-pink-500/10 text-pink-400 text-sm font-medium border border-pink-500/20 mb-8"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-pink-500/10 text-pink-400 text-sm font-medium border border-pink-500/20 mb-4"
           >
-            <Lock className="w-4 h-4" />
-            Investor Hub & Relations
+            <Flame className="w-4 h-4" />
+            Pre-seed Round Now Open
           </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
             className="text-4xl md:text-7xl font-bold tracking-tight mb-8 font-heading px-4"
           >
-            Building the Infrastructure for the <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-pink-300">AI Search Economy</span>
+            The Technology is Built.<br className="hidden md:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-pink-300">Now We Need the Fuel.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="text-xl md:text-2xl text-zinc-400 max-w-3xl mx-auto mb-12 leading-relaxed"
+            className="text-xl md:text-2xl text-zinc-400 max-w-3xl mx-auto mb-6 leading-relaxed"
           >
-            Auspexi is capitalizing on the fundamental shift from traditional search engines to Answer Engines. We are building the deterministic operating system for Generative Engine Optimization (GEO).
+            Auspexi has built the deterministic infrastructure for Generative Engine Optimization from scratch — no external capital, no compromises. We are at pre-seed: the platform is live, the workflow is proven, and the first paying subscribers are one funding round away.
           </motion.p>
+
+          {/* Stage progress strip */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+            className="flex items-center justify-center gap-2 mb-10 text-xs font-bold uppercase tracking-widest"
+          >
+            <span className="px-3 py-1.5 rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/40">Pre-seed ← Now</span>
+            <ChevronRight className="w-3 h-3 text-zinc-600" />
+            <span className="px-3 py-1.5 rounded-full bg-zinc-800 text-zinc-500">Seed</span>
+            <ChevronRight className="w-3 h-3 text-zinc-600" />
+            <span className="px-3 py-1.5 rounded-full bg-zinc-800 text-zinc-500">Series A</span>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <button
-              onClick={() => setShowDataRoom(true)}
+            <a
+              href="mailto:sales@auspexi.com?subject=Pre-seed Investment Enquiry"
               className={`px-8 py-4 bg-white text-black font-semibold rounded-full hover:bg-zinc-200 transition-colors flex items-center gap-2 w-full sm:w-auto justify-center ${NEON}`}
             >
-              <Eye className="w-4 h-4" /> Access Data Room Preview
-            </button>
-            <a
-              href="mailto:sales@auspexi.com"
-              className={`px-8 py-4 bg-zinc-900 text-white font-semibold rounded-full hover:bg-zinc-800 transition-colors hidden sm:flex items-center gap-2 w-full sm:w-auto justify-center ${NEON}`}
-            >
-              Contact Foundry Team
+              <Flame className="w-4 h-4" /> Enquire About Pre-seed
             </a>
+            <button
+              onClick={() => setShowDataRoom(true)}
+              className={`px-8 py-4 bg-zinc-900 text-white font-semibold rounded-full hover:bg-zinc-800 transition-colors flex items-center gap-2 w-full sm:w-auto justify-center ${NEON}`}
+            >
+              <Eye className="w-4 h-4" /> View Data Room
+            </button>
           </motion.div>
+        </div>
+      </section>
+
+      {/* What Exists Now */}
+      <section className="py-16 px-6 border-y border-zinc-900 bg-zinc-900/30">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <p className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-3">Built Without External Capital</p>
+            <h2 className="text-2xl md:text-3xl font-bold font-heading text-white">What Already Exists</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {WHAT_EXISTS_NOW.map((item, i) => (
+              <div key={i} className={`flex items-start gap-3 p-4 rounded-xl bg-zinc-900/50 ${NEON}`}>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                <span className="text-sm text-zinc-300">{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Three-stage funding journey */}
+      <section className="py-24 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">The Funding Journey</h2>
+            <p className="text-zinc-400 max-w-2xl mx-auto">Three rounds, three clear missions. Each stage is the proof the next stage demands.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Pre-seed card */}
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className={`p-8 rounded-2xl bg-zinc-900 relative overflow-hidden ${NEON}`}>
+              <div className="absolute top-4 right-4 px-2 py-0.5 bg-pink-500/20 text-pink-400 text-[10px] font-bold rounded-full border border-pink-500/30 uppercase tracking-widest">Now Open</div>
+              <Flame className="w-10 h-10 text-pink-500 mb-6" />
+              <h3 className="text-xl font-bold text-white mb-1">Pre-seed</h3>
+              <p className="text-pink-400 text-sm font-mono mb-4">$50k – $500k</p>
+              <p className="text-zinc-400 text-sm leading-relaxed mb-6">Light the engine. Fund founder runway and the first high-touch customer acquisitions. Prove the market will pay for GEO infrastructure.</p>
+              <div className="space-y-2 text-xs text-zinc-500">
+                <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-pink-500" />First 20–50 paying subscribers</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-pink-500" />Unit economics proven (CAC / LTV)</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-pink-500" />First testimonials and case studies</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-pink-500" />Pricing and tier validation</div>
+              </div>
+            </motion.div>
+
+            {/* Seed card */}
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className={`p-8 rounded-2xl bg-zinc-900 relative overflow-hidden ${NEON}`}>
+              <div className="absolute top-4 right-4 px-2 py-0.5 bg-zinc-800 text-zinc-500 text-[10px] font-bold rounded-full border border-zinc-700 uppercase tracking-widest">~12 Months</div>
+              <Sprout className="w-10 h-10 text-emerald-500 mb-6" />
+              <h3 className="text-xl font-bold text-white mb-1">Seed</h3>
+              <p className="text-emerald-400 text-sm font-mono mb-4">$500k – $2M</p>
+              <p className="text-zinc-400 text-sm leading-relaxed mb-6">Dominate the space. Build the data team, publish GEO research, become the undisputed expert authority before the incumbents notice the category exists.</p>
+              <div className="space-y-2 text-xs text-zinc-500">
+                <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-emerald-500" />200–500 paying subscribers</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-emerald-500" />Data scientist + growth marketer hired</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-emerald-500" />GEO research published — own the narrative</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-emerald-500" />Enterprise pilots, agency partnerships</div>
+              </div>
+            </motion.div>
+
+            {/* Series A card */}
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className={`p-8 rounded-2xl bg-zinc-900 relative overflow-hidden ${NEON}`}>
+              <div className="absolute top-4 right-4 px-2 py-0.5 bg-zinc-800 text-zinc-500 text-[10px] font-bold rounded-full border border-zinc-700 uppercase tracking-widest">~24–30 Months</div>
+              <Building2 className="w-10 h-10 text-blue-400 mb-6" />
+              <h3 className="text-xl font-bold text-white mb-1">Series A</h3>
+              <p className="text-blue-400 text-sm font-mono mb-4">$3M+</p>
+              <p className="text-zinc-400 text-sm leading-relaxed mb-6">After customers. Scale GTM, launch the proprietary SLM, expand internationally, and transition from early adopters to enterprise non-discretionary spend.</p>
+              <div className="space-y-2 text-xs text-zinc-500">
+                <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-blue-400" />500+ subscribers, proven NRR &gt;120%</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-blue-400" />Proprietary SLM replaces third-party APIs</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-blue-400" />Enterprise contracts, agency white-label</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-blue-400" />International expansion</div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pre-seed + Seed models */}
+      <section className="py-16 px-6 bg-zinc-900/30 border-y border-zinc-900">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">Capital Models</h2>
+            <p className="text-zinc-400 max-w-2xl mx-auto">Adjust the sliders to see what each round size buys in concrete outcomes — no fabricated hockey sticks, just honest unit economics.</p>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <PreSeedCalculator />
+            <SeedCalculator />
+          </div>
         </div>
       </section>
 
@@ -418,12 +703,12 @@ export default function InvestorHubPage() {
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-12">
               <div className="max-w-2xl">
-                <div className="inline-flex items-center gap-2 px-2 py-0.5 text-[10px] font-bold bg-pink-500/10 text-pink-400 border border-pink-500/20 rounded-full tracking-widest uppercase mb-4">
-                  Confidential
+                <div className="inline-flex items-center gap-2 px-2 py-0.5 text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full tracking-widest uppercase mb-4">
+                  Series A · Confidential
                 </div>
-                <h2 className="text-3xl md:text-4xl font-bold font-heading text-white">The Data Room</h2>
+                <h2 className="text-3xl md:text-4xl font-bold font-heading text-white">The Series A Data Room</h2>
                 <p className="text-zinc-400 mt-4">
-                  A comprehensive overview of our market positioning, technical architecture, and proprietary datasets. Accessing the full Data Room requires an active NDA.
+                  Where the journey leads. Market positioning, technical architecture, financial models and proprietary datasets for the Series A round — accessed after pre-seed and seed milestones are proven.
                 </p>
               </div>
               <div className="flex items-center gap-4">
