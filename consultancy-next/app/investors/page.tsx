@@ -272,16 +272,23 @@ function InvestorCalculator() {
 
   const calculateReturn = () => {
     const months = 36;
-    const initialUsers = 100;
     const avgArpu = 350;
-    let users = initialUsers;
+    const fundingMillions = funding / 1_000_000;
+
+    // Larger rounds unlock faster GTM execution and hiring — modelled as a
+    // growth rate boost of +2.5% per $1M above the $1M baseline.
+    const capitalGrowthBoost = (fundingMillions - 1) * 2.5;
+    const effectiveGrowth = growthRate + capitalGrowthBoost;
+
+    let users = 100;
     for (let i = 0; i < months; i++) {
-      users = users * (1 + (growthRate / 100));
+      users = users * (1 + effectiveGrowth / 100);
     }
     const year3ARR = users * avgArpu * 12;
-    const valuation = year3ARR * 12.5;
-    const returnOnInvestment = (valuation / (funding / 0.2)) * 10;
-    return { arr: year3ARR, valuation, roi: returnOnInvestment.toFixed(1) };
+    const exitValuation = year3ARR * 12.5;
+    const investorReturn = exitValuation * 0.20;
+    const multiple = investorReturn / funding;
+    return { arr: year3ARR, valuation: exitValuation, roi: multiple.toFixed(1) };
   };
 
   const results = calculateReturn();
@@ -304,7 +311,7 @@ function InvestorCalculator() {
               <span className="text-sm font-bold text-white">${(funding / 1000000).toFixed(1)}M</span>
             </div>
             <input
-              type="range" min="1000000" max="10000000" step="500000"
+              type="range" min="1000000" max="5000000" step="250000"
               value={funding} onChange={(e) => setFunding(Number(e.target.value))}
               className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-pink-500"
             />
