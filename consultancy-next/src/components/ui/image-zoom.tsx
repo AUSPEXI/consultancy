@@ -40,7 +40,7 @@ export function ImageZoom({ src, alt, zoomLevel = 2.5 }: ImageZoomProps) {
       setShowZoom(true);
     }
 
-    const lensSize = 250; // 250px width/height for the magnifying glass
+    const lensSize = 450; // 450px width/height for the magnifying glass
     const lensRadius = lensSize / 2;
 
     // Calculate background position
