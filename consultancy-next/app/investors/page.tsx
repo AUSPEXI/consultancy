@@ -355,7 +355,7 @@ export default function InvestorHubPage() {
   }, [isSuperUser, showDataRoom]);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-24 pb-16 overflow-x-hidden">
+    <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-24 pb-16 [overflow-x:clip]">
       <PublicHeader />
 
       {/* Hero */}
@@ -916,26 +916,6 @@ export default function InvestorHubPage() {
               View the detailed technology roadmap <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="py-24 bg-gradient-to-b from-zinc-950 to-pink-950/10 border-t border-zinc-900">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <Zap className="w-12 h-12 text-pink-500 mx-auto mb-8" />
-          <h2 className="text-3xl md:text-4xl font-bold font-heading mb-6">Access the Data Room</h2>
-          <p className="text-zinc-400 text-lg mb-10 max-w-2xl mx-auto">
-            Accredited investors and venture funds are invited to review our prospectus, detailed financial modeling, and proprietary technology demonstrations.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="mailto:sales@auspexi.com?subject=Data Room Access Request"
-              className={`px-8 py-4 bg-pink-600 text-white font-semibold rounded-full hover:bg-pink-500 transition-colors flex items-center gap-2 w-full sm:w-auto justify-center ${NEON}`}
-            >
-              <FileText className="w-4 h-4" /> Request Access
-            </a>
-          </div>
-          <p className="text-zinc-600 text-sm mt-6">Confidentiality Agreement Required.</p>
         </div>
       </section>
 

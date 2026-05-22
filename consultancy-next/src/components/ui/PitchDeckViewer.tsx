@@ -1,6 +1,8 @@
+'use client'
+
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Maximize2, ExternalLink } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Maximize2, ExternalLink, X } from 'lucide-react';
 
 const SLIDES = [
   {
@@ -20,7 +22,7 @@ const SLIDES = [
   },
   {
     title: "The 768-D Latent Space Moat",
-    content: "Using Gemini's native embedding dimensions and pgvector, we build a proprietary coordinate map of your brand perception—a moat that deepens with every audit.",
+    content: "Using Gemini's native embedding dimensions and pgvector, we build a proprietary coordinate map of your brand perception — a moat that deepens with every audit.",
     image: "https://images.unsplash.com/photo-1639322537228-f710d846310a?q=80&w=1000&auto=format&fit=crop"
   },
   {
@@ -37,79 +39,113 @@ const SLIDES = [
 
 export function PitchDeckViewer() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const next = () => setCurrentSlide((s) => (s + 1) % SLIDES.length);
   const prev = () => setCurrentSlide((s) => (s - 1 + SLIDES.length) % SLIDES.length);
-  const toggleFullscreen = () => setIsFullscreen(!isFullscreen);
 
-  return (
-    <div
-      id="pitch-deck-container"
-      className={`${isFullscreen ? 'fixed inset-0 z-[10000] rounded-none bg-black' : 'bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl relative'} overflow-hidden group transition-all duration-500`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className={`${isFullscreen ? 'h-full w-full' : 'aspect-[16/9]'} relative overflow-hidden bg-zinc-950`}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentSlide}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="absolute inset-0"
-          >
-            <img
-              src={SLIDES[currentSlide].image}
-              alt={SLIDES[currentSlide].title}
-              className="object-cover w-full h-full opacity-30"
-            />
-            <div className={`absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent ${isFullscreen ? 'p-16 md:p-32' : 'p-6 md:p-12'} flex flex-col justify-end`}>
-              <h4 className={`${isFullscreen ? 'text-4xl md:text-6xl mb-8' : 'text-xl md:text-4xl mb-4'} font-bold text-white tracking-tight leading-tight`}>{SLIDES[currentSlide].title}</h4>
-              <p className={`${isFullscreen ? 'text-lg md:text-2xl max-w-4xl' : 'text-xs md:text-lg max-w-2xl'} text-zinc-300 leading-relaxed`}>{SLIDES[currentSlide].content}</p>
+  const slideContent = (
+    <>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentSlide}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          className="absolute inset-0"
+        >
+          <img
+            src={SLIDES[currentSlide].image}
+            alt={SLIDES[currentSlide].title}
+            className="object-cover w-full h-full opacity-30"
+          />
+          {/* Text padded away from both arrows (64px sides) and dot bar (96px bottom) */}
+          <div className={`absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent flex flex-col justify-end ${isFullscreen ? 'px-16 pb-20 pt-8 md:px-32 md:pb-32 md:pt-16' : 'px-16 pb-24 pt-4 md:px-16 md:pb-20 md:pt-6'}`}>
+            <h4 className={`font-bold text-white tracking-tight leading-tight ${isFullscreen ? 'text-3xl md:text-6xl mb-4 md:mb-8' : 'text-base md:text-3xl mb-2 md:mb-3'}`}>
+              {SLIDES[currentSlide].title}
+            </h4>
+            <p className={`text-zinc-300 leading-relaxed ${isFullscreen ? 'text-base md:text-2xl max-w-4xl' : 'text-xs md:text-base max-w-2xl line-clamp-3 md:line-clamp-none'}`}>
+              {SLIDES[currentSlide].content}
+            </p>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Prev — always visible, clear of text */}
+      <button
+        onClick={prev}
+        className="absolute left-3 top-1/2 -translate-y-1/2 p-2 md:p-3 bg-black/60 hover:bg-pink-500 text-white rounded-full transition-colors z-30 backdrop-blur-sm"
+        aria-label="Previous slide"
+      >
+        <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+      </button>
+
+      {/* Next — always visible */}
+      <button
+        onClick={next}
+        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 md:p-3 bg-black/60 hover:bg-pink-500 text-white rounded-full transition-colors z-30 backdrop-blur-sm"
+        aria-label="Next slide"
+      >
+        <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+      </button>
+
+      {/* Dot indicators */}
+      <div className="absolute bottom-8 md:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20 pointer-events-none">
+        {SLIDES.map((_, i) => (
+          <div key={i} className={`h-1 transition-all rounded-full ${i === currentSlide ? 'w-8 bg-pink-500' : 'w-2 bg-zinc-700'}`} />
+        ))}
+      </div>
+    </>
+  );
+
+  if (isFullscreen) {
+    return (
+      <div className="fixed inset-0 z-[10000] bg-black overflow-hidden">
+        <div className="relative w-full h-full">
+          {slideContent}
+          {/* Fullscreen footer bar */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 flex items-center justify-between bg-zinc-900/80 backdrop-blur-sm z-50 border-t border-zinc-800">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-pink-500/10 rounded-lg hidden sm:block">
+                <Maximize2 className="w-4 h-4 text-pink-400" />
+              </div>
+              <span className="text-sm font-medium text-white">Auspexi Series A Deck</span>
+              <span className="text-xs font-mono text-zinc-500">{currentSlide + 1} / {SLIDES.length}</span>
             </div>
-          </motion.div>
-        </AnimatePresence>
-
-        <button
-          onClick={prev}
-          className={`absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 hover:bg-pink-500 text-white rounded-full transition-all z-30 backdrop-blur-sm ${isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </button>
-        <button
-          onClick={next}
-          className={`absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 hover:bg-pink-500 text-white rounded-full transition-all z-30 backdrop-blur-sm ${isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}
-        >
-          <ChevronRight className="w-6 h-6" />
-        </button>
-
-        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
-          {SLIDES.map((_, i) => (
-            <div key={i} className={`h-1 transition-all rounded-full ${i === currentSlide ? 'w-8 bg-pink-500' : 'w-2 bg-zinc-700'}`} />
-          ))}
+            <button
+              onClick={() => setIsFullscreen(false)}
+              className="flex items-center gap-2 text-[10px] font-bold text-white transition-colors uppercase tracking-widest bg-pink-600 hover:bg-pink-500 px-3 py-1.5 rounded-md"
+            >
+              <X className="w-3 h-3" /> Exit
+            </button>
+          </div>
         </div>
       </div>
+    );
+  }
 
-      <div className={`${isFullscreen ? 'absolute bottom-0 left-0 right-0' : ''} p-4 border-t border-zinc-800 flex items-center justify-between bg-zinc-900 shadow-xl z-50`}>
+  return (
+    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
+      {/* Slide viewport */}
+      <div className="aspect-[16/9] relative overflow-hidden bg-zinc-950">
+        {slideContent}
+      </div>
+
+      {/* Footer bar */}
+      <div className="p-4 border-t border-zinc-800 flex items-center justify-between bg-zinc-900">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-pink-500/10 rounded-lg hidden sm:block">
             <Maximize2 className="w-4 h-4 text-pink-400" />
           </div>
-          <span className="text-xs md:text-sm font-medium text-white truncate max-w-[120px] sm:max-w-none">Auspexi Series A Deck</span>
+          <span className="text-xs md:text-sm font-medium text-white">Auspexi Series A Deck</span>
           <span className="text-[10px] md:text-xs font-mono text-zinc-500 ml-1">{currentSlide + 1} / {SLIDES.length}</span>
         </div>
-        <div className="flex gap-2">
-          {isFullscreen && (
-            <button onClick={() => setIsFullscreen(false)} className="flex items-center gap-2 text-[10px] font-bold text-white transition-colors uppercase tracking-widest bg-pink-600 px-3 py-1.5 rounded-md">
-              Exit
-            </button>
-          )}
-          <button onClick={toggleFullscreen} className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 hover:text-white transition-colors uppercase tracking-widest bg-zinc-800/50 px-3 py-1.5 rounded-md border border-zinc-700/50">
-            <ExternalLink className="w-3 h-3" /> {isFullscreen ? 'Restore' : 'Fullscreen'}
-          </button>
-        </div>
+        <button
+          onClick={() => setIsFullscreen(true)}
+          className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 hover:text-white transition-colors uppercase tracking-widest bg-zinc-800/50 px-3 py-1.5 rounded-md border border-zinc-700/50"
+        >
+          <ExternalLink className="w-3 h-3" /> Fullscreen
+        </button>
       </div>
     </div>
   );
