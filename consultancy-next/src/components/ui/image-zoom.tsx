@@ -26,12 +26,18 @@ export function ImageZoom({ src, alt, zoomLevel = 2.5 }: ImageZoomProps) {
 
     const lensSize = 450;
     const lensRadius = lensSize / 2;
-    const bgPosX = (x * zoomLevel) - lensRadius;
-    const bgPosY = (y * zoomLevel) - lensRadius;
+
+    // Clamp lens so it never leaves the image area
+    const lensLeft = Math.max(0, Math.min(x - lensRadius, rect.width - lensSize));
+    const lensTop = Math.max(0, Math.min(y - lensRadius, rect.height - lensSize));
+
+    // Clamp background offset so the scaled image never shows empty space
+    const bgPosX = Math.max(0, Math.min(x * zoomLevel - lensRadius, rect.width * zoomLevel - lensSize));
+    const bgPosY = Math.max(0, Math.min(y * zoomLevel - lensRadius, rect.height * zoomLevel - lensSize));
 
     const lens = lensRef.current;
-    lens.style.left = `${x - lensRadius}px`;
-    lens.style.top = `${y - lensRadius}px`;
+    lens.style.left = `${lensLeft}px`;
+    lens.style.top = `${lensTop}px`;
     lens.style.backgroundImage = `url('${src}')`;
     lens.style.backgroundSize = `${rect.width * zoomLevel}px ${rect.height * zoomLevel}px`;
     lens.style.backgroundPosition = `-${bgPosX}px -${bgPosY}px`;
