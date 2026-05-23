@@ -1,14 +1,11 @@
 "use client";
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion } from 'motion/react';
 import { SparklesCore } from '@/components/ui/sparkles';
 import { BentoGrid, BentoCard } from '@/components/ui/bento-grid';
 import { GlowingEffect } from '@/components/ui/glowing-effect';
 import { PricingCard } from '@/components/ui/dark-gradient-pricing';
 import { Footerdemo } from '@/components/ui/footer-section';
-import { TestimonialsColumn } from '@/components/ui/testimonials-columns-1';
-import { ImageZoom } from '@/components/ui/image-zoom';
-import { DottedSurface } from '@/components/ui/dotted-surface';
 import { ArrowRight, Bot, Target, Zap, Search, BarChart3, ShieldAlert, CheckCircle2, Database, Mic, Brain, Blocks, Activity, Hash, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,14 +15,43 @@ import { PublicHeader } from '@/components/ui/public-header';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { blogPosts } from '@/data/blogPosts';
-import { BlogHero } from '@/components/BlogHero';
 import { cn } from '@/lib/utils';
 
-// Lazy load heavy interactive components
-const SplineScene = lazy(() => import('@/components/ui/splite').then(m => ({ default: m.SplineScene })));
+// SplineScene: direct import — splite.tsx handles its own lazy loading internally.
+// Removing the outer lazy() eliminates one full network waterfall before the robot appears.
+import { SplineScene } from '@/components/ui/splite';
+
+// Heavy below-fold components — lazy loaded and only mounted when near the viewport
+const LazyImageZoom = lazy(() => import('@/components/ui/image-zoom').then(m => ({ default: m.ImageZoom })));
+const LazyTestimonialsColumn = lazy(() => import('@/components/ui/testimonials-columns-1').then(m => ({ default: m.TestimonialsColumn })));
+const LazyDottedSurface = lazy(() => import('@/components/ui/dotted-surface').then(m => ({ default: m.DottedSurface })));
+const LazyBlogHero = lazy(() => import('@/components/BlogHero').then(m => ({ default: m.BlogHero })));
 
 // Memoized feature card to prevent re-renders during interactions
 const MemoizedBentoCard = React.memo(BentoCard);
+
+// Renders a placeholder until the element scrolls within 400px of the viewport,
+// then mounts children once and never unmounts. Section id="" stays in the DOM
+// so anchor-link scrolling always works.
+function LazySection({ children, minHeight = '400px' }: { children: React.ReactNode; minHeight?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); io.disconnect(); } },
+      { rootMargin: '400px' }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} style={!visible ? { minHeight } : undefined}>
+      {visible && children}
+    </div>
+  );
+}
 
 function VideoPlayer() {
   const [playing, setPlaying] = useState(false);
@@ -254,10 +280,10 @@ export function LandingPageClient() {
             background="transparent"
             minSize={0.6}
             maxSize={1.4}
-            particleDensity={50}
+            particleDensity={20}
             className="w-full h-full"
             particleColor="#ffffff"
-            speed={1}
+            speed={0.6}
           />
         </div>
 
@@ -330,18 +356,9 @@ export function LandingPageClient() {
                 {latentNodes.map((node, i) => (
                   <motion.div
                     key={i}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{
-                      opacity: [0.85, 1.0, 0.85],
-                      y: [0, -10, 0],
-                      x: [0, 5, 0],
-                    }}
-                    transition={{
-                      duration: 4 + Math.random() * 2,
-                      repeat: Infinity,
-                      delay: node.delay,
-                      ease: "easeInOut"
-                    }}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 0.9, y: 0 }}
+                    transition={{ duration: 0.5, delay: node.delay, ease: "easeOut" }}
                     style={{ left: node.x, top: node.y }}
                     className="absolute flex items-center gap-2 whitespace-nowrap"
                   >
@@ -374,40 +391,47 @@ export function LandingPageClient() {
 
       {/* Bento Grid Features */}
       <section id="features" className="py-24 relative">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">The Auspexi Arsenal</h2>
-            <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
-              Everything you need to dominate AI Answer Engines and secure your Share of Voice.
-            </p>
-          </div>
+        <LazySection minHeight="700px">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">The Auspexi Arsenal</h2>
+              <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
+                Everything you need to dominate AI Answer Engines and secure your Share of Voice.
+              </p>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:grid-rows-3 max-w-5xl mx-auto">
-            {features.map((feature) => (
-              <MemoizedBentoCard key={feature.name} {...feature} className={feature.className + " dark"} />
-            ))}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:grid-rows-3 max-w-5xl mx-auto">
+              {features.map((feature) => (
+                <MemoizedBentoCard key={feature.name} {...feature} className={feature.className + " dark"} />
+              ))}
+            </div>
           </div>
-        </div>
+        </LazySection>
       </section>
 
       {/* Infographic Zoom Section */}
       <section id="strategy" className="py-24 bg-zinc-900/30 border-y border-zinc-900">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">The GEO Strategy</h2>
-            <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
-              Hover over the infographic to explore the exact strategies we use to optimize your brand for AI models.
-            </p>
+        <LazySection minHeight="600px">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">The GEO Strategy</h2>
+              <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
+                Hover over the infographic to explore the exact strategies we use to optimize your brand for AI models.
+              </p>
+            </div>
+            <Suspense fallback={<div className="w-full aspect-[2/1] bg-zinc-900/50 rounded-2xl animate-pulse" />}>
+              <LazyImageZoom
+                src="/geo-infographic.svg"
+                alt="Generative Engine Optimization Roadmap"
+              />
+            </Suspense>
           </div>
-          <ImageZoom
-            src="/geo-infographic.svg"
-            alt="Generative Engine Optimization Roadmap"
-          />
-        </div>
+        </LazySection>
       </section>
 
       {/* Glowing Effect Specs */}
-      <section className="py-24">
+      <section className="py-24" id="platform-features">
+        <LazySection minHeight="600px">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">The Platform Features</h2>
@@ -489,10 +513,12 @@ export function LandingPageClient() {
             </li>
           </ul>
         </div>
+        </LazySection>
       </section>
 
       {/* Testimonials */}
       <section id="testimonials" className="py-24 bg-zinc-900/30 border-y border-zinc-900 overflow-hidden">
+        <LazySection minHeight="700px">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">Trusted by Pioneers</h2>
@@ -502,15 +528,19 @@ export function LandingPageClient() {
           </div>
 
           <div className="flex justify-center gap-6 [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)] h-[600px]">
-            <TestimonialsColumn testimonials={testimonials.slice(0, 2)} duration={15} />
-            <TestimonialsColumn testimonials={testimonials.slice(2, 4)} className="hidden md:block" duration={19} />
-            <TestimonialsColumn testimonials={testimonials.slice(4, 6)} className="hidden lg:block" duration={17} />
+            <Suspense fallback={<div className="w-full h-full bg-zinc-900/30 rounded-2xl animate-pulse" />}>
+              <LazyTestimonialsColumn testimonials={testimonials.slice(0, 2)} duration={15} />
+              <LazyTestimonialsColumn testimonials={testimonials.slice(2, 4)} className="hidden md:block" duration={19} />
+              <LazyTestimonialsColumn testimonials={testimonials.slice(4, 6)} className="hidden lg:block" duration={17} />
+            </Suspense>
           </div>
         </div>
+        </LazySection>
       </section>
 
       {/* Pricing */}
       <section id="pricing" className="py-24">
+        <LazySection minHeight="800px">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">Simple, Transparent Pricing</h2>
@@ -647,10 +677,12 @@ export function LandingPageClient() {
             </p>
           </div>
         </div>
+        </LazySection>
       </section>
 
       {/* Blog Section */}
       <section id="blog" className="py-24 bg-zinc-900/30 border-y border-zinc-900">
+        <LazySection minHeight="600px">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
             <div>
@@ -665,28 +697,35 @@ export function LandingPageClient() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {blogPosts.slice(0, 3).map((post, i) => (
-              <Link href={`/blog/${post.slug}`} key={i} className="group cursor-pointer flex flex-col">
-                <div className="w-full flex min-h-[220px] rounded-xl overflow-hidden mb-4 relative bg-[#0B0E14] shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
-                  <BlogHero title={post.title} category={post.category} compact={true} />
-                </div>
-                <div className="flex items-center gap-3 text-xs font-medium text-zinc-500 mb-2">
-                  <span className="text-pink-400 bg-pink-400/10 px-2 py-1 rounded-md">{post.category}</span>
-                  <span>•</span>
-                  <span>{post.date}</span>
-                </div>
-                <h3 className="text-xl font-semibold text-zinc-200 group-hover:text-white transition-colors leading-snug">
-                  {post.title}
-                </h3>
-              </Link>
-            ))}
+            <Suspense fallback={<div className="w-full min-h-[220px] bg-zinc-900/50 rounded-xl animate-pulse" />}>
+              {blogPosts.slice(0, 3).map((post, i) => (
+                <Link href={`/blog/${post.slug}`} key={i} className="group cursor-pointer flex flex-col">
+                  <div className="w-full flex min-h-[220px] rounded-xl overflow-hidden mb-4 relative bg-[#0B0E14] shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+                    <LazyBlogHero title={post.title} category={post.category} compact={true} />
+                  </div>
+                  <div className="flex items-center gap-3 text-xs font-medium text-zinc-500 mb-2">
+                    <span className="text-pink-400 bg-pink-400/10 px-2 py-1 rounded-md">{post.category}</span>
+                    <span>•</span>
+                    <span>{post.date}</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-zinc-200 group-hover:text-white transition-colors leading-snug">
+                    {post.title}
+                  </h3>
+                </Link>
+              ))}
+            </Suspense>
           </div>
         </div>
+        </LazySection>
       </section>
 
       {/* CTA Section */}
       <section className="py-32 relative overflow-hidden min-h-[500px] bg-[#0c0c0e]">
-        {isDesktop && <DottedSurface className="absolute inset-0 z-0 opacity-70" />}
+        {isDesktop && (
+          <Suspense fallback={null}>
+            <LazyDottedSurface className="absolute inset-0 z-0 opacity-70" />
+          </Suspense>
+        )}
         <div className="absolute inset-0 bg-zinc-900/40 z-[-2]"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-pink-500/5 rounded-full blur-[120px] pointer-events-none z-[-2]"></div>
 

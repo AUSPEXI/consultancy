@@ -46,6 +46,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Spline CDN preconnect — eliminates cold-connect delay for the robot */}
+        <link rel="preconnect" href="https://prod.spline.design" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://prod.spline.design" />
+        <link rel="preconnect" href="https://unpkg.com" crossOrigin="" />
+      </head>
       <body className="antialiased bg-[#050505] text-white">
         <NavigationProgress />
         <AuthProvider>{children}</AuthProvider>
