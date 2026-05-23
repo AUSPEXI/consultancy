@@ -31,32 +31,31 @@ const MemoizedBentoCard = React.memo(BentoCard);
 function VideoPlayer() {
   const [playing, setPlaying] = useState(false);
   return (
-    <div className="aspect-video rounded-2xl overflow-hidden bg-zinc-900 relative group shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+    <div className="aspect-video rounded-2xl overflow-hidden bg-zinc-950 relative group shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
       <video
         controls
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover bg-zinc-950"
+        style={{ backgroundColor: '#09090b' }}
         onPlay={() => setPlaying(true)}
       >
         <source src="/Generative_Engine_Optimization_AI_Video.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
-      {/* Branded placeholder shown until the video starts */}
-      {!playing && (
-        <div
-          className="absolute inset-0 cursor-pointer"
-          onClick={(e) => {
-            setPlaying(true);
-            const video = (e.currentTarget.previousElementSibling as HTMLVideoElement);
-            video?.play();
-          }}
-        >
-          <img
-            src="/video-placeholder.svg"
-            alt="Why GEO Matters Now"
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
+      {/* Always in DOM — opacity fade prevents flash of yellow first frame */}
+      <div
+        className={`absolute inset-0 cursor-pointer transition-opacity duration-300 ${playing ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        onClick={(e) => {
+          setPlaying(true);
+          const video = (e.currentTarget.previousElementSibling as HTMLVideoElement);
+          video?.play();
+        }}
+      >
+        <img
+          src="/video-placeholder.svg"
+          alt="Why GEO Matters Now"
+          className="w-full h-full object-cover"
+        />
+      </div>
     </div>
   );
 }
@@ -365,7 +364,7 @@ export function LandingPageClient() {
       </section>
 
       {/* Bento Grid Features */}
-      <section id="features" className="py-24 relative">
+      <section id="features" className="py-24 relative bg-zinc-950">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">The Auspexi Arsenal</h2>
@@ -399,7 +398,7 @@ export function LandingPageClient() {
       </section>
 
       {/* Glowing Effect Specs */}
-      <section className="py-24" id="platform-features">
+      <section className="py-24 bg-zinc-950" id="platform-features">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">The Platform Features</h2>
@@ -502,7 +501,7 @@ export function LandingPageClient() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-24">
+      <section id="pricing" className="py-24 bg-zinc-950">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">Simple, Transparent Pricing</h2>
