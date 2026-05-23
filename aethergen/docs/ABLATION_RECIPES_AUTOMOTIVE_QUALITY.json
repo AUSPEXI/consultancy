@@ -1,0 +1,168 @@
+{
+  "version": "1.0",
+  "dataset": "changes_data_rows_automotive",
+  "schema_hash": "automotive_quality_v1",
+  "repeats": 3,
+  "description": "Automotive Quality Ablation Testing - Diagnose Model Collapse Risk",
+  "ablations": [
+    {
+      "name": "baseline_all_modules",
+      "description": "All innovation modules enabled - baseline performance",
+      "modules": { 
+        "enable": [
+          "FrequencyHarmonicsLayer",
+          "ConsensusAuditEnsemble", 
+          "SelectivePredictionAbstention",
+          "Hypercube8D",
+          "RefractorGeometric",
+          "HarmonicOcaonian",
+          "TriadValidator"
+        ]
+      },
+      "training": { "precision": "FP16" },
+      "privacy": { "epsilon": 0.1, "synthetic_ratio": 95 }
+    },
+    {
+      "name": "frequency_harmonics_only",
+      "description": "Test Frequency Harmonics Layer impact on periodic data quality",
+      "modules": { 
+        "enable": ["FrequencyHarmonicsLayer"],
+        "disable": [
+          "ConsensusAuditEnsemble",
+          "SelectivePredictionAbstention", 
+          "Hypercube8D",
+          "RefractorGeometric",
+          "HarmonicOcaonian",
+          "TriadValidator"
+        ]
+      },
+      "training": { "precision": "FP16" },
+      "privacy": { "epsilon": 0.1, "synthetic_ratio": 95 }
+    },
+    {
+      "name": "consensus_audit_only",
+      "description": "Test Consensus Audit Ensemble for outlier/bias detection",
+      "modules": { 
+        "enable": ["ConsensusAuditEnsemble"],
+        "disable": [
+          "FrequencyHarmonicsLayer",
+          "SelectivePredictionAbstention",
+          "Hypercube8D", 
+          "RefractorGeometric",
+          "HarmonicOcaonian",
+          "TriadValidator"
+        ]
+      },
+      "training": { "precision": "FP16" },
+      "privacy": { "epsilon": 0.1, "synthetic_ratio": 95 }
+    },
+    {
+      "name": "hypercube_8d_only",
+      "description": "Test 8D hypercube geometric mapping for data quality",
+      "modules": { 
+        "enable": ["Hypercube8D"],
+        "disable": [
+          "FrequencyHarmonicsLayer",
+          "ConsensusAuditEnsemble",
+          "SelectivePredictionAbstention",
+          "RefractorGeometric", 
+          "HarmonicOcaonian",
+          "TriadValidator"
+        ]
+      },
+      "training": { "precision": "FP16" },
+      "privacy": { "epsilon": 0.1, "synthetic_ratio": 95 }
+    },
+    {
+      "name": "triad_validator_only",
+      "description": "Test Triad Validator for geometric/algebraic/topological consistency",
+      "modules": { 
+        "enable": ["TriadValidator"],
+        "disable": [
+          "FrequencyHarmonicsLayer",
+          "ConsensusAuditEnsemble",
+          "SelectivePredictionAbstention",
+          "Hypercube8D",
+          "RefractorGeometric",
+          "HarmonicOcaonian"
+        ]
+      },
+      "training": { "precision": "FP16" },
+      "privacy": { "epsilon": 0.1, "synthetic_ratio": 95 }
+    },
+    {
+      "name": "quality_focused_ensemble",
+      "description": "Focus on quality modules: Consensus + Triad + Harmonics",
+      "modules": { 
+        "enable": [
+          "ConsensusAuditEnsemble",
+          "TriadValidator", 
+          "FrequencyHarmonicsLayer"
+        ],
+        "disable": [
+          "SelectivePredictionAbstention",
+          "Hypercube8D",
+          "RefractorGeometric",
+          "HarmonicOcaonian"
+        ]
+      },
+      "training": { "precision": "FP16" },
+      "privacy": { "epsilon": 0.1, "synthetic_ratio": 95 }
+    },
+    {
+      "name": "performance_focused_ensemble",
+      "description": "Focus on performance: Hypercube + Refractor + Harmonic",
+      "modules": { 
+        "enable": [
+          "Hypercube8D",
+          "RefractorGeometric",
+          "HarmonicOcaonian"
+        ],
+        "disable": [
+          "FrequencyHarmonicsLayer",
+          "ConsensusAuditEnsemble",
+          "SelectivePredictionAbstention",
+          "TriadValidator"
+        ]
+      },
+      "training": { "precision": "FP16" },
+      "privacy": { "epsilon": 0.1, "synthetic_ratio": 95 }
+    },
+    {
+      "name": "minimal_modules",
+      "description": "Minimal modules to identify core quality drivers",
+      "modules": { 
+        "enable": ["TriadValidator"],
+        "disable": [
+          "FrequencyHarmonicsLayer",
+          "ConsensusAuditEnsemble",
+          "SelectivePredictionAbstention",
+          "Hypercube8D",
+          "RefractorGeometric",
+          "HarmonicOcaonian"
+        ]
+      },
+      "training": { "precision": "FP16" },
+      "privacy": { "epsilon": 0.1, "synthetic_ratio": 95 }
+    }
+  ],
+  "metrics": [
+    "accuracy", 
+    "privacyScore", 
+    "utilityScore", 
+    "generationSpeed",
+    "modelCollapseRisk",
+    "dataQualityScore",
+    "geometricConsistency",
+    "harmonicResonance",
+    "consensusReliability"
+  ],
+  "cleaning": {
+    "synthetic": true,
+    "triadGuided": true
+  },
+  "adaptation": {
+    "mode": "black-box",
+    "tools": ["quality_analyzer", "bias_detector", "consistency_checker"]
+  }
+}

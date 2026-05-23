@@ -1,0 +1,89 @@
+{
+  "name": "Aethergen Automotive — Material Defect Pipeline",
+  "tasks": [
+    {
+      "task_key": "setup_uc",
+      "notebook_task": {
+        "notebook_path": "databricks/automotive/notebooks/01_setup_uc",
+        "base_parameters": {
+          "catalog_name": "aethergen",
+          "schema_name": "automotive",
+          "volume_name": "automotive_assets",
+          "external_location_uri": ""
+        }
+      }
+    },
+    {
+      "task_key": "schema_seed",
+      "depends_on": [{"task_key": "setup_uc"}],
+      "notebook_task": {
+        "notebook_path": "databricks/automotive/notebooks/02_schema_seed",
+        "base_parameters": {
+          "catalog_name": "aethergen",
+          "schema_name": "automotive",
+          "dataset_name": "material_defect_v1",
+          "delta_base_uri": "",
+          "preview_percent": "1"
+        }
+      }
+    },
+    {
+      "task_key": "synthetic_generate",
+      "depends_on": [{"task_key": "schema_seed"}],
+      "notebook_task": {
+        "notebook_path": "databricks/automotive/notebooks/03_synthetic_generate",
+        "base_parameters": {
+          "catalog_name": "aethergen",
+          "schema_name": "automotive",
+          "dataset_name": "material_defect_v1",
+          "delta_base_uri": "",
+          "rows": "50000"
+        }
+      }
+    },
+    {
+      "task_key": "benchmarks_evidence",
+      "depends_on": [{"task_key": "synthetic_generate"}],
+      "notebook_task": {
+        "notebook_path": "databricks/automotive/notebooks/04_benchmarks_evidence",
+        "base_parameters": {
+          "catalog_name": "aethergen",
+          "schema_name": "automotive",
+          "dataset_name": "material_defect_v1",
+          "volume_uri": "/Volumes/aethergen/automotive/automotive_assets",
+          "auc_min": "0.75"
+        }
+      }
+    },
+    {
+      "task_key": "register_models",
+      "depends_on": [{"task_key": "benchmarks_evidence"}],
+      "notebook_task": {
+        "notebook_path": "databricks/automotive/notebooks/05_register_models",
+        "base_parameters": {
+          "catalog_name": "aethergen",
+          "schema_name": "automotive",
+          "dataset_name": "material_defect_v1",
+          "model_name": "aethergen.automotive.material_defect_detection_v1"
+        }
+      }
+    },
+    {
+      "task_key": "package_publish",
+      "depends_on": [{"task_key": "register_models"}],
+      "notebook_task": {
+        "notebook_path": "databricks/automotive/notebooks/06_package_publish",
+        "base_parameters": {
+          "catalog_name": "aethergen",
+          "schema_name": "automotive",
+          "dataset_name": "material_defect_v1",
+          "model_name": "aethergen.automotive.material_defect_detection_v1",
+          "volume_uri": "/Volumes/aethergen/automotive/automotive_assets"
+        }
+      }
+    }
+  ],
+  "format": "MULTI_TASK"
+}
+
+

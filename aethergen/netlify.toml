@@ -1,0 +1,146 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20.19.0"
+
+# Environment variables for aethergen.auspexi.com
+[context.production.environment]
+  VITE_SUPABASE_URL = "https://scnbjflqabnzirqriqgs.supabase.co"
+  VITE_ADMIN_EMAILS = "sales@auspexi.com"
+  # Note: Add VITE_SUPABASE_ANON_KEY in Netlify's environment variables dashboard (keep secret)
+
+[context.deploy-preview.environment]
+  VITE_SUPABASE_URL = "https://scnbjflqabnzirqriqgs.supabase.co"
+  VITE_ADMIN_EMAILS = "sales@auspexi.com"
+  # Note: Add VITE_SUPABASE_ANON_KEY in Netlify's environment variables dashboard (keep secret)
+
+[functions]
+  directory = "netlify/functions"
+
+[functions."*"]
+  timeout = 120
+
+[functions."databricks-jobs"]
+  included_files = [
+    "databricks/**"
+  ]
+
+# Specific API redirects (must come BEFORE the catch-all)
+[[redirects]]
+  from = "/api/entitlements"
+  to = "/.netlify/functions/get-entitlements"
+  status = 200
+
+[[redirects]]
+  from = "/api/stripe/create-checkout"
+  to = "/.netlify/functions/create-checkout-session"
+  status = 200
+
+[[redirects]]
+  from = "/api/stripe/webhook"
+  to = "/.netlify/functions/stripe-webhook"
+  status = 200
+
+# General API redirects (must come BEFORE the catch-all)
+[[redirects]]
+  from = "/api/:resource"
+  to = "/.netlify/functions/api?resource=:resource"
+  status = 200
+
+# Removed invalid redirects using /.netlify in from path; clients now call /api/* directly
+
+
+
+[[redirects]]
+  from = "/trigger-enhanced-collection"
+  to = "/.netlify/functions/enhanced-cron-collect"
+  status = 200
+
+# Main collection endpoint - FIXED: Point to working function
+[[redirects]]
+  from = "/trigger-collection"
+  to = "/.netlify/functions/cron-collect"
+  status = 200
+
+# I/O optimized collection endpoint
+[[redirects]]
+  from = "/trigger-optimized-collection"
+  to = "/.netlify/functions/io-optimized-cron-collect"
+  status = 200
+
+# Stats refresh endpoint
+[[redirects]]
+  from = "/refresh-stats"
+  to = "/.netlify/functions/refresh-stats"
+  status = 200
+
+# Enhanced marketplace upload with Databricks
+[[redirects]]
+  from = "/trigger-databricks-upload"
+  to = "/.netlify/functions/enhanced-marketplace-upload"
+  status = 200
+
+# Additional API endpoints for SDSP features
+[[redirects]]
+  from = "/api/verify-zkp"
+  to = "/.netlify/functions/verifyZKP"
+  status = 200
+
+[[redirects]]
+  from = "/api/process-feedback"
+  to = "/.netlify/functions/processMetaLearning"
+  status = 200
+
+[[redirects]]
+  from = "/api/upload-marketplace"
+  to = "/.netlify/functions/uploadToMarketplace"
+  status = 200
+
+[[redirects]]
+  from = "/api/fetch-data"
+  to = "/.netlify/functions/fetchData"
+  status = 200
+
+[[redirects]]
+  from = "/api/process-data"
+  to = "/.netlify/functions/processData"
+  status = 200
+
+# Serve prerendered blog pages and normalize trailing slashes (BEFORE SPA fallback)
+[[redirects]]
+  from = "/blog/:slug"
+  to = "/blog/:slug/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/blog/:slug/"
+  to = "/blog/:slug/index.html"
+  status = 200
+
+# SPA fallback - serve index.html for all routes that don't match files or API endpoints
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers for all routes
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Cache headers for static assets
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Development settings for local dev
+[dev]
+  command = "vite" 

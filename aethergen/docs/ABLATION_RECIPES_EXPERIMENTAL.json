@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "repeats": 1,
+  "ablations": [
+    {
+      "name": "experimental_modules",
+      "modules": { "enable": ["HarmonicsLayer", "ConsensusAudit", "SelectiveAbstention"] }
+    },
+    {
+      "name": "fusion_alignment",
+      "description": "Cross-domain field alignment for fusion testing",
+      "training": { "modelFilter": [] },
+      "privacy": { "epsilon": 0.2, "synthetic_ratio": 95 }
+    }
+  ],
+  "fusion": {
+    "mappings": [
+      { "source": "patient.age", "target": "age" },
+      { "source": "patient_id", "target": "id" },
+      { "source": "diagnosis", "target": "condition" }
+    ]
+  },
+  "metrics": ["accuracy", "privacyScore", "utilityScore", "generationSpeed"]
+}
+
+

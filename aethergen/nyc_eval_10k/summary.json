@@ -1,0 +1,14 @@
+{
+  "metrics": {
+    "queries": 10000,
+    "tokens_total_baseline": 1020000,
+    "tokens_total_composed": 289925,
+    "calls_total_baseline": 10000,
+    "calls_total_composed": 0,
+    "latency_total_ms_baseline": 9150000,
+    "latency_total_ms_composed": 2510000,
+    "token_reduction_pct": 72,
+    "calls_reduction_pct": 100,
+    "latency_reduction_pct": 73
+  }
+}

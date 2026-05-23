@@ -1,0 +1,16 @@
+version: 1
+defaults:
+  op_threshold: 0.5
+  latency_ceiling_ms: 120
+rules:
+  - name: icu_night_override
+    when: "location == 'ICU' and shift == 'night'"
+    effect:
+      op_threshold: 0.6
+      latency_ceiling_ms: 150
+  - name: high_burst_caution
+    when: "burst_score > 0.8"
+    effect:
+      op_threshold: 0.65
+      safe_hold: true
+

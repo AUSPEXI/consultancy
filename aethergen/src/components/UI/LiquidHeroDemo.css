@@ -1,0 +1,116 @@
+/* Custom Liquid Morphing Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes liquid-morph {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+  25% {
+    transform: scale(1.05) rotate(1deg);
+    filter: hue-rotate(15deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(-1deg);
+    filter: hue-rotate(30deg);
+  }
+  75% {
+    transform: scale(1.05) rotate(1deg);
+    filter: hue-rotate(15deg);
+  }
+}
+
+@keyframes undulate-slow {
+  0%, 100% {
+    transform: translateX(0) scaleY(1);
+  }
+  50% {
+    transform: translateX(20px) scaleY(1.1);
+  }
+}
+
+@keyframes undulate-medium {
+  0%, 100% {
+    transform: translateX(0) scaleY(1);
+  }
+  50% {
+    transform: translateX(-15px) scaleY(0.9);
+  }
+}
+
+@keyframes undulate-fast {
+  0%, 100% {
+    transform: translateX(0) scaleY(1);
+  }
+  50% {
+    transform: translateX(10px) scaleY(1.05);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(147, 51, 234, 0.5);
+  }
+}
+
+/* Apply animations to elements - More specific to override Tailwind */
+.animate-fade-in {
+  animation: fade-in 1s ease-out forwards !important;
+}
+
+.animate-liquid-morph {
+  animation: liquid-morph 8s ease-in-out infinite !important;
+}
+
+.animate-undulate-slow {
+  animation: undulate-slow 8s ease-in-out infinite !important;
+}
+
+.animate-undulate-medium {
+  animation: undulate-medium 6s ease-in-out infinite !important;
+}
+
+.animate-undulate-fast {
+  animation: undulate-fast 4s ease-in-out infinite !important;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite !important;
+}
+
+/* Force animations to work */
+.liquid-layer {
+  will-change: transform, filter, opacity;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+/* Smooth transitions for all elements */
+* {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced backdrop blur for glassmorphism */
+.backdrop-blur-lg {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Smooth hover effects */
+.hover\:bg-white\/20:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}

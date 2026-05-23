@@ -1,0 +1,38 @@
+{
+  "pilot": {
+    "name": "<customer_or_project>",
+    "date": "<YYYY-MM-DD>",
+    "environment": "on-device|vpc|hybrid",
+    "data_boundary": "no_raw_docs_exit|anchors_only|vectors_only"
+  },
+  "metrics": {
+    "queries": 0,
+    "tokens_total_baseline": 0,
+    "tokens_total_composed": 0,
+    "calls_total_baseline": 0,
+    "calls_total_composed": 0,
+    "latency_total_ms_baseline": 0,
+    "latency_total_ms_composed": 0,
+    "token_reduction_pct": 0,
+    "calls_reduction_pct": 0,
+    "latency_reduction_pct": 0
+  },
+  "routing": {
+    "abstain_rate": 0,
+    "fetch_more_rate": 0,
+    "reroute_rate": 0
+  },
+  "acceptance": {
+    "coverage_target": 0.95,
+    "breach_rate": 0.0
+  },
+  "provenance": {
+    "anchors": ["<anchor_pack_ids>"]
+  },
+  "crypto_profile": {
+    "hash_algo": "sha256",
+    "sig_algo": "ed25519|ml-dsa|hybrid",
+    "sig_mode": "single|hybrid",
+    "created_at": "<iso8601>"
+  }
+}

@@ -1,0 +1,434 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global accessibility tweak: avoid light gray text on light backgrounds */
+@layer base {
+  /* Enforce readable text on light backgrounds across app */
+  :root, body, body * {
+    color: inherit;
+  }
+  [style*="color:#999"], [style*="color: #999"],
+  [style*="color:#777"], [style*="color: #777"],
+  [style*="color:#666"], [style*="color: #666"],
+  [style*="color:#555"], [style*="color: #555"] {
+    color: #334155 !important; /* slate-700 */
+  }
+  /* Medium greys mapped to readable tones on light surfaces */
+  .text-gray-400, .text-slate-400, .text-neutral-400 { color: #475569 !important; }
+  .text-gray-500, .text-slate-500, .text-neutral-500 { color: #374151 !important; }
+  .text-gray-600, .text-slate-600, .text-neutral-600 { color: #1f2937 !important; }
+  /* Tailwind utility greys overridden to readable defaults */
+  .text-gray-300, .text-gray-200, .text-gray-100,
+  .text-slate-300, .text-slate-200, .text-slate-100,
+  .text-neutral-300, .text-neutral-200, .text-neutral-100 {
+    color: #334155; /* slate-700 equivalent */
+  }
+  /* Blog readability: force high-contrast text inside prose on light backgrounds */
+  .prose, .prose * {
+    color: #0f172a !important; /* slate-900 */
+    opacity: 1 !important;
+  }
+  /* Keycap style used in blogs for anchor_hash etc. */
+  .prose .kbd, .kbd {
+    background: #111827 !important;
+    color: #ffffff !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace !important;
+  }
+  .prose a { color: #1d4ed8 !important; } /* blue-700 links */
+  .prose strong { color: #0b1220 !important; }
+  .prose code { color: #0f172a !important; }
+}
+
+@layer utilities {
+  /* Liquid Morphing Animations */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes liquid-morph {
+    0%, 100% {
+      transform: scale(1) rotate(0deg);
+      filter: hue-rotate(0deg);
+    }
+    25% {
+      transform: scale(1.05) rotate(1deg);
+      filter: hue-rotate(15deg);
+    }
+    50% {
+      transform: scale(1.1) rotate(-1deg);
+      filter: hue-rotate(30deg);
+    }
+    75% {
+      transform: scale(1.05) rotate(1deg);
+      filter: hue-rotate(15deg);
+    }
+  }
+
+  @keyframes undulate-slow {
+    0%, 100% {
+      transform: translateX(0) scaleY(1);
+    }
+    50% {
+      transform: translateX(20px) scaleY(1.1);
+    }
+  }
+
+  @keyframes undulate-medium {
+    0%, 100% {
+      transform: translateX(0) scaleY(1);
+    }
+    50% {
+      transform: translateX(-15px) scaleY(0.9);
+    }
+  }
+
+  @keyframes undulate-fast {
+    0%, 100% {
+      transform: translateX(0) scaleY(1);
+    }
+    50% {
+      transform: translateX(10px) scaleY(1.05);
+    }
+  }
+
+  /* Liquid Morphing Animation Classes */
+  .animate-fade-in {
+    animation: fade-in 1s ease-out forwards !important;
+  }
+
+  .animate-liquid-morph {
+    animation: liquid-morph 8s ease-in-out infinite !important;
+  }
+
+  .animate-undulate-slow {
+    animation: undulate-slow 8s ease-in-out infinite !important;
+  }
+
+  .animate-undulate-medium {
+    animation: undulate-medium 6s ease-in-out infinite !important;
+  }
+
+  .animate-undulate-fast {
+    animation: undulate-fast 4s ease-in-out infinite !important;
+  }
+
+  /* Liquid Layer Performance Optimizations */
+  .liquid-layer {
+    will-change: transform, filter, opacity !important;
+    transform-style: preserve-3d !important;
+    backface-visibility: hidden !important;
+  }
+}
+
+/* Hide scrollbars for horizontal nav overflow on mobile */
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Brand utilities */
+.neon-card {
+  box-shadow: 0 0 0 1px rgba(16,185,129,0.3), 0 10px 30px rgba(16,185,129,0.15), inset 0 0 40px rgba(59,130,246,0.08);
+}
+.neon-ring {
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.25), 0 0 40px rgba(16,185,129,0.25);
+}
+.soft-divider {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(59,130,246,0) 0%, rgba(59,130,246,0.35) 50%, rgba(16,185,129,0) 100%);
+}
+
+/* CRITICAL: Prevent flashing while preserving all styling */
+@layer base {
+  html {
+    background: linear-gradient(180deg, #0b1220 0%, #111827 40%, #0b1220 100%) !important;
+    color: #e6edf3 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 100vh !important;
+    overflow-x: hidden !important;
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    color: #e6edf3 !important;
+    min-height: 100vh !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+
+  #root {
+    min-height: 100vh !important;
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  * {
+    box-sizing: border-box !important;
+  }
+}
+
+/* CRITICAL: Disable ALL transitions and animations until app is shown */
+:not(.show-app) *,
+:not(.show-app) *::before,
+:not(.show-app) *::after {
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Only enable animations after app is shown */
+.show-app .animate-spin {
+  animation: spin 1s linear infinite !important;
+}
+
+.show-app .animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+}
+
+.show-app .animate-pulse-slow {
+  animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+}
+
+/* Enable smooth transitions only after app is shown */
+.show-app .transition-colors {
+  transition: color 150ms ease-in-out, background-color 150ms ease-in-out !important;
+}
+
+.show-app .transition-shadow {
+  transition: box-shadow 150ms ease-in-out !important;
+}
+
+.show-app .hover\:shadow-lg:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Keyframe animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* AGI Emergence Glitch Effects - DRAMATIC Electrical Interference */
+.glitch-overlay {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.glitch-overlay.active {
+  opacity: 1 !important;
+}
+
+/* TV interference pattern - covers whole hero section */
+.glitch-overlay.active .glitch-static {
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(255,255,255,0.9) 2px,
+      rgba(255,255,255,0.9) 4px
+    );
+  /* No animation here; black flashes are driven by React state overlay */
+}
+
+/* TV Interference Lines - subtle additional lines, no timeline dependency */
+.glitch-overlay.active .glitch-line {
+  opacity: 0.9;
+  background: white;
+  box-shadow: 0 0 5px rgba(255,255,255,0.8);
+}
+
+/* Intense screen flicker */
+.glitch-overlay.active .glitch-flicker {
+  opacity: 0;
+  animation: screenFlicker 0.03s infinite;
+  background: rgba(255,255,255,0.9);
+}
+
+
+
+@keyframes screenFlicker {
+  0%, 100% { opacity: 0; }
+  10%, 90% { opacity: 0.5; }
+  50% { opacity: 1.0; }
+}
+
+/* AGI Letters emerging through the interference */
+.agi-letters {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.agi-letters.active {
+  opacity: 1;
+  animation: agiEmergence 3s ease-in-out;
+}
+
+@keyframes agiEmergence {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+    filter: blur(3px);
+  }
+  20% {
+    opacity: 0.3;
+    transform: scale(0.9) translateY(10px);
+    filter: blur(2px);
+  }
+  40% {
+    opacity: 0.7;
+    transform: scale(1.0) translateY(0px);
+    filter: blur(1px);
+  }
+  60% {
+    opacity: 0.9;
+    transform: scale(1.05) translateY(-5px);
+    filter: blur(0.5px);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1.0) translateY(0px);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+    filter: blur(1px);
+  }
+}
+
+/* Add a subtle pulsing effect to make AGI feel more alive */
+.agi-letters.active h1 {
+  animation: agiPulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes agiPulse {
+  0% {
+    filter: drop-shadow(0 0 20px rgba(0,255,255,0.8)) brightness(1);
+  }
+  100% {
+    filter: drop-shadow(0 0 25px rgba(0,255,255,1)) brightness(1.1);
+  }
+}
+
+/* SDSP-specific styling */
+.sdsp-gradient {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+}
+
+.sdsp-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.zkproof-indicator {
+  background: linear-gradient(45deg, #10b981, #059669);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mod-compliant {
+  background: linear-gradient(45deg, #f59e0b, #d97706);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Ensure stable rendering */
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive container */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
