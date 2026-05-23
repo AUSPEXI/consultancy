@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { db } from '@/firebase';
+import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { logAuditAction } from '@/lib/audit';
 import {
   TrendingUp, BarChart3, Globe, ShieldCheck, Zap, ArrowRight,
   FileText, Lock, CheckCircle2, Layout, Database, Eye, PieChart,
@@ -536,6 +539,7 @@ function SeedCalculator() {
 export default function InvestorHubPage() {
   const { user } = useAuth();
   const [showDataRoom, setShowDataRoom] = useState(false);
+  const [dataRoomLogs, setDataRoomLogs] = useState<{ id: string; timestamp: any; userId: string; details: any }[]>([]);
 
   const isSuperUser = user?.email === 'hopiumcalculator@gmail.com';
 
@@ -544,6 +548,29 @@ export default function InvestorHubPage() {
       setShowDataRoom(true);
     }
   }, [isSuperUser, showDataRoom]);
+
+  useEffect(() => {
+    if (showDataRoom && user?.uid) {
+      logAuditAction(user.uid, 'DATA_ROOM_VIEW', { page: 'investors', tier: 'series_a' });
+    }
+  }, [showDataRoom, user?.uid]);
+
+  useEffect(() => {
+    if (!isSuperUser || !user?.uid) return;
+
+    const q = query(
+      collection(db, 'audit_logs'),
+      where('action', '==', 'DATA_ROOM_VIEW'),
+      orderBy('timestamp', 'desc'),
+      limit(15)
+    );
+
+    const unsubscribe = onSnapshot(q, snapshot => {
+      setDataRoomLogs(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any)));
+    }, () => {});
+
+    return () => unsubscribe();
+  }, [isSuperUser, user?.uid]);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-24 pb-16 [overflow-x:clip]">
@@ -713,8 +740,8 @@ export default function InvestorHubPage() {
               </div>
               <div className="flex items-center gap-4">
                 <div className="text-right hidden sm:block">
-                  <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase">Encryption Status</p>
-                  <p className="text-xs font-mono text-emerald-500">AES-256_ACTIVE</p>
+                  <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase">Infrastructure</p>
+                  <p className="text-xs font-mono text-emerald-500">Google Cloud · TLS 1.3</p>
                 </div>
                 <div className={`p-3 bg-zinc-900 rounded-xl ${NEON}`}>
                   <ShieldCheck className="w-6 h-6 text-emerald-500" />
@@ -1123,6 +1150,45 @@ export default function InvestorHubPage() {
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* Data Room Access Log */}
+                <div className={`p-8 bg-zinc-900 rounded-3xl ${NEON}`}>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                      <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white">Data Room Access Log</h3>
+                      <p className="text-xs text-zinc-500 uppercase tracking-widest">Live Firebase Audit Trail</p>
+                    </div>
+                  </div>
+                  {dataRoomLogs.length === 0 ? (
+                    <p className="text-sm text-zinc-500 italic">No access events recorded yet. Your next page load will appear here.</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-sm">
+                        <thead>
+                          <tr className="border-b border-zinc-800">
+                            <th className="pb-3 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Timestamp</th>
+                            <th className="pb-3 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">User ID</th>
+                            <th className="pb-3 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Details</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-800/50">
+                          {dataRoomLogs.map(log => (
+                            <tr key={log.id} className="hover:bg-zinc-800/30 transition-colors">
+                              <td className="py-3 pr-6 text-zinc-400 font-mono text-xs whitespace-nowrap">
+                                {log.timestamp ? new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(log.timestamp.toDate()) : 'Just now'}
+                              </td>
+                              <td className="py-3 pr-6 text-zinc-500 font-mono text-xs truncate max-w-[160px]">{log.userId}</td>
+                              <td className="py-3 text-zinc-400 text-xs font-mono">{log.details?.page ?? '—'} · {log.details?.tier ?? '—'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
