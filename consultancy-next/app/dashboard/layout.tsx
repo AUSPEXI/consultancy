@@ -9,6 +9,8 @@ import { Header } from '@/components/dashboard/Header';
 
 const Copilot = dynamic(() => import('@/components/dashboard/Copilot').then(m => ({ default: m.Copilot })), { ssr: false });
 
+const ADMIN_BYPASS = process.env.NEXT_PUBLIC_ADMIN_BYPASS === 'true';
+
 function DashboardSkeleton() {
   return (
     <div className="flex h-screen bg-zinc-950 text-zinc-50 font-sans overflow-hidden">
@@ -50,8 +52,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.replace('/dashboard');
+    if (!loading && !user && !ADMIN_BYPASS) {
+      router.replace('/');
     }
   }, [user, loading, router]);
 
@@ -59,15 +61,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setIsSidebarOpen(false);
   }, []);
 
-  // Show full skeleton immediately — feels instant, replaces the blank/spinner gap
-  if (loading || !user) {
+  if (loading || (!user && !ADMIN_BYPASS)) {
     return <DashboardSkeleton />;
   }
 
   return (
     <div className="flex h-screen bg-zinc-950 text-zinc-50 font-sans overflow-hidden relative">
+      {ADMIN_BYPASS && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-black text-xs font-bold text-center py-1 tracking-widest uppercase">
+          Admin Bypass Active — Remove NEXT_PUBLIC_ADMIN_BYPASS before production
+        </div>
+      )}
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className={`flex-1 flex flex-col min-w-0 overflow-hidden ${ADMIN_BYPASS ? 'pt-6' : ''}`}>
         <Header onMenuClick={() => setIsSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="max-w-6xl mx-auto">
