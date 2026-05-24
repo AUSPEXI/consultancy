@@ -206,6 +206,18 @@ export const AnchorsSchema = z.union([
 export type AnchorsResult = z.infer<typeof AnchorsSchema>;
 
 /**
+ * Competitor Analysis Schema
+ */
+export const CompetitorAnalysisSchema = z.object({
+  name: z.string().min(1, 'Competitor name is required'),
+  decayStatus: z.enum(['healthy', 'decaying', 'stale', 'vulnerable']),
+  trojanHorseOpportunity: z.boolean(),
+  vulnerabilities: z.array(z.string().min(5)).max(5),
+});
+
+export type CompetitorAnalysis = z.infer<typeof CompetitorAnalysisSchema>;
+
+/**
  * Schema Validation Result
  */
 export interface ValidationResult<T> {
