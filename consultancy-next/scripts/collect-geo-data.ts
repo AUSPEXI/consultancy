@@ -1,41 +1,45 @@
 /**
- * Phase 2: Perplexity GEO Data Collector
+ * Phase 2: GEO Data Collector (Gemini)
  *
- * Queries the Perplexity API for real (query, response_text, citation_outcome) triplets
- * and augments the synthetic CSV schema with 8 response-level fields.
+ * Queries Gemini Flash to generate realistic (query, response_text, citation_outcome)
+ * triplets and augments the synthetic schema with 8 response-level fields.
  *
  * Usage:
- *   PERPLEXITY_API_KEY=pplx-xxx TARGET_BRAND="YourBrand" npx tsx scripts/collect-perplexity-data.ts
+ *   GEMINI_API_KEY=your-key TARGET_BRAND="YourBrand" npx tsx scripts/collect-geo-data.ts
  *
  * Optional env vars:
- *   BATCH_SIZE          - queries per run (default: 50)
- *   OUTPUT_FILE         - output JSONL path (default: public/data/geo_phase2.jsonl)
- *   QUERIES_FILE        - JSON array of query strings (default: uses built-in GEO query set)
- *   MODEL               - Perplexity model (default: sonar)
- *   DELAY_MS            - ms between requests (default: 1200)
+ *   BATCH_SIZE    - queries per run (default: 50)
+ *   OUTPUT_FILE   - output JSONL path (default: public/data/geo_phase2.jsonl)
+ *   QUERIES_FILE  - path to JSON array of query strings (default: built-in GEO set)
+ *   MODEL         - Gemini model (default: gemini-2.0-flash)
+ *   DELAY_MS      - ms between requests (default: 800)
+ *
+ * Note: Gemini generates realistic AI-style responses but is not search-grounded.
+ * For production training data, replace with real LLM API calls (Perplexity sonar,
+ * ChatGPT browsing, etc.) once you have the relevant API subscriptions.
  */
 
-import OpenAI from 'openai';
+import { GoogleGenAI } from '@google/genai';
 import fs from 'fs';
 import path from 'path';
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
-const API_KEY = process.env.PERPLEXITY_API_KEY;
+const API_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
 const TARGET_BRAND = process.env.TARGET_BRAND || '';
 const BATCH_SIZE = parseInt(process.env.BATCH_SIZE || '50', 10);
-const OUTPUT_FILE = process.env.OUTPUT_FILE || path.join(process.cwd(), 'public', 'data', 'geo_phase2.jsonl');
+const OUTPUT_FILE = process.env.OUTPUT_FILE
+  || path.join(process.cwd(), 'public', 'data', 'geo_phase2.jsonl');
 const QUERIES_FILE = process.env.QUERIES_FILE || '';
-const MODEL = process.env.MODEL || 'sonar';
-const DELAY_MS = parseInt(process.env.DELAY_MS || '1200', 10);
+const MODEL = process.env.MODEL || 'gemini-2.0-flash';
+const DELAY_MS = parseInt(process.env.DELAY_MS || '800', 10);
 
 if (!API_KEY) {
-  console.error('Error: PERPLEXITY_API_KEY is not set.');
+  console.error('Error: GEMINI_API_KEY is not set.');
   process.exit(1);
 }
-
 if (!TARGET_BRAND) {
-  console.error('Error: TARGET_BRAND is not set. Set it to the real brand name you are tracking.');
+  console.error('Error: TARGET_BRAND is not set. e.g. TARGET_BRAND="Auspexi"');
   process.exit(1);
 }
 
@@ -66,23 +70,24 @@ const DEFAULT_QUERIES = [
 
 // ─── Confidence language patterns ─────────────────────────────────────────────
 
-const HIGH_CONFIDENCE = ['definitely', 'certainly', 'clearly', 'undoubtedly', 'the best', 'top choice', 'leading', 'widely regarded'];
-const LOW_CONFIDENCE = ['might', 'may', 'could', 'perhaps', 'possibly', 'some users', 'depending on', 'it depends'];
+const HIGH_CONFIDENCE_WORDS = ['definitely', 'certainly', 'clearly', 'undoubtedly',
+  'the best', 'top choice', 'leading', 'widely regarded', 'most popular'];
+const LOW_CONFIDENCE_WORDS = ['might', 'may', 'could', 'perhaps', 'possibly',
+  'some users', 'depending on', "it depends", 'varies'];
 
 function detectConfidenceLanguage(text: string): 'high' | 'medium' | 'low' {
   const lower = text.toLowerCase();
-  const high = HIGH_CONFIDENCE.filter(w => lower.includes(w)).length;
-  const low = LOW_CONFIDENCE.filter(w => lower.includes(w)).length;
+  const high = HIGH_CONFIDENCE_WORDS.filter(w => lower.includes(w)).length;
+  const low = LOW_CONFIDENCE_WORDS.filter(w => lower.includes(w)).length;
   if (high > low) return 'high';
   if (low > high) return 'low';
   return 'medium';
 }
 
-// ─── Brand position in response ───────────────────────────────────────────────
+// ─── Brand position ───────────────────────────────────────────────────────────
 
 function getBrandPosition(text: string, brand: string): 'first_third' | 'middle_third' | 'last_third' | 'not_present' {
-  const lower = text.toLowerCase();
-  const idx = lower.indexOf(brand.toLowerCase());
+  const idx = text.toLowerCase().indexOf(brand.toLowerCase());
   if (idx === -1) return 'not_present';
   const fraction = idx / text.length;
   if (fraction < 0.33) return 'first_third';
@@ -94,53 +99,43 @@ function getBrandPosition(text: string, brand: string): 'first_third' | 'middle_
 
 function detectFramingType(text: string, brand: string): 'leader' | 'challenger' | 'alternative' | 'not_mentioned' {
   const lower = text.toLowerCase();
-  const brandLower = brand.toLowerCase();
-  if (!lower.includes(brandLower)) return 'not_mentioned';
-
-  // Look at tokens near brand mention
-  const idx = lower.indexOf(brandLower);
-  const window = lower.slice(Math.max(0, idx - 80), idx + 80);
-
+  if (!lower.includes(brand.toLowerCase())) return 'not_mentioned';
+  const idx = lower.indexOf(brand.toLowerCase());
+  const window = lower.slice(Math.max(0, idx - 100), idx + 100);
   if (/\b(best|top|leading|#1|number one|most popular|market leader)\b/.test(window)) return 'leader';
-  if (/\b(alternative|instead|compared to|versus|vs\.?|rather than|competitor)\b/.test(window)) return 'alternative';
-  if (/\b(also|another option|can also|worth considering|growing|emerging)\b/.test(window)) return 'challenger';
+  if (/\b(alternative|instead|rather than|versus|vs\.?|competitor|compared to)\b/.test(window)) return 'alternative';
   return 'challenger';
 }
 
 // ─── Citation verbatim ────────────────────────────────────────────────────────
 
 function extractCitationVerbatim(text: string, brand: string): string {
-  const brandLower = brand.toLowerCase();
   const sentences = text.split(/(?<=[.!?])\s+/);
-  const match = sentences.find(s => s.toLowerCase().includes(brandLower));
+  const match = sentences.find(s => s.toLowerCase().includes(brand.toLowerCase()));
   return match ? match.trim().slice(0, 300) : '';
 }
 
 // ─── Co-cited brands ──────────────────────────────────────────────────────────
 
 const KNOWN_BRANDS = [
-  'HubSpot', 'Salesforce', 'SEMrush', 'Ahrefs', 'Moz', 'BrightEdge', 'Conductor',
-  'Jasper', 'Copy.ai', 'Surfer SEO', 'Clearscope', 'MarketMuse', 'Frase',
+  'HubSpot', 'Salesforce', 'SEMrush', 'Ahrefs', 'Moz', 'BrightEdge',
+  'Jasper', 'Surfer SEO', 'Clearscope', 'MarketMuse', 'Frase',
   'Perplexity', 'ChatGPT', 'Claude', 'Gemini', 'Bing', 'Google',
-  'Sprout Social', 'Buffer', 'Hootsuite', 'Brandwatch', 'Mention',
+  'Sprout Social', 'Brandwatch', 'Mention', 'Hootsuite', 'Buffer',
 ];
 
 function extractCoCitedBrands(text: string, targetBrand: string): string[] {
-  const found: string[] = [];
-  for (const brand of KNOWN_BRANDS) {
-    if (brand.toLowerCase() === targetBrand.toLowerCase()) continue;
-    if (text.toLowerCase().includes(brand.toLowerCase())) {
-      found.push(brand);
-    }
-  }
-  return found.slice(0, 8);
+  return KNOWN_BRANDS
+    .filter(b => b.toLowerCase() !== targetBrand.toLowerCase()
+      && text.toLowerCase().includes(b.toLowerCase()))
+    .slice(0, 8);
 }
 
-// ─── Main collector ───────────────────────────────────────────────────────────
+// ─── Gemini call ──────────────────────────────────────────────────────────────
 
 interface Phase2Record {
   query: string;
-  ai_engine: 'Perplexity';
+  ai_engine: string;
   model_version: string;
   is_cited: boolean;
   brand_position_in_response: 'first_third' | 'middle_third' | 'last_third' | 'not_present';
@@ -151,28 +146,30 @@ interface Phase2Record {
   query_answered_fully: boolean;
   response_text: string;
   citation_verbatim: string;
-  citations: string[];
   collected_at: string;
 }
 
 async function collectRecord(
-  client: OpenAI,
+  genAI: GoogleGenAI,
   query: string,
-  brand: string
+  brand: string,
 ): Promise<Phase2Record> {
-  const response = await client.chat.completions.create({
-    model: MODEL,
-    messages: [{ role: 'user', content: query }],
-  } as any);
+  // Ask Gemini to simulate how an AI assistant would answer this query
+  const prompt = `You are simulating how an AI assistant (like Perplexity or ChatGPT) would answer the following user query. Write a realistic, helpful 3-5 sentence response as if you are that AI assistant answering with up-to-date knowledge. Mention specific tools, brands, or platforms where appropriate.\n\nUser query: "${query}"`;
 
-  const content = (response.choices[0]?.message?.content) || '';
-  const citations: string[] = (response as any).citations || [];
+  const result = await (genAI as any).models.generateContent({
+    model: MODEL,
+    contents: prompt,
+    config: { generationConfig: { temperature: 0.9 } },
+  });
+
+  const content: string = result.text || '';
   const wordCount = content.trim().split(/\s+/).length;
   const isCited = content.toLowerCase().includes(brand.toLowerCase());
 
   return {
     query,
-    ai_engine: 'Perplexity',
+    ai_engine: 'Gemini',
     model_version: MODEL,
     is_cited: isCited,
     brand_position_in_response: getBrandPosition(content, brand),
@@ -180,54 +177,50 @@ async function collectRecord(
     co_cited_brands: extractCoCitedBrands(content, brand),
     confidence_language: detectConfidenceLanguage(content),
     response_word_count: wordCount,
-    query_answered_fully: wordCount > 80 && !content.toLowerCase().includes("i don't know"),
+    query_answered_fully: wordCount > 60,
     response_text: content,
     citation_verbatim: extractCitationVerbatim(content, brand),
-    citations,
     collected_at: new Date().toISOString(),
   };
 }
 
-async function sleep(ms: number) {
+function sleep(ms: number) {
   return new Promise(r => setTimeout(r, ms));
 }
 
-async function main() {
-  const client = new OpenAI({
-    apiKey: API_KEY,
-    baseURL: 'https://api.perplexity.ai',
-  });
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
-  // Load queries
+async function main() {
+  const genAI = new GoogleGenAI({ apiKey: API_KEY });
+
   let queries: string[];
   if (QUERIES_FILE && fs.existsSync(QUERIES_FILE)) {
     queries = JSON.parse(fs.readFileSync(QUERIES_FILE, 'utf-8'));
     console.log(`Loaded ${queries.length} queries from ${QUERIES_FILE}`);
   } else {
     queries = DEFAULT_QUERIES;
-    console.log(`Using built-in query set (${queries.length} queries)`);
+    console.log(`Using built-in GEO query set (${queries.length} queries)`);
   }
 
   const batch = queries.slice(0, BATCH_SIZE);
   console.log(`Collecting ${batch.length} records for brand: "${TARGET_BRAND}"`);
-  console.log(`Output: ${OUTPUT_FILE}\n`);
+  console.log(`Model: ${MODEL} | Output: ${OUTPUT_FILE}\n`);
 
-  // Ensure output directory exists
   fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
-
   const stream = fs.createWriteStream(OUTPUT_FILE, { flags: 'a' });
-  let success = 0;
+
+  let cited = 0;
   let failed = 0;
 
   for (let i = 0; i < batch.length; i++) {
     const query = batch[i];
-    process.stdout.write(`[${i + 1}/${batch.length}] "${query.slice(0, 60)}" ... `);
+    process.stdout.write(`[${i + 1}/${batch.length}] "${query.slice(0, 55)}" ... `);
 
     try {
-      const record = await collectRecord(client, query, TARGET_BRAND);
+      const record = await collectRecord(genAI, query, TARGET_BRAND);
       stream.write(JSON.stringify(record) + '\n');
+      if (record.is_cited) cited++;
       console.log(`${record.is_cited ? '✓ cited' : '— not cited'} | ${record.response_word_count}w | ${record.framing_type}`);
-      success++;
     } catch (err: any) {
       console.log(`ERROR: ${err.message}`);
       failed++;
@@ -237,12 +230,9 @@ async function main() {
   }
 
   stream.end();
-  console.log(`\nDone. ${success} records written, ${failed} failed.`);
+  const total = batch.length - failed;
+  console.log(`\nDone. ${total} records written (${cited} cited, ${total - cited} not cited), ${failed} failed.`);
   console.log(`Output: ${OUTPUT_FILE}`);
-  console.log(`\nNext step: load ${OUTPUT_FILE} into your SLM training pipeline.`);
 }
 
-main().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+main().catch(err => { console.error(err); process.exit(1); });
