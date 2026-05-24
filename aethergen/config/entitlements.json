@@ -1,0 +1,16 @@
+{
+  "example_tenant": {
+    "features": [
+      "synthetic_healthcare_fraud",
+      "databricks_uc_integration"
+    ]
+  },
+  "dev": {
+    "features": [
+      "sensitive_ab",
+      "metrics_uc_publish"
+    ]
+  }
+}
+
+

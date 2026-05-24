@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "dataset": "local_generated",
+  "schema_hash": "demo",
+  "repeats": 2,
+  "ablations": [
+    {
+      "name": "baseline_all_models",
+      "training": { "precision": "FP16" }
+    },
+    {
+      "name": "disable_modelA",
+      "modules": { "disable": ["ModelA"] },
+      "training": { "modelFilter": ["ModelB", "ModelC"], "precision": "FP8" },
+      "privacy": { "epsilon": 0.05, "synthetic_ratio": 98 }
+    }
+  ],
+  "metrics": ["accuracy", "privacyScore", "utilityScore", "generationSpeed"]
+}
+
+

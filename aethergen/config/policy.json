@@ -1,0 +1,12 @@
+{
+  "sensitive_features": [
+    "troop_movement_modeling",
+    "battlefield_simulation",
+    "weapons_targeting_assist",
+    "mass_surveillance_enrichment"
+  ],
+  "default_deny_sensitive": true,
+  "notes": "Default-deny for sensitive capabilities. Grant explicitly per-tenant via entitlements.json."
+}
+
+

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PQC Posture Metrics",
+  "type": "object",
+  "properties": {
+    "version": {"type": "integer"},
+    "generatedAt": {"type": "string", "format": "date-time"},
+    "env": {"type": "string"},
+    "libraries": {
+      "type": "object",
+      "properties": {
+        "openssl": {"type": "string"},
+        "oqs-provider": {"type": "string"},
+        "liboqs": {"type": "string"}
+      },
+      "required": ["openssl"]
+    },
+    "algorithms": {
+      "type": "object",
+      "properties": {
+        "kem": {"type": "string"},
+        "signature": {"type": "string"},
+        "hybrid": {"type": "boolean"}
+      }
+    },
+    "handshake": {
+      "type": "object",
+      "properties": {
+        "successRate": {"type": "number"},
+        "p95LatencyMs": {"type": "number"},
+        "baselineP95Ms": {"type": "number"},
+        "retries": {"type": "integer"}
+      }
+    },
+    "sizes": {
+      "type": "object",
+      "properties": {
+        "certBytes": {"type": "integer"},
+        "sigBytes": {"type": "integer"},
+        "pubKeyBytes": {"type": "integer"}
+      }
+    },
+    "constantTimeChecks": {
+      "type": "object",
+      "properties": {
+        "passes": {"type": "boolean"},
+        "notes": {"type": "string"}
+      }
+    }
+  },
+  "required": ["version", "generatedAt", "env", "algorithms", "handshake"]
+}

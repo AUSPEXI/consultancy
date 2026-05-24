@@ -1,0 +1,24 @@
+{
+  "name": "ab_context_experiment",
+  "tasks": [
+    {
+      "task_key": "train_baseline",
+      "notebook_task": { "notebook_path": "/Shared/experiments/train_baseline" },
+      "existing_cluster_id": "${DATABRICKS_CLUSTER_ID}"
+    },
+    {
+      "task_key": "train_context",
+      "notebook_task": { "notebook_path": "/Shared/experiments/train_context" },
+      "existing_cluster_id": "${DATABRICKS_CLUSTER_ID}",
+      "depends_on": [ { "task_key": "train_baseline" } ]
+    },
+    {
+      "task_key": "compare",
+      "notebook_task": { "notebook_path": "/Shared/experiments/compare_runs" },
+      "existing_cluster_id": "${DATABRICKS_CLUSTER_ID}",
+      "depends_on": [ { "task_key": "train_context" } ]
+    }
+  ]
+}
+
+

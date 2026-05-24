@@ -1,0 +1,42 @@
+version: 1
+entities:
+  Actor:
+    fields:
+      - id: string
+      - type: string
+      - attributes: map
+  Event:
+    fields:
+      - id: string
+      - actor_id: ref Actor.id
+      - ts: timestamp
+      - kind: string
+      - payload: map
+      - location: string?
+      - intent: string?
+  Episode:
+    fields:
+      - id: string
+      - actor_id: ref Actor.id
+      - start_ts: timestamp
+      - end_ts: timestamp?
+      - label: string?
+relations:
+  - Actor 1..* Event (Actor.id -> Event.actor_id)
+  - Actor 1..* Episode (Actor.id -> Episode.actor_id)
+constraints:
+  - Event.ts ascending within actor_id windows
+  - Episode.start_ts <= Episode.end_ts
+features:
+  windows:
+    - name: last_1h
+      duration_minutes: 60
+    - name: last_24h
+      duration_minutes: 1440
+graph:
+  motifs:
+    - name: burst
+      rule: ">= N events in window"
+    - name: role_switch
+      rule: "Actor.type changes within episode"
+

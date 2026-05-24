@@ -1,0 +1,12 @@
+{
+  "posts": [
+    {
+      "slug": "edge-computing-packages",
+      "title": "Auspexi’s Edge Computing Packages: Secure AI at the Edge",
+      "tags": ["edge", "automotive", "healthcare", "finance", "security"],
+      "summary": "Edge AI that runs offline with checksums, SBOMs, and optional evidence bundles—integrated with Auspexi’s synthetic data and LLM training tools."
+    }
+  ]
+}
+
+
