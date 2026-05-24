@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Radar, ArrowRight, ShieldAlert, Plus, X, Loader2, Trash2, Database } from 'lucide-react';
-import { SyntheticDataPanel } from '@/components/dashboard/SyntheticDataPanel';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
@@ -284,9 +283,6 @@ export default function Competitors() {
           </div>
         </div>
       </div>
-
-      {/* Synthetic Dataset */}
-      <SyntheticDataPanel />
 
       {/* Analyze Modal */}
       {isModalOpen && (

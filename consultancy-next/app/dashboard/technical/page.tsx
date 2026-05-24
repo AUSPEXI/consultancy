@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Code, Server, RefreshCw, Loader2, ArrowRight, Copy, CheckCircle2, FileJson, Download, Target } from 'lucide-react';
+import { SyntheticDataPanel } from '@/components/dashboard/SyntheticDataPanel';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
@@ -496,6 +497,15 @@ export default {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Analytics Engine — synthetic dataset proof of capability */}
+      <div className="mt-2">
+        <div className="mb-4">
+          <h2 className="text-base font-semibold text-white">Analytics Engine</h2>
+          <p className="text-xs text-zinc-500 mt-1">10K-row AetherGen synthetic dataset powering the GEO intelligence layer. Validates data pipeline, aggregation, and multi-brand cross-engine analysis at scale.</p>
+        </div>
+        <SyntheticDataPanel />
       </div>
     </div>
   );

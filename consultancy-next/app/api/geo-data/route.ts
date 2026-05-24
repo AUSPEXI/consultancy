@@ -225,6 +225,56 @@ function aggregate(rows: GeoRow[]) {
   };
 }
 
+// Warm the cache at module load time (server cold start) so the first
+// browser request is never the one waiting for CSV parsing.
+function warmCache() {
+  if (_cache) return;
+  try {
+    const csvPath = path.join(process.cwd(), 'public', 'data', 'geo_data.csv');
+    if (!fs.existsSync(csvPath)) return;
+    const text = fs.readFileSync(csvPath, 'utf-8');
+    const lines = text.split('\n');
+    const headers = lines[0].split(',').map(h => h.trim());
+    const rows: GeoRow[] = [];
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      const vals = parseCSVLine(line);
+      if (vals.length !== headers.length) continue;
+      const obj: Record<string, string> = {};
+      headers.forEach((h, idx) => { obj[h] = vals[idx]; });
+      rows.push({
+        brand: obj.brand, ai_engine: obj.ai_engine, model_version: obj.model_version,
+        is_cited: obj.is_cited === 'true', citation_rank: parseFloat(obj.citation_rank) || 0,
+        sov_score: parseFloat(obj.sov_score) || 0, sentiment: obj.sentiment,
+        content_score: parseFloat(obj.content_score) || 0,
+        entity_density_score: parseFloat(obj.entity_density_score) || 0,
+        statistical_anchors_score: parseFloat(obj.statistical_anchors_score) || 0,
+        inverted_pyramid_score: parseFloat(obj.inverted_pyramid_score) || 0,
+        entropy_score: parseFloat(obj.entropy_score) || 0,
+        competitor_name: obj.competitor_name, competitor_sov: parseFloat(obj.competitor_sov) || 0,
+        decay_score: parseFloat(obj.decay_score) || 0, decay_status: obj.decay_status,
+        trojan_horse_opportunity: obj.trojan_horse_opportunity === 'true',
+        risk_score: parseFloat(obj.risk_score) || 0, z_score: parseFloat(obj.z_score) || 0,
+        drift_detected: obj.drift_detected === 'true',
+        ai_traffic: parseFloat(obj.ai_traffic) || 0, ai_citations: parseFloat(obj.ai_citations) || 0,
+        platform_chatgpt: parseFloat(obj.platform_chatgpt) || 0,
+        platform_perplexity: parseFloat(obj.platform_perplexity) || 0,
+        platform_claude: parseFloat(obj.platform_claude) || 0,
+        platform_gemini: parseFloat(obj.platform_gemini) || 0,
+        category: obj.category, query_intent: obj.query_intent,
+        semantic_cluster: obj.semantic_cluster, search_query: obj.search_query,
+        rowIndex: i,
+      });
+    }
+    _cache = aggregate(rows);
+  } catch {
+    // Non-fatal — first real request will populate cache
+  }
+}
+
+warmCache();
+
 export async function GET() {
   try {
     if (_cache) {

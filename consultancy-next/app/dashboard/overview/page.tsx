@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Cell, ReferenceArea, PieChart, Pie } from 'recharts';
 import { TrendingUp, Users, Target, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, HelpCircle, Sparkles } from 'lucide-react';
-import { SyntheticDataPanel } from '@/components/dashboard/SyntheticDataPanel';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
@@ -647,8 +646,6 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {/* Synthetic Dataset Analytics */}
-      <SyntheticDataPanel />
     </div>
   );
 }
