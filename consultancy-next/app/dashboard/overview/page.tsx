@@ -11,6 +11,7 @@ import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
 import { useGeoAnalytics } from '@/hooks/useGeoAnalytics';
+import { useGeoData } from '@/hooks/useGeoData';
 import { UmapVisualization } from '@/components/ui/UmapVisualization';
 import { Tooltip as UITooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { SemanticAnchorsModal } from '@/components/dashboard/SemanticAnchorsModal';
@@ -74,6 +75,7 @@ export default function OverviewPage() {
 
   const userPrompts = userData?.sentimentPrompts || defaultPrompts;
 
+  const { data: geoData } = useGeoData();
   const { pulseData, mapPoints, sentimentTrace, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(
     userData?.brand || '',
     userPrompts,
@@ -256,15 +258,81 @@ export default function OverviewPage() {
 
   const handleCopy = () => { navigator.clipboard.writeText(generatedShadowLink); setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
-  const displayData = metrics.length > 0 ? metrics : [
+  // Synthetic data fallbacks — power demo/new-user charts with real aggregates from the 10K GEO corpus
+  const syntheticDisplayData = useMemo(() => {
+    if (!geoData || !geoData.sovTimeSeries.length) return null;
+    const { sovTimeSeries, stats, platformScores, competitors } = geoData;
+    const scoreByPlatform: Record<string, number> = {};
+    platformScores.forEach(p => { scoreByPlatform[p.platform.toLowerCase()] = p.score; });
+    const compAvgSov = competitors[0]?.avg_sov ?? Math.round(stats.avg_sov * 0.75);
+    const compBSov = competitors[1]?.avg_sov ?? Math.round(stats.avg_sov * 0.6);
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return sovTimeSeries.slice(-5).map((m, i, arr) => {
+      const brandKeys = Object.keys(m).filter(k => k !== 'month');
+      const vals = brandKeys.map(k => (m as any)[k]).filter((v): v is number => typeof v === 'number');
+      const avgSov = vals.length ? Math.round(vals.reduce((s, v) => s + v, 0) / vals.length) : Math.round(stats.avg_sov);
+      const monthNum = parseInt(String(m.month).split('/')[0], 10) || (i + 1);
+      const progress = i / Math.max(1, arr.length - 1);
+      return {
+        shortDate: MONTHS[(monthNum - 1) % 12],
+        aSov: avgSov,
+        err: Math.round(stats.citation_rate * (0.5 + 0.5 * progress)),
+        compA: Math.round(compAvgSov),
+        compB: Math.round(compBSov),
+        compGap: avgSov - Math.round(compAvgSov),
+        aiTraffic: Math.round((stats.total_rows / 60) * (0.4 + 0.6 * progress)),
+        platforms: {
+          chatgpt:    scoreByPlatform['chatgpt']    ?? avgSov + 8,
+          perplexity: scoreByPlatform['perplexity'] ?? Math.max(5, avgSov - 12),
+          claude:     scoreByPlatform['claude']     ?? avgSov + 3,
+          gemini:     scoreByPlatform['gemini']     ?? avgSov + 15,
+        },
+      };
+    });
+  }, [geoData]);
+
+  const syntheticLatest = useMemo(() => {
+    if (!geoData) return null;
+    const { stats, platformScores, competitors, contentScores } = geoData;
+    const scoreByPlatform: Record<string, number> = {};
+    platformScores.forEach(p => { scoreByPlatform[p.platform.toLowerCase()] = p.score; });
+    const compAvgSov = competitors[0]?.avg_sov ?? Math.round(stats.avg_sov * 0.75);
+    return {
+      id: 'synthetic',
+      aSov:     Math.round(stats.avg_sov),
+      err:      Math.round(stats.citation_rate),
+      compA:    Math.round(compAvgSov),
+      compB:    competitors[1]?.avg_sov ? Math.round(competitors[1].avg_sov) : Math.round(stats.avg_sov * 0.6),
+      compGap:  Math.round(stats.avg_sov - compAvgSov),
+      aiTraffic: Math.round(stats.total_rows / 50),
+      platforms: {
+        chatgpt:    scoreByPlatform['chatgpt']    ?? Math.round(stats.avg_sov + 8),
+        perplexity: scoreByPlatform['perplexity'] ?? Math.max(5, Math.round(stats.avg_sov - 12)),
+        claude:     scoreByPlatform['claude']     ?? Math.round(stats.avg_sov + 3),
+        gemini:     scoreByPlatform['gemini']     ?? Math.round(stats.avg_sov + 15),
+      },
+      radar: [
+        { subject: 'Brand Trust',      brandScore: Math.min(100, Math.round(stats.avg_sov * 1.3)),  compScore: Math.min(100, Math.round(compAvgSov * 1.1))  },
+        { subject: 'Technical Moat',   brandScore: Math.round(stats.avg_sov * 0.9),                 compScore: Math.min(100, Math.round(compAvgSov * 1.2))  },
+        { subject: 'Citation Depth',   brandScore: Math.round(stats.citation_rate),                 compScore: Math.round(stats.citation_rate * 0.75)        },
+        { subject: 'Fact Veracity',    brandScore: Math.min(100, Math.round(stats.avg_sov * 1.4)),  compScore: Math.round(compAvgSov * 0.9)                  },
+        { subject: 'Neural Sync',      brandScore: Math.round(stats.avg_sov * 0.85),                compScore: Math.min(100, Math.round(compAvgSov * 1.15))  },
+        { subject: 'Market Dominance', brandScore: Math.round(stats.avg_sov),                       compScore: Math.round(compAvgSov)                        },
+      ],
+      topUrls: ['/blog/ai-sov-benchmark-report', '/features/citation-engine', '/docs/geo-optimisation', '/case-studies/enterprise']
+        .map((path, i) => ({ path, citations: contentScores[i]?.content_score ?? 45 - i * 5 })),
+    };
+  }, [geoData]);
+
+  const displayData = metrics.length > 0 ? metrics : (syntheticDisplayData ?? [
     { shortDate: 'Mon', aSov: 12, err: 20, compGap: -33, compA: 45, compB: 30, aiTraffic: 120, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } },
     { shortDate: 'Tue', aSov: 18, err: 35, compGap: -24, compA: 42, compB: 28, aiTraffic: 132, platforms: { chatgpt: 25, claude: 20, gemini: 30, perplexity: 15 } },
     { shortDate: 'Wed', aSov: 25, err: 45, compGap: -13, compA: 38, compB: 25, aiTraffic: 250, platforms: { chatgpt: 35, claude: 30, gemini: 40, perplexity: 20 } },
     { shortDate: 'Thu', aSov: 32, err: 60, compGap: -3, compA: 35, compB: 22, aiTraffic: 280, platforms: { chatgpt: 45, claude: 40, gemini: 50, perplexity: 25 } },
     { shortDate: 'Fri', aSov: 45, err: 80, compGap: 15, compA: 30, compB: 18, aiTraffic: 310, platforms: { chatgpt: 60, claude: 55, gemini: 70, perplexity: 35 } },
-  ];
+  ]);
 
-  const latest = metrics.length > 0 ? metrics[metrics.length - 1] : { id: 'placeholder', aSov: 12, err: 20, compGap: -33, compA: 45, compB: 30, aiTraffic: 120, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } };
+  const latest = metrics.length > 0 ? metrics[metrics.length - 1] : (syntheticLatest ?? { id: 'placeholder', aSov: 12, err: 20, compGap: -33, compA: 45, compB: 30, aiTraffic: 120, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } });
   const previous = metrics.length > 1 ? metrics[metrics.length - 2] : latest;
   const safeLatest = { aSov: latest.aSov ?? 0, err: latest.err ?? 0, compGap: latest.compGap ?? 0, aiTraffic: latest.aiTraffic ?? 0, compA: latest.compA ?? 0, platforms: latest.platforms || {}, radar: latest.radar || [], sentiment: latest.sentiment || [], topUrls: latest.topUrls || [] };
   const safePrevious = { aSov: previous.aSov ?? 0, err: previous.err ?? 0, compGap: previous.compGap ?? 0, aiTraffic: previous.aiTraffic ?? 0, compA: previous.compA ?? 0 };
@@ -336,7 +404,7 @@ export default function OverviewPage() {
           <p className="text-sm text-zinc-400 mt-1">Track Absolute SOV, Entity Recall, and the growth of your Proprietary Neural Moat.</p>
         </div>
         <div className="flex gap-3">
-          {metrics.length === 0 && (<span className="inline-flex items-center px-3 py-1.5 rounded-md bg-amber-500/10 text-amber-400 text-xs font-medium border border-amber-500/20">Demo Data Mode</span>)}
+          {metrics.length === 0 && (<span className="inline-flex items-center px-3 py-1.5 rounded-md bg-amber-500/10 text-amber-400 text-xs font-medium border border-amber-500/20">{geoData ? 'Synthetic Demo' : 'Demo Data Mode'}</span>)}
           <button onClick={runAudit} disabled={isAuditing} className={`${auditSuccess ? 'bg-emerald-600' : 'bg-pink-600 hover:bg-pink-700'} disabled:opacity-50 text-white px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 shadow-lg ${auditSuccess ? 'shadow-emerald-500/20' : 'shadow-pink-500/20'}`}>
             {isAuditing ? <Loader2 className="w-4 h-4 animate-spin" /> : auditSuccess ? <div className="flex items-center gap-2">✓ Updated</div> : <Activity className="w-4 h-4" />}
             {!isAuditing && !auditSuccess && "Refresh Metrics"}
@@ -383,7 +451,7 @@ export default function OverviewPage() {
             { label: 'A-SOV Dominance', value: Math.round(safeLatest.aSov), color: '#ec4899', icon: Target, desc: 'Absolute Share of Voice - % of AI responses dominated by your brand' },
             { label: 'Entity Recall', value: Math.round(safeLatest.err), color: '#a855f7', icon: BrainCircuit, desc: 'Entity Recall Rate - how often specific facts about your brand are correctly retrieved' },
             { label: 'Platform Sync', value: finalPlatformSync, color: '#3b82f6', icon: Activity, desc: 'Across-model consistency index' },
-            { label: 'Sentiment Index', value: 78, color: '#10b981', icon: TrendingUp, desc: 'Average qualitative sentiment score across tracked vectors' },
+            { label: 'Sentiment Index', value: geoData ? (geoData.sentimentDist.find(s => s.sentiment === 'Positive')?.pct ?? 78) : 78, color: '#10b981', icon: TrendingUp, desc: 'Average qualitative sentiment score across tracked vectors' },
           ].map((dial, i) => (
             <UITooltip key={i}>
               <TooltipTrigger asChild>
