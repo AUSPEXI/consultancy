@@ -47,8 +47,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     let unsubscribeUserDoc: (() => void) | undefined
 
     const safetyTimeout = setTimeout(() => {
-      if (loading) setLoading(false)
-    }, 5000)
+      setLoading(false)
+    }, 3000)
 
     const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
       clearTimeout(safetyTimeout)
@@ -57,6 +57,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (currentUser) {
         const userDocRef = doc(db, 'users', currentUser.uid)
         const isAdmin = currentUser.email === 'hopiumcalculator@gmail.com' || currentUser.email === 'sales@auspexi.com'
+
+        // Resolve role immediately from email so tier-gated pages don't flash
+        if (isAdmin) setRole('admin')
+
+        // Unblock the dashboard shell immediately — Firestore data hydrates below
+        setLoading(false)
 
         try {
           const userDoc = await getDoc(userDocRef)
@@ -94,8 +100,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setRole('user')
         setUserData(null)
         if (unsubscribeUserDoc) unsubscribeUserDoc()
+        setLoading(false)
       }
-      setLoading(false)
     })
 
     return () => {
