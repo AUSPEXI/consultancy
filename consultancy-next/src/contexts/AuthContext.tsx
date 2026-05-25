@@ -57,9 +57,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (currentUser) {
         const userDocRef = doc(db, 'users', currentUser.uid)
         const isAdmin = currentUser.email === 'hopiumcalculator@gmail.com' || currentUser.email === 'sales@auspexi.com'
+        const defaultTier = currentUser.email === 'hopiumcalculator@gmail.com' ? 'Enterprise' : 'Free'
 
-        // Resolve role immediately from email so tier-gated pages don't flash
-        if (isAdmin) setRole('admin')
+        // Resolve role and tier immediately from email so tier-gated pages don't flash
+        if (isAdmin) {
+          setRole('admin')
+          setTier(defaultTier as UserData['tier'])
+        }
 
         // Unblock the dashboard shell immediately — Firestore data hydrates below
         setLoading(false)
@@ -76,7 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           firestoreAvailable = true
           if (!userDoc.exists()) {
             const initialData: UserData = {
-              tier: 'Free',
+              tier: defaultTier as UserData['tier'],
               role: isAdmin ? 'admin' : 'user',
               email: currentUser.email,
               onboardingCompleted: false,
