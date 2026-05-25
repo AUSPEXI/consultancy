@@ -64,8 +64,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         // Unblock the dashboard shell immediately — Firestore data hydrates below
         setLoading(false)
 
+        let firestoreAvailable = false
         try {
-          const userDoc = await getDoc(userDocRef)
+          // Timeout getDoc at 4s — "Database not found" hangs for ~30s otherwise
+          const userDoc = await Promise.race([
+            getDoc(userDocRef),
+            new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error('firestore-timeout')), 4000)
+            ),
+          ])
+          firestoreAvailable = true
           if (!userDoc.exists()) {
             const initialData: UserData = {
               tier: 'Free',
@@ -78,23 +86,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             setRole(initialData.role)
             setUserData(initialData)
           }
-        } catch (error) {
-          console.error('Error creating user doc:', error)
+        } catch (error: any) {
+          if (error?.message !== 'firestore-timeout') {
+            console.error('Error creating user doc:', error)
+          }
+          // Firestore unavailable — dashboard runs without persisted user data
         }
 
-        unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
-          if (docSnap.exists()) {
-            const data = docSnap.data() as UserData
-            const resolvedRole = isAdmin ? 'admin' : (data.role || 'user')
-            setTier(data.tier || 'Free')
-            setRole(resolvedRole)
-            setUserData({
-              ...data,
-              role: resolvedRole,
-              email: currentUser.email || data.email,
-            })
-          }
-        })
+        // Only subscribe if Firestore is reachable; avoids infinite retry spam
+        if (firestoreAvailable) {
+          unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
+            if (docSnap.exists()) {
+              const data = docSnap.data() as UserData
+              const resolvedRole = isAdmin ? 'admin' : (data.role || 'user')
+              setTier(data.tier || 'Free')
+              setRole(resolvedRole)
+              setUserData({
+                ...data,
+                role: resolvedRole,
+                email: currentUser.email || data.email,
+              })
+            }
+          })
+        }
       } else {
         setTier('Free')
         setRole('user')
