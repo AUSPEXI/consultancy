@@ -193,18 +193,34 @@ export default function SettingsPage() {
           <CardDescription className="text-zinc-400">Connect Auspexi to your existing infrastructure.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+
+          {/* Sitemap */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">Inbound Auspexi Webhook URL</label>
+            <label className="text-sm font-medium text-zinc-300">Sitemap URL</label>
+            <div className="flex gap-2">
+              <Input readOnly value="https://auspexi.com/sitemap.xml" className="bg-zinc-950 border-zinc-800 text-zinc-400 font-mono text-xs" />
+              <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText('https://auspexi.com/sitemap.xml'); alert('Sitemap URL copied!'); }}>Copy</Button>
+            </div>
+            <p className="text-xs text-zinc-500">Submit this to Google Search Console, Bing Webmaster Tools, and any AI search engine registration portals. All 31+ pages are indexed here.</p>
+          </div>
+
+          {/* Inbound webhook */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-zinc-300">Inbound Webhook — Your Server → Auspexi</label>
             <div className="flex gap-2">
               <Input readOnly value={origin ? `${origin}/api/webhooks/auspexi` : ''} className="bg-zinc-950 border-zinc-800 text-zinc-400 font-mono text-xs" />
               <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(`${origin}/api/webhooks/auspexi`); alert('Inbound Webhook URL copied!'); }}>Copy</Button>
             </div>
-            <p className="text-xs text-zinc-500">Use this URL in your internal CMS or backend to push content directly to Auspexi.</p>
+            <p className="text-xs text-zinc-500">
+              Configure your internal server to POST here when content is published. Include header <code className="text-zinc-300">x-auspexi-secret: YOUR_SECRET</code> and body <code className="text-zinc-300">&#123; userId, type: &quot;article&quot;|&quot;fact&quot;, title, content, url &#125;</code>
+            </p>
           </div>
+
+          {/* Outbound webhook */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">Outbound Platform Webhook URL (Your CMS)</label>
-            <Input name="cmsWebhookUrl" value={formData.cmsWebhookUrl} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" placeholder="https://your-cms.com/api/webhooks/auspexi" />
-            <p className="text-xs text-zinc-500">Provide the webhook URL for your CMS. Auspexi will use this to automatically sync approved data and push real-time platform events.</p>
+            <label className="text-sm font-medium text-zinc-300">Outbound Webhook — Auspexi → Your Server</label>
+            <Input name="cmsWebhookUrl" value={formData.cmsWebhookUrl} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" placeholder="https://your-internal-server.com/api/auspexi-push" />
+            <p className="text-xs text-zinc-500">Auspexi will POST generated articles and schema here. Your server receives <code className="text-zinc-300">&#123; event, timestamp, data: &#123; title, content, schema &#125; &#125;</code></p>
           </div>
         </CardContent>
       </Card>
