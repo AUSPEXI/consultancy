@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react';
-import { ShieldAlert, Trash2, Database, Loader2, CheckCircle2, History, TrendingUp, PieChart, Eye, Rocket, Share2, ExternalLink, Zap } from 'lucide-react';
+import { ShieldAlert, Trash2, Database, Loader2, CheckCircle2, History, TrendingUp, PieChart, Eye, Rocket, Share2, ExternalLink, Zap, UserCog } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/firebase';
-import { collection, query, where, getDocs, doc, setDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { Button } from '@/components/ui/button';
 import { blogPosts } from '@/data/blogPosts';
@@ -18,6 +18,48 @@ export default function SuperuserPage() {
   const [isSeeding, setIsSeeding] = useState(false);
   const [isGeoSeeding, setIsGeoSeeding] = useState(false);
   const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Tier management
+  const [tierEmail, setTierEmail] = useState('');
+  const [selectedTier, setSelectedTier] = useState('Premium');
+  const [isUpdatingTier, setIsUpdatingTier] = useState(false);
+
+  const TIERS = ['Free', 'Basic', 'Medium', 'Pro', 'Business', 'Premium', 'Enterprise', 'PipelineOffer'];
+
+  const updateUserTier = async () => {
+    if (!tierEmail.trim()) return;
+    setIsUpdatingTier(true);
+    setStatus(null);
+    try {
+      const q = query(collection(db, 'users'), where('email', '==', tierEmail.trim().toLowerCase()));
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        setStatus({ type: 'error', message: `No user found with email: ${tierEmail}` });
+        return;
+      }
+      await updateDoc(snap.docs[0].ref, { tier: selectedTier });
+      setStatus({ type: 'success', message: `Tier updated to "${selectedTier}" for ${tierEmail}` });
+      setTierEmail('');
+    } catch (err: any) {
+      setStatus({ type: 'error', message: `Failed: ${err.message}` });
+    } finally {
+      setIsUpdatingTier(false);
+    }
+  };
+
+  const setOwnTier = async (tier: string) => {
+    if (!user) return;
+    setIsUpdatingTier(true);
+    setStatus(null);
+    try {
+      await updateDoc(doc(db, 'users', user.uid), { tier });
+      setStatus({ type: 'success', message: `Your tier set to "${tier}". Refresh to see changes.` });
+    } catch (err: any) {
+      setStatus({ type: 'error', message: `Failed: ${err.message}` });
+    } finally {
+      setIsUpdatingTier(false);
+    }
+  };
 
   const effectiveUid = user?.uid ?? (ADMIN_BYPASS ? BYPASS_UID : null);
 
@@ -374,6 +416,66 @@ export default function SuperuserPage() {
               </button>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Tier Management */}
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center">
+            <UserCog className="w-5 h-5 text-blue-400" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-white">User Tier Management</h3>
+            <p className="text-xs text-zinc-500 mt-0.5">Change any user's tier to unlock dashboard features</p>
+          </div>
+        </div>
+
+        {/* Quick-set own tier */}
+        <div className="mb-6">
+          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">Quick-set your own tier</p>
+          <div className="flex flex-wrap gap-2">
+            {TIERS.map(t => (
+              <button
+                key={t}
+                onClick={() => setOwnTier(t)}
+                disabled={isUpdatingTier}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all disabled:opacity-50
+                  border-zinc-700 text-zinc-400 hover:border-blue-500/50 hover:text-blue-400 hover:bg-blue-500/5"
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Update another user by email */}
+        <div>
+          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">Update another user by email</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="email"
+              value={tierEmail}
+              onChange={e => setTierEmail(e.target.value)}
+              placeholder="user@example.com"
+              className="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+            />
+            <select
+              value={selectedTier}
+              onChange={e => setSelectedTier(e.target.value)}
+              className="bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+            >
+              {TIERS.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+            <button
+              onClick={updateUserTier}
+              disabled={isUpdatingTier || !tierEmail.trim()}
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 whitespace-nowrap"
+            >
+              {isUpdatingTier ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserCog className="w-4 h-4" />}
+              Update Tier
+            </button>
+          </div>
         </div>
       </div>
 
