@@ -451,9 +451,26 @@ export default function SettingsPage() {
 
           {/* Outbound webhook */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">Outbound Webhook — Auspexi → Your Server</label>
-            <Input name="cmsWebhookUrl" value={formData.cmsWebhookUrl} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" placeholder="https://your-internal-server.com/api/auspexi-push" />
-            <p className="text-xs text-zinc-500">Auspexi posts generated articles and schema to this URL. Payload: <code className="text-zinc-300">&#123; event, timestamp, data: &#123; title, content, schema &#125; &#125;</code></p>
+            <label className="text-sm font-medium text-zinc-300">Outbound Webhook — Auspexi → Your CMS</label>
+            <div className="flex gap-2">
+              <Input name="cmsWebhookUrl" value={formData.cmsWebhookUrl} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" placeholder="https://your-internal-server.com/api/auspexi-push" />
+              {origin && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setFormData(prev => ({ ...prev, cmsWebhookUrl: `${origin}/api/notify-article` }))}
+                  className="shrink-0 text-xs"
+                >
+                  Use Email Notify
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-zinc-500">
+              Auspexi posts generated articles and schema to this URL when you click &quot;Publish to Database &amp; CMS&quot;.{' '}
+              No CMS yet? Click <strong className="text-zinc-400">Use Email Notify</strong> — we&apos;ll email the article directly to your account address instead.
+              Payload: <code className="text-zinc-300">&#123; userId, topic, article, facts, schema, brand, timestamp &#125;</code>
+            </p>
           </div>
         </CardContent>
       </Card>
