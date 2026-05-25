@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Activity, Play, Loader2, Target, BarChart3, TrendingUp, Cpu, Network } from 'lucide-react';
+import { Activity, Loader2, Target, BarChart3, TrendingUp, Cpu, Network } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { checkTierAccess } from '@/constants/tiers';
@@ -9,7 +9,9 @@ export default function GeoPulsePage() {
   const { tier, role } = useAuth();
   const [keyword, setKeyword] = useState('');
   const [isProbing, setIsProbing] = useState(false);
+  const [currentStep, setCurrentStep] = useState(-1);
   const [results, setResults] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   if (role !== 'admin' && !checkTierAccess(tier, 'Premium')) {
     return (
@@ -30,50 +32,6 @@ export default function GeoPulsePage() {
     );
   }
 
-  const runProbe = () => {
-    if (!keyword.trim()) return;
-    setIsProbing(true);
-    setResults(null);
-    setCurrentStep(0);
-
-    // Simulate steps
-    const steps = [
-      "Accessing Proprietary Data Lake...",
-      "Benchmarking against Semantic Anchors...",
-      "Analyzing Vector Distribution...",
-      "Calculating Share of Voice...",
-      "Finalizing Market Vulnerability Insights..."
-    ];
-
-    let step = 0;
-    const interval = setInterval(() => {
-      step++;
-      setCurrentStep(step);
-      if (step >= steps.length) clearInterval(interval);
-    }, 600);
-
-    // Simulate API calls to LLMs
-    setTimeout(() => {
-      setResults({
-        keyword,
-        models: [
-          { name: 'GPT-4o', sov: 35, sentiment: 'Positive', trend: '+5%' },
-          { name: 'Gemini Pro', sov: 42, sentiment: 'Neutral', trend: '-2%' },
-          { name: 'Claude 3.5', sov: 28, sentiment: 'Positive', trend: '+12%' }
-        ],
-        aggregateSov: 35,
-        insights: [
-          "Your brand is frequently mentioned alongside 'reliability' in GPT-4 outputs.",
-          "Claude 3.5 associates your brand with 'innovation' but lacks recent product data.",
-          "Gemini Pro favors your competitor for 'cost-effectiveness' queries."
-        ]
-      });
-      setIsProbing(false);
-      setCurrentStep(-1);
-    }, 3500);
-  };
-
-  const [currentStep, setCurrentStep] = useState(-1);
   const probeSteps = [
     "Accessing Proprietary Data Lake...",
     "Benchmarking against Semantic Anchors...",
@@ -81,6 +39,44 @@ export default function GeoPulsePage() {
     "Calculating Share of Voice...",
     "Finalizing Market Vulnerability Insights..."
   ];
+
+  const runProbe = async () => {
+    if (!keyword.trim()) return;
+    setIsProbing(true);
+    setResults(null);
+    setError(null);
+    setCurrentStep(0);
+
+    let step = 0;
+    const interval = setInterval(() => {
+      step++;
+      setCurrentStep(step);
+      if (step >= probeSteps.length) clearInterval(interval);
+    }, 500);
+
+    try {
+      const res = await fetch('/api/geo-pulse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ keyword: keyword.trim() }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || 'Scan failed');
+      setResults(json.result);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      clearInterval(interval);
+      setCurrentStep(-1);
+      setIsProbing(false);
+    }
+  };
+
+  const sentimentColor = (s: string) => {
+    if (s === 'Positive') return 'bg-emerald-500/10 text-emerald-400';
+    if (s === 'Negative') return 'bg-red-500/10 text-red-400';
+    return 'bg-amber-500/10 text-amber-400';
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -103,6 +99,7 @@ export default function GeoPulsePage() {
               type="text"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && !isProbing && runProbe()}
               placeholder="e.g., 'Best enterprise CRM software'"
               className="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
               disabled={isProbing}
@@ -136,20 +133,23 @@ export default function GeoPulsePage() {
               <Network className="absolute inset-0 m-auto w-6 h-6 text-pink-400 animate-pulse" />
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Querying Proprietary Data Lake</h3>
-
             <div className="space-y-2 mt-4 max-w-xs mx-auto text-left">
               {probeSteps.map((step, i) => (
                 <div key={i} className={`flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold transition-all duration-300 ${i < currentStep ? 'text-emerald-500' : i === currentStep ? 'text-pink-500' : 'text-zinc-700'}`}>
-                   <div className={`w-1.5 h-1.5 rounded-full ${i < currentStep ? 'bg-emerald-500' : i === currentStep ? 'bg-pink-500 animate-pulse' : 'bg-zinc-800'}`} />
-                   {step}
+                  <div className={`w-1.5 h-1.5 rounded-full ${i < currentStep ? 'bg-emerald-500' : i === currentStep ? 'bg-pink-500 animate-pulse' : 'bg-zinc-800'}`} />
+                  {step}
                 </div>
               ))}
             </div>
-
             <p className="text-sm text-zinc-500 mt-8 max-w-md mx-auto">
               Aggregating first-party search intent patterns and mapping vector distributions against your Semantic Anchors.
             </p>
           </div>
+        )}
+
+        {/* Error */}
+        {error && !isProbing && (
+          <div className="py-8 text-center text-red-400 text-sm">{error}</div>
         )}
 
         {/* Results */}
@@ -167,42 +167,47 @@ export default function GeoPulsePage() {
               <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-5">
                 <div className="flex items-center gap-2 text-zinc-400 mb-2">
                   <BarChart3 className="w-4 h-4" />
-                  <span className="text-sm font-medium">Total Responses</span>
+                  <span className="text-sm font-medium">Data Signals</span>
                 </div>
-                <div className="text-3xl font-bold text-white">150</div>
+                <div className="text-3xl font-bold text-white">{results.totalSignals.toLocaleString()}</div>
               </div>
               <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-5">
                 <div className="flex items-center gap-2 text-zinc-400 mb-2">
-                  <TrendingUp className="w-4 h-4 text-emerald-400" />
-                  <span className="text-sm font-medium text-emerald-400">Position Drift</span>
+                  <TrendingUp className={`w-4 h-4 ${results.overallSentiment === 'Positive' ? 'text-emerald-400' : 'text-amber-400'}`} />
+                  <span className={`text-sm font-medium ${results.overallSentiment === 'Positive' ? 'text-emerald-400' : 'text-amber-400'}`}>Overall Sentiment</span>
                 </div>
-                <div className="text-3xl font-bold text-emerald-400">+4.2%</div>
+                <div className={`text-3xl font-bold ${results.overallSentiment === 'Positive' ? 'text-emerald-400' : results.overallSentiment === 'Negative' ? 'text-red-400' : 'text-amber-400'}`}>
+                  {results.overallSentiment}
+                </div>
               </div>
             </div>
 
             {/* Model Breakdown */}
             <div>
               <h3 className="text-base font-semibold text-white mb-4">Model Specific Analysis</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {results.models.map((model: any, i: number) => (
                   <div key={i} className="bg-zinc-950 border border-zinc-800 rounded-xl p-5 relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
                         <Cpu className="w-4 h-4 text-pink-400" />
-                        <span className="font-semibold text-white">{model.name}</span>
+                        <span className="font-semibold text-white text-sm">{model.name}</span>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded-full ${model.sentiment === 'Positive' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
+                      <span className={`text-xs px-2 py-1 rounded-full ${sentimentColor(model.sentiment)}`}>
                         {model.sentiment}
                       </span>
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                       <div className="text-sm text-zinc-400 flex justify-between">
                         <span>Share of Voice:</span>
                         <span className="text-white font-medium">{model.sov}%</span>
                       </div>
+                      <div className="w-full bg-zinc-800 rounded-full h-1.5">
+                        <div className="bg-pink-500 h-1.5 rounded-full" style={{ width: `${Math.min(model.sov, 100)}%` }} />
+                      </div>
                       <div className="text-sm text-zinc-400 flex justify-between">
-                        <span>Trend (30d):</span>
+                        <span>Trend:</span>
                         <span className={model.trend.startsWith('+') ? 'text-emerald-400' : 'text-amber-400'}>{model.trend}</span>
                       </div>
                     </div>
@@ -217,16 +222,14 @@ export default function GeoPulsePage() {
               <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-5 space-y-4">
                 {results.insights.map((insight: string, i: number) => (
                   <div key={i} className="flex gap-3 text-sm text-zinc-300">
-                    <div className="mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-pink-500"></div></div>
+                    <div className="mt-1 shrink-0"><div className="w-1.5 h-1.5 rounded-full bg-pink-500"></div></div>
                     <p>{insight}</p>
                   </div>
                 ))}
               </div>
             </div>
-
           </div>
         )}
-
       </div>
     </div>
   );
