@@ -1,5 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbAdmin } from '@/lib/firebase-admin';
+import { embeddingService } from '@/lib/embeddings';
+
+// Three interpretable semantic axes for GEO space
+const SEMANTIC_AXES = [
+  'technical expertise, innovation, engineering capability, product depth',
+  'market authority, brand trust, reputation, citation credibility, thought leadership',
+  'competitive differentiation, unique value proposition, category ownership',
+];
+
+function dotProduct(a: number[], b: number[]): number {
+  return a.reduce((sum, v, i) => sum + v * b[i], 0);
+}
+
+function clamp(v: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, v));
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -8,93 +24,119 @@ export async function GET(req: NextRequest) {
     const platform = searchParams.get('platform') || 'All';
     const timeframe = searchParams.get('timeframe') || 'current';
 
-    // Default clusters if no custom ones exist
-    let clusters = [
-      { x: -50, y: 40, label: 'Reputational Moat', color: '#ec4899', baseType: 'Systemic Anchor' },
-      { x: 60, y: -30, label: 'Technical Competence', color: '#06b6d4', baseType: 'Signal Point' },
-      { x: -20, y: -60, label: 'Pricing Perception', color: '#8b5cf6', baseType: 'Emergent Trend' },
+    // Fetch user's anchor labels for cluster naming
+    let anchorLabels: { label: string; color: string; baseType: string }[] = [
+      { label: 'Reputational Moat', color: '#ec4899', baseType: 'Systemic Anchor' },
+      { label: 'Technical Competence', color: '#06b6d4', baseType: 'Signal Point' },
+      { label: 'Competitive Edge', color: '#8b5cf6', baseType: 'Emergent Trend' },
     ];
 
-    // Fetch custom clusters from Firestore if userId provided
+    let vaultFacts: { text: string; id: string }[] = [];
+
     if (userId && dbAdmin) {
       try {
+        // Fetch custom anchor labels from user profile
         const userDoc = await dbAdmin.collection('users').doc(userId).get();
         if (userDoc.exists) {
           const data = userDoc.data();
-          if (data?.latentAnchors && Array.isArray(data.latentAnchors) && data.latentAnchors.length > 0) {
-            // Assign fixed coordinates to anchors for deterministic clusters
-            clusters = data.latentAnchors.map((a: any, idx: number) => ({
-              ...a,
-              x: idx === 0 ? -60 : idx === 1 ? 70 : idx === 2 ? -10 : idx === 3 ? 40 : -30,
-              y: idx === 0 ? 50 : idx === 1 ? -40 : idx === 2 ? -70 : idx === 3 ? 20 : 10,
-            }));
+          if (data?.latentAnchors?.length > 0) {
+            anchorLabels = data.latentAnchors.slice(0, 4);
           }
         }
+
+        // Fetch knowledge vault facts to embed
+        const vaultSnap = await dbAdmin
+          .collection('knowledge_graph')
+          .where('userId', '==', userId)
+          .limit(40)
+          .get();
+        vaultFacts = vaultSnap.docs.map(d => ({
+          id: d.id,
+          text: (d.data().fact as string) || '',
+        })).filter(f => f.text.length > 10);
       } catch (err) {
-        console.error('Error fetching custom anchors:', err);
+        console.error('Firestore fetch error in analytics/map:', err);
       }
     }
 
-    // Shift centers slightly based on platform to simulate different model biases
-    const biasX = platform === 'Gemini' ? 20 : platform === 'ChatGPT' ? -20 : platform === 'Claude' ? 0 : 0;
-    const biasY = platform === 'Gemini' ? -10 : platform === 'ChatGPT' ? 20 : platform === 'Claude' ? -30 : 0;
+    // Embed the 3 semantic axes
+    const axisEmbeddings = await embeddingService.generateEmbeddings(SEMANTIC_AXES);
 
-    // Simulate "drift" for historical snapshots
-    const driftFactor = timeframe === 'month' ? 1.5 : timeframe === 'week' ? 0.7 : 0;
-    const timeSeed = timeframe === 'month' ? 30 : timeframe === 'week' ? 7 : 1;
+    let points: any[] = [];
 
-    const clustersWithBias = clusters.map((c, i) => ({
-      ...c,
-      x: c.x + biasX + driftFactor * (i + 1) * 2,
-      y: c.y + biasY - driftFactor * (i + 1) * 1.5,
-    }));
+    if (vaultFacts.length > 0) {
+      // Real path: embed each vault fact and project onto the 3 semantic axes
+      const factTexts = vaultFacts.map(f => f.text);
+      const factEmbeddings = await embeddingService.generateEmbeddings(factTexts);
 
-    const points = Array.from({ length: 120 }, (_, i) => {
-      const cluster = clustersWithBias[i % clustersWithBias.length];
-      const theta = Math.random() * 2 * Math.PI;
-      const r = Math.sqrt(Math.random()) * 50;
+      points = factEmbeddings.map((emb, i) => {
+        const x = clamp(dotProduct(emb, axisEmbeddings[0]) * 80, -90, 90);
+        const y = clamp(dotProduct(emb, axisEmbeddings[1]) * 80, -90, 90);
+        const z = clamp(dotProduct(emb, axisEmbeddings[2]) * 80, -90, 90);
 
-      const individualDrift = Math.sin(i + timeSeed) * driftFactor * 2;
+        // Assign to nearest anchor label based on dominant axis
+        const absX = Math.abs(x), absY = Math.abs(y), absZ = Math.abs(z);
+        const dominant = absX > absY && absX > absZ ? 0 : absY > absZ ? 1 : 2;
+        const anchor = anchorLabels[dominant % anchorLabels.length];
 
-      return {
-        id: i,
-        x: cluster.x + r * Math.cos(theta) + individualDrift,
-        y: cluster.y + r * Math.sin(theta) - individualDrift,
-        z: Math.random() * 40 - 20 + individualDrift * 2,
-        size: Math.floor(Math.random() * 6) + 3,
-        type: cluster.label,
-        groupType: cluster.baseType,
-        source:
-          platform === 'All' ? ['Gemini', 'ChatGPT', 'Claude'][i % 3] : platform,
-        label: [
-          'Security Compliance',
-          'API Latency',
-          'Founder History',
-          'Tokenomics',
-          'Market Share',
-          'Github Activity',
-          'Patent Filing',
-          'Discord Sentiment',
-          'Reddit Leak',
-          'Enterprise Trust',
-          'Latency Spike',
-          'Model Drift',
-        ][i % 12],
-        distance: Math.random(),
-        sentiment: Math.random() > 0.4 ? 'positive' : 'negative',
-      };
-    });
+        const platforms = ['Gemini', 'ChatGPT', 'Claude'];
+
+        return {
+          id: i,
+          x: parseFloat(x.toFixed(2)),
+          y: parseFloat(y.toFixed(2)),
+          z: parseFloat(z.toFixed(2)),
+          size: Math.floor(Math.random() * 4) + 4,
+          type: anchor.label,
+          groupType: anchor.baseType,
+          source: platform === 'All' ? platforms[i % 3] : platform,
+          label: vaultFacts[i].text.substring(0, 60),
+          distance: Math.abs(x * x + y * y + z * z) / (90 * 90 * 3),
+          sentiment: y > 0 ? 'positive' : 'negative',
+          real: true,
+        };
+      });
+    } else {
+      // Fallback: embed the anchor labels themselves as placeholder points
+      const anchorTexts = anchorLabels.map(a => a.label + ': ' + a.baseType);
+      const anchorEmbs = await embeddingService.generateEmbeddings(anchorTexts);
+
+      const platforms = ['Gemini', 'ChatGPT', 'Claude'];
+      points = anchorEmbs.flatMap((emb, ai) => {
+        const cx = clamp(dotProduct(emb, axisEmbeddings[0]) * 80, -90, 90);
+        const cy = clamp(dotProduct(emb, axisEmbeddings[1]) * 80, -90, 90);
+        const cz = clamp(dotProduct(emb, axisEmbeddings[2]) * 80, -90, 90);
+        const anchor = anchorLabels[ai];
+
+        return Array.from({ length: 15 }, (_, i) => ({
+          id: ai * 15 + i,
+          x: parseFloat((cx + (Math.random() * 30 - 15)).toFixed(2)),
+          y: parseFloat((cy + (Math.random() * 30 - 15)).toFixed(2)),
+          z: parseFloat((cz + (Math.random() * 30 - 15)).toFixed(2)),
+          size: Math.floor(Math.random() * 4) + 3,
+          type: anchor.label,
+          groupType: anchor.baseType,
+          source: platform === 'All' ? platforms[i % 3] : platform,
+          label: anchor.label,
+          distance: Math.random(),
+          sentiment: Math.random() > 0.4 ? 'positive' : 'negative',
+          real: false,
+        }));
+      });
+    }
 
     return NextResponse.json({
       success: true,
       points,
       metadata: {
-        engine: 'Gemini-Embed-004',
+        engine: 'text-embedding-004',
         dimensions: 768,
         platform,
         timeframe,
-        aggregatedAt: new Date(Date.now() - timeSeed * 3600000 * 24).toISOString(),
-        pathCount: 1240 + timeSeed * 10,
+        aggregatedAt: new Date().toISOString(),
+        pathCount: points.length,
+        realEmbeddings: vaultFacts.length > 0,
+        factsEmbedded: vaultFacts.length,
       },
     });
   } catch (error: any) {

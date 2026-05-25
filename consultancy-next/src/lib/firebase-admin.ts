@@ -1,4 +1,5 @@
 import admin from 'firebase-admin';
+import { getFirestore } from 'firebase-admin/firestore';
 
 if (!admin.apps.length) {
   if (process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
@@ -23,5 +24,11 @@ if (!admin.apps.length) {
   }
 }
 
-export const dbAdmin = admin.apps.length ? admin.firestore() : null;
+const DATABASE_ID = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID || 'ai-studio-2cf48d01-0e3c-41eb-88cf-8117f9ee3d0c';
+
+export const dbAdmin = admin.apps.length
+  ? getFirestore(admin.app(), DATABASE_ID)
+  : null;
+
 export default admin;
+

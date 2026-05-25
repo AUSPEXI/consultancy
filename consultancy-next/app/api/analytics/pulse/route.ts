@@ -1,30 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { dbAdmin } from '@/lib/firebase-admin';
 
 export async function GET(req: NextRequest) {
   try {
-    const now = new Date();
+    const { searchParams } = req.nextUrl;
+    const userId = searchParams.get('userId');
 
-    // Generate simulated real-time ingestion pulse with date and zScore
-    const pulse = Array.from({ length: 30 }, (_, i) => {
-      const date = new Date(now);
-      date.setMinutes(now.getMinutes() - (29 - i) * 30); // 30 min intervals
+    if (!userId || !dbAdmin) {
+      // Return empty state — no fake data
+      return NextResponse.json({
+        success: true,
+        pulse: [],
+        hasRealData: false,
+        message: 'Run a Citation Probe to start tracking your AI citation trend.',
+      });
+    }
 
-      // "drift" pulse - usually calm, with occasional spikes (anomalies)
-      const baseNoise = Math.random() * 0.5 - 0.25;
-      const spike = i === 15 || i === 25 ? (Math.random() > 0.5 ? 3.5 : -3.5) : 0;
-      const zScore = parseFloat((baseNoise + spike).toFixed(2));
+    // Fetch last 30 citation tests for this user
+    const snap = await dbAdmin
+      .collection('citation_tests')
+      .where('userId', '==', userId)
+      .orderBy('timestamp', 'desc')
+      .limit(30)
+      .get();
 
-      return {
-        date: date.toISOString(),
-        zScore,
-        isAnomaly: Math.abs(zScore) > 2.5,
-        mentions: Math.floor(Math.random() * 100) + 20,
-        citations: Math.floor(Math.random() * 40) + 10,
-        nodeShift: Math.abs(zScore * 10), // Visual indicator for node movement
-      };
-    });
+    if (snap.empty) {
+      return NextResponse.json({
+        success: true,
+        pulse: [],
+        hasRealData: false,
+        message: 'Run a Citation Probe to start tracking your AI citation trend.',
+      });
+    }
 
-    return NextResponse.json({ success: true, pulse });
+    const pulse = snap.docs
+      .map(d => {
+        const data = d.data();
+        // z-score: deviation from 50% baseline citation rate
+        const rate = data.citationRate ?? 0;
+        const zScore = parseFloat(((rate - 50) / 25).toFixed(2));
+        return {
+          date: data.timestamp,
+          citationRate: rate,
+          citedCount: data.citedCount ?? 0,
+          totalQueries: data.totalQueries ?? 0,
+          zScore,
+          isAnomaly: Math.abs(zScore) > 2,
+          mentions: data.citedCount ?? 0,
+          citations: data.citedCount ?? 0,
+          nodeShift: Math.abs(zScore * 10),
+        };
+      })
+      .reverse(); // chronological order
+
+    return NextResponse.json({ success: true, pulse, hasRealData: true });
   } catch (error: any) {
     console.error('Error in analytics/pulse:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
