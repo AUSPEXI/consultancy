@@ -20,6 +20,7 @@ if (apps.length > 0) {
   app = initializeApp(firebaseConfig)
 }
 
-export const db = getFirestore(app)
+const databaseId = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID || 'ai-studio-2cf48d01-0e3c-41eb-88cf-8117f9ee3d0c'
+export const db = getFirestore(app, databaseId)
 export const auth = getAuth(app)
 export const googleProvider = new GoogleAuthProvider()
