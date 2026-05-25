@@ -40,7 +40,7 @@ service cloud.firestore {
     function isAdmin() {
       return isAuthenticated() &&
         ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 'role' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
-          (request.auth.token.email == "hopiumcalculator@gmail.com" && request.auth.token.email_verified == true));
+          (request.auth.token.email in ["hopiumcalculator@gmail.com", "sales@auspexi.com"] && request.auth.token.email_verified == true));
     }
 
     // ===============================================================
@@ -51,7 +51,7 @@ service cloud.firestore {
              (!('name' in data) || (data.name is string && data.name.size() <= 100)) &&
              (!('role' in data) || data.role in ['admin', 'user']) &&
              (!('uid' in data) || (data.uid is string)) &&
-             (!('tier' in data) || data.tier in ['Free', 'Basic', 'Pro', 'Business', 'Enterprise', 'PipelineOffer']) &&
+             (!('tier' in data) || data.tier in ['Free', 'Basic', 'Medium', 'Pro', 'Business', 'Enterprise', 'Premium', 'PipelineOffer']) &&
              (!('brand' in data) || (data.brand is string && data.brand.size() <= 100)) &&
              (!('domain' in data) || (data.domain is string && data.domain.size() <= 100)) &&
              (!('cmsWebhookUrl' in data) || (data.cmsWebhookUrl is string && data.cmsWebhookUrl.size() <= 500)) &&
