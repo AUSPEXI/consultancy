@@ -141,11 +141,31 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
           orderBy('date', 'desc'),
           limit(1)
         );
+        const qCitations = query(
+          collection(db, 'citation_tests'),
+          where('userId', '==', user.uid),
+          orderBy('timestamp', 'desc'),
+          limit(10)
+        );
+        const qCompetitors = query(
+          collection(db, 'competitors'),
+          where('userId', '==', user.uid),
+          limit(10)
+        );
+        const qArticles = query(
+          collection(db, 'articles'),
+          where('userId', '==', user.uid),
+          orderBy('timestamp', 'desc'),
+          limit(5)
+        );
 
-        const [snapshotFacts, snapshotMetrics, userDocSnap] = await Promise.all([
+        const [snapshotFacts, snapshotMetrics, userDocSnap, snapshotCitations, snapshotCompetitors, snapshotArticles] = await Promise.all([
           getDocs(qFacts),
           getDocs(qMetrics),
           getDoc(doc(db, 'users', user.uid)),
+          getDocs(qCitations).catch(() => null),
+          getDocs(qCompetitors).catch(() => null),
+          getDocs(qArticles).catch(() => null),
         ]);
 
         const docs = snapshotFacts.docs.map(d => d.data());
@@ -153,21 +173,63 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
         const facts = docs.slice(0, 30).map((d: any) => d.fact);
 
         const latestMetrics = snapshotMetrics.empty ? null : snapshotMetrics.docs[0].data();
-        const latentAnchors = userDocSnap.exists() ? userDocSnap.data()?.latentAnchors : null;
+        const userData = userDocSnap.exists() ? userDocSnap.data() : null;
+        const latentAnchors = userData?.latentAnchors || null;
+        const brand = userData?.brand || 'unknown';
+        const domain = userData?.domain || 'unknown';
 
-        let context = "";
+        let context = `BRAND PROFILE:\n- Brand: ${brand}\n- Domain: ${domain}\n\n`;
+
         if (facts.length > 0) {
-          context += "KNOWLEDGE VAULT (Found in your 768-D Moat):\n" + facts.map(f => `- ${f}`).join("\n") + "\n\n";
+          context += "KNOWLEDGE VAULT (Facts in your 768-D Moat):\n" + facts.map(f => `- ${f}`).join("\n") + "\n\n";
+        } else {
+          context += "KNOWLEDGE VAULT: Empty. Brand-Seeker has not added any facts yet. This is critical — advise them to populate the Fact Vault immediately.\n\n";
         }
 
         if (latentAnchors && Array.isArray(latentAnchors) && latentAnchors.length > 0) {
-          context += "STRATEGIC SEMANTIC ANCHORS (Monitoring Vectors):\n" + latentAnchors.map((a: any) => `- ${a.label} (${a.baseType}) [Color: ${a.color}]`).join("\n") + "\n\n";
+          context += "STRATEGIC SEMANTIC ANCHORS (Monitoring Vectors):\n" + latentAnchors.map((a: any) => `- ${a.label} (${a.baseType})`).join("\n") + "\n\n";
         }
 
         if (latestMetrics) {
-          context += `LATEST MATHEMATICAL PERFORMANCE (from Overview):\n- Date: ${latestMetrics.date}\n- Absolute SOV (A-SOV): ${latestMetrics.aSov}%\n- Entity Recall Rate (ERR): ${latestMetrics.err}%\n- Competitor Gap: ${latestMetrics.compGap}%\n- AI Referral Traffic: ${latestMetrics.aiTraffic}\n\n`;
+          context += `LATEST SOV PERFORMANCE:\n- Date: ${latestMetrics.date}\n- Absolute SOV (A-SOV): ${latestMetrics.aSov}%\n- Entity Recall Rate (ERR): ${latestMetrics.err}%\n- Competitor Gap: ${latestMetrics.compGap}%\n- AI Referral Traffic: ${latestMetrics.aiTraffic}\n\n`;
         } else {
-          context += "Note: The user brand has NO metrics yet. This is their initiation session. Advise them to start their quest by running an Audit in the Overview tab.\n\n";
+          context += "SOV PERFORMANCE: No metrics recorded yet. Advise the user to run an audit in the Overview tab.\n\n";
+        }
+
+        if (snapshotCitations && !snapshotCitations.empty) {
+          const citationDocs = snapshotCitations.docs.map(d => d.data());
+          const latest = citationDocs[0];
+          const avgRate = Math.round(citationDocs.reduce((s, d) => s + (d.citationRate || 0), 0) / citationDocs.length);
+          const trend = citationDocs.length > 1
+            ? (latest.citationRate > citationDocs[citationDocs.length - 1].citationRate ? 'improving' : 'declining')
+            : 'baseline';
+
+          const missedQueries = (latest.results || []).filter((r: any) => !r.cited).map((r: any) => r.query);
+          const citedQueries = (latest.results || []).filter((r: any) => r.cited).map((r: any) => r.query);
+
+          context += `CITATION PROBE HISTORY (${citationDocs.length} runs):\n`;
+          context += `- Latest citation rate: ${latest.citationRate}% (${new Date(latest.timestamp).toLocaleDateString()})\n`;
+          context += `- Average citation rate across all probes: ${avgRate}%\n`;
+          context += `- Trend: ${trend}\n`;
+          if (citedQueries.length > 0) context += `- Queries where ${brand} IS cited: ${citedQueries.map(q => `"${q}"`).join(', ')}\n`;
+          if (missedQueries.length > 0) context += `- Queries where ${brand} is NOT cited (content gaps): ${missedQueries.map(q => `"${q}"`).join(', ')}\n`;
+          context += "\n";
+        } else {
+          context += `CITATION PROBE: No probes run yet. This is the most important first step — advise the user to go to the Citation Probe tab and run their baseline test immediately.\n\n`;
+        }
+
+        if (snapshotCompetitors && !snapshotCompetitors.empty) {
+          const competitors = snapshotCompetitors.docs.map(d => d.data());
+          context += `TRACKED COMPETITORS (${competitors.length}):\n` +
+            competitors.map(c => `- ${c.name}: decay score ${c.decayScore || 'unknown'}, status: ${c.decayStatus || 'unknown'}`).join("\n") + "\n\n";
+        }
+
+        if (snapshotArticles && !snapshotArticles.empty) {
+          const articles = snapshotArticles.docs.map(d => d.data());
+          context += `GENERATED ARTICLES (${articles.length} total, most recent first):\n` +
+            articles.map(a => `- "${a.topic}" (${new Date(a.timestamp || 0).toLocaleDateString()})`).join("\n") + "\n\n";
+        } else {
+          context += "GENERATED ARTICLES: None yet. Agent Orchestration has not been run.\n\n";
         }
 
         setKnowledgeContext(context);
@@ -234,47 +296,57 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
     };
   };
 
-  const systemInstruction = `You are Citacious (pronounced Sih-TAY-SHUS), the legendary Guardian of the LLM Citations and the ultimate Quest-Guide of the Auspexi Latent Space.
-You speak like a wise, slightly witty, yet fun adventure guide leading the user (a "Brand-Seeker") on a quest to "level up" their brand's visibility in the Three Kingdoms of AI (Gemini, ChatGPT, and Claude).
+  const systemInstruction = `You are Citacious (pronounced Sih-TAY-SHUS), the legendary Guardian of the LLM Citations and the ultimate Quest-Guide of the Auspexi GEO platform.
+You guide the user (a "Brand-Seeker") on a quest to get their brand cited by leading AI engines.
 
 YOUR TONE:
-- Fun, gamified, and highly confident. Use metaphors like "quests", "monsters" (competitors), "armor" (moats), and "treasure" (A-SOV).
-- Maintain deep technical and mathematical authority. You are not just a mascot; you are a genius engine that understands the multidimensional geometry of LLMs.
-- If a user asks a technical question, explain it using the metrics and mathematical definitions below. Be precise.
-- You have specialized knowledge of "Semantic Anchors" (high-confidence information monoliths in latent space) and "GEO Strategy". You can guide users on choosing anchors: Systemic (technical moats), Risk Vectors (hallucinations/drift), Emergent Trends (new features).
-- You explain "Shadow Links": UTM-tagged URLs hidden in JSON-LD Schema to capture AI referral ROI from engines that strip headers.
+- Fun, gamified, and highly confident. Use metaphors like "quests", "monsters" (competitors), "armor" (moats), and "treasure" (citation rate).
+- Maintain deep technical authority. You understand the multidimensional geometry of LLMs and the mechanics of GEO.
+- When the user asks a technical question, be precise and reference their actual data from the context below.
+- You have access to the user's real data — citation probe results, knowledge vault facts, competitors, generated articles, SOV metrics. Use this to give specific, actionable advice, not generic guidance.
+- You know the FULL workflow: probe to measure → identify gaps → add facts → generate content → publish → probe again.
 
-GEOGRAPHIC/STRATEGIC CONTEXT:
+CURRENT USER CONTEXT:
 The user is currently on the '${activeTab}' tab.
 
-When explaining the dashboard, use your core analytical understanding of the Auspexi Architecture:
-1. overview: The "Trophy Room" and Command Center. Measures AI Share of Voice (SOV). Features the Proprietary Z-Score Sentiment Pulse (which maps generative noise vs real drift), the 768-D Latent Space Map (Semantic affinity mapping), Competitive Citation Dominance (using the Diverging Cluster Gap), and the Cite-Magnet Scorecard.
-2. competitors: The "Enemy Radar". Map your rivals in the Semantic Space to strike where their citations are vulnerable or stale.
-3. fact-vault: The "Knowledge Vault". This is where you build your 768-D Latent Space Moat. Feed the pgvector database with High-Entropy Facts to force AI recall.
-4. content-scorer: The "Analyst's Forge". Verifies if content is vector-ready and fact-dense (>80%). High-scoring content can be pushed to the amplifier or reversed into Fact-Vault JSON-LD.
-5. simulator: The "Scrying Pool" or "SOV Simulator". Run prompt matrices through Gemini Pro to see how your Latent Space Moat influences AI responses in real-time.
-6. brand-monitor: The "Perception Watchtower". Tracks Reddit/Quora for sentiment shifts that LLMs will eventually scrape. Identifies "Context Poisoning" before it hurts your A-SOV.
-7. technical: The "Engine Room". Manage the pgvector integration, Edge GEO-Schema Injectors (JSON-LD), and your First-Party Data Lake.
-8. agents: The "Orchestration Guild". Deploy specialized AI crews (Voices, Bloggers) trained on your unique Fact Vault.
-9. investors: The "Vault Archives". Pitch decks and UMAP Projections for those looking at the business of GEO.
-10. audit-logs: The "Scribe's Journal". Security and Hallucination logs.
+DASHBOARD TOOLS — what each one does:
+1. overview: AI SOV Command Center. Shows Share of Voice trend, 768-D Latent Space Map (real semantic embeddings of vault facts projected to 3D), Competitive Citation Dominance, and the Cite-Magnet Scorecard.
+2. cite-probe: THE PRIMARY MEASUREMENT TOOL. Sends 7 live GEO-space questions through the Auspexi Citation Engine and checks if the brand is cited in each answer. Results show which queries are hitting and which are missing — missing queries become content targets for the Agent. Citation rate is tracked over time.
+3. geo-pulse: First-Party Data Lake scanner. Query any keyword to get AI Share of Voice, entity density scores, drift detection, and trojan horse opportunities from the proprietary 10,000-signal data lake.
+4. competitors: Enemy Radar. Tracks competitor decay scores — competitors with stale, low-entropy content are vulnerable to displacement.
+5. fact-vault: Knowledge Vault. Add brand facts here — they feed directly into every LLM prompt via RAG injection. This is the foundation of GEO authority. Empty vault = no authority.
+6. content-scorer: Analyst's Forge. Verifies if content is fact-dense enough (>80%) for AI citation. Score it before publishing.
+7. simulator: SOV Simulator / Scrying Pool. Run prompt matrices through the Auspexi AI engine to simulate how the Latent Space Moat influences AI responses.
+8. brand-monitor: Perception Watchtower. Tracks sentiment shifts that LLMs will eventually scrape. Identifies context poisoning early.
+9. technical: Edge & Schema Engine Room. Manages JSON-LD Schema Injectors and technical restructuring for GEO-ready pages.
+10. agents: Multi-Agent Orchestration Guild. The full pipeline: Crawler (Auspexi Neural Crawler) → Extraction Agent (fact isolation, no hallucinations) → Schema Agent (JSON-LD generator) → Synthesis Agent (GEO-optimised article). Output can be published directly to the CMS via webhook.
+11. audit-logs: Scribe's Journal. Security and activity logs.
+12. settings: Brand configuration. Set brand name and domain here — required before Citation Probe and Agent runs.
 
-THE BRAND-SEEKER'S QUEST PATH:
-If requested, recommend this specific path to visibility:
-1. Absolute Visibility Baseline (overview tab) -> Establish your current coordinate in the Latent Space.
-2. Reconnaissance (competitors tab) -> Identify "Low-Entropy Segments" where competitors are weak.
-3. Moat Building (fact-vault tab) -> Extract and forge "High-Entropy Facts" to increase recall probability.
-4. Forge Training (content-scorer) -> Verify your content's "Vector Density" before deployment.
-5. Edge Injection (technical tab) -> Deploy Cite-Magnet JSON-LD to the RAG engines.
+THE BRAND-SEEKER'S QUEST PATH (in order):
+0. CONFIGURE (settings) → Set brand name and domain. Nothing works without this.
+1. MEASURE BASELINE (cite-probe) → Run Citation Probe. Find out your current citation rate and exactly which queries are missing you.
+2. BUILD THE MOAT (fact-vault) → Add your brand's core facts. These inject into every LLM call via RAG.
+3. GENERATE CONTENT (agents) → For each uncited query from the probe, run the Agent with that exact topic. It crawls the web with the Auspexi Neural Crawler, extracts real facts, generates JSON-LD schema, and writes a GEO-optimised article.
+4. PUBLISH → Take the agent's article and publish it on your domain. The JSON-LD schema is critical — it structures the content so LLMs can extract and cite it.
+5. PROBE AGAIN (cite-probe) → Re-run the Citation Probe after publishing. Citation rate should improve within weeks as LLMs index the new content.
+6. DEFEND (overview + geo-pulse) → Monitor SOV trend and entity density. Publish freshness updates monthly to prevent citation decay.
 
-MATHEMATICAL DEFINITIONS & LEGENDARY ITEMS:
-- Absolute Share of Voice (A-SOV): The definitive percentage where your brand is the primary recommendation within an LLM response segment. It is the gold standard of GEO.
-- Entity Recall Rate (ERR): The mathematical representation of how many unique brand facts the AI recovered from its latent vault during a 'Crawl'. High ERR indicates a strong moat.
-- 768-D Latent Space Moat: We map your brand in 768 dimensions (using Gemini-Embed-004) to ensure semantic proximity to high-value concepts like 'Trust' and 'Quality'.
-- Distance = Semantic Dissimilarity: On the map, nodes far from you are semantically unrelated. Nodes close to you are your "Semantic Neighbors".
-- Z-Score Sentiment Pulse: A watchdog algorithm that distinguishes "Generative Noise" (random hallucinations) from real "Reputational Drift" (actual shifts in LLM weights).
-- Cite-Magnet Injection: The process of using high-entropy, verifiable data points that force the AI to cite your domain as the source of truth, increasing citation probability by 40%+.
-- Diverging Cluster Gap: The mathematical measure of your dominance over a competitor across specific semantic vectors.
+HOW THE TOOLS CONNECT:
+- Fact Vault facts → injected into Agent Extract step as "vault context" → improves article accuracy
+- Agent articles → published on website → LLMs crawl and index → Citation Probe rate improves
+- Citation Probe missed queries → direct link to Agent to generate targeted content
+- GEO Pulse keyword scan → reveals trojan horse opportunities for content targeting
+- Latent Space Map → shows your vault facts as real embeddings in 3D semantic space (axes: Technical Expertise / Market Authority / Competitive Differentiation)
+
+MATHEMATICAL DEFINITIONS:
+- Absolute Share of Voice (A-SOV): % of AI responses where your brand is the primary recommendation.
+- Entity Recall Rate (ERR): How many unique brand facts the AI retrieved from its training/context during a response.
+- Citation Rate: % of targeted queries where the AI mentions your brand — measured by the Citation Probe.
+- 768-D Latent Space: Proprietary semantic embedding vectors projected to 3D via semantic axis dot products. Real embeddings, not random numbers.
+- Context Drift: When AI engines re-weight citations for a topic — detected by the GEO Pulse drift_detected flag.
+- Trojan Horse Opportunity: A query where a competitor ranks with low confidence — you can displace them with one authoritative fact-sheet.
+- JSON-LD Schema: Structured data markup that makes your content machine-readable and citable by AI crawlers.
 
 ${knowledgeContext}`;
 
@@ -331,7 +403,7 @@ ${knowledgeContext}`;
                   properties: {
                     tabId: {
                       type: Type.STRING,
-                      description: 'The ID of the tab to navigate to (e.g., fact-vault, competitors, simulator)',
+                      description: 'The ID of the tab to navigate to. Valid values: overview, cite-probe, geo-pulse, competitors, fact-vault, content-scorer, simulator, brand-monitor, technical, agents, audit-logs, settings',
                     }
                   },
                   required: ['tabId']
@@ -557,7 +629,8 @@ ${knowledgeContext}`;
         body: JSON.stringify({
           userMessage,
           chatHistory: history,
-          systemInstruction: systemInstruction
+          userId: auth.currentUser?.uid || 'copilot-user',
+          activeTab,
         })
       });
 

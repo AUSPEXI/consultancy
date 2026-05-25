@@ -42,6 +42,13 @@ interface LLMCallOptions {
   temperature?: number;
   maxRetries?: number;
   schema?: any; // Zod schema for validation
+  feature?: string; // e.g. 'copilot', 'agent-extract', 'cite-probe' — for cost audit
+}
+
+interface LogCtx {
+  userId: string;
+  feature: string;
+  model: string;
 }
 
 interface LLMCallResult<T> {
@@ -100,11 +107,14 @@ export class LLMOrchestrator {
     let retriesAttempted = 0;
 
     const finalPrompt = prompt || (contents ? JSON.stringify(contents) : '');
+    const logCtx: LogCtx | undefined = options.feature
+      ? { userId, feature: options.feature, model }
+      : undefined;
 
     try {
       rawOutput = await callWithExponentialBackoff(
         async () => {
-          const response = await this.callProvider(provider, model, finalPrompt, temperature, contents);
+          const response = await this.callProvider(provider, model, finalPrompt, temperature, contents, logCtx);
           return response;
         },
         provider,
@@ -263,7 +273,8 @@ export class LLMOrchestrator {
     model: string,
     prompt: string,
     temperature: number,
-    contents?: any[]
+    contents?: any[],
+    logCtx?: LogCtx
   ): Promise<string> {
     switch (provider) {
       case 'openai':
@@ -271,7 +282,7 @@ export class LLMOrchestrator {
       case 'anthropic':
         return this.callAnthropic(model, prompt, temperature);
       case 'gemini':
-        return this.callGemini(model, prompt, temperature, contents);
+        return this.callGemini(model, prompt, temperature, contents, logCtx);
       default:
         throw new Error(`Unknown provider: ${provider}`);
     }
@@ -294,24 +305,55 @@ export class LLMOrchestrator {
     throw new Error('Anthropic SDK not yet integrated. Please install @anthropic-ai/sdk.');
   }
 
-  private async callGemini(modelName: string, prompt: string, temperature: number, contents?: any[]): Promise<string> {
+  private async callGemini(modelName: string, prompt: string, temperature: number, contents?: any[], logCtx?: LogCtx): Promise<string> {
     const key = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
     if (!key) throw new Error('GEMINI_API_KEY is not set');
 
     const genAI: any = new GoogleGenAI({ apiKey: key });
-    
+
     const isJsonRequested = prompt.toLowerCase().includes('json') || prompt.toLowerCase().includes('schema');
 
     const result = await genAI.models.generateContent({
       model: modelName,
       contents: contents || prompt,
-      config: { 
+      config: {
         generationConfig: { temperature },
         responseMimeType: isJsonRequested ? "application/json" : undefined
       }
     });
-    
+
+    // Capture token usage and log cost asynchronously
+    if (logCtx && result.usageMetadata) {
+      const inputTokens = result.usageMetadata.promptTokenCount || 0;
+      const outputTokens = result.usageMetadata.candidatesTokenCount || 0;
+      this.writeCostEntry(logCtx.userId, logCtx.feature, modelName, inputTokens, outputTokens).catch(() => {});
+    }
+
     return result.text || '';
+  }
+
+  private async writeCostEntry(userId: string, feature: string, model: string, inputTokens: number, outputTokens: number): Promise<void> {
+    try {
+      const { dbAdmin } = await import('./firebase-admin');
+      if (!dbAdmin) return;
+      // Gemini 2.0 Flash pricing (per million tokens)
+      const rateInput = model.includes('flash') ? 0.10 : 0.35;
+      const rateOutput = model.includes('flash') ? 0.40 : 1.05;
+      const estimatedCostUsd = (inputTokens / 1_000_000) * rateInput + (outputTokens / 1_000_000) * rateOutput;
+      await dbAdmin.collection('cost_audit').add({
+        userId,
+        feature,
+        model,
+        provider: 'gemini',
+        inputTokens,
+        outputTokens,
+        estimatedCostUsd,
+        totalCostUsd: estimatedCostUsd,
+        timestamp: new Date().toISOString(),
+      });
+    } catch {
+      // Cost logging is non-critical — never throw
+    }
   }
 
   /**

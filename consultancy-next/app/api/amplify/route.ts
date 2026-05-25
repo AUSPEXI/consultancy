@@ -21,6 +21,7 @@ export async function POST(request: Request) {
       model: 'gemini-2.0-flash',
       prompt,
       schema: AmplifySchema,
+      feature: 'amplify',
     });
 
     if (!result.success) return NextResponse.json({ error: result.error }, { status: 500 });

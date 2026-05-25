@@ -1,13 +1,248 @@
 'use client'
 
 import { useState } from 'react';
-import { ShieldAlert, Trash2, Database, Loader2, CheckCircle2, History, TrendingUp, PieChart, Eye, Rocket, Share2, ExternalLink, Zap } from 'lucide-react';
+import { ShieldAlert, Trash2, Database, Loader2, CheckCircle2, History, TrendingUp, PieChart, Eye, Rocket, Share2, ExternalLink, Zap, UserCog, DollarSign, BarChart3, RefreshCw, Calculator } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/firebase';
-import { collection, query, where, getDocs, doc, setDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { Button } from '@/components/ui/button';
 import { blogPosts } from '@/data/blogPosts';
+
+// ─── Cost Audit Types ───────────────────────────────────────────────────────
+
+interface FeatureBreakdown {
+  feature: string;
+  calls: number;
+  totalCost: number;
+  avgCostPerCall: number;
+  inputTokens: number;
+  outputTokens: number;
+}
+
+interface CostAuditData {
+  totalCalls: number;
+  grandTotalCost: number;
+  featureBreakdown: FeatureBreakdown[];
+  dailySpend: { date: string; cost: number }[];
+}
+
+const FEATURE_LABELS: Record<string, string> = {
+  'copilot': 'Citacious Copilot',
+  'agent-extract': 'Agent · Extract',
+  'agent-synthesize': 'Agent · Synthesize',
+  'agent-schema': 'Agent · Schema',
+  'agent-crawl': 'Agent · Crawl (Exa)',
+  'cite-probe': 'Citation Probe',
+  'content-scorer': 'Content Scorer',
+  'simulator': 'Simulator',
+  'amplify': 'Fact Amplifier',
+  'research-facts': 'Research Facts',
+  'vault-anchors': 'Vault Anchors',
+  'generate-report': 'GEO Report',
+  'technical': 'Technical Restructure',
+  'technical-schema': 'Technical Schema',
+};
+
+function CostAuditPanel({ userId }: { userId: string }) {
+  const [data, setData] = useState<CostAuditData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [subscribers, setSubscribers] = useState(100);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/cost-audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error);
+      setData(json);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const avgDailyCost = data && data.dailySpend.length > 0
+    ? data.dailySpend.reduce((s, d) => s + d.cost, 0) / data.dailySpend.length
+    : 0;
+  const projectedMonthlyCostPerUser = avgDailyCost * 30;
+  const projectedMonthlyCostTotal = projectedMonthlyCostPerUser * subscribers;
+  // Suggested price: 3× cost margin + $2 buffer
+  const suggestedPrice = Math.max(9, Math.ceil((projectedMonthlyCostPerUser * 3 + 2) / 5) * 5);
+
+  const maxCost = data ? Math.max(...data.featureBreakdown.map(f => f.totalCost), 0.000001) : 1;
+
+  return (
+    <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center">
+            <DollarSign className="w-4 h-4 text-emerald-400" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-white">Cost Audit</h3>
+            <p className="text-xs text-zinc-500 mt-0.5">Live unit economics — token usage, API costs, pricing calculator</p>
+          </div>
+        </div>
+        <button
+          onClick={fetchData}
+          disabled={loading}
+          className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs rounded-lg transition-colors disabled:opacity-50"
+        >
+          {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+          {data ? 'Refresh' : 'Load Data'}
+        </button>
+      </div>
+
+      {error && (
+        <div className="p-3 mb-4 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 text-sm">
+          {error}
+        </div>
+      )}
+
+      {!data && !loading && (
+        <div className="text-center py-12 text-zinc-500">
+          <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-30" />
+          <p className="text-sm">Click &ldquo;Load Data&rdquo; to see your cost breakdown</p>
+          <p className="text-xs mt-1 text-zinc-600">Tracks every LLM call and Exa search made by your account</p>
+        </div>
+      )}
+
+      {data && (
+        <>
+          {/* Summary row */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            {[
+              { label: 'Total API Calls', value: data.totalCalls.toLocaleString(), sub: 'since tracking started' },
+              { label: 'Total Spend', value: `$${data.grandTotalCost.toFixed(4)}`, sub: 'USD, real cost' },
+              { label: 'Avg Daily Cost', value: `$${avgDailyCost.toFixed(4)}`, sub: 'based on active days' },
+              { label: 'Cost / Call', value: data.totalCalls > 0 ? `$${(data.grandTotalCost / data.totalCalls).toFixed(5)}` : '—', sub: 'blended average' },
+            ].map(stat => (
+              <div key={stat.label} className="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 text-center">
+                <div className="text-xl font-black text-white mb-0.5">{stat.value}</div>
+                <div className="text-[10px] text-zinc-500 font-medium uppercase tracking-widest">{stat.label}</div>
+                <div className="text-[10px] text-zinc-600 mt-0.5">{stat.sub}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Feature breakdown */}
+          {data.featureBreakdown.length > 0 && (
+            <div className="mb-8">
+              <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4">Cost by Feature</p>
+              <div className="space-y-2">
+                {data.featureBreakdown.map(f => (
+                  <div key={f.feature} className="flex items-center gap-3">
+                    <div className="w-32 shrink-0 text-xs text-zinc-400 truncate">{FEATURE_LABELS[f.feature] || f.feature}</div>
+                    <div className="flex-1 bg-zinc-900 rounded-full h-2 overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full"
+                        style={{ width: `${Math.min(100, (f.totalCost / maxCost) * 100)}%` }}
+                      />
+                    </div>
+                    <div className="w-20 text-right">
+                      <span className="text-xs font-mono text-white">${f.totalCost.toFixed(5)}</span>
+                    </div>
+                    <div className="w-14 text-right">
+                      <span className="text-[10px] text-zinc-500">{f.calls} calls</span>
+                    </div>
+                    <div className="w-20 text-right hidden md:block">
+                      <span className="text-[10px] text-zinc-600">${f.avgCostPerCall.toFixed(5)}/call</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Daily spend sparkline (text-based) */}
+          {data.dailySpend.length > 0 && (
+            <div className="mb-8">
+              <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">Daily Spend (last {data.dailySpend.length} days)</p>
+              <div className="flex items-end gap-1 h-12">
+                {data.dailySpend.map(d => {
+                  const maxDay = Math.max(...data.dailySpend.map(x => x.cost), 0.000001);
+                  const pct = Math.max(4, (d.cost / maxDay) * 100);
+                  return (
+                    <div key={d.date} className="flex-1 flex flex-col items-center justify-end h-full group relative">
+                      <div
+                        className="w-full bg-emerald-500/60 hover:bg-emerald-400 rounded-sm transition-colors"
+                        style={{ height: `${pct}%` }}
+                        title={`${d.date}: $${d.cost.toFixed(6)}`}
+                      />
+                      <div className="absolute bottom-full mb-1 text-[10px] text-zinc-300 bg-zinc-800 px-1.5 py-0.5 rounded hidden group-hover:block whitespace-nowrap z-10">
+                        {d.date}<br />${d.cost.toFixed(6)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {data.totalCalls === 0 && (
+            <div className="text-center py-6 text-zinc-600 text-sm mb-8">
+              No cost entries yet — use the platform features above to start tracking.
+            </div>
+          )}
+
+          {/* Pricing calculator */}
+          <div className="bg-zinc-950 border border-zinc-700 rounded-2xl p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Calculator className="w-4 h-4 text-pink-400" />
+              <p className="text-sm font-bold text-white">Subscription Pricing Calculator</p>
+            </div>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="text-xs text-zinc-400 uppercase tracking-widest mb-2 block">Target Subscribers</label>
+                <input
+                  type="range"
+                  min={10}
+                  max={10000}
+                  step={10}
+                  value={subscribers}
+                  onChange={e => setSubscribers(Number(e.target.value))}
+                  className="w-full accent-pink-500"
+                />
+                <div className="flex justify-between text-xs text-zinc-500 mt-1">
+                  <span>10</span>
+                  <span className="font-bold text-white">{subscribers.toLocaleString()} subscribers</span>
+                  <span>10,000</span>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {[
+                  { label: 'Monthly API cost / user', value: `$${projectedMonthlyCostPerUser.toFixed(4)}` },
+                  { label: `Total monthly cost (${subscribers.toLocaleString()} users)`, value: `$${projectedMonthlyCostTotal.toFixed(2)}` },
+                  { label: 'Suggested price (3× margin)', value: `$${suggestedPrice}/mo`, highlight: true },
+                  { label: 'Projected monthly revenue', value: `$${(suggestedPrice * subscribers).toLocaleString()}`, highlight: true },
+                  { label: 'Projected net margin', value: `$${Math.max(0, suggestedPrice * subscribers - projectedMonthlyCostTotal).toLocaleString()}`, green: true },
+                ].map(row => (
+                  <div key={row.label} className="flex justify-between items-center">
+                    <span className="text-xs text-zinc-500">{row.label}</span>
+                    <span className={`text-sm font-bold ${row.green ? 'text-emerald-400' : row.highlight ? 'text-pink-400' : 'text-white'}`}>
+                      {row.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <p className="text-[10px] text-zinc-600 mt-4">
+              Based on your actual API usage pattern. 3× cost margin is conservative — SaaS tooling typically runs 5–10×. Assumes usage scales linearly with subscribers.
+            </p>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 const ADMIN_BYPASS = process.env.NEXT_PUBLIC_ADMIN_BYPASS === 'true';
 const BYPASS_UID = 'auspexi-admin-bypass';
@@ -18,6 +253,48 @@ export default function SuperuserPage() {
   const [isSeeding, setIsSeeding] = useState(false);
   const [isGeoSeeding, setIsGeoSeeding] = useState(false);
   const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Tier management
+  const [tierEmail, setTierEmail] = useState('');
+  const [selectedTier, setSelectedTier] = useState('Premium');
+  const [isUpdatingTier, setIsUpdatingTier] = useState(false);
+
+  const TIERS = ['Free', 'Basic', 'Medium', 'Pro', 'Business', 'Premium', 'Enterprise', 'PipelineOffer'];
+
+  const updateUserTier = async () => {
+    if (!tierEmail.trim()) return;
+    setIsUpdatingTier(true);
+    setStatus(null);
+    try {
+      const q = query(collection(db, 'users'), where('email', '==', tierEmail.trim().toLowerCase()));
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        setStatus({ type: 'error', message: `No user found with email: ${tierEmail}` });
+        return;
+      }
+      await updateDoc(snap.docs[0].ref, { tier: selectedTier });
+      setStatus({ type: 'success', message: `Tier updated to "${selectedTier}" for ${tierEmail}` });
+      setTierEmail('');
+    } catch (err: any) {
+      setStatus({ type: 'error', message: `Failed: ${err.message}` });
+    } finally {
+      setIsUpdatingTier(false);
+    }
+  };
+
+  const setOwnTier = async (tier: string) => {
+    if (!user) return;
+    setIsUpdatingTier(true);
+    setStatus(null);
+    try {
+      await updateDoc(doc(db, 'users', user.uid), { tier });
+      setStatus({ type: 'success', message: `Your tier set to "${tier}". Refresh to see changes.` });
+    } catch (err: any) {
+      setStatus({ type: 'error', message: `Failed: ${err.message}` });
+    } finally {
+      setIsUpdatingTier(false);
+    }
+  };
 
   const effectiveUid = user?.uid ?? (ADMIN_BYPASS ? BYPASS_UID : null);
 
@@ -376,6 +653,68 @@ export default function SuperuserPage() {
           ))}
         </div>
       </div>
+
+      {/* Tier Management */}
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center">
+            <UserCog className="w-5 h-5 text-blue-400" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-white">User Tier Management</h3>
+            <p className="text-xs text-zinc-500 mt-0.5">Change any user's tier to unlock dashboard features</p>
+          </div>
+        </div>
+
+        {/* Quick-set own tier */}
+        <div className="mb-6">
+          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">Quick-set your own tier</p>
+          <div className="flex flex-wrap gap-2">
+            {TIERS.map(t => (
+              <button
+                key={t}
+                onClick={() => setOwnTier(t)}
+                disabled={isUpdatingTier}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all disabled:opacity-50
+                  border-zinc-700 text-zinc-400 hover:border-blue-500/50 hover:text-blue-400 hover:bg-blue-500/5"
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Update another user by email */}
+        <div>
+          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">Update another user by email</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="email"
+              value={tierEmail}
+              onChange={e => setTierEmail(e.target.value)}
+              placeholder="user@example.com"
+              className="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+            />
+            <select
+              value={selectedTier}
+              onChange={e => setSelectedTier(e.target.value)}
+              className="bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+            >
+              {TIERS.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+            <button
+              onClick={updateUserTier}
+              disabled={isUpdatingTier || !tierEmail.trim()}
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 whitespace-nowrap"
+            >
+              {isUpdatingTier ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserCog className="w-4 h-4" />}
+              Update Tier
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {effectiveUid && <CostAuditPanel userId={effectiveUid} />}
 
       <div className="p-6 bg-zinc-900/30 border border-zinc-800 rounded-2xl">
         <div className="flex items-center gap-3 mb-4">

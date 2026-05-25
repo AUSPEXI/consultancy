@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Cell, ReferenceArea, PieChart, Pie } from 'recharts';
 import { TrendingUp, Users, Target, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, HelpCircle, Sparkles } from 'lucide-react';
+import { SyntheticDataPanel } from '@/components/dashboard/SyntheticDataPanel';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
@@ -291,7 +292,7 @@ export default function OverviewPage() {
     { name: 'ChatGPT', visibility: Math.min(100, Math.max(0, safePlatforms.chatgpt)), fill: '#10a37f' },
     { name: 'Perplexity', visibility: Math.min(100, Math.max(0, safePlatforms.perplexity)), fill: '#22d3ee' },
     { name: 'Claude', visibility: Math.min(100, Math.max(0, safePlatforms.claude)), fill: '#d97757' },
-    { name: 'Gemini', visibility: Math.min(100, Math.max(0, safePlatforms.gemini)), fill: '#4285f4' },
+    { name: 'Google AI', visibility: Math.min(100, Math.max(0, safePlatforms.gemini)), fill: '#4285f4' },
   ];
 
   const chartData = metrics.length > 0 ? metrics.slice(-5) : displayData.slice(-5);
@@ -351,7 +352,7 @@ export default function OverviewPage() {
         const driftLabel = latestAnomaly ? `${Math.abs(latestAnomaly.zScore).toFixed(1)}σ Anomaly` : '-3.2σ Threshold';
         const driftMsg = latestAnomaly
           ? `Live anomaly detected (z=${zScore}) in your latent projections. Immediate recalibration recommended to protect your SOV.`
-          : 'Anomaly detected in "API Latency" clusters within Gemini-2.5-flash latent projections. Run an audit to establish your baseline and protect your A-SOV.';
+          : 'Anomaly detected in "API Latency" clusters within your latent space projections. Run an audit to establish your baseline and protect your A-SOV.';
         if (!showDrift) return null;
         return (
           <div className="mb-6 p-6 bg-rose-500/10 border border-rose-500/20 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
@@ -507,7 +508,7 @@ export default function OverviewPage() {
               <div className="space-y-1"><h3 className="text-xl font-bold text-white tracking-tight">Neural Cluster Distribution</h3><p className="text-xs text-zinc-500 max-w-md font-medium">Mapping your brand anchors across the LLM collective latent space.</p></div>
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-1 p-1 bg-zinc-900/50 rounded-xl border border-zinc-800">
-                  {['All', 'Gemini', 'ChatGPT', 'Claude'].map(p => (<button key={p} onClick={() => setSelectedPlatform(p)} className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${selectedPlatform === p ? 'bg-pink-600 text-white shadow-lg shadow-pink-600/20' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}>{p}</button>))}
+                  {['All', 'Google AI', 'ChatGPT', 'Claude'].map(p => (<button key={p} onClick={() => setSelectedPlatform(p)} className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${selectedPlatform === p ? 'bg-pink-600 text-white shadow-lg shadow-pink-600/20' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}>{p}</button>))}
                 </div>
                 <div className="flex items-center gap-1 p-1 bg-zinc-900/50 rounded-xl border border-zinc-800">
                   {['current', 'week', 'month'].map(t => (<button key={t} onClick={() => setSelectedTimeframe(t)} className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${selectedTimeframe === t ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}>{t === 'current' ? 'Live' : t === 'week' ? '7D Roll' : '30D Roll'}</button>))}
@@ -645,6 +646,9 @@ export default function OverviewPage() {
           )}
         </div>
       </div>
+
+      {/* Synthetic Dataset Analytics */}
+      <SyntheticDataPanel />
     </div>
   );
 }

@@ -31,6 +31,7 @@ export async function POST(request: Request) {
       model: 'gemini-2.0-flash',
       prompt,
       schema: SimulatorSchema,
+      feature: 'simulator',
     });
 
     if (!result.success) {

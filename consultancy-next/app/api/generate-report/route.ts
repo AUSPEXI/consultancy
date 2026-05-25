@@ -24,6 +24,7 @@ export async function POST(request: Request) {
       provider: 'gemini',
       model: 'gemini-2.0-flash',
       prompt,
+      feature: 'generate-report',
     });
 
     if (!result.success) return NextResponse.json({ error: result.error }, { status: 500 });

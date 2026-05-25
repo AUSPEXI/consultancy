@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
       model: 'gemini-2.0-flash',
       prompt,
       schema: AnchorsSchema,
+      feature: 'vault-anchors',
     });
 
     if (!result.success) {

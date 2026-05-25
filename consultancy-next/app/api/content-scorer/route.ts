@@ -64,6 +64,7 @@ export async function POST(request: Request) {
       model: 'gemini-2.0-flash',
       prompt,
       schema: ContentScorerSchema,
+      feature: 'content-scorer',
     });
 
     if (!result.success) {

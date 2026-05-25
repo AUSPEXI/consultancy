@@ -2,67 +2,118 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Target, BrainCircuit, LineChart, ShieldCheck, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Target, BrainCircuit, LineChart, ShieldCheck, ArrowRight, CheckCircle2, Database, Network, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
 
+const THESIS = [
+  {
+    stat: '70%',
+    label: 'of search journeys now start with an AI engine',
+    detail: 'Google, ChatGPT, Perplexity, Claude — the discovery layer has fundamentally shifted. Traditional SEO optimises for a ranking algorithm. GEO engineers the underlying knowledge that makes AI cite you as the answer.',
+  },
+  {
+    stat: '< 3%',
+    label: 'of brands have any structured GEO presence',
+    detail: 'The majority of businesses are invisible to AI by default. Their content exists, but it lacks the entity density, schema architecture, and semantic anchoring that forces AI models to surface them.',
+  },
+  {
+    stat: '18 months',
+    label: 'ahead of agencies still selling keyword strategies',
+    detail: 'The window to establish category authority in AI-generated responses is open now. Early movers who engineer their AI presence today will be the default citations for years. Late movers will pay to catch up.',
+  },
+];
+
+const PILLARS = [
+  {
+    icon: <Target className="w-6 h-6 text-zinc-100" />,
+    title: 'Citation Engineering',
+    desc: 'We architect the exact data structures — JSON-LD schema, entity graphs, semantic anchors — that force AI models to cite your brand as the authoritative source for high-intent queries.',
+  },
+  {
+    icon: <Database className="w-6 h-6 text-zinc-100" />,
+    title: 'Share of Voice Measurement',
+    desc: 'Real measurement of how often leading AI engines recommend your brand. Not estimated. Not inferred. Tested live, tracked over time, with per-query visibility into where you are and where you are not.',
+  },
+  {
+    icon: <BrainCircuit className="w-6 h-6 text-zinc-100" />,
+    title: 'Semantic Moat Construction',
+    desc: 'Your brand\'s knowledge vault — mapped in 768-dimensional space. Facts that are structured, dense, and positioned so that AI models retrieve them with high confidence across every relevant query cluster.',
+  },
+  {
+    icon: <Network className="w-6 h-6 text-zinc-100" />,
+    title: 'Multi-Agent Content Pipeline',
+    desc: 'Automated orchestration from topic to published, citable content. Neural crawl, fact extraction, schema generation, and synthesis — without hallucination. Content that LLMs can read, trust, and repeat.',
+  },
+];
+
+const PLATFORM_STATS = [
+  { value: '10,000+', label: 'Market signals in the GEO data lake' },
+  { value: '768-D', label: 'Semantic embedding dimensions' },
+  { value: '4', label: 'Major AI engines tracked and measured' },
+  { value: '7', label: 'Live citation probe queries per run' },
+];
+
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-24 pb-16 overflow-x-hidden">
+    <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-24 pb-32 overflow-x-hidden">
       <PublicHeader />
       <div className="max-w-7xl mx-auto px-6">
+
+        {/* Hero */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center max-w-4xl mx-auto mb-20"
+          className="text-center max-w-4xl mx-auto mb-24"
         >
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-zinc-800 bg-zinc-900/50 text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-8">
+            <Zap className="w-3 h-3 text-pink-400" />
+            Generative Engine Optimization
+          </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-            Mastering Brand Visibility in the <span className="text-zinc-400">Generative Era</span>
+            The Infrastructure Layer for <span className="text-zinc-400">AI-Era Brand Authority</span>
           </h1>
-          <p className="text-lg md:text-xl text-zinc-400 max-w-3xl mx-auto leading-relaxed font-sans">
-            Search has fundamentally changed. We build the deterministic infrastructure required to ensure your business is cited, recommended, and trusted by the world&apos;s leading AI models.
+          <p className="text-lg md:text-xl text-zinc-400 max-w-3xl mx-auto leading-relaxed">
+            Search has changed permanently. We build the deterministic infrastructure that ensures your business is cited, recommended, and trusted by the world&apos;s leading AI models — not left to chance.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-12 items-center mb-32">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="relative"
-          >
-            <div className="aspect-square rounded-2xl overflow-hidden bg-zinc-900 relative shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/95 via-zinc-950/40 to-transparent" />
-              <div className="absolute bottom-8 left-8">
-                <h3 className="text-3xl font-bold text-white mb-1 font-heading">Gwylym Pryce-Owen</h3>
-                <p className="text-zinc-300 text-lg">Founder & Chief AI Architect</p>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="space-y-6 text-zinc-300 text-lg leading-relaxed font-sans"
-          >
-            <h2 className="text-3xl font-bold text-white mb-6 font-heading">Built by Enterprise AI Architects</h2>
-            <p>Most systems optimize for one goal and break five. We look at the complete ecosystem. While our roots in digital visibility run deep—spanning over two decades of leading search strategies—the paradigm has radically shifted. Generative AI requires fundamentally different architecture.</p>
-            <p>We are not an agency playing with prompts. Our team engineers production-grade, deterministic AI systems. From deploying billion-row synthetic data pipelines at enterprise scale, to building multi-tenant architectures protected by 6-layer security, we operate at the bleeding edge of the AI frontier.</p>
-            <p>By understanding exactly how LLMs retrieve, cross-reference, and synthesize data, we focus on engineering your future outcomes. Instead of measuring past responses, our architecture actively secures your visibility for tomorrow&apos;s queries.</p>
-            <p>That&apos;s why we built <strong>Auspexi</strong>. Founded on data science and strategic schema frameworks, Auspexi doesn&apos;t just monitor the algorithms—it ensures your brand becomes the irrefutable, deterministic answer within an AI&apos;s neural network. We don&apos;t guess; we engineer your visibility.</p>
-            <div className="pt-6">
-              <Link href="/#pricing">
-                <Button className="bg-white text-black hover:bg-zinc-200 rounded-full px-8 py-6 text-base font-medium shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
-                  Secure Your GEO Advantage <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
+        {/* Founding Thesis — 3 stats */}
+        <div className="grid md:grid-cols-3 gap-6 mb-32">
+          {THESIS.map((t, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.03)]"
+            >
+              <div className="text-5xl font-black text-white mb-3 tracking-tight">{t.stat}</div>
+              <div className="text-sm font-semibold text-pink-400 mb-4 uppercase tracking-widest">{t.label}</div>
+              <p className="text-zinc-400 text-sm leading-relaxed">{t.detail}</p>
+            </motion.div>
+          ))}
         </div>
 
+        {/* Platform stats bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-px bg-zinc-800 rounded-2xl overflow-hidden mb-32 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]"
+        >
+          {PLATFORM_STATS.map((s, i) => (
+            <div key={i} className="bg-zinc-950 px-8 py-10 text-center">
+              <div className="text-3xl font-black text-white mb-1">{s.value}</div>
+              <div className="text-xs text-zinc-500 font-medium">{s.label}</div>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Why GEO section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -70,27 +121,26 @@ export default function AboutPage() {
           className="bg-zinc-900/50 rounded-3xl p-8 md:p-16 mb-32 relative overflow-hidden shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]"
         >
           <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-zinc-800/30 rounded-full blur-3xl" />
-          <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10 font-sans">
-            <h2 className="text-3xl md:text-4xl font-bold text-white font-heading">Why Generative Engine Optimization?</h2>
+          <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-white">Why Generative Engine Optimization?</h2>
             <p className="text-xl text-zinc-400">We are moving from an era of probabilistic guesswork to deterministic truth.</p>
-            <p className="text-lg text-zinc-300">At Auspexi, we believe that true visibility requires proactive engineering. When a customer asks ChatGPT or Perplexity for a recommendation, the AI relies on deep structured data. By mapping your brand seamlessly across these vast knowledge libraries, we ensure you become the deterministic answer.</p>
-            <blockquote className="border-l-4 border-zinc-500 pl-8 py-4 my-12 text-2xl font-medium italic text-zinc-200 text-left bg-zinc-900/50 rounded-r-xl font-sans">
-              &ldquo;The future of digital visibility is engineering the fundamental knowledge graphs to ensure your brand becomes the irrefutable truth in the AI era.&rdquo;
+            <p className="text-lg text-zinc-300 leading-relaxed">
+              When a customer asks an AI for a recommendation, the model doesn&apos;t crawl the web in real time — it retrieves from structured knowledge. Brands that have engineered their presence into that knowledge layer get cited. Brands that haven&apos;t, don&apos;t. Auspexi exists to close that gap systematically, measurably, and permanently.
+            </p>
+            <blockquote className="border-l-4 border-zinc-500 pl-8 py-4 my-12 text-2xl font-medium italic text-zinc-200 text-left bg-zinc-900/50 rounded-r-xl">
+              &ldquo;The future of digital visibility is engineering the fundamental knowledge structure so your brand becomes the irrefutable answer in the AI era.&rdquo;
             </blockquote>
           </div>
         </motion.div>
 
+        {/* Four pillars */}
         <div className="mb-32">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 font-heading">The Auspexi Advantage</h2>
-            <p className="text-xl text-zinc-400 max-w-3xl mx-auto font-sans">Built on deep AI architectural principles, our platform ensures your brand is the logical output for high-intent queries.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">The Platform Architecture</h2>
+            <p className="text-xl text-zinc-400 max-w-3xl mx-auto">Four integrated capabilities. One outcome: your brand as the AI-era authority in your category.</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { icon: <Target className="w-8 h-8 text-zinc-100" />, title: "Ontological Interoperability", desc: "We don't rely on simple keywords. We build sophisticated semantic frameworks, making incompatible LLM knowledge libraries recognize your brand's authority seamlessly." },
-              { icon: <BrainCircuit className="w-8 h-8 text-zinc-100" />, title: "Enterprise AI Orchestration", desc: "Powered by complex multi-model routing and synthetic data pipelines, our backend engineers deep, deterministic consensus rather than just tracking it." },
-              { icon: <LineChart className="w-8 h-8 text-zinc-100" />, title: "Proactive GEO Influence", desc: "Auspexi architects the foundational data layer required to actively secure citations, turning passive visibility into a verifiable, deterministic outcome." }
-            ].map((feature, i) => (
+          <div className="grid md:grid-cols-2 gap-6">
+            {PILLARS.map((p, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -99,23 +149,60 @@ export default function AboutPage() {
                 transition={{ delay: i * 0.1 }}
                 className="bg-zinc-900 rounded-2xl p-8 hover:bg-zinc-800/80 transition-colors shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]"
               >
-                <div className="w-16 h-16 bg-zinc-950 border border-zinc-800 rounded-xl flex items-center justify-center mb-6">{feature.icon}</div>
-                <h3 className="text-xl font-bold text-white mb-4 font-heading">{feature.title}</h3>
-                <p className="text-zinc-400 leading-relaxed text-sm font-sans">{feature.desc}</p>
+                <div className="w-12 h-12 bg-zinc-950 border border-zinc-800 rounded-xl flex items-center justify-center mb-6">{p.icon}</div>
+                <h3 className="text-xl font-bold text-white mb-3">{p.title}</h3>
+                <p className="text-zinc-400 leading-relaxed text-sm">{p.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+        {/* From the Founder — small, credible, not dominating */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-32"
+        >
+          <div className="max-w-4xl mx-auto bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 md:p-12">
+            <div className="flex flex-col md:flex-row gap-8 items-start">
+              <div className="shrink-0">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden border border-zinc-700 shadow-[0_0_0_2px_rgba(190,24,93,0.4)]">
+                  <img
+                    src="/bio-pic.png"
+                    alt="Gwylym Pryce-Owen"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+              <div className="flex-1">
+                <p className="text-zinc-300 text-lg leading-relaxed italic mb-6">
+                  &ldquo;Two decades in digital strategy taught me one thing — every major platform shift creates a brief window where early movers lock in structural advantages that compound for years. We are at that window with AI now. Auspexi is built to make sure the brands that move first get the citations that matter, before the space saturates.&rdquo;
+                </p>
+                <div>
+                  <div className="font-bold text-white">Gwylym Pryce-Owen</div>
+                  <div className="text-sm text-zinc-500">Founder, Auspexi</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Partner with authority + CTA */}
+        <div className="grid md:grid-cols-2 gap-12 items-start mb-16">
           <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-8">
-            <div className="font-sans">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 font-heading">Partner with Authority</h2>
-              <p className="text-xl text-zinc-400 mb-8">When you subscribe to Auspexi, you aren&apos;t just buying software. You are partnering with a dedicated engineering unit that understands the fundamental architecture of the AI revolution.</p>
-              <ul className="space-y-6">
-                {["Makers of billion-row synthetic data pipelines and Edge LLMs", "Enterprise environments secured by 6-layer GDPR architecture", "Pioneers of semantic mapping and structured entity data", "Engineers operating 18+ months ahead of traditional agencies"].map((item, i) => (
-                  <li key={i} className="flex items-start gap-4 text-zinc-300 text-lg">
-                    <CheckCircle2 className="w-6 h-6 text-zinc-500 shrink-0 mt-1" />
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Built on Evidence, Not Estimates</h2>
+              <p className="text-xl text-zinc-400 mb-8">Every Auspexi recommendation is grounded in live measurement — not industry averages or projected models.</p>
+              <ul className="space-y-5">
+                {[
+                  'Live citation testing across AI engines — not simulated, not sampled',
+                  'Semantic embedding of your brand facts into a real 768-dimensional space',
+                  'Automated content pipeline from topic to published, schema-structured article',
+                  'Trend tracking from baseline — so you know whether your position is improving',
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-4 text-zinc-300">
+                    <CheckCircle2 className="w-5 h-5 text-pink-500 shrink-0 mt-0.5" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -124,13 +211,18 @@ export default function AboutPage() {
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="bg-zinc-900 rounded-3xl p-8 md:p-12 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
             <ShieldCheck className="w-12 h-12 text-zinc-100 mb-8" />
-            <h3 className="text-3xl font-bold text-white mb-6 font-heading">Don&apos;t Get Left Behind</h3>
-            <p className="text-zinc-400 text-lg mb-10 leading-relaxed font-sans">The transition to Agentic AI and Generative Search is happening now. Secure your brand&apos;s position as the authoritative answer for years to come.</p>
+            <h3 className="text-3xl font-bold text-white mb-4">The Window Is Open Now</h3>
+            <p className="text-zinc-400 text-lg mb-10 leading-relaxed">
+              The transition to AI-first search is happening faster than most organisations have planned for. The brands that establish GEO authority in the next 12 months will be the ones competitors are paying to catch up to in 36.
+            </p>
             <Link href="/#pricing">
-              <Button className="w-full bg-white text-black hover:bg-zinc-200 rounded-xl py-6 text-lg font-medium shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">Start Your GEO Journey</Button>
+              <Button className="w-full bg-white text-black hover:bg-zinc-200 rounded-xl py-6 text-lg font-medium shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+                Start Your GEO Journey <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
             </Link>
           </motion.div>
         </div>
+
       </div>
       <Footerdemo />
     </div>

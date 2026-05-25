@@ -72,7 +72,7 @@ export async function POST(request: Request) {
       { name: 'ChatGPT',    sov: Math.round(avgChatgpt),    sentiment: engineSentiment('gpt'),        trend: overallTrend },
       { name: 'Perplexity', sov: Math.round(avgPerplexity), sentiment: engineSentiment('perplexity'),  trend: overallTrend },
       { name: 'Claude',     sov: Math.round(avgClaude),     sentiment: engineSentiment('claude'),      trend: overallTrend },
-      { name: 'Gemini',     sov: Math.round(avgGemini),     sentiment: engineSentiment('gemini'),      trend: overallTrend },
+      { name: 'Google AI',  sov: Math.round(avgGemini),     sentiment: engineSentiment('gemini'),      trend: overallTrend },
     ];
 
     const insights = buildInsights(keyword.trim(), rows, avgChatgpt, avgPerplexity, avgClaude, avgGemini, aggregateSov);

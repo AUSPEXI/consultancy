@@ -27,6 +27,7 @@ export default function AgentsPage() {
   const [generatedSchema, setGeneratedSchema] = useState('');
   const [finalArticle, setFinalArticle] = useState('');
   const [showResults, setShowResults] = useState(false);
+  const [publishMsg, setPublishMsg] = useState('');
 
   useEffect(() => {
     const handleSetTopic = (e: any) => { if (e.detail?.topic) setTopic(e.detail.topic); };
@@ -48,7 +49,7 @@ export default function AgentsPage() {
 
   const resetState = () => {
     setCrawlerStatus('idle'); setExtractionStatus('idle'); setSchemaStatus('idle'); setSynthesisStatus('idle');
-    setExtractedFacts(''); setGeneratedSchema(''); setFinalArticle(''); setShowResults(false); setRateLimitWarning('');
+    setExtractedFacts(''); setGeneratedSchema(''); setFinalArticle(''); setShowResults(false); setRateLimitWarning(''); setPublishMsg('');
   };
 
   const runOrchestration = async () => {
@@ -102,12 +103,12 @@ export default function AgentsPage() {
       setShowResults(true);
     } catch (error: any) {
       console.error('Orchestration failed:', error);
-      if (error?.message?.includes('429')) setRateLimitWarning('Google API rate limit exceeded. Please wait a bit.');
+      if (error?.message?.includes('429')) setRateLimitWarning('Google API rate limit exceeded. Please wait a bit before retrying.');
+      else setRateLimitWarning(error?.message || 'Agent workflow failed. Check console for details.');
       setCrawlerStatus(prev => prev === 'running' ? 'error' : prev);
       setExtractionStatus(prev => prev === 'running' ? 'error' : prev);
       setSchemaStatus(prev => prev === 'running' ? 'error' : prev);
       setSynthesisStatus(prev => prev === 'running' ? 'error' : prev);
-      alert('Agent workflow failed. Check console for details.');
     } finally {
       setIsOrchestrating(false);
     }
@@ -115,17 +116,21 @@ export default function AgentsPage() {
 
   const handlePublishToCms = async () => {
     setIsPublishing(true);
+    setPublishMsg('');
     try {
       const articlePayload = { userId: user?.uid || 'anonymous', topic, article: finalArticle, facts: extractedFacts, schema: generatedSchema, brand: userData?.brand || '', timestamp: new Date().toISOString() };
       await addDoc(collection(db, 'articles'), articlePayload);
       if (userData?.cmsWebhookUrl) {
         const response = await fetch(userData.cmsWebhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(articlePayload) });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) throw new Error(`Webhook returned ${response.status}`);
+        const webhookData = await response.json().catch(() => ({}));
+        setPublishMsg(webhookData.emailed ? `Saved and emailed to ${webhookData.to}` : 'Saved to database and sent to webhook.');
+      } else {
+        setPublishMsg('Saved to database. Add a webhook URL in Settings to also receive email notifications.');
       }
-      alert(userData?.cmsWebhookUrl ? 'Successfully saved to Database and published via Webhook!' : 'Successfully saved to Native Database!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Publish error:', error);
-      alert('Failed to publish content. Check console for details.');
+      setPublishMsg(`Error: ${error.message}`);
     } finally {
       setIsPublishing(false);
     }
@@ -224,19 +229,26 @@ export default function AgentsPage() {
                 <div className="text-sm text-zinc-300 prose prose-invert max-w-none">
                   <ReactMarkdown>{finalArticle}</ReactMarkdown>
                 </div>
-                <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-end gap-3">
-                  <button
-                    onClick={() => {
-                      window.dispatchEvent(new CustomEvent('draft-content', { detail: { content: finalArticle, type: 'blog' } }));
-                    }}
-                    className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
-                  >
-                    <BrainCircuit className="w-4 h-4" /> Verify AI Extractability
-                  </button>
-                  <button onClick={handlePublishToCms} disabled={isPublishing} className="bg-white hover:bg-zinc-200 disabled:opacity-50 text-black px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2">
-                    {isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                    {isPublishing ? 'Publishing...' : 'Publish to Database & CMS'} <ArrowRight className="w-4 h-4" />
-                  </button>
+                <div className="mt-6 pt-4 border-t border-zinc-800 flex flex-col gap-3">
+                  {publishMsg && (
+                    <p className={`text-xs px-3 py-2 rounded-md ${publishMsg.startsWith('Error') ? 'bg-rose-500/10 text-rose-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
+                      {publishMsg}
+                    </p>
+                  )}
+                  <div className="flex justify-end gap-3">
+                    <button
+                      onClick={() => {
+                        window.dispatchEvent(new CustomEvent('draft-content', { detail: { content: finalArticle, type: 'blog' } }));
+                      }}
+                      className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
+                    >
+                      <BrainCircuit className="w-4 h-4" /> Verify AI Extractability
+                    </button>
+                    <button onClick={handlePublishToCms} disabled={isPublishing} className="bg-white hover:bg-zinc-200 disabled:opacity-50 text-black px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2">
+                      {isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                      {isPublishing ? 'Publishing...' : 'Publish to Database & CMS'} <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
