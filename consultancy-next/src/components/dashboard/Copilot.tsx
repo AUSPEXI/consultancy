@@ -629,7 +629,8 @@ ${knowledgeContext}`;
         body: JSON.stringify({
           userMessage,
           chatHistory: history,
-          systemInstruction: systemInstruction
+          userId: auth.currentUser?.uid || 'copilot-user',
+          activeTab,
         })
       });
 
