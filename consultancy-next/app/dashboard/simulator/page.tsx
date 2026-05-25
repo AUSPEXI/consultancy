@@ -22,7 +22,7 @@ export default function SimulatorPage() {
           <h1 className="text-3xl font-bold font-heading mb-2">Multi-Engine SOV Simulator</h1>
           <p className="text-zinc-400">Simulate how different LLMs respond to high-intent queries and track your Share of Voice.</p>
         </div>
-        <UpgradePrompt title="Simulator Locked" description="Upgrade to the Medium tier to access the Multi-Engine SOV Simulator and see exactly how ChatGPT, Claude, Gemini, and Perplexity view your brand." requiredTier="Medium" />
+        <UpgradePrompt title="Simulator Locked" description="Upgrade to the Medium tier to access the Multi-Engine SOV Simulator and see exactly how leading AI engines view your brand." requiredTier="Medium" />
       </div>
     );
   }
@@ -102,9 +102,9 @@ export default function SimulatorPage() {
             <div className="text-4xl font-bold text-pink-400">{results.sovScore}%</div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <EngineCard name="ChatGPT (OpenAI)" data={results.chatgpt} />
+            <EngineCard name="ChatGPT" data={results.chatgpt} />
             <EngineCard name="Claude (Anthropic)" data={results.claude} />
-            <EngineCard name="Gemini (Google)" data={results.gemini} />
+            <EngineCard name="Google AI" data={results.gemini} />
             <EngineCard name="Perplexity" data={results.perplexity} />
           </div>
         </div>

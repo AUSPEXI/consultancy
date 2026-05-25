@@ -104,7 +104,7 @@ export default function CiteProbePage() {
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">AI Citation Probe</h1>
           <p className="text-sm text-zinc-400 mt-1">
-            Asks Gemini real GEO-space questions right now and checks if <span className="text-white font-medium">{brand}</span> gets cited.
+            Queries the Auspexi Citation Engine with real GEO-space questions and checks if <span className="text-white font-medium">{brand}</span> gets cited.
           </p>
         </div>
         <button
@@ -131,7 +131,7 @@ export default function CiteProbePage() {
             <Zap className="absolute inset-0 m-auto w-6 h-6 text-pink-400 animate-pulse" />
           </div>
           <p className="text-white font-semibold">Querying AI engines...</p>
-          <p className="text-zinc-400 text-sm mt-2">Sending 7 real GEO-space questions to Gemini and checking for <span className="text-white">{brand}</span></p>
+          <p className="text-zinc-400 text-sm mt-2">Sending 7 real GEO-space questions to the Auspexi Citation Engine and checking for <span className="text-white">{brand}</span></p>
         </div>
       )}
 
@@ -186,7 +186,7 @@ export default function CiteProbePage() {
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
             <div className="px-6 py-4 border-b border-zinc-800">
               <h3 className="text-sm font-semibold text-white">Query Results</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">Live responses from Gemini — does it mention {brand}?</p>
+              <p className="text-xs text-zinc-500 mt-0.5">Live AI engine responses — does it mention {brand}?</p>
             </div>
             <div className="divide-y divide-zinc-800/50">
               {probeData.results.map((r, i) => (
@@ -248,7 +248,7 @@ export default function CiteProbePage() {
           <Zap className="w-10 h-10 text-zinc-600 mx-auto mb-4" />
           <h3 className="text-base font-semibold text-white mb-2">Ready to probe</h3>
           <p className="text-zinc-400 text-sm max-w-md mx-auto">
-            Hits Gemini with 7 real questions people ask when looking for GEO tools.
+            Fires 7 real questions people ask when looking for GEO tools into the Auspexi Citation Engine.
             Checks live whether <span className="text-white font-medium">{brand}</span> or <span className="text-white font-medium">{domain}</span> appears in any answer.
           </p>
         </div>

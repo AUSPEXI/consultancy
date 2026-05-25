@@ -258,7 +258,7 @@ export default {
                    <div className="bg-pink-500 h-full w-[65%] animate-pulse"></div>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
-                   {['GPT-4o', 'Gemini Pro', 'Claude 3.5'].map(m => (
+                   {['AI Engine I', 'AI Engine II', 'AI Engine III'].map(m => (
                       <div key={m} className="bg-zinc-950 border border-zinc-800 rounded p-2 text-center">
                          <div className="text-[10px] text-zinc-500 mb-1">{m}</div>
                          <div className="text-xs text-white font-mono">99.8%</div>

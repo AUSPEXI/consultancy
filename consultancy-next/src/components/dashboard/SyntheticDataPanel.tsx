@@ -22,7 +22,7 @@ const BRAND_COLORS: Record<string, string> = {
 const ENGINE_COLORS: Record<string, string> = {
   ChatGPT: '#10b981',
   Claude: '#f59e0b',
-  Gemini: '#3b82f6',
+  'Google AI': '#3b82f6',
   Perplexity: '#ec4899',
 };
 
@@ -176,7 +176,7 @@ export function SyntheticDataPanel() {
                 <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
                   <div>
                     <h4 className="text-sm font-semibold text-white">Platform SOV by Brand</h4>
-                    <p className="text-xs text-zinc-500 mt-0.5">ChatGPT / Perplexity / Claude / Gemini share per brand</p>
+                    <p className="text-xs text-zinc-500 mt-0.5">ChatGPT / Perplexity / Claude / Google AI share per brand</p>
                   </div>
                   <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5">
                     <select
@@ -199,7 +199,7 @@ export function SyntheticDataPanel() {
                     { subject: 'ChatGPT', value: b.ChatGPT },
                     { subject: 'Perplexity', value: b.Perplexity },
                     { subject: 'Claude', value: b.Claude },
-                    { subject: 'Gemini', value: b.Gemini },
+                    { subject: 'Google AI', value: b.Gemini },
                   ];
                   return (
                     <div className="h-[200px]">
@@ -226,14 +226,14 @@ export function SyntheticDataPanel() {
                       <XAxis dataKey="brand" stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} />
                       <YAxis stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} domain={[0, 100]} />
                       <Tooltip contentStyle={{ backgroundColor: '#09090b', border: '1px solid #27272a', borderRadius: '8px' }} />
-                      {['ChatGPT', 'Perplexity', 'Claude', 'Gemini'].map(p => (
+                      {['ChatGPT', 'Perplexity', 'Claude', 'Google AI'].map(p => (
                         <Bar key={p} dataKey={p} fill={ENGINE_COLORS[p]} radius={[2, 2, 0, 0]} maxBarSize={18} />
                       ))}
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
                 <div className="flex gap-4 flex-wrap">
-                  {['ChatGPT', 'Perplexity', 'Claude', 'Gemini'].map(p => (
+                  {['ChatGPT', 'Perplexity', 'Claude', 'Google AI'].map(p => (
                     <div key={p} className="flex items-center gap-1.5">
                       <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: ENGINE_COLORS[p] }} />
                       <span className="text-[10px] text-zinc-400">{p}</span>
