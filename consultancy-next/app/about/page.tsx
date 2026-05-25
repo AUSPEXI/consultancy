@@ -58,7 +58,7 @@ const PLATFORM_STATS = [
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-24 pb-16 overflow-x-hidden">
+    <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-24 pb-32 overflow-x-hidden">
       <PublicHeader />
       <div className="max-w-7xl mx-auto px-6">
 
@@ -189,7 +189,7 @@ export default function AboutPage() {
         </motion.div>
 
         {/* Partner with authority + CTA */}
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div className="grid md:grid-cols-2 gap-12 items-start mb-16">
           <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-8">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Built on Evidence, Not Estimates</h2>
