@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getExa } from '@/lib/exa';
+import { dbAdmin } from '@/lib/firebase-admin';
 
 export async function POST(request: Request) {
   try {
-    const { topic } = await request.json();
+    const { topic, userId = 'anonymous' } = await request.json();
     if (!topic?.trim()) {
       return NextResponse.json({ error: 'topic is required' }, { status: 400 });
     }
@@ -22,6 +23,22 @@ export async function POST(request: Request) {
       text: r.text || '',
       publishedDate: r.publishedDate || null,
     }));
+
+    // Log Exa search cost: ~$0.025 per search request (neural, 8 results)
+    if (dbAdmin && userId !== 'anonymous') {
+      dbAdmin.collection('cost_audit').add({
+        userId,
+        feature: 'agent-crawl',
+        model: 'exa-neural',
+        provider: 'exa',
+        inputTokens: 0,
+        outputTokens: 0,
+        estimatedCostUsd: 0.025,
+        totalCostUsd: 0.025,
+        exaResults: sources.length,
+        timestamp: new Date().toISOString(),
+      }).catch(() => {});
+    }
 
     return NextResponse.json({
       success: true,

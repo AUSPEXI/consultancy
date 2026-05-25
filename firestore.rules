@@ -211,6 +211,13 @@ service cloud.firestore {
       allow update: if false;
     }
 
+    match /cost_audit/{entryId} {
+      allow read: if isAdmin();
+      allow create: if false; // Written only by server-side admin SDK
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
     // Temporary rules for internal components that might use these collections
     match /competitorScans/{id} {
       allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid) && (request.resource == null || request.resource.data.userId == request.auth.uid);

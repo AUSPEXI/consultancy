@@ -2,6 +2,27 @@ import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { dbAdmin } from '@/lib/firebase-admin';
 
+// Gemini 2.0 Flash: $0.10/1M input, $0.40/1M output tokens
+async function logCiteProbesCost(userId: string, results: any[]): Promise<void> {
+  if (!dbAdmin || userId === 'anonymous') return;
+  // Rough estimate: each probe ~300 input + 200 output tokens
+  const totalInputTokens = results.length * 300;
+  const totalOutputTokens = results.length * 200;
+  const estimatedCostUsd = (totalInputTokens / 1_000_000) * 0.10 + (totalOutputTokens / 1_000_000) * 0.40;
+  await dbAdmin.collection('cost_audit').add({
+    userId,
+    feature: 'cite-probe',
+    model: 'gemini-2.0-flash',
+    provider: 'gemini',
+    inputTokens: totalInputTokens,
+    outputTokens: totalOutputTokens,
+    estimatedCostUsd,
+    totalCostUsd: estimatedCostUsd,
+    queriesRun: results.length,
+    timestamp: new Date().toISOString(),
+  });
+}
+
 // Default GEO-space queries — auspexi's target citation territory
 const DEFAULT_QUERIES = [
   'What are the best tools for generative engine optimization?',
@@ -91,10 +112,11 @@ export async function POST(request: Request) {
       results,
     };
 
-    // Persist to Firestore for trend tracking
+    // Persist to Firestore for trend tracking + cost audit
     if (dbAdmin && userId !== 'anonymous') {
       try {
         await dbAdmin.collection('citation_tests').add(probeResult);
+        logCiteProbesCost(userId, results).catch(() => {});
       } catch (err) {
         console.error('Failed to persist citation test:', err);
       }

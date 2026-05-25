@@ -39,6 +39,7 @@ Return ONLY the markdown fact list. No preamble, no explanation.`;
       provider: 'gemini',
       model: 'gemini-2.0-flash',
       prompt,
+      feature: 'agent-extract',
     });
 
     if (!result.success) {

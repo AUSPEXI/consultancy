@@ -42,6 +42,7 @@ export async function POST(request: Request) {
       model: 'gemini-2.0-flash',
       prompt,
       schema: FactExtractionSchema,
+      feature: 'research-facts',
     });
 
     if (!result.success) {

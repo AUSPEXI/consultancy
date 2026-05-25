@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
       model: 'gemini-2.0-flash',
       contents,
       temperature: 0.7,
+      feature: 'copilot',
     });
 
     if (!result.success) {

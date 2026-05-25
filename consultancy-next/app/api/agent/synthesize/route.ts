@@ -38,6 +38,7 @@ Return ONLY the markdown article. No preamble, no explanation.`;
       provider: 'gemini',
       model: 'gemini-2.0-flash',
       prompt,
+      feature: 'agent-synthesize',
     });
 
     if (!result.success) {

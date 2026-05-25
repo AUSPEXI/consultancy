@@ -30,6 +30,7 @@ ${facts.substring(0, 6000)}
       provider: 'gemini',
       model: 'gemini-2.0-flash',
       prompt,
+      feature: 'agent-schema',
     });
 
     if (!result.success) {
