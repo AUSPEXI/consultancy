@@ -1645,7 +1645,7 @@ This is the kind of data you need before you set your pricing. It's genuinely di
 
 One of the more practical things we shipped this sprint is a simple email notification system for generated articles. Here's the problem it solves: the Agents tab can generate a high-quality GEO article in a few minutes, but then what? If you don't have a CMS or a webhook endpoint set up, the article just lives in your Firestore database and you have to log in to read it.
 
-We built a `/api/notify-article` endpoint that solves this without requiring any external tools. When you click "Publish to Database & CMS" in the Agents tab, it saves the article to your database *and* emails you the full article content, the extracted facts, and the JSON-LD schema — formatted and ready to use.
+We built a \`/api/notify-article\` endpoint that solves this without requiring any external tools. When you click "Publish to Database & CMS" in the Agents tab, it saves the article to your database *and* emails you the full article content, the extracted facts, and the JSON-LD schema — formatted and ready to use.
 
 In Settings, under the Outbound Webhook section, there's a new "Use Email Notify" button that pre-fills the webhook URL with this endpoint. One click, save your settings, and from that point on every article you generate gets emailed to your account address. You can copy it straight into your website editor.
 
@@ -1692,11 +1692,11 @@ One of the first things we did after the migration was create a proper robots.tx
 
 Our robots.txt now explicitly allows: GPTBot (ChatGPT), ChatGPT-User, anthropic-ai, ClaudeBot, PerplexityBot, and Google-Extended (Gemini's web data pipeline). These are the crawlers that feed into the AI engines your customers are using to find recommendations. Blocking them — even accidentally — is an own goal.
 
-We also block the right things: `/dashboard/`, `/api/`, and the preview endpoints that shouldn't be publicly indexed. The principle is simple: be maximally open to AI crawlers for public content, and strict about protecting private routes.
+We also block the right things: \`/dashboard/\`, \`/api/\`, and the preview endpoints that shouldn't be publicly indexed. The principle is simple: be maximally open to AI crawlers for public content, and strict about protecting private routes.
 
 ## A Sitemap That Covers Everything
 
-The new site generates a dynamic sitemap at `/sitemap.xml` that covers every public page: the homepage, all product pages, the about page, the FAQ, and all 31 blog posts. Each entry has a last-modified date and a priority score (1.0 for the homepage, 0.9 for the blog index, 0.8 for individual posts).
+The new site generates a dynamic sitemap at \`/sitemap.xml\` that covers every public page: the homepage, all product pages, the about page, the FAQ, and all 31 blog posts. Each entry has a last-modified date and a priority score (1.0 for the homepage, 0.9 for the blog index, 0.8 for individual posts).
 
 The sitemap is automatically updated when we publish new blog posts — it's generated from the same data file that renders the blog, so there's no manual maintenance or risk of forgetting to update it.
 
