@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
+import { logAuditAction } from '@/lib/audit';
 import { Chrome, Linkedin, Twitter, MessageCircle, Instagram, Music2, CheckCircle2, Loader2, Sparkles, Network, X } from 'lucide-react';
 
 const AUSPEXI_GEO_KEYWORDS = [
@@ -129,6 +130,7 @@ export default function SettingsPage() {
     setConnectedSocials(newSocials);
     try {
       await setDoc(doc(db, 'users', user.uid), { connectedSocials: newSocials }, { merge: true });
+      await logAuditAction(user.uid, 'Connected Social Platform', { platform });
       setSocialInputs(prev => ({ ...prev, [platform]: '' }));
     } catch (err) {
       setConnectedSocials(connectedSocials);
@@ -143,6 +145,7 @@ export default function SettingsPage() {
     setConnectedSocials(newSocials);
     try {
       await setDoc(doc(db, 'users', user.uid), { connectedSocials: newSocials }, { merge: true });
+      await logAuditAction(user.uid, 'Disconnected Social Platform', { platform });
     } catch {
       setConnectedSocials(connectedSocials);
     }
@@ -206,6 +209,7 @@ export default function SettingsPage() {
       const competitors = [formData.competitor1, formData.competitor2, formData.competitor3, formData.competitor4, formData.competitor5, formData.competitor6].filter(Boolean);
       const keywords = [formData.keyword1, formData.keyword2, formData.keyword3, formData.keyword4, formData.keyword5, formData.keyword6, formData.keyword7, formData.keyword8, formData.keyword9, formData.keyword10].filter(Boolean);
       await setDoc(userRef, { brand: formData.brand, domain: formData.domain, cmsWebhookUrl: formData.cmsWebhookUrl, competitors, keywords }, { merge: true });
+      await logAuditAction(user.uid, 'Saved Settings', { brand: formData.brand, domain: formData.domain, keywordCount: keywords.length, competitorCount: competitors.length });
       setSaveMsg({ type: 'success', text: 'Settings saved. Citacious will pick up your brand data on next message.' });
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'users');

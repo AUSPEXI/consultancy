@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import { db } from '@/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { checkTierAccess } from '@/constants/tiers';
+import { logAuditAction } from '@/lib/audit';
 
 type AgentStatus = 'idle' | 'running' | 'completed' | 'error';
 
@@ -120,6 +121,7 @@ export default function AgentsPage() {
     try {
       const articlePayload = { userId: user?.uid || 'anonymous', topic, article: finalArticle, facts: extractedFacts, schema: generatedSchema, brand: userData?.brand || '', timestamp: new Date().toISOString() };
       await addDoc(collection(db, 'articles'), articlePayload);
+      if (user) await logAuditAction(user.uid, 'Published Article to CMS', { topic, brand: userData?.brand || '' });
       if (userData?.cmsWebhookUrl) {
         const response = await fetch(userData.cmsWebhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(articlePayload) });
         if (!response.ok) throw new Error(`Webhook returned ${response.status}`);

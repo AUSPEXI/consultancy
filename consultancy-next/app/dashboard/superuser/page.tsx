@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/firebase';
 import { collection, query, where, getDocs, doc, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
+import { logAuditAction } from '@/lib/audit';
 import { Button } from '@/components/ui/button';
 import { blogPosts } from '@/data/blogPosts';
 
@@ -273,6 +274,7 @@ export default function SuperuserPage() {
         return;
       }
       await updateDoc(snap.docs[0].ref, { tier: selectedTier });
+      if (user) await logAuditAction(user.uid, 'Admin Updated User Tier', { targetEmail: tierEmail, newTier: selectedTier });
       setStatus({ type: 'success', message: `Tier updated to "${selectedTier}" for ${tierEmail}` });
       setTierEmail('');
     } catch (err: any) {
@@ -288,6 +290,7 @@ export default function SuperuserPage() {
     setStatus(null);
     try {
       await updateDoc(doc(db, 'users', user.uid), { tier });
+      await logAuditAction(user.uid, 'Set Own Tier (Dev)', { newTier: tier });
       setStatus({ type: 'success', message: `Your tier set to "${tier}". Refresh to see changes.` });
     } catch (err: any) {
       setStatus({ type: 'error', message: `Failed: ${err.message}` });
@@ -321,6 +324,7 @@ export default function SuperuserPage() {
       }
       if (user) {
         const userRef = doc(db, 'users', user.uid);
+        await logAuditAction(user.uid, 'Hard Reset — All Data Purged', { collectionsCleared: collectionsToClear });
         await setDoc(userRef, { uid: user.uid, email: user.email, onboardingCompleted: false, brand: '', domain: '', keywords: [], competitors: [], connectedSocials: [], cmsWebhookUrl: '', sentimentPrompts: [], tier: 'Free', role: 'user', createdAt: new Date().toISOString().split('T')[0] });
       }
       localStorage.clear();
@@ -366,6 +370,7 @@ export default function SuperuserPage() {
         }))
       });
       await batch.commit();
+      if (user) await logAuditAction(user.uid, 'Seeded Historical Baseline Data', { uid: effectiveUid });
       setStatus({ type: 'success', message: 'Historical baseline seeded successfully.' });
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'sovMetrics');
@@ -531,6 +536,7 @@ export default function SuperuserPage() {
         }),
       });
 
+      if (user) await logAuditAction(user.uid, 'Seeded GEO Synthetic Dataset', { uid: effectiveUid });
       setStatus({ type: 'success', message: 'GEO synthetic dataset seeded: 30-day SOV, 15 facts, 10 content scans, 5 competitors, UMAP clusters.' });
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'geo-seed');
