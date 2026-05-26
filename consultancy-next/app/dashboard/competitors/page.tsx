@@ -30,6 +30,13 @@ export default function Competitors() {
   const [inputUrl, setInputUrl] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [pushingFact, setPushingFact] = useState<string | null>(null);
+  const [deployingAll, setDeployingAll] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+  const showToast = (text: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToast({ text, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -93,11 +100,37 @@ export default function Competitors() {
         createdAt: new Date().toISOString().split('T')[0],
       });
       await logAuditAction(user.uid, 'Auto-generated Counter-Fact', { competitor: competitorName });
-      alert("Success! Counter-Fact has been deployed to the Fact-Vault.");
+      showToast('Counter-Fact deployed to Fact-Vault.');
     } catch (error) {
        console.error("Fact error:", error);
     } finally {
       setPushingFact(null);
+    }
+  };
+
+  const handleDeployAll = async (comp: Competitor) => {
+    if (!user) return;
+    setDeployingAll(comp.id);
+    try {
+      const vulns = comp.vulnerabilities && comp.vulnerabilities.length > 0
+        ? comp.vulnerabilities
+        : ['Generic decay'];
+      for (const vuln of vulns) {
+        await addDoc(collection(db, 'facts'), {
+          userId: user.uid,
+          statement: `Unlike ${comp.name}, which shows data decay concerning ${vuln.toLowerCase()}, we provide updated solutions in this area.`,
+          entropyScore: 85,
+          cliffhangerActive: true,
+          category: 'Competitor Counter-Fact',
+          createdAt: new Date().toISOString().split('T')[0],
+        });
+      }
+      await logAuditAction(user.uid, 'Deployed All Counter-Facts', { competitor: comp.name, count: vulns.length });
+      showToast(`${vulns.length} counter-fact${vulns.length > 1 ? 's' : ''} deployed to Fact-Vault.`);
+    } catch (error: any) {
+      showToast('Deploy failed. Please try again.', 'error');
+    } finally {
+      setDeployingAll(null);
     }
   };
 
@@ -149,7 +182,7 @@ export default function Competitors() {
       }
     } catch (error: any) {
        console.error("Unknown error:", error);
-       alert("An error occurred: " + (error?.message || "Unknown error"));
+       showToast(error?.message || 'Analysis failed. Please try again.', 'error');
     } finally {
       setIsAnalyzing(false);
     }
@@ -159,6 +192,11 @@ export default function Competitors() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+      {toast && (
+        <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-[10000] px-6 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${toast.type === 'success' ? 'bg-emerald-500/90 border-emerald-400 text-white' : toast.type === 'error' ? 'bg-rose-500/90 border-rose-400 text-white' : 'bg-zinc-900/90 border-zinc-700 text-zinc-300'}`}>
+          <span className="text-sm font-bold tracking-tight">{toast.text}</span>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold font-heading mb-2">Competitor Radar</h1>
@@ -237,9 +275,15 @@ export default function Competitors() {
                   </div>
 
                   <div className="flex flex-col sm:flex-row items-center gap-3">
-                    <button className="w-full sm:w-auto bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2">
-                      Deploy Overwrite Action
-                      <ArrowRight className="w-4 h-4" />
+                    <button
+                      onClick={() => handleDeployAll(comp)}
+                      disabled={deployingAll === comp.id || pushingFact !== null}
+                      className="w-full sm:w-auto bg-rose-600 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                    >
+                      {deployingAll === comp.id
+                        ? <><Loader2 className="w-4 h-4 animate-spin" /> Deploying...</>
+                        : <>Deploy All to Fact-Vault <ArrowRight className="w-4 h-4" /></>
+                      }
                     </button>
                   </div>
                 </div>

@@ -25,6 +25,12 @@ export default function TechnicalPage() {
   const [copiedSchema, setCopiedSchema] = useState(false);
 
   const [savedFacts, setSavedFacts] = useState<any[]>([]);
+  const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+  const showToast = (text: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToast({ text, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -86,7 +92,7 @@ export default function TechnicalPage() {
       }
     } catch (error) {
       console.error('Error restructuring text:', error);
-      alert('Failed to restructure text. Please try again.');
+      showToast('Failed to restructure text. Please try again.', 'error');
     } finally {
       setIsProcessing(false);
     }
@@ -113,7 +119,7 @@ export default function TechnicalPage() {
       }
     } catch (error) {
       console.error('Error generating schema:', error);
-      alert('Failed to generate schema. Please try again.');
+      showToast('Failed to generate schema. Please try again.', 'error');
     } finally {
       setIsGeneratingSchema(false);
     }
@@ -224,6 +230,11 @@ export default {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
+      {toast && (
+        <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-[10000] px-6 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${toast.type === 'success' ? 'bg-emerald-500/90 border-emerald-400 text-white' : toast.type === 'error' ? 'bg-rose-500/90 border-rose-400 text-white' : 'bg-zinc-900/90 border-zinc-700 text-zinc-300'}`}>
+          <span className="text-sm font-bold tracking-tight">{toast.text}</span>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Enterprise Infrastructure</h1>
@@ -399,7 +410,7 @@ export default {
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(result.table);
-                      alert('HTML copied to clipboard!');
+                      showToast('HTML copied to clipboard!');
                     }}
                     className="text-xs font-medium text-pink-400 hover:text-pink-300 flex items-center gap-1"
                   >

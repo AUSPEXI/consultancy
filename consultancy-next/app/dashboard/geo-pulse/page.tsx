@@ -1,17 +1,21 @@
 'use client';
 import { useState } from 'react';
-import { Activity, Loader2, Target, BarChart3, TrendingUp, Cpu, Network } from 'lucide-react';
+import { Activity, Loader2, Target, BarChart3, TrendingUp, Cpu, Network, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { checkTierAccess } from '@/constants/tiers';
 
 export default function GeoPulsePage() {
-  const { tier, role } = useAuth();
+  const { tier, role, userData } = useAuth();
   const [keyword, setKeyword] = useState('');
   const [isProbing, setIsProbing] = useState(false);
+  const [isBatchScanning, setIsBatchScanning] = useState(false);
   const [currentStep, setCurrentStep] = useState(-1);
   const [results, setResults] = useState<any>(null);
+  const [batchResults, setBatchResults] = useState<Array<{ keyword: string; result: any }>>([]);
   const [error, setError] = useState<string | null>(null);
+
+  const savedKeywords: string[] = userData?.keywords ?? [];
 
   if (role !== 'admin' && !checkTierAccess(tier, 'Premium')) {
     return (
@@ -40,10 +44,22 @@ export default function GeoPulsePage() {
     "Finalizing Market Vulnerability Insights..."
   ];
 
+  const fetchKeyword = async (kw: string) => {
+    const res = await fetch('/api/geo-pulse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ keyword: kw }),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) throw new Error(json.error || 'Scan failed');
+    return json.result;
+  };
+
   const runProbe = async () => {
     if (!keyword.trim()) return;
     setIsProbing(true);
     setResults(null);
+    setBatchResults([]);
     setError(null);
     setCurrentStep(0);
 
@@ -55,14 +71,8 @@ export default function GeoPulsePage() {
     }, 500);
 
     try {
-      const res = await fetch('/api/geo-pulse', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ keyword: keyword.trim() }),
-      });
-      const json = await res.json();
-      if (!res.ok || !json.success) throw new Error(json.error || 'Scan failed');
-      setResults(json.result);
+      const result = await fetchKeyword(keyword.trim());
+      setResults(result);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -70,6 +80,27 @@ export default function GeoPulsePage() {
       setCurrentStep(-1);
       setIsProbing(false);
     }
+  };
+
+  const runBatchScan = async () => {
+    if (savedKeywords.length === 0 || isBatchScanning) return;
+    setIsBatchScanning(true);
+    setResults(null);
+    setBatchResults([]);
+    setError(null);
+
+    const accumulated: Array<{ keyword: string; result: any }> = [];
+    for (const kw of savedKeywords) {
+      try {
+        const result = await fetchKeyword(kw);
+        accumulated.push({ keyword: kw, result });
+        setBatchResults([...accumulated]);
+      } catch {
+        accumulated.push({ keyword: kw, result: null });
+        setBatchResults([...accumulated]);
+      }
+    }
+    setIsBatchScanning(false);
   };
 
   const sentimentColor = (s: string) => {
@@ -102,17 +133,17 @@ export default function GeoPulsePage() {
               onKeyDown={(e) => e.key === 'Enter' && !isProbing && runProbe()}
               placeholder="e.g., 'Best enterprise CRM software'"
               className="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
-              disabled={isProbing}
+              disabled={isProbing || isBatchScanning}
             />
             <button
               onClick={runProbe}
-              disabled={isProbing || !keyword.trim()}
+              disabled={isProbing || isBatchScanning || !keyword.trim()}
               className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
             >
               {isProbing ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Analyzing Data...
+                  Analyzing...
                 </>
               ) : (
                 <>
@@ -122,6 +153,31 @@ export default function GeoPulsePage() {
               )}
             </button>
           </div>
+
+          {/* Saved keyword chips */}
+          {savedKeywords.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2 items-center">
+              <span className="text-xs text-zinc-500 shrink-0">Saved:</span>
+              {savedKeywords.map((kw) => (
+                <button
+                  key={kw}
+                  onClick={() => { setKeyword(kw); setResults(null); setBatchResults([]); }}
+                  disabled={isProbing || isBatchScanning}
+                  className="px-3 py-1 rounded-full text-xs font-medium bg-zinc-800 hover:bg-pink-600/20 hover:text-pink-300 text-zinc-400 border border-zinc-700 hover:border-pink-500/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {kw}
+                </button>
+              ))}
+              <button
+                onClick={runBatchScan}
+                disabled={isProbing || isBatchScanning}
+                className="ml-auto px-3 py-1 rounded-full text-xs font-semibold bg-pink-600/20 hover:bg-pink-600/40 text-pink-400 border border-pink-500/30 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+              >
+                {isBatchScanning ? <Loader2 className="w-3 h-3 animate-spin" /> : <ChevronRight className="w-3 h-3" />}
+                Scan All
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Loading State */}
@@ -144,6 +200,71 @@ export default function GeoPulsePage() {
             <p className="text-sm text-zinc-500 mt-8 max-w-md mx-auto">
               Aggregating first-party search intent patterns and mapping vector distributions against your Semantic Anchors.
             </p>
+          </div>
+        )}
+
+        {/* Batch scanning progress */}
+        {isBatchScanning && (
+          <div className="py-8 flex flex-col items-center justify-center text-center">
+            <Loader2 className="w-8 h-8 text-pink-500 animate-spin mb-4" />
+            <p className="text-sm text-zinc-400">Scanning {batchResults.length + 1} of {savedKeywords.length} keywords…</p>
+            {batchResults.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2 justify-center">
+                {batchResults.map(({ keyword: kw, result }) => (
+                  <span key={kw} className={`px-2 py-1 rounded-full text-xs font-medium ${result ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+                    {kw}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Batch results table */}
+        {!isBatchScanning && batchResults.length > 0 && (
+          <div className="space-y-4 animate-in slide-in-from-bottom-8 duration-700">
+            <h3 className="text-base font-semibold text-white border-b border-zinc-800 pb-2">Batch Scan Results — {batchResults.length} Keywords</h3>
+            <div className="overflow-x-auto rounded-xl border border-zinc-800">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-zinc-800 bg-zinc-950">
+                    <th className="text-left px-4 py-3 text-zinc-400 font-medium">Keyword</th>
+                    <th className="text-left px-4 py-3 text-zinc-400 font-medium">Agg. SoV</th>
+                    <th className="text-left px-4 py-3 text-zinc-400 font-medium">Signals</th>
+                    <th className="text-left px-4 py-3 text-zinc-400 font-medium">Sentiment</th>
+                    <th className="text-left px-4 py-3 text-zinc-400 font-medium hidden md:table-cell">Top Insight</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {batchResults.map(({ keyword: kw, result }) => (
+                    <tr
+                      key={kw}
+                      onClick={() => result && (setKeyword(kw), setResults(result), setBatchResults([]))}
+                      className="border-b border-zinc-800/50 hover:bg-zinc-900/50 cursor-pointer transition-colors"
+                    >
+                      <td className="px-4 py-3 font-medium text-zinc-200">{kw}</td>
+                      {result ? (
+                        <>
+                          <td className="px-4 py-3 text-white font-bold">{result.aggregateSov}%</td>
+                          <td className="px-4 py-3 text-zinc-300">{result.totalSignals.toLocaleString()}</td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${result.overallSentiment === 'Positive' ? 'bg-emerald-500/10 text-emerald-400' : result.overallSentiment === 'Negative' ? 'bg-red-500/10 text-red-400' : 'bg-amber-500/10 text-amber-400'}`}>
+                              {result.overallSentiment}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-zinc-400 text-xs hidden md:table-cell max-w-xs truncate">
+                            {result.insights?.[0] ?? '—'}
+                          </td>
+                        </>
+                      ) : (
+                        <td colSpan={4} className="px-4 py-3 text-red-400 text-xs">Scan failed</td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-zinc-500">Click any row to drill into that keyword's full analysis.</p>
           </div>
         )}
 

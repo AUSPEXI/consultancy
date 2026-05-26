@@ -188,7 +188,7 @@ export default function OverviewPage() {
         const shortDate = lastDate.toLocaleDateString('en-US', { weekday: 'short' });
         const prevAsov = metrics.length > 0 ? metrics[metrics.length - 1].aSov : 12;
         const prevErr = metrics.length > 0 ? metrics[metrics.length - 1].err : 20;
-        const prevAiTraffic = metrics.length > 0 ? metrics[metrics.length - 1].aiTraffic : 120;
+        const prevAiTraffic = metrics.length > 0 ? Math.min(metrics[metrics.length - 1].aiTraffic, 9999) : 120;
         const prevCompA = metrics.length > 0 ? metrics[metrics.length - 1].compA : 45;
 
         const historicalWrites: Promise<any>[] = [];
@@ -240,16 +240,16 @@ export default function OverviewPage() {
   };
 
   const handleSyncCMS = async () => {
-    if (!user || !userData?.cmsWebhookUrl) { alert("Please configure an Outbound Platform Webhook (Your CMS) in Settings to use this feature."); return; }
+    if (!user || !userData?.cmsWebhookUrl) { setToastMessage({ text: 'Configure an Outbound Webhook in Settings first.', type: 'info' }); return; }
     setIsSyncingCMS(true);
     try {
       const payload = { shadowLink: generatedShadowLink, jsonLd: { "@context": "https://schema.org", "@type": "Product", "name": userData.brand || "Your Brand", "url": generatedShadowLink } };
       const resp = await fetch('/api/push-to-cms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ webhookUrl: userData.cmsWebhookUrl, payload }) });
       const data = await resp.json();
-      if (data.success) { alert("Success! Shadow Link and JSON-LD injected into CMS via webhook."); }
+      if (data.success) { setToastMessage({ text: 'Shadow Link and JSON-LD injected via webhook.', type: 'success' }); }
       else { throw new Error(data.error); }
     } catch (e: any) {
-      alert(`Sync failed: ${e.message}`);
+      setToastMessage({ text: `Sync failed: ${e.message}`, type: 'error' });
     } finally {
       setIsSyncingCMS(false);
     }
@@ -267,12 +267,12 @@ export default function OverviewPage() {
 
   const latest = metrics.length > 0 ? metrics[metrics.length - 1] : { id: 'placeholder', aSov: 12, err: 20, compGap: -33, compA: 45, compB: 30, aiTraffic: 120, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } };
   const previous = metrics.length > 1 ? metrics[metrics.length - 2] : latest;
-  const safeLatest = { aSov: latest.aSov ?? 0, err: latest.err ?? 0, compGap: latest.compGap ?? 0, aiTraffic: latest.aiTraffic ?? 0, compA: latest.compA ?? 0, platforms: latest.platforms || {}, radar: latest.radar || [], sentiment: latest.sentiment || [], topUrls: latest.topUrls || [] };
-  const safePrevious = { aSov: previous.aSov ?? 0, err: previous.err ?? 0, compGap: previous.compGap ?? 0, aiTraffic: previous.aiTraffic ?? 0, compA: previous.compA ?? 0 };
-  const asovTrend = safeLatest.aSov - safePrevious.aSov;
-  const trafficTrend = safeLatest.aiTraffic - safePrevious.aiTraffic;
-  const errTrend = safeLatest.err - safePrevious.err;
-  const gapTrend = safeLatest.compGap - safePrevious.compGap;
+  const safeLatest = { aSov: latest.aSov ?? 0, err: latest.err ?? 0, compGap: latest.compGap ?? 0, aiTraffic: Math.min(latest.aiTraffic ?? 0, 9999), compA: latest.compA ?? 0, platforms: latest.platforms || {}, radar: latest.radar || [], sentiment: latest.sentiment || [], topUrls: latest.topUrls || [] };
+  const safePrevious = { aSov: previous.aSov ?? 0, err: previous.err ?? 0, compGap: previous.compGap ?? 0, aiTraffic: Math.min(previous.aiTraffic ?? 0, 9999), compA: previous.compA ?? 0 };
+  const asovTrend = Math.round(safeLatest.aSov - safePrevious.aSov);
+  const trafficTrend = Math.round(safeLatest.aiTraffic - safePrevious.aiTraffic);
+  const errTrend = Math.round(safeLatest.err - safePrevious.err);
+  const gapTrend = Math.round(safeLatest.compGap - safePrevious.compGap);
 
   const radarData = (latest.radar || [
     { subject: 'Brand Trust', brandScore: safeLatest.aSov + 20, compScore: safeLatest.compA + 10 },

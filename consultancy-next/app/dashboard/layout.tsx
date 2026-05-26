@@ -67,13 +67,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen bg-zinc-950 text-zinc-50 font-sans overflow-hidden relative">
-      {ADMIN_BYPASS && (
+      {ADMIN_BYPASS && typeof window !== 'undefined' && window.location.hostname === 'localhost' && (
         <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-black text-xs font-bold text-center py-1 tracking-widest uppercase">
-          Admin Bypass Active — Remove NEXT_PUBLIC_ADMIN_BYPASS before production
+          Dev bypass active — not visible in production
         </div>
       )}
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-      <div className={`flex-1 flex flex-col min-w-0 overflow-hidden ${ADMIN_BYPASS ? 'pt-6' : ''}`}>
+      <div className={`flex-1 flex flex-col min-w-0 overflow-hidden ${ADMIN_BYPASS && typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'pt-6' : ''}`}>
         <Header onMenuClick={() => setIsSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="max-w-6xl mx-auto">

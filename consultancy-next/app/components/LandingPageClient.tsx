@@ -312,8 +312,8 @@ export function LandingPageClient() {
               </div>
             </div>
 
-            <div className="md:col-span-7 relative h-[400px] md:h-[600px] w-full flex items-center justify-end">
-              <div className="absolute inset-0 w-[120%] -right-[10%] h-full z-10">
+            <div className="md:col-span-7 relative h-[300px] md:h-[600px] w-full flex items-center justify-end overflow-hidden md:overflow-visible">
+              <div className="absolute inset-0 w-full md:w-[120%] md:-right-[10%] h-full z-10 pointer-events-none md:pointer-events-auto">
                 <Suspense fallback={
                   <div className="w-full h-full bg-black flex items-center justify-center">
                     <div className="animate-pulse bg-zinc-900 w-3/4 h-3/4 rounded-full blur-3xl opacity-20" />
