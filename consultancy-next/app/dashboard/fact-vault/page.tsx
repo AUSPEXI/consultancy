@@ -32,6 +32,12 @@ export default function FactVault() {
   const [isExtracting, setIsExtracting] = useState(false);
   const [isResearching, setIsResearching] = useState(false);
   const [amplifyingFact, setAmplifyingFact] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+  const showToast = (text: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setToast({ text, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -86,7 +92,7 @@ export default function FactVault() {
     if (!inputText.trim() || !user) return;
 
     if (isAtLimit) {
-      alert(`You have reached your limit of ${currentLimit} facts for the ${tier} tier. Please upgrade to extract more.`);
+      showToast(`Fact limit reached (${currentLimit} for ${tier} tier). Upgrade to add more.`, 'info');
       return;
     }
 
@@ -145,7 +151,7 @@ export default function FactVault() {
     if (!industry.trim() || !user) return;
 
     if (isAtLimit) {
-      alert(`You have reached your limit of ${currentLimit} facts for the ${tier} tier. Please upgrade to extract more.`);
+      showToast(`Fact limit reached (${currentLimit} for ${tier} tier). Upgrade to add more.`, 'info');
       return;
     }
 
@@ -201,6 +207,11 @@ export default function FactVault() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+      {toast && (
+        <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-[10000] px-6 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${toast.type === 'success' ? 'bg-emerald-500/90 border-emerald-400 text-white' : toast.type === 'error' ? 'bg-rose-500/90 border-rose-400 text-white' : 'bg-zinc-900/90 border-zinc-700 text-zinc-300'}`}>
+          <span className="text-sm font-bold tracking-tight">{toast.text}</span>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">The Fact-Vault</h1>
@@ -213,7 +224,7 @@ export default function FactVault() {
           <button
             onClick={() => {
               if (isAtLimit) {
-                alert(`You have reached your limit of ${currentLimit} facts for the ${tier} tier. Please upgrade to extract more.`);
+                showToast(`Fact limit reached (${currentLimit} for ${tier} tier). Upgrade to add more.`, 'info');
               } else {
                 setIsResearchModalOpen(true);
               }
@@ -226,7 +237,7 @@ export default function FactVault() {
           <button
             onClick={() => {
               if (isAtLimit) {
-                alert(`You have reached your limit of ${currentLimit} facts for the ${tier} tier. Please upgrade to extract more.`);
+                showToast(`Fact limit reached (${currentLimit} for ${tier} tier). Upgrade to add more.`, 'info');
               } else {
                 setIsModalOpen(true);
               }
@@ -370,15 +381,15 @@ export default function FactVault() {
                                   body: JSON.stringify({ type: 'ontology_injection', ontology: ontologyData })
                                 });
                                 if (!response.ok) throw new Error('Webhook rejected');
-                                alert("Successfully injected ontology schema via your CMS Webhook.");
+                                showToast('Ontology schema injected via webhook.', 'success');
                               } catch (e: any) {
                                 console.error(e);
-                                alert("Failed to push ontology to Webhook. If you see 'Failed to fetch', ensure the Webhook URL is correct, or if using the Shared App URL, ensure you click 'Share' again to deploy the latest backend changes. Falling back to download.");
+                                showToast('Webhook push failed — downloading instead. Check your webhook URL in Settings.', 'error');
                                 downloadFallback();
                               }
                             } else {
                               downloadFallback();
-                              alert("Ontology JSON-LD downloaded! To automatically inject schema directly to your CMS, configure a Webhook URL in Settings.");
+                              showToast('JSON-LD downloaded. Add a webhook in Settings to auto-inject to your CMS.', 'info');
                             }
                           }}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 transition-colors text-xs font-medium border border-indigo-500/20"

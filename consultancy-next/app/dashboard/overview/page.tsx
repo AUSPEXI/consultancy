@@ -240,16 +240,16 @@ export default function OverviewPage() {
   };
 
   const handleSyncCMS = async () => {
-    if (!user || !userData?.cmsWebhookUrl) { alert("Please configure an Outbound Platform Webhook (Your CMS) in Settings to use this feature."); return; }
+    if (!user || !userData?.cmsWebhookUrl) { setToastMessage({ text: 'Configure an Outbound Webhook in Settings first.', type: 'info' }); return; }
     setIsSyncingCMS(true);
     try {
       const payload = { shadowLink: generatedShadowLink, jsonLd: { "@context": "https://schema.org", "@type": "Product", "name": userData.brand || "Your Brand", "url": generatedShadowLink } };
       const resp = await fetch('/api/push-to-cms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ webhookUrl: userData.cmsWebhookUrl, payload }) });
       const data = await resp.json();
-      if (data.success) { alert("Success! Shadow Link and JSON-LD injected into CMS via webhook."); }
+      if (data.success) { setToastMessage({ text: 'Shadow Link and JSON-LD injected via webhook.', type: 'success' }); }
       else { throw new Error(data.error); }
     } catch (e: any) {
-      alert(`Sync failed: ${e.message}`);
+      setToastMessage({ text: `Sync failed: ${e.message}`, type: 'error' });
     } finally {
       setIsSyncingCMS(false);
     }
