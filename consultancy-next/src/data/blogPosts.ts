@@ -1532,7 +1532,193 @@ This isn't just about speed; it's about veracity. In the fast-moving economy of 
       <p>
         This creates overwhelming user curiosity. You have established credibility by allowing the AI to present your facts, but you have successfully protected the deeply valuable implementation insight, forcing the user to click the citation link to access your domain. By mastering Information Cliffhangers, you turn AI engines from traffic-stealers into powerful lead-generation funnels.
       </p>
-  
+
     `,
+  },
+  {
+    slug: "citacious-upgrade-real-time-brand-intelligence",
+    title: "Citacious Just Got a Lot Smarter — And She Actually Knows Your Brand Now",
+    category: "Product Updates",
+    date: "May 26, 2026",
+    image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?q=80&w=1200&auto=format&fit=crop",
+    excerpt: "We completely rethought how Citacious works. She now reads your live account data before every conversation — your citation scores, your vault facts, your competitors — and gives you advice that's actually specific to your situation.",
+    content: `
+## She Knows Who You Are Now
+
+When we first launched Citacious, she was helpful but generic. She could explain GEO concepts, walk you through the platform, and answer questions — but she didn't really *know* you. Every conversation started from scratch. She didn't know your brand name, she hadn't seen your Citation Probe results, and she had no idea whether you were a first-time user trying to understand what GEO even is, or an experienced marketer who just wanted to know why your Perplexity score dipped last week.
+
+That's changed completely. We've shipped a major upgrade to how Citacious works under the hood, and honestly, it feels like the difference between talking to a helpful stranger and talking to someone who's been watching your dashboard with you for months.
+
+## What's Actually Different
+
+The biggest change is that Citacious now reads your live account data before she says a single word to you. The moment you open the chat, she's already looked at:
+
+- Your brand name and domain
+- Your Citation Probe history — how many queries you're being cited on, which ones you're missing, and whether your rate is trending up or down
+- Your Knowledge Vault facts — how many you've added and what they say
+- Your competitors and how they're tracked
+- Whether you've generated any GEO articles yet
+- Your latest Share of Voice metrics
+
+She uses all of that to decide what you actually need help with right now. Not what a hypothetical Auspexi user might need — *you*, specifically.
+
+## The Quest Stage System
+
+One thing we're particularly proud of is what we call Quest Stages. Instead of giving every user the same generic advice, Citacious figures out exactly where you are in your GEO journey and meets you there.
+
+If you've just signed up and haven't set up your brand yet, she won't immediately launch into a lecture about semantic anchors. She'll ask you what your business does, who your customers are, and then guide you to Settings to get the basics in place. She explains *why* each step matters before asking you to do it — because if you don't understand why you're doing something, you won't actually do it.
+
+If you've got your brand configured but haven't run a Citation Probe yet, she knows that's your most urgent next step. She'll explain what the probe does, what a baseline looks like, and what to do with the results.
+
+If your vault is empty, she'll tell you that's the gap that's holding you back from better citation rates. If you've got articles generated but haven't published them, she'll explain why that last step is critical — the AI engines can't index content that isn't live.
+
+Each stage has its own specific guidance, and Citacious knows which one you're in without you having to explain anything.
+
+## A Better Experience for Business Owners Who Are New to GEO
+
+One thing we hear a lot is that GEO can feel intimidating if you're coming to it fresh. Terms like "latent space," "semantic anchors," and "knowledge graphs" don't mean much if you've never heard them before, and the last thing a small business owner needs is to feel like they need a computer science degree to use a marketing tool.
+
+Citacious now leads with plain language first. If you're new and you ask her what GEO is, she'll say something like: *"When someone asks ChatGPT or Perplexity for a recommendation in your category, GEO is what determines whether the AI names your brand or your competitor."* That's it. One sentence. Then she asks about your business and goes from there.
+
+The jargon still exists — it's useful shorthand once you know what it means — but Citacious introduces it gradually and always in the context of your specific situation.
+
+## User-Instance Locking: Your Data Stays Yours
+
+We want to be transparent about an important security change in this update. Citacious is now completely locked to your account instance. Her system instructions are built server-side from your actual Firestore data — she receives no instructions from the client side at all.
+
+What this means in practice: there's no way for the AI to be tricked into referencing another user's data, and there's no way to inject custom instructions that override her guidance. She knows exactly whose account she's working with, and all her advice — every specific number, every metric, every recommendation — comes from your data only.
+
+## Try Her With a Real Question
+
+The best way to see the difference is to just ask her something specific. Try: *"What should I be focusing on right now?"* — she'll look at your actual account state and tell you. Not a list of five generic things to do. The one thing that matters most for where you are today.
+
+We think you'll notice the difference immediately.
+`,
+  },
+  {
+    slug: "four-new-tools-citation-probe-agents-cost-audit",
+    title: "Four New Tools Just Launched: Citation Probe, Agent Crew, Cost Audit, and Article Email Delivery",
+    category: "Product Updates",
+    date: "May 26, 2026",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop",
+    excerpt: "A busy few weeks at Auspexi. We've shipped four major new features: a live Citation Probe that tests your brand against real AI queries, a four-agent content crew, full cost tracking, and article email delivery for when you don't have a CMS yet.",
+    content: `
+## A Busy Sprint
+
+We don't usually talk about what's happening behind the scenes this much, but the last few weeks have been genuinely exciting. Four substantial new features have shipped, and each one addresses something real that users were running into. Here's what's new and why it matters.
+
+## 1. The Citation Probe: Your GEO Baseline in 60 Seconds
+
+This one's the headline. The Citation Probe runs seven live queries across multiple AI engines and checks whether your brand gets cited in the response. It's your GEO baseline — the starting point that everything else in your strategy should be built around.
+
+Before the probe existed, the only way to know whether ChatGPT or Perplexity was recommending your brand was to manually open those tools and test queries yourself. That's not a system. It's guesswork, and it doesn't give you anything you can track over time.
+
+The probe changes that. You get a citation rate (the percentage of queries where your brand was mentioned), a breakdown of which specific queries are hitting and which are missing, and a timestamp so you can track how the number moves as you publish more content and add more vault facts. Run it now to get your baseline. Run it again in four weeks after you've published a GEO article or two. That delta is your proof that the strategy is working.
+
+The missed queries are equally useful — those are your content gaps. Each uncited query is a topic you should be writing about. We've wired Citacious to read these results and recommend exactly that.
+
+## 2. The Multi-Agent Orchestration Crew
+
+The Agents tab has been in the platform for a while, but this sprint we rebuilt the underlying pipeline and added significant reliability improvements. Here's how the crew works:
+
+**Crawler Agent** pulls live content from across the web on whatever topic you specify. It's using neural search, not keyword matching, so it finds genuinely relevant material rather than just pages that contain your search term.
+
+**Extraction Agent** reads everything the crawler pulled and isolates the high-entropy facts — the specific, verifiable data points that AI engines are likely to cite. It discards the noise. Your Knowledge Vault context is injected here, so the agent knows what you already know about your brand and can build on it rather than repeat it.
+
+**Schema Agent** takes those extracted facts and structures them as JSON-LD. This is the machine-readable format that AI crawlers prefer. It's not glamorous, but it's one of the highest-leverage things you can do for your citation rate.
+
+**Synthesis Agent** writes the GEO article. Not a generic blog post. An article structured specifically to be cited — with a clear thesis statement, H2/H3 headers that match common AI query patterns, embedded statistics, and a Key Takeaways section at the end. The article is grounded in the facts the extraction agent found, which means it doesn't hallucinate.
+
+When you hit Publish, the article saves to your database and, if you've set up the email webhook (more on that below), gets sent to you directly so you can copy it to your site.
+
+## 3. Cost Audit: Understanding Your Unit Economics
+
+If you're in the Superuser panel, you'll find a new Cost Audit section. This was built specifically to answer a question that comes up a lot in early-stage SaaS: *what does it actually cost to serve one user?*
+
+The panel tracks every API call made by your account — Citacious conversations, Citation Probe queries, agent runs, content scoring, everything. It breaks down the total spend by feature, shows you a daily spend sparkline for the last 30 days, and calculates the average cost per call.
+
+The pricing calculator at the bottom is where it gets interesting. Drag the subscriber slider to your target number of users. It calculates your total monthly API cost at that scale, then suggests a subscription price at a 3× cost margin (conservative for SaaS — most tools run 5-10×). It also shows projected net revenue and margin at that subscriber count.
+
+This is the kind of data you need before you set your pricing. It's genuinely difficult to find this information anywhere else because it's specific to your usage pattern, not someone else's estimates.
+
+## 4. Article Email Delivery: A Free CMS Substitute
+
+One of the more practical things we shipped this sprint is a simple email notification system for generated articles. Here's the problem it solves: the Agents tab can generate a high-quality GEO article in a few minutes, but then what? If you don't have a CMS or a webhook endpoint set up, the article just lives in your Firestore database and you have to log in to read it.
+
+We built a `/api/notify-article` endpoint that solves this without requiring any external tools. When you click "Publish to Database & CMS" in the Agents tab, it saves the article to your database *and* emails you the full article content, the extracted facts, and the JSON-LD schema — formatted and ready to use.
+
+In Settings, under the Outbound Webhook section, there's a new "Use Email Notify" button that pre-fills the webhook URL with this endpoint. One click, save your settings, and from that point on every article you generate gets emailed to your account address. You can copy it straight into your website editor.
+
+For most people at the early stages, this is all you need. Once you have a real CMS set up, you swap the URL out for your CMS endpoint and the workflow stays exactly the same.
+
+## What's Next
+
+The Citation Probe is going to become more central to the platform as we build out the automated monthly re-run and trend tracking. We're also working on making the agent crew smarter about reading your existing vault before generating content — so over time, your articles get increasingly specific to your brand rather than the general industry.
+
+More soon.
+`,
+  },
+  {
+    slug: "why-we-rebuilt-auspexi-on-nextjs-for-ai-search",
+    title: "Why We Rebuilt the Entire Auspexi Website on Next.js — And What It Means for Your AI Visibility",
+    category: "Platform & Infrastructure",
+    date: "May 26, 2026",
+    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1200&auto=format&fit=crop",
+    excerpt: "We moved off our old Vite/React setup and rebuilt auspexi.com on Next.js from the ground up. The reason? A single-page app is invisible to AI crawlers. If we're an AI visibility platform, our own site needs to be a demonstration of what we're selling.",
+    content: `
+## The Awkward Truth About Our Old Website
+
+Here's an honest admission: until recently, auspexi.com was a single-page React app built with Vite. It looked good, it worked well as a product, and our dashboard was solid. But from the perspective of AI crawlers and search engines, it had a fundamental problem.
+
+Single-page apps render in the browser using JavaScript. When a crawler — whether that's Googlebot, GPTBot, or ClaudeBot — visits a JavaScript-rendered page, they often see a near-empty HTML shell. The actual content is invisible to them because they don't run JavaScript the same way a browser does. The result: all our blog posts, all our product copy, all the detailed content that should be helping us rank and get cited — none of it was being indexed properly.
+
+This is embarrassing for a company whose entire product is about helping other brands get cited by AI. We were preaching structured data and crawlability while running a site that was essentially opaque to the crawlers we were optimizing for.
+
+So we rebuilt everything on Next.js, and we want to explain why that decision matters — not just for us, but as an illustration of the kind of infrastructure decisions that affect AI visibility for any business.
+
+## What Next.js Actually Changes
+
+Next.js uses server-side rendering (SSR) and static site generation (SSG). When a crawler visits any page on the new auspexi.com, the server sends back fully rendered HTML — no JavaScript execution required, no waiting for hydration, no content missing. The crawler sees exactly what a browser would see.
+
+That matters for two reasons.
+
+**First, indexability.** Every single page on the site now has real, crawlable content. Our 31 blog posts are all individually indexed. The product pages, the about page, the pricing section — all of it exists as real HTML that search engines and AI crawlers can read and process. We went from effectively zero indexable content to a fully structured, crawlable site overnight.
+
+**Second, speed.** Server-rendered pages load faster for humans too, which is a ranking signal for traditional search engines. And for AI crawlers that have rate limits and time constraints, a fast page means more of your content gets processed per visit.
+
+## The AI Crawler Permissions Layer
+
+One of the first things we did after the migration was create a proper robots.txt that explicitly allows the crawlers that matter for GEO. By default, many platforms set conservative robots.txt rules or leave them unspecified. That's fine for preventing spam crawlers, but it can accidentally block the AI crawlers you actually want.
+
+Our robots.txt now explicitly allows: GPTBot (ChatGPT), ChatGPT-User, anthropic-ai, ClaudeBot, PerplexityBot, and Google-Extended (Gemini's web data pipeline). These are the crawlers that feed into the AI engines your customers are using to find recommendations. Blocking them — even accidentally — is an own goal.
+
+We also block the right things: `/dashboard/`, `/api/`, and the preview endpoints that shouldn't be publicly indexed. The principle is simple: be maximally open to AI crawlers for public content, and strict about protecting private routes.
+
+## A Sitemap That Covers Everything
+
+The new site generates a dynamic sitemap at `/sitemap.xml` that covers every public page: the homepage, all product pages, the about page, the FAQ, and all 31 blog posts. Each entry has a last-modified date and a priority score (1.0 for the homepage, 0.9 for the blog index, 0.8 for individual posts).
+
+The sitemap is automatically updated when we publish new blog posts — it's generated from the same data file that renders the blog, so there's no manual maintenance or risk of forgetting to update it.
+
+Once we verify ownership in Google Search Console (waiting on DNS propagation as of this writing), we'll submit the sitemap and track indexation. More importantly, AI crawlers that support sitemap parsing will use it to discover content they might not find through standard link-following — especially important for a relatively new domain.
+
+## What This Means in Practice
+
+For people building on similar stacks, the key lessons from our migration:
+
+**If you're on a JavaScript-only SPA, your AI visibility is probably lower than your traditional SEO metrics suggest.** Even if you rank well in Google (which has gotten better at rendering JavaScript), the AI crawlers that feed Perplexity, ChatGPT, and Claude are more conservative. Server rendering is the safest path.
+
+**Robots.txt is not just about blocking bad actors.** It's about actively signalling to valuable crawlers that your content is available and welcome. Explicitly listing the AI crawlers you want to allow sends a clear signal.
+
+**A sitemap is table stakes.** If you're not submitting one, you're relying entirely on the crawler to discover your pages through link-following. For a site with dozens of blog posts, that's a slow and incomplete process.
+
+## We're Building on What We Preach
+
+The core of Auspexi's value proposition is that your brand's digital presence should be structured, machine-readable, and explicitly optimised for AI engines. The infrastructure changes we've made to our own site are a direct application of that philosophy.
+
+We moved to Next.js because it was the right call for our AI visibility, not because it was the trendy framework. The sitemap, the robots.txt permissions, the server rendering — these are exactly the kinds of technical GEO decisions we help our customers make. Now our own site is built on the same foundation.
+
+If you want to understand whether your own site has similar crawlability issues, the Citation Probe in your dashboard is a good starting point. It'll tell you how you're currently being cited. And Citacious can walk you through the technical tab if you want to audit your schema and robots setup in more detail.
+`,
   },
 ];
