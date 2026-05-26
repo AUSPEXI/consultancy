@@ -27,6 +27,16 @@ const ALL_FAQS = [
   { question: "What happens if I cancel a special or one-time deal?", answer: "If you secure a discounted rate, lifetime deal, or special promotional pricing, that rate is locked in for as long as your subscription remains active. If you decide to cancel and sign back up later, you will be subject to the standard, full subscription pricing." }
 ];
 
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: ALL_FAQS.map(({ question, answer }) => ({
+    '@type': 'Question',
+    name: question,
+    acceptedAnswer: { '@type': 'Answer', text: answer },
+  })),
+};
+
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const [showAll, setShowAll] = useState(false);
@@ -35,6 +45,7 @@ export default function FAQPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30 flex flex-col overflow-x-hidden">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <PublicHeader />
 
       <main className="pt-32 pb-24 flex-1">

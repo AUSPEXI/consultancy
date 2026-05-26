@@ -36,12 +36,13 @@ const jsonLd = {
       offers: { '@type': 'AggregateOffer', priceCurrency: 'USD', lowPrice: '149', highPrice: '4999' },
     },
     {
-      '@type': 'FAQPage',
-      mainEntity: [
-        { '@type': 'Question', name: 'What is Generative Engine Optimization (GEO)?', acceptedAnswer: { '@type': 'Answer', text: "GEO is the practice of optimizing your brand's content so AI models cite your brand as the authoritative source." } },
-        { '@type': 'Question', name: 'How is GEO different from traditional SEO?', acceptedAnswer: { '@type': 'Answer', text: 'SEO targets ranked blue links. GEO targets zero-click AI answers from ChatGPT, Gemini, Claude and Perplexity.' } },
-        { '@type': 'Question', name: 'What is AI Share of Voice?', acceptedAnswer: { '@type': 'Answer', text: 'A-SOV measures how often AI models mention your brand versus competitors across industry queries.' } },
-      ],
+      '@type': 'Organization',
+      '@id': 'https://auspexi.com/#org',
+      name: 'Auspexi',
+      url: 'https://auspexi.com',
+      logo: 'https://auspexi.com/geo-infographic.png',
+      description: 'The leading Generative Engine Optimization platform. Track and grow your brand\'s AI Share of Voice across ChatGPT, Gemini, Claude and Perplexity.',
+      sameAs: ['https://linkedin.com/company/auspexi', 'https://x.com/auspexi'],
     },
   ],
 }
