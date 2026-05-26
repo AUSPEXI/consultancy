@@ -188,7 +188,7 @@ export default function OverviewPage() {
         const shortDate = lastDate.toLocaleDateString('en-US', { weekday: 'short' });
         const prevAsov = metrics.length > 0 ? metrics[metrics.length - 1].aSov : 12;
         const prevErr = metrics.length > 0 ? metrics[metrics.length - 1].err : 20;
-        const prevAiTraffic = metrics.length > 0 ? Math.min(metrics[metrics.length - 1].aiTraffic, 9999) : 120;
+        const prevAiTraffic = metrics.length > 0 ? Math.min(metrics[metrics.length - 1].aiTraffic, 750) : 120;
         const prevCompA = metrics.length > 0 ? metrics[metrics.length - 1].compA : 45;
 
         const historicalWrites: Promise<any>[] = [];
@@ -199,7 +199,7 @@ export default function OverviewPage() {
             const hDateStr = historyDate.toISOString().split('T')[0];
             const hShortDate = historyDate.toLocaleDateString('en-US', { weekday: 'short' });
             const hAsov = Math.max(5, prevAsov - (i * 2));
-            historicalWrites.push(setDoc(doc(db, 'sovMetrics', `${user.uid}_${hDateStr}`), { userId: user.uid, date: hDateStr, shortDate: hShortDate, aSov: hAsov, err: Math.max(5, prevErr - (i * 3)), compA: prevCompA + 5, compB: 30, aiTraffic: Math.max(10, prevAiTraffic - (i * 20)), platforms: { chatgpt: hAsov + 5, perplexity: Math.max(0, hAsov - 10), claude: hAsov + 2, gemini: hAsov + 10 } }, { merge: true }));
+            historicalWrites.push(setDoc(doc(db, 'sovMetrics', `${user.uid}_${hDateStr}`), { userId: user.uid, date: hDateStr, shortDate: hShortDate, aSov: hAsov, err: Math.max(5, prevErr - (i * 3)), compA: prevCompA + 5, compB: 30, aiTraffic: Math.round(hAsov * 7 + Math.floor(Math.random() * 40)), platforms: { chatgpt: hAsov + 5, perplexity: Math.max(0, hAsov - 10), claude: hAsov + 2, gemini: hAsov + 10 } }, { merge: true }));
           }
         }
         await Promise.all(historicalWrites);
@@ -207,7 +207,7 @@ export default function OverviewPage() {
         const newAsov = Math.min(100, Math.max(5, prevAsov + (Math.random() > 0.5 ? Math.floor(Math.random() * 12) : -Math.floor(Math.random() * 5))));
         const newCompA = Math.max(0, Math.min(100, prevCompA + (Math.random() > 0.6 ? Math.floor(Math.random() * 5) : -Math.floor(Math.random() * 8))));
         const simulatedPlatforms = { chatgpt: Math.min(100, Math.max(5, newAsov + Math.floor(Math.random() * 20))), perplexity: Math.min(100, Math.max(0, newAsov - Math.floor(Math.random() * 15))), claude: Math.min(100, Math.max(5, newAsov + Math.floor(Math.random() * 10))), gemini: Math.min(100, Math.max(5, newAsov + Math.floor(Math.random() * 25))) };
-        await setDoc(doc(db, 'sovMetrics', `${user.uid}_${dateStr}`), { userId: user.uid, date: dateStr, shortDate, aSov: newAsov, err: Math.min(100, Math.max(0, prevErr + Math.floor(Math.random() * 15) - 5)), compGap: newAsov - newCompA, compA: newCompA, compB: Math.max(0, (metrics.length > 0 ? (metrics[metrics.length - 1].compB || 30) : 30) - Math.floor(Math.random() * 5)), aiTraffic: prevAiTraffic + Math.floor(Math.random() * 60) - 10, platforms: simulatedPlatforms }, { merge: true });
+        await setDoc(doc(db, 'sovMetrics', `${user.uid}_${dateStr}`), { userId: user.uid, date: dateStr, shortDate, aSov: newAsov, err: Math.min(100, Math.max(0, prevErr + Math.floor(Math.random() * 15) - 5)), compGap: newAsov - newCompA, compA: newCompA, compB: Math.max(0, (metrics.length > 0 ? (metrics[metrics.length - 1].compB || 30) : 30) - Math.floor(Math.random() * 5)), aiTraffic: Math.round(newAsov * 7 + Math.floor(Math.random() * 50)), platforms: simulatedPlatforms }, { merge: true });
         // Stop spinner as soon as data lands — audit log can write silently
         setIsAuditing(false);
         setAuditSuccess(true);
@@ -267,8 +267,8 @@ export default function OverviewPage() {
 
   const latest = metrics.length > 0 ? metrics[metrics.length - 1] : { id: 'placeholder', aSov: 12, err: 20, compGap: -33, compA: 45, compB: 30, aiTraffic: 120, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } };
   const previous = metrics.length > 1 ? metrics[metrics.length - 2] : latest;
-  const safeLatest = { aSov: latest.aSov ?? 0, err: latest.err ?? 0, compGap: latest.compGap ?? 0, aiTraffic: Math.min(latest.aiTraffic ?? 0, 9999), compA: latest.compA ?? 0, platforms: latest.platforms || {}, radar: latest.radar || [], sentiment: latest.sentiment || [], topUrls: latest.topUrls || [] };
-  const safePrevious = { aSov: previous.aSov ?? 0, err: previous.err ?? 0, compGap: previous.compGap ?? 0, aiTraffic: Math.min(previous.aiTraffic ?? 0, 9999), compA: previous.compA ?? 0 };
+  const safeLatest = { aSov: latest.aSov ?? 0, err: latest.err ?? 0, compGap: latest.compGap ?? 0, aiTraffic: Math.min(latest.aiTraffic ?? 0, 750), compA: latest.compA ?? 0, platforms: latest.platforms || {}, radar: latest.radar || [], sentiment: latest.sentiment || [], topUrls: latest.topUrls || [] };
+  const safePrevious = { aSov: previous.aSov ?? 0, err: previous.err ?? 0, compGap: previous.compGap ?? 0, aiTraffic: Math.min(previous.aiTraffic ?? 0, 750), compA: previous.compA ?? 0 };
   const asovTrend = Math.round(safeLatest.aSov - safePrevious.aSov);
   const trafficTrend = Math.round(safeLatest.aiTraffic - safePrevious.aiTraffic);
   const errTrend = Math.round(safeLatest.err - safePrevious.err);
