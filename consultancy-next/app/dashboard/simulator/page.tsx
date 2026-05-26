@@ -14,6 +14,12 @@ export default function SimulatorPage() {
   const [brand, setBrand] = useState('');
   const [isSimulating, setIsSimulating] = useState(false);
   const [results, setResults] = useState<any>(null);
+  const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+  const showToast = (text: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToast({ text, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   if (role !== 'admin' && !checkTierAccess(tier, 'Medium')) {
     return (
@@ -47,7 +53,7 @@ export default function SimulatorPage() {
       }
     } catch (error) {
       console.error('Error simulating:', error);
-      alert('Failed to run simulation. Please try again.');
+      showToast('Failed to run simulation. Please try again.', 'error');
     } finally {
       setIsSimulating(false);
     }
@@ -68,6 +74,11 @@ export default function SimulatorPage() {
 
   return (
     <div className="space-y-6">
+      {toast && (
+        <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-[10000] px-6 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${toast.type === 'success' ? 'bg-emerald-500/90 border-emerald-400 text-white' : toast.type === 'error' ? 'bg-rose-500/90 border-rose-400 text-white' : 'bg-zinc-900/90 border-zinc-700 text-zinc-300'}`}>
+          <span className="text-sm font-bold tracking-tight">{toast.text}</span>
+        </div>
+      )}
       <div>
         <h1 className="text-3xl font-bold font-heading mb-2 flex items-center gap-3">
           <MonitorPlay className="w-8 h-8 text-pink-500" />

@@ -30,6 +30,7 @@ export default function Competitors() {
   const [inputUrl, setInputUrl] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [pushingFact, setPushingFact] = useState<string | null>(null);
+  const [deployingAll, setDeployingAll] = useState<string | null>(null);
   const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   const showToast = (text: string, type: 'success' | 'error' | 'info' = 'success') => {
@@ -104,6 +105,32 @@ export default function Competitors() {
        console.error("Fact error:", error);
     } finally {
       setPushingFact(null);
+    }
+  };
+
+  const handleDeployAll = async (comp: Competitor) => {
+    if (!user) return;
+    setDeployingAll(comp.id);
+    try {
+      const vulns = comp.vulnerabilities && comp.vulnerabilities.length > 0
+        ? comp.vulnerabilities
+        : ['Generic decay'];
+      for (const vuln of vulns) {
+        await addDoc(collection(db, 'facts'), {
+          userId: user.uid,
+          statement: `Unlike ${comp.name}, which shows data decay concerning ${vuln.toLowerCase()}, we provide updated solutions in this area.`,
+          entropyScore: 85,
+          cliffhangerActive: true,
+          category: 'Competitor Counter-Fact',
+          createdAt: new Date().toISOString().split('T')[0],
+        });
+      }
+      await logAuditAction(user.uid, 'Deployed All Counter-Facts', { competitor: comp.name, count: vulns.length });
+      showToast(`${vulns.length} counter-fact${vulns.length > 1 ? 's' : ''} deployed to Fact-Vault.`);
+    } catch (error: any) {
+      showToast('Deploy failed. Please try again.', 'error');
+    } finally {
+      setDeployingAll(null);
     }
   };
 
@@ -248,9 +275,15 @@ export default function Competitors() {
                   </div>
 
                   <div className="flex flex-col sm:flex-row items-center gap-3">
-                    <button className="w-full sm:w-auto bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2">
-                      Deploy Overwrite Action
-                      <ArrowRight className="w-4 h-4" />
+                    <button
+                      onClick={() => handleDeployAll(comp)}
+                      disabled={deployingAll === comp.id || pushingFact !== null}
+                      className="w-full sm:w-auto bg-rose-600 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                    >
+                      {deployingAll === comp.id
+                        ? <><Loader2 className="w-4 h-4 animate-spin" /> Deploying...</>
+                        : <>Deploy All to Fact-Vault <ArrowRight className="w-4 h-4" /></>
+                      }
                     </button>
                   </div>
                 </div>
