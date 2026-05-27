@@ -6,8 +6,43 @@ const nextConfig = {
   images: { unoptimized: true },
   async redirects() {
     return [
-      { source: '/strategy', destination: '/#strategy', permanent: false },
-      { source: '/testimonials', destination: '/#testimonials', permanent: false },
+      // ── Existing anchors ─────────────────────────────────────────────────
+      { source: '/strategy',    destination: '/#strategy',    permanent: false },
+      { source: '/testimonials',destination: '/#testimonials',permanent: false },
+
+      // ── Old AethergenAI pages → sensible new destinations (301) ──────────
+      // Account/user flows
+      { source: '/account',              destination: '/dashboard',  permanent: true },
+      { source: '/pricing',              destination: '/#pricing',   permanent: true },
+      { source: '/pilot',                destination: '/',           permanent: true },
+      { source: '/funding',              destination: '/',           permanent: true },
+
+      // Old product / demo pages
+      { source: '/ai',                   destination: '/',           permanent: true },
+      { source: '/evidence',             destination: '/',           permanent: true },
+      { source: '/context-dashboard',    destination: '/dashboard',  permanent: true },
+      { source: '/context-engineering',  destination: '/',           permanent: true },
+      { source: '/choose-model',         destination: '/',           permanent: true },
+      { source: '/zero-trust-calibration',destination: '/',          permanent: true },
+      { source: '/hero-art',             destination: '/',           permanent: true },
+      { source: '/ab-experiment',        destination: '/',           permanent: true },
+      { source: '/marketplace-demo',     destination: '/',           permanent: true },
+      { source: '/automotive-demo',      destination: '/',           permanent: true },
+      { source: '/efficiency-demo',      destination: '/',           permanent: true },
+      { source: '/cards-demo',           destination: '/',           permanent: true },
+      { source: '/starter/lam',          destination: '/',           permanent: true },
+      { source: '/starter/slm',          destination: '/',           permanent: true },
+      { source: '/starter/sam',          destination: '/',           permanent: true },
+      { source: '/starter/moe',          destination: '/',           permanent: true },
+
+      // Old path prefixes (wildcard)
+      { source: '/press/:path*',         destination: '/',           permanent: true },
+      { source: '/docs/:path*',          destination: '/',           permanent: true },
+      { source: '/notebooks/:path*',     destination: '/',           permanent: true },
+      { source: '/experiments/:path*',   destination: '/',           permanent: true },
+      { source: '/marketing/:path*',     destination: '/',           permanent: true },
+      { source: '/cv/:path*',            destination: '/',           permanent: true },
+      { source: '/starter/:path*',       destination: '/',           permanent: true },
     ];
   },
   webpack: (config) => {
