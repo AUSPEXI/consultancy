@@ -205,6 +205,12 @@ export const AnchorsSchema = z.union([
 
 export type AnchorsResult = z.infer<typeof AnchorsSchema>;
 
+export const CompetitorSuggestSchema = z.object({
+  competitors: z.array(z.string().min(1)).min(1).max(6),
+});
+
+export type CompetitorSuggestResult = z.infer<typeof CompetitorSuggestSchema>;
+
 /**
  * Schema Validation Result
  */

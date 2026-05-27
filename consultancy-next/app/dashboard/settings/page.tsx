@@ -9,7 +9,7 @@ import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
-import { Chrome, Linkedin, Twitter, MessageCircle, Instagram, Music2, CheckCircle2, Loader2, Sparkles, Network, X } from 'lucide-react';
+import { Chrome, Linkedin, Twitter, MessageCircle, Instagram, Music2, CheckCircle2, Loader2, Sparkles, Network, X, Search } from 'lucide-react';
 
 const AUSPEXI_GEO_KEYWORDS = [
   'generative engine optimization',
@@ -28,6 +28,14 @@ const AUSPEXI_COMPETITORS = [
   'brightedge.com', 'semrush.com', 'conductor.com',
   'clearscope.io', 'marketmuse.com', 'botify.com',
 ];
+
+const AUSPEXI_SOCIALS: Record<string, string> = {
+  linkedin:  'https://linkedin.com/company/auspexi',
+  twitter:   'https://x.com/auspexi',
+  instagram: 'https://instagram.com/auspexi',
+  tiktok:    'https://tiktok.com/@auspexi',
+  reddit:    'u/auspexi',
+};
 
 const AUSPEXI_ANCHORS = [
   { label: 'GEO Authority',        color: '#ec4899', baseType: 'Systemic Anchor' },
@@ -86,6 +94,7 @@ export default function SettingsPage() {
   const [origin, setOrigin] = useState('');
   const [anchors, setAnchors] = useState<any[]>([]);
   const [isGeneratingAnchors, setIsGeneratingAnchors] = useState(false);
+  const [isDiscoveringCompetitors, setIsDiscoveringCompetitors] = useState(false);
   const [formData, setFormData] = useState({
     brand: '', domain: '', cmsWebhookUrl: '',
     keyword1: '', keyword2: '', keyword3: '', keyword4: '', keyword5: '',
@@ -183,11 +192,12 @@ export default function SettingsPage() {
     }
   };
 
-  const applyAuspexiDefaults = () => {
+  const applyAuspexiDefaults = async () => {
     setFormData(prev => ({
       ...prev,
       brand: 'Auspexi',
       domain: 'auspexi.com',
+      cmsWebhookUrl: origin ? `${origin}/api/notify-article` : prev.cmsWebhookUrl,
       keyword1: AUSPEXI_GEO_KEYWORDS[0], keyword2: AUSPEXI_GEO_KEYWORDS[1],
       keyword3: AUSPEXI_GEO_KEYWORDS[2], keyword4: AUSPEXI_GEO_KEYWORDS[3],
       keyword5: AUSPEXI_GEO_KEYWORDS[4], keyword6: AUSPEXI_GEO_KEYWORDS[5],
@@ -197,6 +207,49 @@ export default function SettingsPage() {
       competitor3: AUSPEXI_COMPETITORS[2], competitor4: AUSPEXI_COMPETITORS[3],
       competitor5: AUSPEXI_COMPETITORS[4], competitor6: AUSPEXI_COMPETITORS[5],
     }));
+    // Auto-connect all known Auspexi social accounts
+    const socialKeys = Object.keys(AUSPEXI_SOCIALS);
+    setConnectedSocials(socialKeys);
+    if (user) {
+      try {
+        await setDoc(doc(db, 'users', user.uid), { connectedSocials: socialKeys }, { merge: true });
+      } catch {}
+    }
+    setSaveMsg({ type: 'success', text: 'Auspexi defaults applied — social accounts connected. Hit Save Settings to persist.' });
+  };
+
+  // ── AI competitor discovery ─────────────────────────────────────────────────
+  const discoverCompetitors = async () => {
+    if (!formData.brand) return;
+    setIsDiscoveringCompetitors(true);
+    try {
+      const keywords = [
+        formData.keyword1, formData.keyword2, formData.keyword3,
+        formData.keyword4, formData.keyword5,
+      ].filter(Boolean);
+      const res = await fetch('/api/suggest-competitors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user?.uid, brand: formData.brand, domain: formData.domain, keywords }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+      const comps: string[] = data.competitors || [];
+      setFormData(prev => ({
+        ...prev,
+        competitor1: comps[0] || prev.competitor1,
+        competitor2: comps[1] || prev.competitor2,
+        competitor3: comps[2] || prev.competitor3,
+        competitor4: comps[3] || prev.competitor4,
+        competitor5: comps[4] || prev.competitor5,
+        competitor6: comps[5] || prev.competitor6,
+      }));
+      setSaveMsg({ type: 'success', text: `Discovered ${comps.length} competitors. Review them below, then hit Save.` });
+    } catch (err: any) {
+      setSaveMsg({ type: 'error', text: `Discovery failed: ${err.message}` });
+    } finally {
+      setIsDiscoveringCompetitors(false);
+    }
   };
 
   // ── Save ────────────────────────────────────────────────────────────────────
@@ -296,8 +349,20 @@ export default function SettingsPage() {
       {/* Competitors */}
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
-          <CardTitle className="text-white">Competitor Tracking</CardTitle>
-          <CardDescription className="text-zinc-400">Brands you are racing for AI citations. Enter their domains — the platform monitors their content decay and flags displacement opportunities.</CardDescription>
+          <div className="flex items-start justify-between">
+            <div>
+              <CardTitle className="text-white">Competitor Tracking</CardTitle>
+              <CardDescription className="text-zinc-400 mt-1">Brands racing you for AI citations. Enter their domains — or let AI discover your true competitors based on your brand and keywords.</CardDescription>
+            </div>
+            <button
+              onClick={discoverCompetitors}
+              disabled={isDiscoveringCompetitors || !formData.brand}
+              className="flex items-center gap-2 px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 rounded-xl text-sm font-medium transition-colors disabled:opacity-50 whitespace-nowrap ml-4"
+            >
+              {isDiscoveringCompetitors ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+              AI Discover
+            </button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -308,6 +373,7 @@ export default function SettingsPage() {
               </div>
             ))}
           </div>
+          <p className="text-xs text-zinc-600 mt-3">Don&apos;t know your competitors? Click <span className="text-cyan-500">AI Discover</span> — Gemini will identify the 6 brands most likely competing with you for AI citations.</p>
         </CardContent>
       </Card>
 
