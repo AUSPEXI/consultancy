@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { NavigationProgress } from '@/components/ui/NavigationProgress'
+import { CookieConsent } from '@/components/ui/cookie-consent'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -55,6 +56,7 @@ export default function RootLayout({
       <body className="antialiased bg-[#050505] text-white">
         <NavigationProgress />
         <AuthProvider>{children}</AuthProvider>
+        <CookieConsent />
       </body>
     </html>
   )
