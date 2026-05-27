@@ -50,8 +50,31 @@ export default async function BlogPostPage(
 
   if (!post) notFound();
 
+  const blogPostingJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.excerpt,
+    url: `https://auspexi.com/blog/${post.slug}`,
+    datePublished: post.date,
+    image: post.image || 'https://auspexi.com/geo-infographic.png',
+    articleSection: post.category,
+    author: {
+      '@type': 'Organization',
+      name: 'Auspexi',
+      url: 'https://auspexi.com',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Auspexi',
+      logo: { '@type': 'ImageObject', url: 'https://auspexi.com/geo-infographic.png' },
+    },
+    isPartOf: { '@id': 'https://auspexi.com/blog' },
+  };
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30 overflow-x-hidden">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJsonLd) }} />
       <PublicHeader />
 
       <main className="pt-32 pb-24">

@@ -15,6 +15,13 @@ export const metadata: Metadata = {
     description: 'The latest tactics, research and case studies on Generative Engine Optimization.',
     url: 'https://auspexi.com/blog',
     type: 'website',
+    images: [{ url: '/geo-infographic.png', width: 1200, height: 630, alt: 'Auspexi Blog — GEO Strategy Insights' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'GEO Strategy Insights | Auspexi Blog',
+    description: 'The latest tactics, research and case studies on Generative Engine Optimization.',
+    images: ['/geo-infographic.png'],
   },
 };
 

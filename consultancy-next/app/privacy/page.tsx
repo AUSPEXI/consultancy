@@ -1,16 +1,42 @@
-'use client'
-
-import React from 'react';
+import type { Metadata } from 'next';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
+
+export const metadata: Metadata = {
+  title: 'Privacy & Cookie Policy | Auspexi',
+  description: 'Auspexi\'s privacy and cookie policy. Learn how we collect, use, and protect your personal data in compliance with GDPR.',
+  metadataBase: new URL('https://auspexi.com'),
+  alternates: { canonical: 'https://auspexi.com/privacy' },
+  openGraph: {
+    title: 'Privacy & Cookie Policy | Auspexi',
+    description: 'How Auspexi collects, uses, and protects your personal data in compliance with GDPR.',
+    url: 'https://auspexi.com/privacy',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Privacy & Cookie Policy | Auspexi',
+    description: 'How Auspexi collects, uses, and protects your personal data in compliance with GDPR.',
+  },
+};
+
+const privacyJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'Privacy & Cookie Policy',
+  url: 'https://auspexi.com/privacy',
+  description: 'Auspexi privacy and cookie policy — GDPR compliant data handling.',
+  isPartOf: { '@id': 'https://auspexi.com/#website' },
+};
 
 export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(privacyJsonLd) }} />
       <PublicHeader />
       <main className="pt-32 pb-24">
         <div className="max-w-4xl mx-auto px-6">
-          <h1 className="text-4xl md:text-5xl font-bold font-heading mb-8">Privacy & Cookie Policy</h1>
+          <h1 className="text-4xl md:text-5xl font-bold font-heading mb-8">Privacy &amp; Cookie Policy</h1>
           <p className="text-zinc-400 mb-12 font-mono text-xs">Last updated: April 2026</p>
           <div className="prose prose-invert prose-zinc max-w-none text-sm leading-relaxed text-zinc-350 space-y-8 font-sans">
             <section className="mb-10">

@@ -1,12 +1,38 @@
-'use client'
-
-import React from 'react';
+import type { Metadata } from 'next';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
+
+export const metadata: Metadata = {
+  title: 'Terms of Service | Auspexi',
+  description: 'Auspexi\'s Terms of Service. Read the full terms governing use of the Auspexi GEO platform, including intellectual property, prohibited uses, and limitation of liability.',
+  metadataBase: new URL('https://auspexi.com'),
+  alternates: { canonical: 'https://auspexi.com/terms' },
+  openGraph: {
+    title: 'Terms of Service | Auspexi',
+    description: 'Terms governing use of the Auspexi GEO platform.',
+    url: 'https://auspexi.com/terms',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Terms of Service | Auspexi',
+    description: 'Terms governing use of the Auspexi GEO platform.',
+  },
+};
+
+const termsJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'Terms of Service',
+  url: 'https://auspexi.com/terms',
+  description: 'Auspexi Terms of Service governing use of the GEO platform.',
+  isPartOf: { '@id': 'https://auspexi.com/#website' },
+};
 
 export default function TermsOfServicePage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(termsJsonLd) }} />
       <PublicHeader />
       <main className="pt-32 pb-24">
         <div className="max-w-4xl mx-auto px-6">
@@ -22,7 +48,7 @@ export default function TermsOfServicePage() {
               <p>The Service and its original content, features, and functionality are and will remain the exclusive property of Auspexi and its licensors. The Service is protected by copyright, trademark, and other laws of both the United States and foreign countries. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of Auspexi.</p>
             </section>
             <section className="mb-10">
-              <h2 className="text-2xl font-semibold mb-4 text-white font-heading">3. Prohibited Uses & Anti-Reverse Engineering</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-white font-heading">3. Prohibited Uses &amp; Anti-Reverse Engineering</h2>
               <p className="mb-4">You agree not to use the Service for any unlawful purpose or any purpose prohibited under this clause. <strong>Specifically, you strictly agree NOT to:</strong></p>
               <ul className="list-disc pl-6 space-y-2 mb-4">
                 <li>Reverse engineer, decompile, disassemble, decipher or otherwise attempt to derive the source code for any underlying intellectual property used to provide the Service.</li>

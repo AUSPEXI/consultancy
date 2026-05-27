@@ -6,6 +6,17 @@ import { VoiceAgent } from '@/components/ui/voice-agent';
 import { VoiceAgentProvider } from '@/contexts/VoiceAgentContext';
 import { Sparkles, Mic, Zap, Brain, MessageSquare, Shield } from 'lucide-react';
 
+const voiceJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Citacious by Auspexi',
+  applicationCategory: 'BusinessApplication',
+  description: 'Real-time AI voice assistant for Generative Engine Optimization strategy, powered by Gemini Live.',
+  url: 'https://auspexi.com/voice-agents',
+  operatingSystem: 'Web',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+
 const features = [
   { icon: Zap, title: "Ultra-Low Latency", description: "Sub-500ms response times powered by Gemini Live API for natural, real-time conversation." },
   { icon: Brain, title: "Brand-Aware Intelligence", description: "Citacious pulls from your Fact-Vault and live SOV metrics to give hyper-personalized GEO guidance." },
@@ -17,6 +28,7 @@ export default function VoiceAgentsPage() {
   return (
     <VoiceAgentProvider>
       <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30 flex flex-col overflow-x-hidden">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(voiceJsonLd) }} />
         <PublicHeader />
 
         <main className="pt-32 pb-24 flex-1">

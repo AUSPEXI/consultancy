@@ -49,6 +49,18 @@ const PILLARS = [
   },
 ];
 
+const aboutJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': 'https://auspexi.com/#org',
+  name: 'Auspexi',
+  url: 'https://auspexi.com',
+  logo: 'https://auspexi.com/geo-infographic.png',
+  description: 'GEO platform engineering structured knowledge for AI-era brand authority across ChatGPT, Gemini, Claude, and Perplexity.',
+  foundingDate: '2025',
+  sameAs: ['https://linkedin.com/company/auspexi', 'https://x.com/auspexi'],
+};
+
 const PLATFORM_STATS = [
   { value: '10,000+', label: 'Market signals in the GEO data lake' },
   { value: '768-D', label: 'Semantic embedding dimensions' },
@@ -59,6 +71,7 @@ const PLATFORM_STATS = [
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 pt-24 pb-32 overflow-x-hidden">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }} />
       <PublicHeader />
       <div className="max-w-7xl mx-auto px-6">
 
