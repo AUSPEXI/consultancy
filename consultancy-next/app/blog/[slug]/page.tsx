@@ -1,8 +1,6 @@
-'use client'
-
-import React from 'react';
-import { useParams } from 'next/navigation';
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
 import { blogPosts } from '@/data/blogPosts';
@@ -11,21 +9,46 @@ import { ArrowLeft } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 
-export default function BlogPostPage() {
-  const params = useParams();
-  const slug = params?.slug as string;
-  const post = blogPosts.find(p => p.slug === slug);
+// Pre-build every blog slug at deploy time → fully static HTML for Google
+export function generateStaticParams() {
+  return blogPosts.map((post) => ({ slug: post.slug }));
+}
 
-  if (!post) {
-    return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Post Not Found</h1>
-          <Link href="/blog" className="text-pink-400 hover:text-pink-300">Return to Blog</Link>
-        </div>
-      </div>
-    );
-  }
+// Per-post title + description in <head> for Google and social sharing
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const { slug } = await params;
+  const post = blogPosts.find((p) => p.slug === slug);
+  if (!post) return { title: 'Post Not Found | Auspexi' };
+  return {
+    title: `${post.title} | Auspexi`,
+    description: post.excerpt,
+    metadataBase: new URL('https://auspexi.com'),
+    alternates: { canonical: `https://auspexi.com/blog/${post.slug}` },
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      url: `https://auspexi.com/blog/${post.slug}`,
+      type: 'article',
+      images: [{ url: post.image || '/geo-infographic.png', width: 1200, height: 630, alt: post.title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+      images: [post.image || '/geo-infographic.png'],
+    },
+  };
+}
+
+export default async function BlogPostPage(
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  const { slug } = await params;
+  const post = blogPosts.find((p) => p.slug === slug);
+
+  if (!post) notFound();
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30 overflow-x-hidden">

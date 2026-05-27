@@ -1,10 +1,22 @@
-'use client'
-
+import type { Metadata } from 'next';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
 import Link from 'next/link';
 import { blogPosts } from '@/data/blogPosts';
 import { BlogHero } from '@/components/BlogHero';
+
+export const metadata: Metadata = {
+  title: 'GEO Strategy Insights | Auspexi Blog',
+  description: 'The latest tactics, research and case studies on Generative Engine Optimization. Learn how to dominate AI search across ChatGPT, Gemini, Claude and Perplexity.',
+  metadataBase: new URL('https://auspexi.com'),
+  alternates: { canonical: 'https://auspexi.com/blog' },
+  openGraph: {
+    title: 'GEO Strategy Insights | Auspexi Blog',
+    description: 'The latest tactics, research and case studies on Generative Engine Optimization.',
+    url: 'https://auspexi.com/blog',
+    type: 'website',
+  },
+};
 
 export default function BlogPage() {
   return (
