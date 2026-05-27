@@ -188,7 +188,7 @@ export default function OverviewPage() {
         const shortDate = lastDate.toLocaleDateString('en-US', { weekday: 'short' });
         const prevAsov = metrics.length > 0 ? metrics[metrics.length - 1].aSov : 12;
         const prevErr = metrics.length > 0 ? metrics[metrics.length - 1].err : 20;
-        const prevAiTraffic = metrics.length > 0 ? Math.min(metrics[metrics.length - 1].aiTraffic, 750) : 120;
+        const prevAiTraffic = metrics.length > 0 ? Math.min(metrics[metrics.length - 1].aiTraffic, 9999) : 120;
         const prevCompA = metrics.length > 0 ? metrics[metrics.length - 1].compA : 45;
 
         const historicalWrites: Promise<any>[] = [];
@@ -267,8 +267,8 @@ export default function OverviewPage() {
 
   const latest = metrics.length > 0 ? metrics[metrics.length - 1] : { id: 'placeholder', aSov: 12, err: 20, compGap: -33, compA: 45, compB: 30, aiTraffic: 120, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } };
   const previous = metrics.length > 1 ? metrics[metrics.length - 2] : latest;
-  const safeLatest = { aSov: latest.aSov ?? 0, err: latest.err ?? 0, compGap: latest.compGap ?? 0, aiTraffic: Math.min(latest.aiTraffic ?? 0, 750), compA: latest.compA ?? 0, platforms: latest.platforms || {}, radar: latest.radar || [], sentiment: latest.sentiment || [], topUrls: latest.topUrls || [] };
-  const safePrevious = { aSov: previous.aSov ?? 0, err: previous.err ?? 0, compGap: previous.compGap ?? 0, aiTraffic: Math.min(previous.aiTraffic ?? 0, 750), compA: previous.compA ?? 0 };
+  const safeLatest = { aSov: latest.aSov ?? 0, err: latest.err ?? 0, compGap: latest.compGap ?? 0, aiTraffic: Math.min(latest.aiTraffic ?? 0, 9999), compA: latest.compA ?? 0, platforms: latest.platforms || {}, radar: latest.radar || [], sentiment: latest.sentiment || [], topUrls: latest.topUrls || [] };
+  const safePrevious = { aSov: previous.aSov ?? 0, err: previous.err ?? 0, compGap: previous.compGap ?? 0, aiTraffic: Math.min(previous.aiTraffic ?? 0, 9999), compA: previous.compA ?? 0 };
   const asovTrend = Math.round(safeLatest.aSov - safePrevious.aSov);
   const trafficTrend = Math.round(safeLatest.aiTraffic - safePrevious.aiTraffic);
   const errTrend = Math.round(safeLatest.err - safePrevious.err);
