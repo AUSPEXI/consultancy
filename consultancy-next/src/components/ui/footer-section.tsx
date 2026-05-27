@@ -123,6 +123,7 @@ export function Footerdemo() {
           <nav className="flex gap-6 text-sm">
             <Link href="/privacy" className="transition-colors hover:text-white">Privacy Policy</Link>
             <Link href="/terms" className="transition-colors hover:text-white">Terms of Service</Link>
+            <Link href="/acceptable-use" className="transition-colors hover:text-white">Acceptable Use</Link>
           </nav>
         </div>
       </div>
