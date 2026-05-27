@@ -529,6 +529,49 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
 ];
 
 // Condensed knowledge base for Citacious system prompt
+// Aura knowledge base — full coverage of all 10 FAQ categories, voice-optimised format.
+// Concise, conversational answers covering every topic a public visitor might raise.
+export const AURA_FAQ_KNOWLEDGE = `
+WHAT IS GEO:
+Generative Engine Optimization is the practice of engineering your brand knowledge so AI models like ChatGPT, Gemini, Claude, and Perplexity cite your brand as authoritative. Unlike traditional SEO which ranks links, GEO embeds brand facts into the AI knowledge layer so your brand appears in AI-generated answers. Auspexi measures, improves, and automates this for you.
+
+WHAT IS AI SHARE OF VOICE (A-SoV):
+A-SoV is the percentage of relevant AI responses that mention your brand. If AI mentions you in 4 out of 10 relevant responses, your SoV is 40%. Auspexi tracks this live across ChatGPT, Gemini, Claude, and Perplexity. Early-stage brands can realistically achieve 30 to 60 percent SoV in their niche within the first few months.
+
+WHY GEO MATTERS NOW:
+Over 50% of consumers now use AI for product and service research before buying. If your brand is not being cited by AI, you are invisible to that audience. GEO is not a future trend — it is happening right now. Brands that establish AI citation authority in 2025 will be very difficult to displace once AI models consolidate their knowledge.
+
+HOW AI ENGINES DIFFER:
+ChatGPT and Perplexity use real-time web retrieval — fresh, high-quality content can appear in their responses within 1 to 2 weeks. Google Gemini and Anthropic Claude primarily rely on their training data, meaning embedding your brand in those models takes 6 to 12 weeks. Auspexi tracks your citation rate across all four engines separately so you can see where you are winning and where you still need to build presence.
+
+WHAT ARE CITE-MAGNETS:
+Cite-Magnets are structured brand facts engineered specifically to be cited by AI. A good Cite-Magnet has three parts: a specific verifiable claim, a quantified detail, and clear brand attribution. For example: Auspexi maps brand-concept associations across 768 semantic dimensions using Google's text-embedding-004 model. This structure makes it easy for AI to extract and cite.
+
+WHAT IS THE AUSPEXI PLATFORM:
+Auspexi is an integrated GEO platform with eight core tools. GEO-Pulse scans your keywords across AI engines in real time. Fact-Vault is your brand knowledge base. Content Scorer grades your content on AI citability. Brand Monitor watches the web for citation opportunities. Competitors tracks rival brands in your GEO space. Agents auto-generates GEO-optimised articles. Technical Analyzer audits your site for AI crawlability. AI Simulator previews how AI engines would respond to queries about your brand today.
+
+WHAT IS CITACIOUS:
+Citacious is Auspexi's dashboard AI strategist — a real-time voice assistant with deep knowledge of your brand's Fact-Vault, your live SoV metrics, and the full GEO strategy playbook. She lives inside your dashboard and can navigate between tools, analyse your data, suggest next actions, and explain exactly what to do and why. She is powered by Google Gemini Live and responds in under 500 milliseconds.
+
+PRICING AND PLANS:
+Auspexi offers tiered subscription plans billed monthly or annually. Annual plans include a significant discount. All plans include GEO-Pulse, Fact-Vault, Content Scorer, and Citacious from day one. Higher tiers unlock more probe queries, more competitor slots, and advanced features. You can cancel any time with no lock-in on monthly plans. There is a Starter plan for immediate access, and an Enterprise plan with unlimited queries, multi-brand management, and dedicated support. For enterprise pricing, contact sales@auspexi.com.
+
+HOW TO GET STARTED:
+Create your account at auspexi.com. Then in order of impact: complete your brand profile in Settings with your brand name, domain, and competitors; add 10 to 20 Cite-Magnet facts to your Fact-Vault; run GEO-Pulse on your three most important target queries; run the Technical Analyzer on your domain; and talk to Citacious for a strategic briefing. This gives you a complete picture of where you stand within 20 minutes.
+
+HOW LONG BEFORE RESULTS:
+Retrieval-based engines like Perplexity and ChatGPT browsing mode can pick up fresh content within 1 to 2 weeks. Training-based improvement in Gemini and Claude takes 6 to 12 weeks. A well-executed first 30 days — 50 plus facts in the Fact-Vault, 3 GEO articles published, Technical Analyzer fixes implemented — creates the foundation for measurable SoV growth from week 5 onwards.
+
+SECURITY AND GDPR:
+All data is encrypted at rest with AES-256 and in transit with TLS 1.3. Your data is stored in Google Firestore with strict user-level isolation — only your account can access your brand data. Auspexi is UK GDPR compliant, operated from Hampshire, UK. Voice audio from sessions is not stored by Auspexi beyond the live session. Your brand data is never used to train third-party AI models.
+
+COMPETITOR TRACKING:
+Auspexi tracks competitor brands AI Share of Voice alongside yours, showing which competitors are gaining or losing citation share and where their content is becoming stale. The platform surfaces specific Trojan Horse opportunities — topic areas where you can publish fresh authoritative content that supersedes a competitor's weakening AI presence and captures their citation share.
+
+CONTACT AND SUPPORT:
+You can reach Auspexi at sales@auspexi.com for sales, enterprise pricing, or support questions. The platform is operated from Hampshire, UK. For questions about data or privacy, the same email address reaches our data team.
+`;
+
 export const CITACIOUS_GEO_KNOWLEDGE = `
 GEO KNOWLEDGE BASE (authoritative answers for common queries):
 
