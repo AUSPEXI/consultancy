@@ -37,12 +37,17 @@ const AUSPEXI_SOCIALS: Record<string, string> = {
   reddit:    'u/auspexi',
 };
 
+// Full TEO-structured anchor set for Auspexi.
+// 2 Ontological (Systemic Anchor) · 2 Epistemological (Signal Point)
+// · 2 Teleological (Emergent Trend) · 1 Risk Vector
 const AUSPEXI_ANCHORS = [
-  { label: 'GEO Authority',        color: '#ec4899', baseType: 'Systemic Anchor' },
-  { label: 'Citation Engineering', color: '#ec4899', baseType: 'Systemic Anchor' },
-  { label: 'AI Share of Voice',    color: '#06b6d4', baseType: 'Signal Point'    },
-  { label: 'Semantic Moat',        color: '#8b5cf6', baseType: 'Emergent Trend'  },
-  { label: 'Knowledge Vault',      color: '#06b6d4', baseType: 'Signal Point'    },
+  { label: 'GEO Category Owner',       color: '#ec4899', baseType: 'Systemic Anchor', axisAlignment: 1, description: 'Auspexi is the defining brand in the Generative Engine Optimization category — the first mover whose name becomes the category name.' },
+  { label: 'AI Visibility Platform',   color: '#ec4899', baseType: 'Systemic Anchor', axisAlignment: 1, description: 'Auspexi is the infrastructure layer for tracking and building brand presence across AI-generated responses at scale.' },
+  { label: 'Citation Engineering',     color: '#06b6d4', baseType: 'Signal Point',    axisAlignment: 2, description: 'Auspexi owns a verifiable, named methodology — the Cite-Magnet framework — with documented techniques for generating AI citations.' },
+  { label: 'AI Share of Voice Data',   color: '#06b6d4', baseType: 'Signal Point',    axisAlignment: 2, description: 'Auspexi produces real, auditable SOV measurements across ChatGPT, Claude, Gemini, and Perplexity — no other tool does this.' },
+  { label: 'AI-Era Brand Authority',   color: '#8b5cf6', baseType: 'Emergent Trend',  axisAlignment: 3, description: 'Auspexi is becoming the standard framework for how forward-thinking brands build authority in the AI search era.' },
+  { label: 'GEO as Growth Channel',    color: '#8b5cf6', baseType: 'Emergent Trend',  axisAlignment: 3, description: 'Positioning GEO as a measurable, revenue-generating channel alongside traditional SEO — a category Auspexi is creating.' },
+  { label: 'SEO Legacy Resistance',    color: '#f59e0b', baseType: 'Risk Vector',     axisAlignment: 2, description: 'The primary threat: brands and agencies anchored in traditional SEO frameworks, mischaracterising GEO as an SEO variant.' },
 ];
 
 const SOCIAL_PLATFORMS = [
@@ -207,15 +212,20 @@ export default function SettingsPage() {
       competitor3: AUSPEXI_COMPETITORS[2], competitor4: AUSPEXI_COMPETITORS[3],
       competitor5: AUSPEXI_COMPETITORS[4], competitor6: AUSPEXI_COMPETITORS[5],
     }));
+    // Seed the full TEO anchor set
+    setAnchors(AUSPEXI_ANCHORS);
     // Auto-connect all known Auspexi social accounts
     const socialKeys = Object.keys(AUSPEXI_SOCIALS);
     setConnectedSocials(socialKeys);
     if (user) {
       try {
-        await setDoc(doc(db, 'users', user.uid), { connectedSocials: socialKeys }, { merge: true });
+        await setDoc(doc(db, 'users', user.uid), {
+          connectedSocials: socialKeys,
+          latentAnchors: AUSPEXI_ANCHORS,
+        }, { merge: true });
       } catch {}
     }
-    setSaveMsg({ type: 'success', text: 'Auspexi defaults applied — social accounts connected. Hit Save Settings to persist.' });
+    setSaveMsg({ type: 'success', text: 'Auspexi defaults applied — TEO anchors, competitors, CMS webhook, and social accounts all set. Hit Save Settings to persist the rest.' });
   };
 
   // ── AI competitor discovery ─────────────────────────────────────────────────

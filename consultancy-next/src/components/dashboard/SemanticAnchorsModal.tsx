@@ -213,7 +213,7 @@ export function SemanticAnchorsModal({
                   </div>
                </div>
             ))}
-            {editAnchorsState.length < 5 && (
+            {editAnchorsState.length < 7 && (
                <button onClick={() => setEditAnchorsState([...editAnchorsState, { label: "New Anchor", color: "#ec4899", baseType: "Signal Point" }])} className="group w-full p-10 border-2 border-dashed border-zinc-800 hover:border-pink-500/30 rounded-3xl text-zinc-600 hover:text-pink-400 bg-zinc-950/20 hover:bg-pink-500/5 transition-all duration-500 text-sm font-bold flex flex-col items-center justify-center gap-4">
                   <div className="p-4 bg-zinc-900 rounded-2xl group-hover:bg-pink-500/10 transition-colors border border-zinc-800 group-hover:border-pink-500/20">
                     <Plus className="w-8 h-8" />
