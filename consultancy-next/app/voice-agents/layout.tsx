@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Citacious Voice AI | Real-Time GEO Strategy Assistant | Auspexi',
-  description: 'Meet Citacious — your real-time AI voice assistant powered by Gemini Live. Get instant answers on brand AI visibility, GEO strategy, and live metrics with sub-500ms response times.',
+  title: 'Aura Voice AI | Real-Time GEO Brand Guide | Auspexi',
+  description: 'Meet Aura — Auspexi\'s real-time AI voice brand guide, powered by Gemini Live. Ask anything about GEO, pricing, or Auspexi features and get instant intelligent answers.',
   metadataBase: new URL('https://auspexi.com'),
   alternates: { canonical: 'https://auspexi.com/voice-agents' },
   openGraph: {

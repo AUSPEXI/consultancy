@@ -6,6 +6,7 @@ import { Bot, X, Send, Maximize2, Minimize2, Sparkles, Mic, MicOff, Loader2 } fr
 import { motion, AnimatePresence } from 'framer-motion';
 import { collection, getDocs, getDoc, doc, query, orderBy, limit, where } from 'firebase/firestore';
 import { db, auth } from '@/firebase';
+import { CITACIOUS_GEO_KNOWLEDGE } from '@/data/faqData';
 
 // Lazy initialization of Gemini API
 let aiClient: GoogleGenAI | null = null;
@@ -347,6 +348,9 @@ MATHEMATICAL DEFINITIONS:
 - Context Drift: When AI engines re-weight citations for a topic — detected by the GEO Pulse drift_detected flag.
 - Trojan Horse Opportunity: A query where a competitor ranks with low confidence — you can displace them with one authoritative fact-sheet.
 - JSON-LD Schema: Structured data markup that makes your content machine-readable and citable by AI crawlers.
+
+GEO KNOWLEDGE BASE (use this to answer any user questions about GEO concepts, strategy, or Auspexi features accurately):
+${CITACIOUS_GEO_KNOWLEDGE}
 
 ${knowledgeContext}`;
 

@@ -19,8 +19,8 @@ const voiceJsonLd = {
 
 const features = [
   { icon: Zap, title: "Ultra-Low Latency", description: "Sub-500ms response times powered by Gemini Live API for natural, real-time conversation." },
-  { icon: Brain, title: "Brand-Aware Intelligence", description: "Citacious pulls from your Fact-Vault and live SOV metrics to give hyper-personalized GEO guidance." },
-  { icon: MessageSquare, title: "Knowledge Extraction", description: "Every conversation is analyzed post-call to extract new facts and strengthen your Fact-Vault automatically." },
+  { icon: Brain, title: "GEO Expert Knowledge", description: "Aura knows everything about Generative Engine Optimization — what it is, how it works, and whether Auspexi is right for you." },
+  { icon: MessageSquare, title: "Instant Navigation", description: "Ask Aura to take you anywhere on the site and she'll navigate on your behalf — no clicking required." },
   { icon: Shield, title: "Echo Cancellation", description: "Advanced audio processing eliminates feedback so the agent only hears you, not itself." },
 ];
 
@@ -41,10 +41,10 @@ export default function VoiceAgentsPage() {
                 <span>Gemini Live · Real-Time Voice AI</span>
               </div>
               <h1 className="text-4xl md:text-6xl font-bold font-heading mb-6">
-                Meet <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-pink-600">Citacious</span>
+                Meet <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-pink-600">Aura</span>
               </h1>
               <p className="text-xl text-zinc-400 leading-relaxed">
-                Your legendary GEO Quest-Guide. Ask anything about brand visibility, AI search strategy, or your live metrics — and get an instant, intelligent answer.
+                Auspexi&apos;s voice brand guide. Ask anything about GEO, what Auspexi does, pricing, or where to go next — and get an instant, intelligent answer.
               </p>
             </div>
 
@@ -72,12 +72,12 @@ export default function VoiceAgentsPage() {
                   <Mic className="w-3 h-3 text-pink-400" />
                   HOW IT WORKS
                 </div>
-                <h2 className="text-3xl font-bold font-heading mb-4 text-white">Three Steps to Latent Space Mastery</h2>
+                <h2 className="text-3xl font-bold font-heading mb-4 text-white">Three Ways Aura Helps You</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 text-left">
                   {[
-                    { step: "01", title: "Connect", desc: "Click Start Call. Your browser requests mic access and establishes a secure real-time session with Gemini Live." },
-                    { step: "02", title: "Ask Anything", desc: "Ask about your GEO strategy, request a live metrics briefing, or get Citacious to navigate you to specific dashboard tools." },
-                    { step: "03", title: "Level Up", desc: "Post-call, insights are extracted and fed back into your Fact-Vault, deepening the AI's understanding of your brand." },
+                    { step: "01", title: "Connect", desc: "Click Start Call. Your browser requests mic access and establishes a secure real-time session with Gemini Live. No account needed." },
+                    { step: "02", title: "Ask Anything", desc: "Ask about GEO strategy, what Auspexi does, how pricing works, or have Aura navigate you to the right page on the site." },
+                    { step: "03", title: "Get Started", desc: "Ready to go deeper? Aura will guide you to sign up for the dashboard where Citacious — our dedicated GEO strategist AI — takes over." },
                   ].map((item) => (
                     <div key={item.step} className="flex gap-4">
                       <div className="text-3xl font-black text-pink-500/30 font-mono leading-none mt-1">{item.step}</div>
