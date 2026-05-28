@@ -27,10 +27,10 @@ export const metadata: Metadata = {
 
 export default function BlogPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30 overflow-x-hidden">
+    <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30">
       <PublicHeader />
 
-      <main className="pt-32 pb-24">
+      <main className="pt-32 pb-24 bg-zinc-950">
         <div className="max-w-7xl mx-auto px-6">
           <div className="mb-16 text-center">
             <h1 className="text-4xl md:text-6xl font-bold font-heading mb-6">GEO Strategy Insights</h1>

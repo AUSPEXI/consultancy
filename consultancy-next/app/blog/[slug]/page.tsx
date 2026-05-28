@@ -71,11 +71,11 @@ export default async function BlogPostPage(
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30 overflow-x-hidden">
+    <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJsonLd) }} />
       <PublicHeader />
 
-      <main className="pt-32 pb-24">
+      <main className="pt-32 pb-24 bg-zinc-950">
         <article className="max-w-3xl mx-auto px-6">
           <Link href="/blog" className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-white mb-8 transition-colors">
             <ArrowLeft className="w-4 h-4" />
