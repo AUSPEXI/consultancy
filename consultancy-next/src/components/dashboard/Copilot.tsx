@@ -388,7 +388,7 @@ ${knowledgeContext}`;
       const ai = getAIClient();
 
       const sessionPromise = ai.live.connect({
-        model: "gemini-3.1-flash-live-preview",
+        model: "gemini-2.0-flash-live-001",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
