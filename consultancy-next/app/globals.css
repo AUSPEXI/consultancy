@@ -8,7 +8,7 @@
     color: #fafafa;
     font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
     overscroll-behavior-y: none;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 }
 
