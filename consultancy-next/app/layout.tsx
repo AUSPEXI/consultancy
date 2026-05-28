@@ -46,7 +46,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="bg-zinc-950">
       <head>
         {/* Spline CDN preconnect — eliminates cold-connect delay for the robot */}
         <link rel="preconnect" href="https://prod.spline.design" crossOrigin="" />
