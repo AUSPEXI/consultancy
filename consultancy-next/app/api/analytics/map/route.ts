@@ -151,12 +151,36 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    const engineInfo = embeddingService.getActiveEngine();
+
+    // Log embedding cost to cost_audit
+    if (userId && dbAdmin && points.length > 0) {
+      const totalTexts = (vaultFacts.length > 0 ? vaultFacts.length : anchorLabels.length * 10) + 3; // facts + 3 axes
+      const estimatedTokens = totalTexts * 20; // ~20 tokens avg per short text
+      const costUsd = engineInfo.name === 'openai'
+        ? (estimatedTokens / 1_000_000) * 0.02  // $0.02/1M tokens
+        : (estimatedTokens / 1_000_000) * 0.025; // Gemini embeddings
+      dbAdmin.collection('cost_audit').add({
+        userId,
+        feature: 'latent-space-map',
+        model: engineInfo.model,
+        provider: engineInfo.name,
+        inputTokens: estimatedTokens,
+        outputTokens: 0,
+        estimatedCostUsd: costUsd,
+        totalCostUsd: costUsd,
+        textsEmbedded: totalTexts,
+        timestamp: new Date().toISOString(),
+      }).catch(() => {});
+    }
+
     return NextResponse.json({
       success: true,
       points,
       metadata: {
-        engine: 'text-embedding-004',
-        dimensions: 768,
+        engine: engineInfo.model,
+        provider: engineInfo.name,
+        dimensions: engineInfo.dimensions,
         axes: ['Ontological', 'Epistemological', 'Teleological'],
         platform,
         timeframe,
