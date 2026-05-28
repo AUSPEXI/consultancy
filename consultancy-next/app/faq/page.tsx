@@ -60,25 +60,25 @@ export default function FAQPage() {
           </p>
         </div>
 
-        {/* ── Sticky category nav ── */}
-        <div className="sticky top-[73px] z-40 bg-zinc-950/90 backdrop-blur-md border-y border-zinc-800/60 py-3 mb-16">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: 'none' }}>
-              {FAQ_CATEGORIES.map(cat => {
-                const Icon = ICONS[cat.icon];
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => scrollTo(cat.id)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all shrink-0 whitespace-nowrap"
-                  >
-                    {Icon && <Icon className="w-3 h-3 text-pink-400 shrink-0" />}
-                    {cat.title}
-                    <span className="text-zinc-600 text-[10px]">({cat.items.length})</span>
-                  </button>
-                );
-              })}
-            </div>
+        {/* ── Category nav grid ── */}
+        <div className="max-w-7xl mx-auto px-6 mb-16">
+          <div className="grid grid-cols-2 gap-2">
+            {FAQ_CATEGORIES.map(cat => {
+              const Icon = ICONS[cat.icon];
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => scrollTo(cat.id)}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-900/40 hover:border-pink-500/30 hover:bg-zinc-900/70 transition-all text-left group"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-zinc-950 border border-zinc-800 group-hover:border-pink-500/30 flex items-center justify-center shrink-0 transition-colors">
+                    {Icon && <Icon className="w-4 h-4 text-pink-400" />}
+                  </div>
+                  <span className="flex-1 text-sm font-medium text-zinc-300 group-hover:text-white transition-colors leading-snug">{cat.title}</span>
+                  <span className="text-[10px] font-mono text-zinc-600 group-hover:text-zinc-400 shrink-0 transition-colors">{cat.items.length}q</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
