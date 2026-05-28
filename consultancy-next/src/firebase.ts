@@ -1,6 +1,6 @@
-import { initializeApp, getApp, getApps } from 'firebase/app'
-import { getAuth, GoogleAuthProvider } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app'
+import { getAuth, GoogleAuthProvider, Auth } from 'firebase/auth'
+import { getFirestore, Firestore } from 'firebase/firestore'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,16 +11,17 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 }
 
-let app
-const apps = getApps()
-
-if (apps.length > 0) {
-  app = apps[0]
-} else {
-  app = initializeApp(firebaseConfig)
+// Guard against SSG/build-time runs where Firebase env vars aren't available.
+// useEffect in AuthContext ensures auth/db are only accessed on the client.
+let app: FirebaseApp | null = null
+if (firebaseConfig.apiKey) {
+  app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig)
 }
 
 const databaseId = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID || 'ai-studio-2cf48d01-0e3c-41eb-88cf-8117f9ee3d0c'
-export const db = getFirestore(app, databaseId)
-export const auth = getAuth(app)
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const db: Firestore = app ? getFirestore(app, databaseId) : (null as any)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const auth: Auth = app ? getAuth(app) : (null as any)
 export const googleProvider = new GoogleAuthProvider()
