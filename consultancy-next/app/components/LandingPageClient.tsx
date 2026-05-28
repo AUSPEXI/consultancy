@@ -10,7 +10,7 @@ import { ImageZoom } from '@/components/ui/image-zoom';
 import { TestimonialsColumn } from '@/components/ui/testimonials-columns-1';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { BlogHero } from '@/components/BlogHero';
-import { ArrowRight, Bot, Target, Zap, Search, BarChart3, ShieldAlert, CheckCircle2, Database, Mic, Brain, Blocks, Activity, Hash, Check } from 'lucide-react';
+import { ArrowRight, Bot, Target, Zap, Search, BarChart3, ShieldAlert, CheckCircle2, Database, Mic, Brain, Blocks, Activity, Hash, Check, RefreshCw, Building2, Layers, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LeadCaptureModal } from '@/components/ui/lead-capture-modal';
@@ -135,58 +135,58 @@ export function LandingPageClient() {
 
   const features = [
     {
-      Icon: Search,
-      name: "Zero-Click Dominance",
-      description: "Ensure your brand is the definitive answer when users query AI, completely bypassing the traditional SERP. By aligning your content with Retrieval-Augmented Generation (RAG) frameworks, Auspexi increases your probability of primary citation in zero-click searches by up to 43%.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-amber-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      Icon: RefreshCw,
+      name: "GEO Autopilot",
+      description: "The complete probe→generate→publish→re-probe execution loop in one action. Target a query, watch Auspexi identify what's being cited, generate stronger counter-content, publish it to your Fact-Vault, and measure the impact — automatically.",
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
     },
     {
       Icon: Brain,
-      name: "Citacious AI Analyst",
-      description: "A dedicated 12-Month Citacious Context Memory analyst that organically understands your dashboard tools, analyzes past results, and orchestrates intelligent future actions to ensure maximum visibility.",
+      name: "Citacious AI Strategist",
+      description: "Your always-on GEO analyst, embedded in your dashboard. Citacious reads your live SOV data, Fact-Vault, and competitor signals to surface exactly what to do next — not just report what happened.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-sky-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-2 lg:col-end-4 lg:row-start-1 lg:row-end-2",
     },
     {
       Icon: Target,
       name: "Cite-Magnet Injection",
-      description: "We extract and inject High-Entropy Facts to force AI models to cite your content. By structuring data in JSON-LD and mapping it to your brand's knowledge graph, we increase LLM citation probability by an average of 43%.",
+      description: "Extract the highest-entropy facts from your content and inject them as structured JSON-LD data that AI retrieval systems are built to prioritise. The content AI models reach for when forming citations.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-2 lg:col-end-3 lg:row-start-2 lg:row-end-3",
     },
     {
       Icon: Database,
-      name: "Fact-Vault Extraction",
-      description: "Automatically find the highest-entropy data points in your whitepapers, case studies, and proprietary research, turning them into potent cite-magnets that models crave.",
+      name: "Fact-Vault",
+      description: "Your brand's verified knowledge base. Store proprietary stats, product facts, and cite-magnets in one place. Every entry feeds your Schema Deploy API, Content Scorer, and Autopilot loops automatically.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-emerald-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-3 lg:col-end-4 lg:row-start-2 lg:row-end-3",
     },
     {
-      Icon: BarChart3,
-      name: "SOV Simulator & Brand Monitor",
-      description: "Track your brand's visibility across Gemini, ChatGPT, and Claude in real-time. Understand exactly how often you are recommended for high-intent industry queries.",
-      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-violet-500/60 w-64 h-64 rounded-full blur-3xl" />,
+      Icon: Building2,
+      name: "Entity Intelligence Hub",
+      description: "AI models can only cite what they recognise as a discrete entity. Entity Hub generates your complete Wikidata profile, Knowledge Panel triggers, and sameAs link set — turning your brand from invisible to institutionally real.",
+      background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-purple-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-3 lg:row-start-3 lg:row-end-4",
     },
     {
       Icon: Activity,
-      name: "Z-Score Sentiment Drift",
-      description: "Automated anomaly detection models monitor historical LLM outputs for your brand. Real-time Z-Score analysis tracks generative noise vs significant truth-drift, capturing reputation leaks before they happen.",
+      name: "AI Share of Voice & GEO Pulse",
+      description: "Real Gemini queries across your target keywords reveal which brands are being cited and how often. Track your SOV trend over time and benchmark it against up to 6 direct competitors.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-orange-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-3 lg:col-end-4 lg:row-start-3 lg:row-end-5",
     },
     {
-      Icon: ShieldAlert,
-      name: "768-D Latent Space Moat",
-      description: "Our proprietary pgvector integration mathematically ensures your brand remains the canonical truth. By generating embeddings with Gemini, we map your brand's semantic proximity to subjective attributes like 'trust' or 'quality'.",
+      Icon: Globe,
+      name: "768-D Latent Space Map",
+      description: "Visualise your brand's semantic position in embedding space. Auspexi maps 768-dimensional Gemini embeddings onto a TEO framework — Ontological, Epistemological, and Teleological axes — so you can see where you own the narrative and where gaps exist.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-fuchsia-700/50 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-5",
     },
     {
-      Icon: Zap,
-      name: "Edge & Schema Generator",
-      description: "Deploy GEO-optimized JSON-LD schema directly to your site with one click. Ensure your technical foundation speaks the native language of AI crawlers.",
+      Icon: Layers,
+      name: "Schema Deploy",
+      description: "One JS snippet on your website. Your structured data stays permanently in sync with your Fact-Vault — no developer needed after day one. GPTBot, ClaudeBot, and Google-Extended read fresh JSON-LD on every crawl.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-yellow-500/50 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5",
     },
@@ -529,59 +529,53 @@ export function LandingPageClient() {
               CTA="Start Now"
               onClick={() => handleCheckout('Basic')}
               benefits={[
-                { text: "Track 1 Brand, 5 Target Keywords", checked: true },
-                { text: "Monthly Citacious Pulse Snapshot", checked: true },
-                { text: "Fact-Vault (1GB Secure Storage)", checked: true },
-                { text: "Basic Latent Space Visibility Map", checked: true },
-                { text: "7-Day Sentiment Pulse History", checked: true },
-                { text: "Weekly Brand SoV Performance Report", checked: true },
-                { text: "Standard Citacious AI Copilot", checked: true },
+                { text: "1 Brand, 5 Target Keywords", checked: true },
+                { text: "AI SOV Overview Dashboard", checked: true },
+                { text: "Fact-Vault (unlimited entries)", checked: true },
+                { text: "Content Scorer", checked: true },
+                { text: "Citacious AI Strategist", checked: true },
+                { text: "Audit Logs & Activity History", checked: true },
                 { text: "LLM Inference & Embedding Costs Inc.", checked: true },
-                { text: "Automated Edge Schema Injection", checked: true },
-                { text: "Personal Citacious Onboarding (Self-Serve)", checked: true },
-                { text: "Z-Score Drift Alerting (Basic)", checked: false },
-                { text: "Reddit/LinkedIn Automation", checked: false },
+                { text: "Competitor Radar", checked: false },
+                { text: "Entity Intelligence Hub", checked: false },
+                { text: "Schema Deploy", checked: false },
+                { text: "GEO Autopilot Loop", checked: false },
+              ]}
+            />
+            <PricingCard
+              tier="Premium"
+              price={currency === 'USD' ? "$499/mo" : "£399/mo"}
+              bestFor="For growth teams ready to move from measurement to execution"
+              CTA="Start Premium"
+              onClick={() => handleCheckout('Pro')}
+              benefits={[
+                { text: "5 Brands, 50 Keywords", checked: true },
+                { text: "Competitor Radar (up to 6)", checked: true },
+                { text: "GEO Pulse Index (live citation scan)", checked: true },
+                { text: "SOV Simulator & Brand Monitor", checked: true },
+                { text: "Entity Intelligence Hub", checked: true },
+                { text: "Schema Deploy (live JSON-LD API)", checked: true },
+                { text: "Multi-Agent Crawler", checked: true },
+                { text: "768-D Latent Space Map", checked: true },
+                { text: "Citation Probe (real Gemini queries)", checked: true },
+                { text: "GEO Autopilot Loop", checked: false },
               ]}
             />
             <PricingCard
               tier="Pro"
-              price={currency === 'USD' ? "$499/mo" : "£399/mo"}
-              bestFor="For growth teams & marketing managers"
+              price={currency === 'USD' ? "$999/mo" : "£799/mo"}
+              bestFor="For brands serious about owning their AI citation narrative"
               CTA="Start Pro"
               onClick={() => handleCheckout('Pro')}
               benefits={[
-                { text: "Track 5 Brands, 50 Keywords", checked: true },
-                { text: "Full Neural Latent Map (Master View)", checked: true },
-                { text: "25-Competitor Sentiment Radar", checked: true },
-                { text: "Z-Score Anomaly & Drift Alerts", checked: true },
-                { text: "Fact-Vault (10GB) + Auto-Extraction", checked: true },
-                { text: "Content Scorer Pro (Direct Fixes)", checked: true },
-                { text: "Priority Report Generation (10/mo)", checked: true },
-                { text: "Competitor Hallucination Monitoring", checked: true },
-                { text: "12-Month Citacious Context Memory", checked: true },
-                { text: "Historical Context Overwrite (Basic)", checked: true },
-                { text: "RAG Fact-Consistency Checker", checked: true },
-                { text: "Weekly Automated Strategy Briefs", checked: true },
-              ]}
-            />
-            <PricingCard
-              tier="Business"
-              price={currency === 'USD' ? "$1,899/mo" : "£1,499/mo"}
-              bestFor="For mid-market SaaS & high-growth brands"
-              CTA="Start Business"
-              onClick={() => handleCheckout('Business')}
-              benefits={[
-                { text: "Track 25 Brands, 250 Keywords", checked: true },
-                { text: "Autonomous Social Seeding (Omnichannel)", checked: true },
-                { text: "Reddit & LinkedIn Fact-Maxing Bot", checked: true },
-                { text: "Advanced Competitor Overwrite Strategy", checked: true },
-                { text: "Fact-Vault (50GB) + Bulk Import", checked: true },
+                { text: "10 Brands, 100 Keywords", checked: true },
+                { text: "Everything in Premium", checked: true },
+                { text: "GEO Autopilot Loop (unlimited runs)", checked: true },
+                { text: "Probe→Generate→Publish→Re-probe", checked: true },
+                { text: "CMS Webhook Auto-Publishing", checked: true },
                 { text: "Full API Access for GEO Integrations", checked: true },
                 { text: "White-Glove Implementation Support", checked: true },
-                { text: "Monthly Domain Reputation Scrub", checked: true },
-                { text: "Predictive Sentiment Modeling", checked: true },
                 { text: "Weekly Strategic Analyst Session", checked: true },
-                { text: "Enterprise LLM Priority Access", checked: true },
                 { text: "Multi-User Team Management", checked: true },
               ]}
             />
@@ -589,20 +583,18 @@ export function LandingPageClient() {
               tier="Enterprise"
               price={currency === 'USD' ? "Custom" : "Custom"}
               bestFor="For Fortune 500 market leaders & agencies"
-              CTA="Talk to AI Sales"
+              CTA="Talk to Sales"
               onClick={() => window.location.href = 'mailto:sales@auspexi.com'}
               benefits={[
                 { text: "Unlimited Keywords & Competitors", checked: true },
-                { text: "Custom SLM Fine-tuning (Private Cloud)", checked: true },
-                { text: "Dedicated ML Engineer Retainer", checked: true },
-                { text: "SOC2 Compliance & SSO Integration", checked: true },
-                { text: "Historical Context Overwrite Cluster", checked: true },
-                { text: "Private Neural Vector Instance", checked: true },
-                { text: "Custom Board-Ready Reporting", checked: true },
+                { text: "Everything in Pro", checked: true },
+                { text: "Dedicated Account Manager", checked: true },
+                { text: "Custom Reporting & Dashboards", checked: true },
                 { text: "Whitelabel GEO Dashboard", checked: true },
+                { text: "SOC2 Compliance & SSO Integration", checked: true },
                 { text: "SLA Guaranteed Response Times", checked: true },
-                { text: "24/7 Strategic Support Account Manager", checked: true },
-                { text: "Custom Data Moat Strategy Blueprint", checked: true },
+                { text: "Custom Integration Support", checked: true },
+                { text: "24/7 Priority Support", checked: true },
               ]}
             />
           </div>
