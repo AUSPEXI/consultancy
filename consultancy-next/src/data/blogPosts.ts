@@ -47,6 +47,18 @@ Google dropping FAQ schema isn't just a technical change. It's Google acknowledg
 
 ---
 
+## This Is Already Happening — Right Now
+
+It is worth being concrete about how fast this shift is moving. In 2023, AI-generated search was a novelty. In 2024, it became a feature. In 2025, it became the default for a growing segment of high-intent buyers — precisely the kind of people your business needs to reach.
+
+Research from across the industry consistently shows that AI engine usage is growing fastest among professionals, decision-makers, and younger consumers. These are not casual searchers. These are the people who research before they spend.
+
+If someone is asking ChatGPT "who should I hire to redo our company website?" or "what's the best CRM for a 20-person sales team?" — that is a high-intent buyer at the exact moment they are ready to make a decision. If your business is not in the answer, a competitor is.
+
+Google saw this coming. FAQ schema was their attempt to survive the transition — give users quick answers before they left. Now that ChatGPT, Gemini, and others give better answers than any snippet box ever could, Google has stopped pretending the old format is enough.
+
+---
+
 ## What This Actually Costs You
 
 Here's the uncomfortable truth: if your business isn't being mentioned when someone asks an AI "who's the best at [what you do]?" — you're invisible to that customer.
@@ -65,13 +77,13 @@ The good news: getting your business recommended by AI isn't magic. It follows p
 
 AI systems like ChatGPT and Gemini learn from content across the web. They cite businesses that appear as clear authorities on specific topics — companies whose facts, figures, and expertise show up consistently across multiple credible sources.
 
-That means the work isn't about tricks or technical shortcuts. It's about:
+That means the work isn't about tricks or technical shortcuts. It's about three things:
 
-**Being genuinely findable.** Your website, your content, and your business profile need to clearly communicate who you are, what you do, and what makes you different — in a format AI systems can actually read and use.
+**Being genuinely findable.** Your website, your content, and your business profile need to clearly communicate who you are, what you do, and what makes you different — in a format AI systems can actually read and use. This means structured data, clear headings, and direct factual statements rather than vague marketing copy.
 
-**Having specific, citable facts.** AI systems love precise information. Not vague claims like "we're the best" — but specific facts like "we've served 400 SMEs in Hampshire since 2019" or "our onboarding takes 48 hours, not weeks."
+**Having specific, citable facts.** AI systems love precise information. Not vague claims like "we're the best" — but specific facts like "we've served 400 SMEs in Hampshire since 2019" or "our onboarding takes 48 hours, not weeks." These are the kinds of details that get pulled into AI answers. Generic claims get ignored.
 
-**Existing as a recognised entity.** AI models work from knowledge graphs — structured records of who businesses are and what they do. If your business isn't properly listed in places like Wikidata, Google Business Profile, and LinkedIn, you're essentially not real to an AI system.
+**Existing as a recognised entity.** AI models work from knowledge graphs — structured records of who businesses are and what they do. If your business isn't properly listed in places like Wikidata, Google Business Profile, and LinkedIn, you're essentially not real to an AI system. Entity establishment is a one-time action with a permanent effect on how AI models recognise and cite your brand.
 
 ---
 
