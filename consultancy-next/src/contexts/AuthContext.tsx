@@ -15,6 +15,7 @@ export interface UserData {
   brand?: string
   domain?: string
   competitors?: string[]
+  watchlistCompetitors?: string[]
   keywords?: string[]
   sentimentPrompts?: string[]
   latentAnchors?: Array<{ label: string; color: string; baseType: string }>

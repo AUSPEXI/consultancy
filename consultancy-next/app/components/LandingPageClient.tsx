@@ -547,7 +547,7 @@ export function LandingPageClient() {
               price={currency === 'USD' ? "$499/mo" : "£399/mo"}
               bestFor="For growth teams ready to move from measurement to execution"
               CTA="Start Premium"
-              onClick={() => handleCheckout('Pro')}
+              onClick={() => handleCheckout('Premium')}
               benefits={[
                 { text: "5 Brands, 50 Keywords", checked: true },
                 { text: "Competitor Radar (up to 6)", checked: true },

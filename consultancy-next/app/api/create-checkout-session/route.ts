@@ -32,17 +32,17 @@ export async function POST(request: Request) {
     let mode: 'subscription' | 'payment' = 'subscription';
 
     if (tier === 'Basic') {
-      unitAmount = 11900; // $119.00
-      productName = 'Auspexi Basic Tier';
+      unitAmount = 14900; // $149.00
+      productName = 'Auspexi Starter';
+    } else if (tier === 'Premium') {
+      unitAmount = 49900; // $499.00
+      productName = 'Auspexi Premium';
     } else if (tier === 'Pro') {
-      unitAmount = 39900; // $399.00
-      productName = 'Auspexi Pro Tier';
-    } else if (tier === 'Business') {
-      unitAmount = 149900; // $1,499.00
-      productName = 'Auspexi Business Tier';
+      unitAmount = 99900; // $999.00
+      productName = 'Auspexi Pro';
     } else if (tier === 'Enterprise') {
-      unitAmount = 499900; // $4,999.00
-      productName = 'Auspexi Enterprise Tier';
+      unitAmount = 0;
+      productName = 'Auspexi Enterprise';
     } else if (tier === 'PipelineOffer') {
       unitAmount = 49900; // $499.00
       productName = 'Auspexi Full Access (Pipeline Offer)';

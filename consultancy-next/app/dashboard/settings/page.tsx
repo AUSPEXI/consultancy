@@ -24,10 +24,8 @@ const AUSPEXI_GEO_KEYWORDS = [
   'AI engine optimization',
 ];
 
-const AUSPEXI_COMPETITORS = [
-  'brightedge.com', 'semrush.com', 'conductor.com',
-  'clearscope.io', 'marketmuse.com', 'botify.com',
-];
+const AUSPEXI_PRIMARY_COMPETITORS = ['brightedge.com', 'semrush.com', 'conductor.com', 'clearscope.io'];
+const AUSPEXI_WATCHLIST_COMPETITORS = ['marketmuse.com', 'botify.com', 'rankscience.com', 'surfer seo'];
 
 const AUSPEXI_SOCIALS: Record<string, string> = {
   linkedin:  'https://linkedin.com/company/auspexi',
@@ -100,11 +98,13 @@ export default function SettingsPage() {
   const [anchors, setAnchors] = useState<any[]>([]);
   const [isGeneratingAnchors, setIsGeneratingAnchors] = useState(false);
   const [isDiscoveringCompetitors, setIsDiscoveringCompetitors] = useState(false);
+  const [watchlistCompetitors, setWatchlistCompetitors] = useState<string[]>([]);
+  const [watchlistInput, setWatchlistInput] = useState('');
   const [formData, setFormData] = useState({
     brand: '', domain: '', cmsWebhookUrl: '',
     keyword1: '', keyword2: '', keyword3: '', keyword4: '', keyword5: '',
     keyword6: '', keyword7: '', keyword8: '', keyword9: '', keyword10: '',
-    competitor1: '', competitor2: '', competitor3: '', competitor4: '', competitor5: '', competitor6: ''
+    competitor1: '', competitor2: '', competitor3: '', competitor4: '',
   });
 
   useEffect(() => { setOrigin(window.location.origin); }, []);
@@ -113,6 +113,8 @@ export default function SettingsPage() {
     if (userData) {
       setConnectedSocials(userData.connectedSocials || []);
       setAnchors(userData.latentAnchors || []);
+      const primary = userData.competitors || [];
+      setWatchlistCompetitors(userData.watchlistCompetitors || []);
       setFormData({
         brand: userData.brand || '',
         domain: userData.domain || '',
@@ -122,9 +124,8 @@ export default function SettingsPage() {
         keyword5: userData.keywords?.[4] || '', keyword6: userData.keywords?.[5] || '',
         keyword7: userData.keywords?.[6] || '', keyword8: userData.keywords?.[7] || '',
         keyword9: userData.keywords?.[8] || '', keyword10: userData.keywords?.[9] || '',
-        competitor1: userData.competitors?.[0] || '', competitor2: userData.competitors?.[1] || '',
-        competitor3: userData.competitors?.[2] || '', competitor4: userData.competitors?.[3] || '',
-        competitor5: userData.competitors?.[4] || '', competitor6: userData.competitors?.[5] || '',
+        competitor1: primary[0] || '', competitor2: primary[1] || '',
+        competitor3: primary[2] || '', competitor4: primary[3] || '',
       });
     }
   }, [userData]);
@@ -208,12 +209,12 @@ export default function SettingsPage() {
       keyword5: AUSPEXI_GEO_KEYWORDS[4], keyword6: AUSPEXI_GEO_KEYWORDS[5],
       keyword7: AUSPEXI_GEO_KEYWORDS[6], keyword8: AUSPEXI_GEO_KEYWORDS[7],
       keyword9: AUSPEXI_GEO_KEYWORDS[8], keyword10: AUSPEXI_GEO_KEYWORDS[9],
-      competitor1: AUSPEXI_COMPETITORS[0], competitor2: AUSPEXI_COMPETITORS[1],
-      competitor3: AUSPEXI_COMPETITORS[2], competitor4: AUSPEXI_COMPETITORS[3],
-      competitor5: AUSPEXI_COMPETITORS[4], competitor6: AUSPEXI_COMPETITORS[5],
+      competitor1: AUSPEXI_PRIMARY_COMPETITORS[0], competitor2: AUSPEXI_PRIMARY_COMPETITORS[1],
+      competitor3: AUSPEXI_PRIMARY_COMPETITORS[2], competitor4: AUSPEXI_PRIMARY_COMPETITORS[3],
     }));
     // Seed the full TEO anchor set
     setAnchors(AUSPEXI_ANCHORS);
+    setWatchlistCompetitors(AUSPEXI_WATCHLIST_COMPETITORS);
     // Auto-connect all known Auspexi social accounts
     const socialKeys = Object.keys(AUSPEXI_SOCIALS);
     setConnectedSocials(socialKeys);
@@ -245,16 +246,17 @@ export default function SettingsPage() {
       const data = await res.json();
       if (!data.success) throw new Error(data.error);
       const comps: string[] = data.competitors || [];
+      const primary = comps.slice(0, 4);
+      const watchlist = comps.slice(4);
       setFormData(prev => ({
         ...prev,
-        competitor1: comps[0] || prev.competitor1,
-        competitor2: comps[1] || prev.competitor2,
-        competitor3: comps[2] || prev.competitor3,
-        competitor4: comps[3] || prev.competitor4,
-        competitor5: comps[4] || prev.competitor5,
-        competitor6: comps[5] || prev.competitor6,
+        competitor1: primary[0] || prev.competitor1,
+        competitor2: primary[1] || prev.competitor2,
+        competitor3: primary[2] || prev.competitor3,
+        competitor4: primary[3] || prev.competitor4,
       }));
-      setSaveMsg({ type: 'success', text: `Discovered ${comps.length} competitors. Review them below, then hit Save.` });
+      if (watchlist.length) setWatchlistCompetitors(prev => [...new Set([...prev, ...watchlist])]);
+      setSaveMsg({ type: 'success', text: `Discovered ${comps.length} competitors — ${primary.length} primary, ${watchlist.length} added to watchlist. Review below, then hit Save.` });
     } catch (err: any) {
       setSaveMsg({ type: 'error', text: `Discovery failed: ${err.message}` });
     } finally {
@@ -269,10 +271,15 @@ export default function SettingsPage() {
     setSaveMsg(null);
     try {
       const userRef = doc(db, 'users', user.uid);
-      const competitors = [formData.competitor1, formData.competitor2, formData.competitor3, formData.competitor4, formData.competitor5, formData.competitor6].filter(Boolean);
+      const competitors = [formData.competitor1, formData.competitor2, formData.competitor3, formData.competitor4].filter(Boolean);
       const keywords = [formData.keyword1, formData.keyword2, formData.keyword3, formData.keyword4, formData.keyword5, formData.keyword6, formData.keyword7, formData.keyword8, formData.keyword9, formData.keyword10].filter(Boolean);
-      await setDoc(userRef, { brand: formData.brand, domain: formData.domain, cmsWebhookUrl: formData.cmsWebhookUrl, competitors, keywords }, { merge: true });
-      await logAuditAction(user.uid, 'Saved Settings', { brand: formData.brand, domain: formData.domain, keywordCount: keywords.length, competitorCount: competitors.length });
+      await setDoc(userRef, {
+        brand: formData.brand, domain: formData.domain, cmsWebhookUrl: formData.cmsWebhookUrl,
+        competitors,
+        watchlistCompetitors: watchlistCompetitors.filter(Boolean),
+        keywords,
+      }, { merge: true });
+      await logAuditAction(user.uid, 'Saved Settings', { brand: formData.brand, domain: formData.domain, keywordCount: keywords.length, competitorCount: competitors.length, watchlistCount: watchlistCompetitors.length });
       setSaveMsg({ type: 'success', text: 'Settings saved. Citacious will pick up your brand data on next message.' });
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'users');
@@ -362,7 +369,7 @@ export default function SettingsPage() {
           <div className="flex items-start justify-between">
             <div>
               <CardTitle className="text-white">Competitor Tracking</CardTitle>
-              <CardDescription className="text-zinc-400 mt-1">Brands racing you for AI citations. Enter their domains — or let AI discover your true competitors based on your brand and keywords.</CardDescription>
+              <CardDescription className="text-zinc-400 mt-1">Brands racing you for AI citations. Primary competitors get full deep-analysis. Watchlist competitors are tracked for mentions.</CardDescription>
             </div>
             <button
               onClick={discoverCompetitors}
@@ -374,16 +381,71 @@ export default function SettingsPage() {
             </button>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[1,2,3,4,5,6].map(num => (
-              <div key={num} className="space-y-2">
-                <label className="text-sm font-medium text-zinc-300">Competitor {num}</label>
-                <Input name={`competitor${num}`} value={(formData as any)[`competitor${num}`]} onChange={handleChange} placeholder="competitor.com" className="bg-zinc-950 border-zinc-800 text-white text-sm" />
-              </div>
-            ))}
+        <CardContent className="space-y-6">
+          {/* Primary competitors */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xs font-bold text-pink-400 uppercase tracking-widest">Primary</span>
+              <span className="text-xs text-zinc-600">— max 4, full benchmark analysis</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {[1,2,3,4].map(num => (
+                <div key={num} className="space-y-1.5">
+                  <label className="text-xs font-medium text-zinc-400">Competitor {num}</label>
+                  <Input name={`competitor${num}`} value={(formData as any)[`competitor${num}`]} onChange={handleChange} placeholder="competitor.com" className="bg-zinc-950 border-zinc-800 text-white text-sm" />
+                </div>
+              ))}
+            </div>
           </div>
-          <p className="text-xs text-zinc-600 mt-3">Don&apos;t know your competitors? Click <span className="text-cyan-500">AI Discover</span> — Gemini will identify the 6 brands most likely competing with you for AI citations.</p>
+
+          {/* Watchlist */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest">Watchlist</span>
+              <span className="text-xs text-zinc-600">— unlimited, mention tracking only</span>
+            </div>
+            <div className="flex gap-2 mb-3">
+              <Input
+                value={watchlistInput}
+                onChange={e => setWatchlistInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && watchlistInput.trim()) {
+                    setWatchlistCompetitors(prev => [...new Set([...prev, watchlistInput.trim()])]);
+                    setWatchlistInput('');
+                  }
+                }}
+                placeholder="competitor.com — press Enter to add"
+                className="bg-zinc-950 border-zinc-800 text-white text-sm"
+              />
+              <button
+                onClick={() => {
+                  if (watchlistInput.trim()) {
+                    setWatchlistCompetitors(prev => [...new Set([...prev, watchlistInput.trim()])]);
+                    setWatchlistInput('');
+                  }
+                }}
+                className="px-3 py-2 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 rounded-lg text-sm transition-colors whitespace-nowrap"
+              >
+                Add
+              </button>
+            </div>
+            {watchlistCompetitors.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {watchlistCompetitors.map(c => (
+                  <span key={c} className="flex items-center gap-1.5 px-2.5 py-1 bg-zinc-800 border border-zinc-700 rounded-lg text-xs text-zinc-300">
+                    {c}
+                    <button onClick={() => setWatchlistCompetitors(prev => prev.filter(x => x !== c))} className="text-zinc-500 hover:text-zinc-300 transition-colors">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-zinc-600">No watchlist competitors yet. Add any number of brands to track for AI mention signals.</p>
+            )}
+          </div>
+
+          <p className="text-xs text-zinc-600">Don&apos;t know your competitors? Click <span className="text-cyan-500">AI Discover</span> — Gemini will identify the brands most likely competing with you for AI citations.</p>
         </CardContent>
       </Card>
 
