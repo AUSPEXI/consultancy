@@ -216,14 +216,9 @@ ${conversationText}`,
       await fetchKnowledgeGraph();
       const weeklyMetricsContext = await fetchWeeklyMetrics();
 
-      const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-      let ai: GoogleGenAI;
-      if (apiKey && apiKey !== 'dummy') {
-        ai = new GoogleGenAI({ apiKey });
-      } else {
-        const baseUrl = `${window.location.protocol}//${window.location.host}/api/genai`;
-        ai = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl } });
-      }
+      const proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
+        `${window.location.protocol}//${window.location.host}/api/genai`;
+      const ai = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl } });
 
       const visitorContext = userData?.brand
         ? `\n\nVISITOR CONTEXT: You are speaking with someone from "${userData.brand}"${userData.domain ? ` (${userData.domain})` : ''}. They are already an Auspexi customer. Welcome them warmly and offer to guide them through the site or help them get back to their dashboard.`

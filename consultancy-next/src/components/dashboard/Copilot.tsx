@@ -13,17 +13,9 @@ let aiClient: GoogleGenAI | null = null;
 
 function getAIClient(): GoogleGenAI {
   if (!aiClient) {
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-    if (apiKey && apiKey !== 'dummy') {
-      aiClient = new GoogleGenAI({ apiKey });
-    } else {
-      // Fallback to proxy
-      const baseUrl = `${window.location.protocol}//${window.location.host}/api/genai`;
-      aiClient = new GoogleGenAI({
-        apiKey: 'dummy',
-        httpOptions: { baseUrl }
-      });
-    }
+    const proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
+      `${window.location.protocol}//${window.location.host}/api/genai`;
+    aiClient = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl } });
   }
   return aiClient;
 }
