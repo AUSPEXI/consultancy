@@ -650,7 +650,7 @@ export function LandingPageClient() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {blogPosts.slice(0, 3).map((post, i) => (
               <Link href={`/blog/${post.slug}`} key={i} className="group cursor-pointer flex flex-col">
-                <div className="w-full flex min-h-[220px] rounded-xl overflow-hidden mb-4 relative bg-[#0B0E14] shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+                <div className="w-full h-[220px] flex-shrink-0 rounded-xl overflow-hidden mb-4 relative bg-[#0B0E14] shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
                   <BlogHero title={post.title} category={post.category} compact={true} />
                 </div>
                 <div className="flex items-center gap-3 text-xs font-medium text-zinc-500 mb-2">
@@ -658,7 +658,7 @@ export function LandingPageClient() {
                   <span>•</span>
                   <span>{post.date}</span>
                 </div>
-                <h3 className="text-xl font-semibold text-zinc-200 group-hover:text-white transition-colors leading-snug">
+                <h3 className="text-xl font-semibold text-zinc-200 group-hover:text-white transition-colors leading-snug line-clamp-2">
                   {post.title}
                 </h3>
               </Link>
