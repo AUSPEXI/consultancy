@@ -75,12 +75,12 @@ export default function FAQPage() {
                 <button
                   key={cat.id}
                   onClick={() => scrollTo(cat.id)}
-                  className="flex flex-col items-center justify-center gap-2 px-4 py-5 rounded-xl border border-zinc-800 bg-zinc-900/40 hover:border-pink-500/30 hover:bg-zinc-900/70 transition-all group text-center"
+                  className="flex flex-col items-center justify-center gap-3 px-4 py-6 rounded-xl border border-zinc-800 bg-zinc-900/40 hover:bg-zinc-900/70 transition-all group text-center shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)] hover:shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(236,72,153,1)]"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-zinc-950 border border-zinc-800 group-hover:border-pink-500/40 group-hover:shadow-[0_0_12px_rgba(236,72,153,0.15)] flex items-center justify-center shrink-0 transition-all">
-                    <span className="font-mono text-sm font-black text-pink-400 leading-none select-none">{glyph?.sym}</span>
+                  <div className="w-14 h-14 rounded-xl bg-zinc-950 border border-zinc-800 group-hover:border-pink-500/40 group-hover:shadow-[0_0_16px_rgba(236,72,153,0.25)] flex items-center justify-center shrink-0 transition-all">
+                    <span className="font-mono text-2xl font-black text-pink-400 leading-none select-none">{glyph?.sym}</span>
                   </div>
-                  <span className="text-xs font-semibold text-zinc-300 group-hover:text-white transition-colors leading-tight">{cat.title}</span>
+                  <span className="text-sm font-semibold text-zinc-300 group-hover:text-white transition-colors leading-tight">{cat.title}</span>
                   <span className="font-mono text-[9px] font-bold text-zinc-600 group-hover:text-pink-500/60 uppercase tracking-widest transition-colors">{glyph?.label} · {cat.items.length}q</span>
                 </button>
               );
