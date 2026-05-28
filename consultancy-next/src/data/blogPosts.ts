@@ -1,5 +1,90 @@
 export const blogPosts = [
   {
+    slug: "google-killed-faq-schema-what-it-means-for-your-business",
+    title: "Google Just Killed FAQ Schema. Here's What It Really Means for Your Business.",
+    excerpt: "Google quietly removed support for FAQ rich results. Most businesses barely noticed. But it's one of the clearest signals yet that the rules of being found online have fundamentally changed — and the businesses adapting now will own the next decade.",
+    date: "May 28, 2026",
+    category: "Strategy",
+    author: "Auspexi Team",
+    readTime: "5 min read",
+    image: "/geo-infographic.png",
+    content: `
+## You Probably Missed This. Your Competitors Did Too.
+
+A few months ago, Google quietly announced it was dropping support for FAQ schema — the structured markup that let businesses show expandable question-and-answer snippets directly in search results.
+
+No fanfare. No replacement. Just gone.
+
+For most business owners, this news barely registered. It sounded like a technical SEO problem — something for the agency to worry about. But buried inside this quiet deprecation is a message every business owner needs to hear:
+
+**The rules of being found online are changing faster than most people realise. And the businesses that adapt now will have an enormous advantage over those who don't.**
+
+---
+
+## Let's Start With What Used to Work
+
+For twenty years, being found online meant one thing: ranking on Google. You hired someone to stuff the right keywords into your website, built some backlinks, maybe added some FAQ boxes — and if you did it well enough, people clicked your link.
+
+The game was clear. Complicated, but clear.
+
+FAQ schema was a perfect example of that game. Add some structured markup to your site, and Google would display your questions and answers right on the search results page. More visibility, more clicks, more customers.
+
+Simple.
+
+---
+
+## Then Everything Changed
+
+Here's what's actually happening: your customers have started asking their questions somewhere completely different.
+
+Instead of typing "best accountant in Hampshire" into Google and clicking links, they're asking ChatGPT. They're talking to Gemini. They're getting answers from Claude. They're using Perplexity to research before they buy.
+
+And those AI systems don't show a list of links. They give a single, confident answer — sometimes mentioning specific businesses by name, sometimes not mentioning yours at all.
+
+**That's the real shift. Your customers aren't searching the way they used to. But most businesses are still optimising for the old way.**
+
+Google dropping FAQ schema isn't just a technical change. It's Google acknowledging that the future of search looks completely different. Even they're adapting.
+
+---
+
+## What This Actually Costs You
+
+Here's the uncomfortable truth: if your business isn't being mentioned when someone asks an AI "who's the best at [what you do]?" — you're invisible to that customer.
+
+Not on page two. Not below the fold. Completely invisible.
+
+And unlike traditional SEO, you can't just check your Google ranking to know this is happening. There's no position number. No click-through rate. Your potential customers are getting answers — and your name simply isn't in them.
+
+This is happening right now, to most businesses. The ones winning are the ones who figured it out early.
+
+---
+
+## What You Should Actually Do
+
+The good news: getting your business recommended by AI isn't magic. It follows patterns you can understand and act on.
+
+AI systems like ChatGPT and Gemini learn from content across the web. They cite businesses that appear as clear authorities on specific topics — companies whose facts, figures, and expertise show up consistently across multiple credible sources.
+
+That means the work isn't about tricks or technical shortcuts. It's about:
+
+**Being genuinely findable.** Your website, your content, and your business profile need to clearly communicate who you are, what you do, and what makes you different — in a format AI systems can actually read and use.
+
+**Having specific, citable facts.** AI systems love precise information. Not vague claims like "we're the best" — but specific facts like "we've served 400 SMEs in Hampshire since 2019" or "our onboarding takes 48 hours, not weeks."
+
+**Existing as a recognised entity.** AI models work from knowledge graphs — structured records of who businesses are and what they do. If your business isn't properly listed in places like Wikidata, Google Business Profile, and LinkedIn, you're essentially not real to an AI system.
+
+---
+
+## The Bottom Line
+
+Google didn't kill FAQ schema to hurt your business. They killed it because the way people search is changing, and they're changing with it.
+
+The businesses that will thrive in the next decade aren't the ones who got best at the old game. They're the ones who saw the new game early and started playing it.
+
+The question isn't whether AI search is coming. It's already here. The question is whether your business will be found when it matters.
+    `.trim(),
+  },
+  {
     slug: "geo-autopilot-probe-correct-publish-loop",
     title: "GEO Autopilot: Closing the Probe-Correct-Publish Loop",
     excerpt: "Measuring your AI citation share is useful. Automatically fixing it is the product. Meet GEO Autopilot — Auspexi's execution engine that probes, generates counter-content, publishes, and re-probes in one unbroken loop.",

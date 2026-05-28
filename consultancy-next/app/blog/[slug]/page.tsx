@@ -31,13 +31,11 @@ export async function generateMetadata(
       description: post.excerpt,
       url: `https://auspexi.com/blog/${post.slug}`,
       type: 'article',
-      images: [{ url: post.image || '/geo-infographic.png', width: 1200, height: 630, alt: post.title }],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.excerpt,
-      images: [post.image || '/geo-infographic.png'],
     },
   };
 }
@@ -57,7 +55,7 @@ export default async function BlogPostPage(
     description: post.excerpt,
     url: `https://auspexi.com/blog/${post.slug}`,
     datePublished: post.date,
-    image: post.image || 'https://auspexi.com/geo-infographic.png',
+    image: `https://auspexi.com/blog/${post.slug}/opengraph-image`,
     articleSection: post.category,
     author: {
       '@type': 'Organization',
@@ -67,7 +65,7 @@ export default async function BlogPostPage(
     publisher: {
       '@type': 'Organization',
       name: 'Auspexi',
-      logo: { '@type': 'ImageObject', url: 'https://auspexi.com/geo-infographic.png' },
+      logo: { '@type': 'ImageObject', url: 'https://auspexi.com/auspexi-logo.png' },
     },
     isPartOf: { '@id': 'https://auspexi.com/blog' },
   };
