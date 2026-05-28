@@ -5,13 +5,19 @@ import Link from 'next/link';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
 import { FAQ_CATEGORIES } from '@/data/faqData';
-import {
-  Plus, Minus, ArrowRight,
-  Zap, Brain, LineChart, Sparkles, Code2, Target, LayoutDashboard, CreditCard, Shield, Rocket,
-} from 'lucide-react';
+import { Plus, Minus, ArrowRight } from 'lucide-react';
 
-const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  Zap, Brain, LineChart, Sparkles, Code2, Target, LayoutDashboard, CreditCard, Shield, Rocket,
+const GLYPHS: Record<string, { sym: string; label: string }> = {
+  fundamentals:    { sym: '∇',   label: 'GEO'  },
+  'ai-engines':    { sym: '⊗',   label: 'LLM'  },
+  measurement:     { sym: '≈',   label: 'SOV'  },
+  'cite-magnets':  { sym: '⊕',   label: 'CMg'  },
+  technical:       { sym: '⟨⟩',  label: 'DEV'  },
+  competitor:      { sym: '◎',   label: 'RAD'  },
+  platform:        { sym: '⬡',   label: 'PLT'  },
+  pricing:         { sym: '◈',   label: 'PRX'  },
+  security:        { sym: '⊙',   label: 'SEC'  },
+  'getting-started': { sym: '▸', label: 'GO'   },
 };
 
 const faqJsonLd = {
@@ -64,18 +70,18 @@ export default function FAQPage() {
         <div className="max-w-7xl mx-auto px-6 mb-16">
           <div className="grid grid-cols-2 gap-2">
             {FAQ_CATEGORIES.map(cat => {
-              const Icon = ICONS[cat.icon];
+              const glyph = GLYPHS[cat.id];
               return (
                 <button
                   key={cat.id}
                   onClick={() => scrollTo(cat.id)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-900/40 hover:border-pink-500/30 hover:bg-zinc-900/70 transition-all text-left group"
+                  className="flex flex-col items-center justify-center gap-2 px-4 py-5 rounded-xl border border-zinc-800 bg-zinc-900/40 hover:border-pink-500/30 hover:bg-zinc-900/70 transition-all group text-center"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-zinc-950 border border-zinc-800 group-hover:border-pink-500/30 flex items-center justify-center shrink-0 transition-colors">
-                    {Icon && <Icon className="w-4 h-4 text-pink-400" />}
+                  <div className="w-10 h-10 rounded-xl bg-zinc-950 border border-zinc-800 group-hover:border-pink-500/40 group-hover:shadow-[0_0_12px_rgba(236,72,153,0.15)] flex items-center justify-center shrink-0 transition-all">
+                    <span className="font-mono text-sm font-black text-pink-400 leading-none select-none">{glyph?.sym}</span>
                   </div>
-                  <span className="flex-1 text-sm font-medium text-zinc-300 group-hover:text-white transition-colors leading-snug">{cat.title}</span>
-                  <span className="text-[10px] font-mono text-zinc-600 group-hover:text-zinc-400 shrink-0 transition-colors">{cat.items.length}q</span>
+                  <span className="text-xs font-semibold text-zinc-300 group-hover:text-white transition-colors leading-tight">{cat.title}</span>
+                  <span className="font-mono text-[9px] font-bold text-zinc-600 group-hover:text-pink-500/60 uppercase tracking-widest transition-colors">{glyph?.label} · {cat.items.length}q</span>
                 </button>
               );
             })}
@@ -85,7 +91,7 @@ export default function FAQPage() {
         {/* ── Category sections ── */}
         <div className="max-w-7xl mx-auto px-6 space-y-20">
           {FAQ_CATEGORIES.map(cat => {
-            const Icon = ICONS[cat.icon];
+            const glyph = GLYPHS[cat.id];
             return (
               <section
                 key={cat.id}
@@ -95,7 +101,7 @@ export default function FAQPage() {
                 <div className="mb-8 p-6 rounded-2xl bg-zinc-900/40 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-zinc-950 border border-pink-500/30 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(236,72,153,0.2)]">
-                      {Icon && <Icon className="w-5 h-5 text-pink-400" />}
+                      <span className="font-mono text-base font-black text-pink-400 leading-none select-none">{glyph?.sym}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2 mb-1">
