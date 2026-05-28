@@ -1,5 +1,155 @@
 export const blogPosts = [
   {
+    slug: "geo-autopilot-probe-correct-publish-loop",
+    title: "GEO Autopilot: Closing the Probe-Correct-Publish Loop",
+    excerpt: "Measuring your AI citation share is useful. Automatically fixing it is the product. Meet GEO Autopilot — Auspexi's execution engine that probes, generates counter-content, publishes, and re-probes in one unbroken loop.",
+    date: "May 27, 2026",
+    category: "Product",
+    author: "Auspexi Team",
+    readTime: "6 min read",
+    image: "/geo-infographic.png",
+    tags: ["GEO Autopilot", "Automation", "AI Citations", "Probe-Correct Loop"],
+    content: `
+## Most GEO Tools Stop at the Dashboard
+
+There is a category problem in the GEO space. Most tools that claim to offer Generative Engine Optimization are, at their core, measurement tools dressed up as strategy tools. They probe AI engines, surface your citation share, display a percentage on a dashboard, and then — nothing. The next step is yours to figure out. You see that your share of voice is 12% and your top competitor is sitting at 41%, and then you open a blank document and try to write something that might close that gap.
+
+That gap between measurement and execution is where most GEO strategies die. Not because the measurement was wrong, but because there was no system to act on it automatically.
+
+GEO Autopilot is built to close that gap entirely.
+
+## The Five-Step Autopilot Cycle
+
+GEO Autopilot is an execution engine organised around a single closed loop that runs continuously:
+
+**Step 1 — Probe.** The system fires your configured query set across multiple AI engines and records exactly which queries are citing your brand, which are citing competitors, and which are citing no one. This is your baseline, and it updates on every cycle.
+
+**Step 2 — Identify.** For each uncited or competitor-dominated query, Autopilot analyses the responses to understand what facts and claims are being cited and why. It maps the semantic gap between what the AI is saying and what your brand should be saying. This is not keyword analysis — it is entity and claim-level analysis of AI output.
+
+**Step 3 — Generate.** Autopilot drafts a counter-fact or a full GEO article designed to displace the existing citation. The content is grounded in your live Fact-Vault — the structured brand facts you have already established — and built using the Agents pipeline: Crawler, Extraction, Schema, and Synthesis agents working in sequence. Every piece of generated content is structurally optimised for AI citation: thesis-first structure, H2/H3 headers matching common query patterns, embedded statistics, and a JSON-LD schema block.
+
+**Step 4 — Publish.** The generated content is pushed directly to your CMS via your configured webhook URL, or delivered via the notify-article email endpoint if you have not set up a webhook yet. The article is live on your site without you touching a keyboard. The Fact-Vault is updated with the new claims so future content builds on what was just published rather than repeating it.
+
+**Step 5 — Re-probe.** After a configurable interval, Autopilot re-runs the same probe set and measures whether the new content shifted your citation rate on the targeted queries. The delta between probe cycles is your proof of impact. If the needle moved, the cycle continues building on that momentum. If it did not, Autopilot flags the query for a different content approach.
+
+## Why This Is Different From a Dashboard
+
+A dashboard tells you what happened. An execution engine changes what happens next. The distinction is not subtle — it is the difference between a reporting tool and a product that does work on your behalf.
+
+Each article Autopilot publishes feeds back into the loop as a training signal for the next generation cycle. The Fact-Vault grows. The Cite-Magnets accumulate. The JSON-LD schema on your live pages gives AI crawlers progressively more structured signal about your brand. Over time, the loop compounds: more facts lead to better content, better content leads to higher citation rates, higher citation rates confirm which fact categories are working and which need reinforcement.
+
+The Agents pipeline — Crawler, Extraction, Schema, and Synthesis — handles the content generation. The Fact-Vault handles the knowledge persistence. Cite-Magnets handle the structured data layer. GEO Autopilot is the orchestration layer that connects all of them and keeps them running without requiring your attention for every cycle.
+
+## What You Configure, What Runs Automatically
+
+You set your query targets, your publishing schedule, and your re-probe interval. Everything else — the analysis, the content generation, the publishing, the measurement — runs without manual input. You review the results in the dashboard and adjust the strategy based on what the data shows.
+
+This is what Generative Engine Optimization looks like when it is built as an execution system rather than a reporting system. The probe-correct-publish loop does not stop when you close the tab.
+`,
+  },
+  {
+    slug: "entity-intelligence-brand-knowledge-graphs",
+    title: "Entity Intelligence: Why Your Brand Needs to Exist Before It Can Be Cited",
+    excerpt: "AI models can only cite what they know exists as a discrete entity. Most brands are invisible at the entity layer — not missing citations, missing existence. The Entity Intelligence Hub fixes this.",
+    date: "May 27, 2026",
+    category: "Strategy",
+    author: "Auspexi Team",
+    readTime: "6 min read",
+    image: "/geo-infographic.png",
+    tags: ["Entity Intelligence", "Knowledge Graphs", "Wikidata", "Schema.org", "GEO"],
+    content: `
+## The Entity Problem Nobody Talks About
+
+When GEO practitioners talk about citation gaps, they typically focus on content — not enough articles, not enough structured data, not enough Fact-Vault entries. This is the right conversation, but it presupposes something that is often not true: that the AI model already knows your brand exists.
+
+Before an AI model can cite your brand, it needs to know you exist as a *thing* — not just a string of words that might appear somewhere in its training data, but a discrete, unambiguous entity with a name, a domain, a category, and defined relationships to other known entities. This is what knowledge graph researchers call entity resolution, and it is the foundational layer of AI citation that most GEO strategies never address.
+
+If your brand is not established as a resolved entity in the knowledge infrastructure that AI models draw from, you are not missing citations. You are missing existence.
+
+## How AI Models Know What Exists
+
+Large language models learn about the world through two primary mechanisms: their training data, and the structured entity data that feeds into knowledge graphs used for grounding and retrieval.
+
+The structured entity layer is where the entity problem lives. Systems like Wikidata, Google's Knowledge Graph, and schema.org Organisation records provide AI models with high-confidence anchors — structured, interlinked records that tell the model: this entity is real, this is what it is, this is how it relates to other known entities. When a model encounters your brand name in a training document, having a corresponding entity record dramatically increases the probability that the model resolves your brand correctly rather than treating the mention as ambiguous noise.
+
+Google Knowledge Panels are the most visible indicator of entity establishment. A Knowledge Panel means Google's systems have resolved your brand as a distinct entity and are confident enough to display structured information about it. This confidence propagates — models trained on Google's data, and systems that use Google's Knowledge Graph for grounding, inherit that confidence.
+
+Wikidata is the other critical anchor. It is the open, machine-readable knowledge base that Wikipedia runs on, and it is one of the most widely used entity resolution sources in the AI ecosystem. Having a Wikidata entry for your brand — with correct statements linking your entity to your domain, your industry category, your founding date, and your key people — gives AI models a clean, authoritative reference point.
+
+Schema.org Organisation markup on your website tells crawlers how to interpret your brand at the entity level: your legal name, your alternate names, your URLs, your founding information, your social profiles. Without it, a crawler must infer your entity from unstructured text, which introduces ambiguity.
+
+## The TEO Foundation: Ontology First
+
+In the TEO framework Auspexi uses to organise GEO strategy, the Ontological axis is the foundation. Ontology is what your brand *is* — your entity definition. Before you can build the Epistemological layer (what you know, your Fact-Vault claims) or the Teleological layer (what you do, your published content), the ontological layer must be solid.
+
+A brand that has rich Fact-Vault content but a weak entity layer is building on sand. The AI may encounter your facts in training data or retrieval contexts, but without a resolved entity to attach them to, those facts may be attributed to the wrong brand, attributed to no one, or simply discarded as low-confidence information.
+
+## What the Entity Intelligence Hub Automates
+
+Auspexi's Entity Intelligence Hub is designed to handle the entity establishment workflow systematically, rather than leaving it as a manual research project.
+
+The Hub generates your complete entity profile — the structured data that needs to exist across each platform to establish your brand as a resolved entity. It checks your current Knowledge Panel status, identifies whether your brand is appearing in AI-powered search overviews, and surfaces the gaps. It generates Wikidata-compatible entity data in the correct statement format. It produces schema.org Organisation markup ready to deploy on your site. And it shows you, specifically, where to submit each piece.
+
+This is a one-time setup with permanent compounding value. Entity establishment does not need to be repeated — once your brand is a resolved entity in the knowledge graph, that resolution persists and strengthens as more content references you correctly. It is the infrastructure investment that makes every other GEO action more effective.
+
+You cannot get cited if you do not exist. The Entity Intelligence Hub ensures you exist first.
+`,
+  },
+  {
+    slug: "schema-as-a-service-dynamic-structured-data",
+    title: "Schema-as-a-Service: One Snippet, Always-Current Structured Data",
+    excerpt: "Static schema markup goes stale. Your Fact-Vault grows daily. Schema Deploy bridges the gap — a single JavaScript snippet keeps your website's structured data in sync with your brand knowledge base, automatically.",
+    date: "May 27, 2026",
+    category: "Product",
+    author: "Auspexi Team",
+    readTime: "5 min read",
+    image: "/geo-infographic.png",
+    tags: ["Schema Markup", "Structured Data", "JSON-LD", "GEO", "Schema Deploy"],
+    content: `
+## Why Schema Markup Is Your Highest-Leverage GEO Action
+
+If there is a single technical GEO action that delivers more citation impact per hour of effort than any other, it is schema markup. The reason is simple: AI crawlers — GPTBot, ClaudeBot, PerplexityBot, and the various Googlebot variants that feed Gemini's data pipeline — prioritise structured data because it is low-ambiguity and machine-readable. When a crawler encounters a block of JSON-LD on your page, it does not need to parse natural language, resolve entity references from context, or make probabilistic inferences about what you mean. The facts are stated explicitly in a format the crawler is designed to read.
+
+This is not theory. It is how structured data was designed to work, and AI crawlers are more reliant on it than traditional search crawlers ever were, because AI crawlers are optimised for breadth rather than depth. They index quickly, they prefer clean signals, and JSON-LD is the cleanest signal available.
+
+## The Problem With Static Schema
+
+Most brands that implement schema markup do it once. A developer adds an Organisation block to the homepage, maybe a few FAQPage entries to the most important landing pages, and the task is considered done. Then the business evolves. New features ship. Pricing changes. FAQs are updated. Team members join. Product descriptions are refined. And the schema sits unchanged, describing a version of the brand that no longer exists.
+
+Stale schema is worse than no schema in some respects, because it actively misleads AI crawlers with outdated information. If your Organisation schema lists a headquarters address that changed six months ago, or your FAQPage schema answers questions about a pricing tier you discontinued, you are not just missing an opportunity — you are actively injecting incorrect facts into the structured data layer that crawlers trust most.
+
+The root cause is structural: static schema files have no connection to your actual brand knowledge. They are written once, deployed, and forgotten.
+
+## How Schema Deploy Works
+
+Auspexi's Schema Deploy feature solves this with a different architecture. Instead of writing schema manually and hardcoding it into your site, you add a single JavaScript snippet to your website's head section. That snippet calls Auspexi's API on each page load and retrieves dynamically generated JSON-LD built from your current Fact-Vault.
+
+The flow is straightforward. You add a fact to your Fact-Vault — say, a new integration your product supports, or an updated pricing figure, or a new FAQ your customers are asking. Within minutes, the Auspexi API generates updated JSON-LD reflecting that fact, and the snippet injects it into every page that loads after that point. No developer involvement. No deployment. No manual schema editing.
+
+This means your structured data is always in sync with your brand knowledge base. The moment your Fact-Vault changes, your schema changes.
+
+## What Schema Types Are Generated
+
+Schema Deploy generates the schema types that AI crawlers are most likely to use for citation decisions:
+
+**Organisation** — Your canonical entity record: legal name, domain, founding date, social profiles, industry category, and key people. This is the entity anchor that ties all other schema to a resolved brand identity.
+
+**FAQPage** — Structured question-and-answer pairs drawn from your Fact-Vault. AI engines are particularly likely to cite FAQPage content in response to direct questions because the format maps cleanly to conversational query structures.
+
+**HowTo** — Step-by-step process descriptions for your product or service. These are cited frequently in instructional contexts and in the AI overviews that appear above traditional search results.
+
+**Article** — Markup for your published GEO articles, including author information, publish date, and a structured summary. This signals to crawlers that your content is authored, dated, and attributable.
+
+**Product** — Pricing, features, availability, and aggregate ratings for your product. Particularly important for preventing the kind of hallucinated pricing that costs you deals before you know the prospect exists.
+
+## Why Dynamic Outperforms Static for GEO
+
+The compounding value of dynamic schema is that it reflects a living knowledge base rather than a snapshot. As your Agents pipeline publishes more GEO content and your Fact-Vault grows, the schema layer grows with it. The structured data that AI crawlers see on your site becomes progressively richer, more accurate, and more comprehensive — without any manual maintenance.
+
+One snippet. Always current. That is the architecture of schema that does not decay.
+`,
+  },
+  {
     slug: "geo-roi-business-case-2027",
     title: "The Strategic ROI of GEO: How AI Visibility Drives Enterprise Revenue",
     category: "Business Strategy",
@@ -449,61 +599,41 @@ This isn't just about speed; it's about veracity. In the fast-moving economy of 
     excerpt:
       "Discover how Citacious uses infinite memory and new metrics to become your personal GEO tutor and analyst. She learns your brand, remembers past actions, and crafts personalized strategies.",
     content: `
-      <h2>The Problem with Static Analytics</h2>
+      <h2>The Dashboard AI Strategist Who Actually Knows Your Brand</h2>
       <p>
-        In the rapidly evolving world of Generative Engine Optimization (GEO), having access to data is no longer enough. Many marketers stare at dashboards filled with numbers—AI Share of Voice (SOV), Citation Frequency, Sentiment Index, and Fact Extraction Rates—and ask themselves a simple question: <em>"What do I actually do with this information?"</em>
+        Most analytics tools give you numbers and leave you to figure out what to do with them. Citacious is different. She is Auspexi's built-in GEO strategist — a conversational AI that lives inside your dashboard and carries deep, current knowledge of the entire platform, your live Fact-Vault, and your real-time Share of Voice metrics. She doesn't just answer questions; she tells you what to do next and why.
       </p>
       <p>
-        Traditional SEO tools provide static reports. They tell you where you rank today compared to yesterday. But they do not understand the nuance of your brand, the specific dynamics of your niche, or the historical context of your previous campaigns. You end up spending hours acting as your own data analyst, trying to connect the dots between a Reddit seeding campaign you ran three weeks ago and a sudden spike in Gemini citations today.
-      </p>
-      <p>
-        This manual analysis is not scalable. To truly dominate AI search, you need an analyst that never sleeps, never forgets, and understands your brand inside and out.
+        Citacious has evolved well beyond a basic AI assistant. She is trained on all eight Auspexi platform modules — Citation Probing, Fact-Vault management, the Agents content pipeline, Schema Deploy, Entity Intelligence, Competitor Radar, Omnichannel Amplifier, and the Analytics dashboard. Ask her about any of them and she'll give you a specific, actionable answer grounded in how those features work and what your current data shows.
       </p>
 
-      <h2>Introducing Citacious: Your Personal GEO Tutor & Analyst</h2>
+      <h2>The TEO Framework: How Citacious Frames Your GEO Strategy</h2>
       <p>
-        Meet <strong>Citacious</strong>. More than just an AI chatbot, Citacious represents a massive leap forward in our platform: an autonomous, memory-driven GEO strategist that lives inside your Auspexi dashboard. She is designed to be your personal tutor, your dedicated analyst, and your proactive strategy partner.
-      </p>
-      <p>
-        We didn't just build an assistant to answer generic SEO questions. We built a system capable of executing deep, niche-specific analysis. Citacious looks at our newly introduced metrics—like your <strong>Brand Entity Resonance</strong> and <strong>Contextual Sentiment Score</strong>—and translates them into plain English actionable steps.
-      </p>
-
-      <h2>The Power of Infinite Memory</h2>
-      <p>
-        The true superpower of Citacious lies in her <strong>Long-Term Memory architecture</strong>. Most AI assistants suffer from "amnesia." Every time you open a new chat, you have to re-explain your brand, your target audience, and your competitors.
-      </p>
-      <p>
-        Citacious is different. She possesses infinite memory regarding your workspace. From the moment you onboard, she begins learning about your subscriber brand and your specific niche or industry. 
-      </p>
-      <p>
-        But she doesn't stop there. Citacious learns from your <strong>previous actions and previous results</strong>. 
+        Citacious organises GEO strategy around what Auspexi calls the TEO framework — three axes that define how AI models understand and cite your brand.
       </p>
       <ul>
-        <li>She remembers that last month, you injected a JSON-LD Cite-Magnet about "latency reduction" that successfully boosted your Claude SOV by 14%.</li>
-        <li>She remembers that two weeks ago, a competitor launched a new feature, and you deployed a Trojan Horse overwrite to counter it.</li>
-        <li>She tracks the current baseline metrics against these historical actions, identifying exact correlations between what you do and how the LLMs respond.</li>
+        <li><strong>Ontology</strong> — What your brand <em>is</em>. This is the entity layer: your name, your domain, your category, your relationships to known entities in the knowledge graph. It is the foundation. If the AI doesn't know you exist as a discrete, unambiguous entity, nothing else matters.</li>
+        <li><strong>Epistemology</strong> — What your brand <em>knows</em>. This is your Fact-Vault: the structured, high-entropy claims, statistics, and differentiators that AI models extract and cite. The richer your vault, the higher your citation probability.</li>
+        <li><strong>Teleology</strong> — What your brand <em>does</em>. This is your published content: GEO articles, schema-wrapped pages, and seeded consensus content that demonstrate your relevance across the queries your customers are actually asking.</li>
       </ul>
-
-      <h2>A Strategy Tailored to Your Niche</h2>
       <p>
-        Because Citacious has full access to your historical performance and understands your industry, her strategic recommendations are hyper-personalized. 
-      </p>
-      <p>
-        If you are in the B2B SaaS space, she won't suggest broad consumer marketing tactics. Instead, she might say: <em>"I noticed your AI Share of Voice on ChatGPT dropped slightly for queries related to 'enterprise compliance.' However, I remember we successfully used Quora Consensus Seeding last quarter to fix a similar drop for 'data security.' I have drafted three new high-entropy facts specifically targeting compliance. Should I push these to your Fact-Vault?"</em>
-      </p>
-      <p>
-        This is the difference between a tool and a tutor. Citacious doesn't just show you that you are losing ground; she reminds you of what worked in the past, formulates a strategy based on your unique brand context, and prepares the exact payload needed to execute the fix.
+        When you ask Citacious for a strategy recommendation, she evaluates your current state across all three axes and tells you which one is the binding constraint. If your entity layer is weak, she'll direct you to Entity Intelligence before anything else. If your vault is thin, she'll push you toward fact extraction. If your content pipeline is stalled, she'll guide you through the Agents workflow.
       </p>
 
-      <h2>Continuous Learning for Continuous Growth</h2>
+      <h2>Live Account Context, Not Generic Advice</h2>
       <p>
-        As the major LLMs (OpenAI, Google Gemini, Anthropic) update their training data and tweak their retrieval algorithms, the rules of GEO change. Because Citacious constantly monitors the global AI landscape and your specific dashboard metrics, she learns from the macro environment just as much as your micro actions.
+        Citacious reads your live account data at the start of every conversation. She knows your brand name, your current Citation Probe score, how many vault facts you have, whether your GEO articles have been published, and how your Share of Voice is trending. None of this requires you to explain your situation — she already knows it.
       </p>
       <p>
-        She acts as a proactive tutor, educating you on the fly. If a new metric is introduced to the dashboard, she will proactively reach out: <em>"I see you're looking at the new Citation Frequency graph. Let's walk through how this differs from SOV, and how our recent LinkedIn distributions have directly impacted it."</em>
+        This means her recommendations are always specific to where you actually are. If your citation rate is 14% and three high-value queries are consistently missing your brand, she doesn't give you a generic content tip — she tells you exactly which queries to write about and how to structure the articles so AI engines are likely to cite them.
+      </p>
+
+      <h2>A Strategist, Not a Chatbot</h2>
+      <p>
+        The distinction matters. A chatbot answers the question you asked. Citacious answers the question you should have asked. She monitors the global AI landscape and your platform metrics simultaneously, which means she can identify when your SOV drop is caused by a model update rather than a content gap — and she can tell the difference.
       </p>
       <p>
-        With Citacious, you aren't just buying software. You are hiring a world-class GEO analyst who knows your brand better than anyone else, who learns from every win and every loss, and who is dedicated to ensuring your facts dominate the AI era.
+        With Citacious, you have a GEO strategist who understands your brand, knows the platform end to end, and gives you a clear next action every time you open the chat. That is what separates measurement from execution.
       </p>
     `,
   },
@@ -542,14 +672,14 @@ This isn't just about speed; it's about veracity. In the fast-moving economy of 
         Here is how the pipeline works:
       </p>
       <ol>
-        <li><strong>Webhook Integration:</strong> Auspexi connects directly to your CMS via secure webhooks.</li>
-        <li><strong>Real-Time Extraction:</strong> The moment a marketer hits "Publish" on a new pricing page or feature update, Auspexi intercepts the payload. Our NLP engine instantly extracts the new High-Entropy Facts (e.g., the new price point, the new feature name).</li>
-        <li><strong>Fact-Vault Update:</strong> The extracted facts automatically overwrite the outdated entities in your centralized Auspexi Fact-Vault.</li>
-        <li><strong>Edge Deployment:</strong> Within milliseconds, the updated Fact-Vault regenerates your JSON-LD Cite-Magnets and pushes them to your Cloudflare or Vercel edge nodes.</li>
+        <li><strong>Content Generation:</strong> When you trigger an article from the Agents tab, Auspexi's four-agent pipeline researches, extracts, schemas, and writes a GEO-optimised article grounded in your Fact-Vault.</li>
+        <li><strong>Fact-Vault Update:</strong> The extracted facts are stored in your centralized Auspexi Fact-Vault, keeping your brand knowledge base current and consistent.</li>
+        <li><strong>Webhook Publishing:</strong> When you click Publish, Auspexi sends the completed article — including the full text, extracted facts, and JSON-LD schema — to your configured CMS webhook URL. Your CMS receives the payload and creates or updates the page automatically.</li>
+        <li><strong>Email Delivery Fallback:</strong> If you don't have a CMS webhook set up yet, Auspexi's <code>notify-article</code> endpoint emails the full article content directly to your account address, ready to paste into any website editor.</li>
       </ol>
 
       <blockquote>
-        "With CMS Auto-Sync, we have achieved Continuous LLM Grounding. Your marketing team doesn't need to learn how to write JSON-LD or understand vector embeddings. They just update the website like they always have, and Auspexi ensures the world's AI models are instantly synchronized." <br/><strong>— Auspexi Infrastructure Team</strong>
+        "With CMS Auto-Sync, we have achieved Continuous LLM Grounding. Your marketing team doesn't need to learn how to write JSON-LD or understand vector embeddings. They publish content through Auspexi, and the structured facts reach your website and the AI crawlers automatically." <br/><strong>— Auspexi Infrastructure Team</strong>
       </blockquote>
 
       <h2>Set It and Forget It GEO</h2>
