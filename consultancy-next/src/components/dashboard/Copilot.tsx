@@ -120,7 +120,7 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
   useEffect(() => {
     const fetchKnowledge = async () => {
       try {
-        const user = auth.currentUser;
+        const user = auth?.currentUser;
         if (!user) return;
 
         const qFacts = query(
@@ -231,7 +231,7 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
       }
     };
 
-    // We listen to auth changes to ensure we fetch once logged in
+    if (!auth) return;
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) fetchKnowledge();
     });
@@ -625,7 +625,7 @@ ${knowledgeContext}`;
         body: JSON.stringify({
           userMessage,
           chatHistory: history,
-          userId: auth.currentUser?.uid || 'copilot-user',
+          userId: auth?.currentUser?.uid || 'copilot-user',
           activeTab,
         })
       });

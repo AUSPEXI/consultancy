@@ -45,6 +45,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!auth) {
+      // Firebase not initialized — NEXT_PUBLIC_FIREBASE_* env vars missing from build
+      setLoading(false)
+      return
+    }
+
     let unsubscribeUserDoc: (() => void) | undefined
 
     const safetyTimeout = setTimeout(() => {

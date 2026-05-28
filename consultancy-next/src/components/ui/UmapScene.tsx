@@ -249,7 +249,7 @@ export default function UmapScene({ points = [] }: { points?: any[] }) {
   }, [points]);
 
   return (
-    <Canvas camera={{ position: [0, 0, 15], fov: 45 }}>
+    <Canvas camera={{ position: [0, 0, 15], fov: 45 }} frameloop="demand">
       <color attach="background" args={['#09090b']} />
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} intensity={1} />
