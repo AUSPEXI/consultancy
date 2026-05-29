@@ -36,7 +36,7 @@ function inferAxis(baseType: string): 1 | 2 | 3 {
   if (baseType === 'Systemic Anchor') return 1;
   if (baseType === 'Signal Point') return 2;
   if (baseType === 'Emergent Trend') return 3;
-  return 2; // Risk Vector defaults to epistemological axis (most common threat type)
+  return 2;
 }
 
 export async function GET(req: NextRequest) {
@@ -46,10 +46,8 @@ export async function GET(req: NextRequest) {
     const platform = searchParams.get('platform') || 'All';
     const timeframe = searchParams.get('timeframe') || 'current';
 
-    // Fetch user's anchor labels for cluster naming
     let anchorLabels: { label: string; color: string; baseType: string; axisAlignment?: number }[] = DEFAULT_ANCHORS;
-
-    let vaultFacts: { text: string; id: string }[] = [];
+    let vaultFacts: { text: string; id: string; embedding?: number[]; collection: 'facts' | 'knowledge_graph' }[] = [];
 
     if (userId && dbAdmin) {
       try {
@@ -57,12 +55,11 @@ export async function GET(req: NextRequest) {
         if (userDoc.exists) {
           const data = userDoc.data();
           if (data?.latentAnchors?.length > 0) {
-            // No cap — use all anchors the user has configured
             anchorLabels = data.latentAnchors;
           }
         }
 
-        // Primary source: facts collection (field: statement) — this is where the Fact Vault writes
+        // Primary source: facts collection (field: statement)
         const factsSnap = await dbAdmin
           .collection('facts')
           .where('userId', '==', userId)
@@ -71,6 +68,8 @@ export async function GET(req: NextRequest) {
         vaultFacts = factsSnap.docs.map(d => ({
           id: d.id,
           text: (d.data().statement as string) || '',
+          embedding: (d.data().embedding as number[] | undefined),
+          collection: 'facts' as const,
         })).filter(f => f.text.length > 10);
 
         // Fallback: knowledge_graph (Perplexity-synced facts)
@@ -83,6 +82,8 @@ export async function GET(req: NextRequest) {
           vaultFacts = kgSnap.docs.map(d => ({
             id: d.id,
             text: (d.data().fact as string) || '',
+            embedding: (d.data().embedding as number[] | undefined),
+            collection: 'knowledge_graph' as const,
           })).filter(f => f.text.length > 10);
         }
       } catch (err) {
@@ -90,30 +91,67 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Group anchors by TEO axis (using axisAlignment if present, otherwise inferred from baseType)
+    // Group anchors by TEO axis
     const anchorsByAxis: Record<number, typeof anchorLabels> = { 1: [], 2: [], 3: [] };
     anchorLabels.forEach(a => {
       const axis = (a as any).axisAlignment ?? inferAxis(a.baseType);
       anchorsByAxis[axis].push(a);
     });
 
-    // Embed the 3 TEO semantic axes
-    const axisEmbeddings = await embeddingService.generateEmbeddings(SEMANTIC_AXES);
+    // TEO axis embeddings — static strings, cache in Firestore to avoid re-embedding on every request
+    let axisEmbeddings: number[][];
+    let axisEmbeddingsWereNew = false;
+    if (dbAdmin) {
+      const axisCacheRef = dbAdmin.collection('_embeddings_cache').doc('teo_axes_v1');
+      const axisCacheDoc = await axisCacheRef.get().catch(() => null);
+      const cached = axisCacheDoc?.data()?.embeddings as number[][] | undefined;
+      if (cached?.length === 3) {
+        axisEmbeddings = cached;
+      } else {
+        axisEmbeddings = await embeddingService.generateEmbeddings(SEMANTIC_AXES);
+        axisEmbeddingsWereNew = true;
+        axisCacheRef.set({ embeddings: axisEmbeddings, cachedAt: new Date().toISOString() }).catch(() => {});
+      }
+    } else {
+      axisEmbeddings = await embeddingService.generateEmbeddings(SEMANTIC_AXES);
+      axisEmbeddingsWereNew = true;
+    }
 
     const platforms = ['Gemini', 'ChatGPT', 'Claude'];
     let points: any[] = [];
+    let newlyEmbeddedCount = 0;
 
     if (vaultFacts.length > 0) {
-      // Real path: embed each vault fact and project onto the 3 TEO axes
-      const factTexts = vaultFacts.map(f => f.text);
-      const factEmbeddings = await embeddingService.generateEmbeddings(factTexts);
+      // Split facts into cached (have stored embedding) and uncached (need embedding API call)
+      const needsEmbedding = vaultFacts.filter(f => !f.embedding || f.embedding.length === 0);
+      const hasCached      = vaultFacts.filter(f =>  f.embedding && f.embedding.length > 0);
+
+      let freshEmbeddings: number[][] = [];
+      if (needsEmbedding.length > 0) {
+        freshEmbeddings = await embeddingService.generateEmbeddings(needsEmbedding.map(f => f.text));
+        newlyEmbeddedCount = needsEmbedding.length;
+
+        // Write new embeddings back to their source collection — fire-and-forget
+        if (dbAdmin) {
+          const batch = dbAdmin.batch();
+          needsEmbedding.forEach((f, i) => {
+            batch.update(dbAdmin!.collection(f.collection).doc(f.id), { embedding: freshEmbeddings[i] });
+          });
+          batch.commit().catch(() => {});
+        }
+      }
+
+      // Build id → embedding map and reconstruct in original order
+      const embMap = new Map<string, number[]>();
+      hasCached.forEach(f    => embMap.set(f.id, f.embedding!));
+      needsEmbedding.forEach((f, i) => embMap.set(f.id, freshEmbeddings[i]));
+      const factEmbeddings = vaultFacts.map(f => embMap.get(f.id)!);
 
       points = factEmbeddings.map((emb, i) => {
         const x = clamp(dotProduct(emb, axisEmbeddings[0]) * 80, -90, 90);
         const y = clamp(dotProduct(emb, axisEmbeddings[1]) * 80, -90, 90);
         const z = clamp(dotProduct(emb, axisEmbeddings[2]) * 80, -90, 90);
 
-        // Assign to nearest anchor using TEO axis alignment
         const absX = Math.abs(x), absY = Math.abs(y), absZ = Math.abs(z);
         const dominantAxis = absX > absY && absX > absZ ? 1 : absY > absZ ? 2 : 3;
         const candidates = anchorsByAxis[dominantAxis];
@@ -138,9 +176,9 @@ export async function GET(req: NextRequest) {
       });
     } else {
       // Fallback: embed anchor labels as placeholder point clouds
-      // Each anchor becomes a gravitational cluster of 10 points around its TEO position
       const anchorTexts = anchorLabels.map(a => `${a.label}: ${a.baseType}`);
       const anchorEmbs = await embeddingService.generateEmbeddings(anchorTexts);
+      newlyEmbeddedCount = anchorTexts.length;
 
       points = anchorEmbs.flatMap((emb, ai) => {
         const cx = clamp(dotProduct(emb, axisEmbeddings[0]) * 80, -90, 90);
@@ -167,13 +205,13 @@ export async function GET(req: NextRequest) {
 
     const engineInfo = embeddingService.getActiveEngine();
 
-    // Log embedding cost to cost_audit
-    if (userId && dbAdmin && points.length > 0) {
-      const totalTexts = (vaultFacts.length > 0 ? vaultFacts.length : anchorLabels.length * 10) + 3; // facts + 3 axes
-      const estimatedTokens = totalTexts * 20; // ~20 tokens avg per short text
+    // Log cost only for texts that actually hit the embedding API this request
+    const billableTexts = newlyEmbeddedCount + (axisEmbeddingsWereNew ? 3 : 0);
+    if (userId && dbAdmin && billableTexts > 0) {
+      const estimatedTokens = billableTexts * 20;
       const costUsd = engineInfo.name === 'openai'
-        ? (estimatedTokens / 1_000_000) * 0.02  // $0.02/1M tokens
-        : (estimatedTokens / 1_000_000) * 0.025; // Gemini embeddings
+        ? (estimatedTokens / 1_000_000) * 0.02
+        : (estimatedTokens / 1_000_000) * 0.025;
       dbAdmin.collection('cost_audit').add({
         userId,
         feature: 'latent-space-map',
@@ -183,7 +221,8 @@ export async function GET(req: NextRequest) {
         outputTokens: 0,
         estimatedCostUsd: costUsd,
         totalCostUsd: costUsd,
-        textsEmbedded: totalTexts,
+        textsEmbedded: billableTexts,
+        cachedFacts: vaultFacts.length - newlyEmbeddedCount,
         timestamp: new Date().toISOString(),
       }).catch(() => {});
     }
@@ -203,6 +242,8 @@ export async function GET(req: NextRequest) {
         anchorCount: anchorLabels.length,
         realEmbeddings: vaultFacts.length > 0,
         factsEmbedded: vaultFacts.length,
+        cachedEmbeddings: vaultFacts.length - newlyEmbeddedCount,
+        newlyEmbedded: newlyEmbeddedCount,
       },
     });
   } catch (error: any) {
