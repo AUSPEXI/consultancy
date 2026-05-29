@@ -28,19 +28,23 @@ export function UmapVisualization({ points = [] }: { points?: any[] }) {
           </div>
           <p className="text-[8px] text-zinc-500 font-mono ml-2">INTERACTIVE_NEURAL_RECONSTRUCTION_MODE</p>
 
-          <div className="mt-4 flex flex-col gap-1 bg-black/30 backdrop-blur-sm border border-white/5 p-2 rounded-lg max-w-[150px]">
-            <p className="text-[8px] text-zinc-400 font-bold uppercase mb-1 border-b border-white/10 pb-1">Data Integrity Pulse</p>
-            <div className="flex justify-between items-center text-[7px] text-zinc-500">
-              <span>Verified Citations:</span>
-              <span className="text-emerald-400 font-mono">1,240</span>
+          <div className="mt-4 flex flex-col gap-1.5 bg-black/30 backdrop-blur-sm border border-white/5 p-2 rounded-lg max-w-[150px]">
+            <p className="text-[8px] text-zinc-400 font-bold uppercase mb-0.5 border-b border-white/10 pb-1">Citation Status</p>
+            <div className="flex items-center gap-1.5 text-[7px] text-zinc-400">
+              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#eab308' }} />
+              <span>Cited territory</span>
             </div>
-            <div className="flex justify-between items-center text-[7px] text-zinc-500">
-              <span>Model Confidence:</span>
-              <span className="text-emerald-400 font-mono">98.2%</span>
+            <div className="flex items-center gap-1.5 text-[7px] text-zinc-400">
+              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#f43f5e' }} />
+              <span>Citation gap</span>
             </div>
-            <div className="flex justify-between items-center text-[7px] text-zinc-500">
-              <span>Vector Sync:</span>
-              <span className="text-pink-400 font-mono">Real-time</span>
+            <div className="flex items-center gap-1.5 text-[7px] text-zinc-400">
+              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#10b981' }} />
+              <span>Untested (positive)</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[7px] text-zinc-400">
+              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#818cf8' }} />
+              <span>Untested (neutral)</span>
             </div>
           </div>
         </div>

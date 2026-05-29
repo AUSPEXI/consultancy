@@ -50,6 +50,18 @@ export default function ContentScorerPage() {
     else localStorage.removeItem('contentScorer_result');
   }, [result]);
 
+  // Read draft passed from agents page via localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem('contentScorer_draft');
+    if (stored) {
+      try {
+        const { content: c, type: t } = JSON.parse(stored);
+        if (c) { setContent(c); setContentType(t || 'blog'); }
+      } catch (_) {}
+      localStorage.removeItem('contentScorer_draft');
+    }
+  }, []);
+
   useEffect(() => {
     const handleDraftContent = (e: Event) => {
       const customEvent = e as CustomEvent<{ content: string; type: ContentType }>;

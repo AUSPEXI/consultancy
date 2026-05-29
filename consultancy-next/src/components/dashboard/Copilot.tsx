@@ -99,6 +99,7 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const hydratedRef = useRef(false);
   const sessionRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -117,14 +118,43 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
     scrollToBottom();
   }, [messages, isOpen]);
 
+  // Hydrate conversation history from Firestore on first auth — enables cross-device continuity
+  useEffect(() => {
+    if (!auth) return;
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (!user || hydratedRef.current) return;
+      hydratedRef.current = true;
+      try {
+        const q = query(
+          collection(db, 'copilot_conversations'),
+          where('userId', '==', user.uid),
+          orderBy('timestamp', 'desc'),
+          limit(30)
+        );
+        const snap = await getDocs(q);
+        if (snap.empty) return;
+        const turns: Message[] = snap.docs
+          .map(d => d.data())
+          .reverse()
+          .map(d => ({ role: (d.role === 'user' ? 'user' : 'model') as 'user' | 'model', content: d.content || '' }))
+          .filter(m => m.content.trim());
+        if (turns.length > 0) setMessages(turns);
+      } catch (err) {
+        console.error('[Copilot] history hydration failed:', err);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
   useEffect(() => {
     const fetchKnowledge = async () => {
       try {
         const user = auth?.currentUser;
         if (!user) return;
 
+        // Primary: Fact Vault (user-entered verified facts)
         const qFacts = query(
-          collection(db, 'knowledge_graph'),
+          collection(db, 'facts'),
           where('userId', '==', user.uid),
           limit(50)
         );
@@ -161,9 +191,16 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
           getDocs(qArticles).catch(() => null),
         ]);
 
-        const docs = snapshotFacts.docs.map(d => d.data());
-        docs.sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-        const facts = docs.slice(0, 30).map((d: any) => d.fact);
+        let docs = snapshotFacts.docs.map(d => d.data());
+        // Fallback: if Fact Vault is empty, try Perplexity-synced knowledge_graph
+        if (docs.length === 0) {
+          try {
+            const kgSnap = await getDocs(query(collection(db, 'knowledge_graph'), where('userId', '==', user.uid), limit(50)));
+            docs = kgSnap.docs.map(d => ({ ...d.data(), statement: d.data().fact }));
+          } catch (_) {}
+        }
+        docs.sort((a: any, b: any) => new Date(b.createdAt || b.timestamp || 0).getTime() - new Date(a.createdAt || a.timestamp || 0).getTime());
+        const facts = docs.slice(0, 30).map((d: any) => d.statement || d.fact).filter(Boolean);
 
         const latestMetrics = snapshotMetrics.empty ? null : snapshotMetrics.docs[0].data();
         const userData = userDocSnap.exists() ? userDocSnap.data() : null;

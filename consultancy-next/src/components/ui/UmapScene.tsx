@@ -14,16 +14,22 @@ interface MapPoint {
   type?: string;
   sentiment: 'positive' | 'negative';
   distance: number;
+  citationStatus?: 'cited' | 'uncited' | 'untested';
 }
 
-function getSentimentLabel(index: number, data: MapPoint[]) {
-  if (index % 10 === 0) return 'Grounding Point';
-  return data[index].sentiment === 'positive' ? 'Positive Node' : 'Risk Node';
+function getPointColor(p: MapPoint, index: number): string {
+  const status = (p as any).citationStatus;
+  if (status === 'cited')   return '#eab308'; // gold  — semantically near a cited query
+  if (status === 'uncited') return '#f43f5e'; // red   — near an uncited query (gap)
+  // untested or no probe run yet: teal for positive sentiment, indigo for negative
+  return p.sentiment === 'positive' ? '#10b981' : '#818cf8';
 }
 
-function getSentimentColor(index: number, data: MapPoint[]) {
-  if (index % 10 === 0) return '#eab308';
-  return data[index].sentiment === 'positive' ? '#10b981' : '#f43f5e';
+function getStatusLabel(p: MapPoint): string {
+  const status = (p as any).citationStatus;
+  if (status === 'cited')   return 'Cited Territory';
+  if (status === 'uncited') return 'Citation Gap';
+  return p.sentiment === 'positive' ? 'Positive Node' : 'Neutral Node';
 }
 
 function PointCloud({ points: data, onHoverChange }: { points: MapPoint[]; onHoverChange?: (h: boolean) => void }) {
@@ -63,9 +69,7 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[]; onHov
       pos[i * 3 + 1] = y;
       pos[i * 3 + 2] = z;
 
-      // Gold for every 10th (grounding anchor), green positive, red negative
-      let nodeColor = p.sentiment === 'positive' ? '#10b981' : '#f43f5e';
-      if (i % 10 === 0) nodeColor = '#eab308';
+      const nodeColor = getPointColor(p, i);
 
       const c = new THREE.Color(nodeColor);
       cols[i * 3] = c.r;
@@ -122,11 +126,11 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[]; onHov
         >
           <div
             className="px-3 py-2 bg-black/90 border-2 rounded-lg shadow-2xl backdrop-blur-xl min-w-[160px] animate-in fade-in zoom-in duration-100 pointer-events-none"
-            style={{ borderColor: `${getSentimentColor(hovered, data)}66` }}
+            style={{ borderColor: `${getPointColor(data[hovered], hovered)}66` }}
           >
             <div className="flex justify-between items-start mb-1">
-              <p className="text-[9px] font-black uppercase tracking-[0.15em]" style={{ color: getSentimentColor(hovered, data) }}>
-                {getSentimentLabel(hovered, data)}
+              <p className="text-[9px] font-black uppercase tracking-[0.15em]" style={{ color: getPointColor(data[hovered], hovered) }}>
+                {getStatusLabel(data[hovered])}
               </p>
               <div className="flex gap-0.5">
                 {[1, 2, 3].map(i => <div key={i} className="w-1 h-1 rounded-full bg-white/20" />)}
@@ -137,12 +141,12 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[]; onHov
             </p>
             <div className="flex flex-col gap-0.5">
               <div className="flex justify-between text-[9px]">
-                <span className="text-zinc-500 font-mono">WEIGHT:</span>
-                <span className="font-mono text-zinc-300">{Math.round((1 - data[hovered].distance) * 100)}%</span>
+                <span className="text-zinc-500 font-mono">ANCHOR:</span>
+                <span className="font-mono text-zinc-300 truncate max-w-[80px]">{data[hovered].type || '—'}</span>
               </div>
               <div className="flex justify-between text-[9px]">
-                <span className="text-zinc-500 font-mono">SOURCE:</span>
-                <span className="font-mono text-zinc-300">GEO_SYNC</span>
+                <span className="text-zinc-500 font-mono">PROXIMITY:</span>
+                <span className="font-mono text-zinc-300">{Math.round((1 - data[hovered].distance) * 100)}%</span>
               </div>
             </div>
           </div>
@@ -217,10 +221,10 @@ export default function UmapScene({ points = [] }: { points?: any[] }) {
         x: p.x ?? 0,
         y: p.y ?? 0,
         z: p.z ?? 0,
-        // label = fact text for hover tooltip (truncated); anchorName = TEO anchor for pillar
         label: (p.label || p.type || 'Signal').substring(0, 50),
         anchorName: p.type || 'Anchor',
         type: p.groupType || p.type,
+        citationStatus: p.citationStatus ?? 'untested',
         sentiment: (p.sentiment === 'positive' || p.sentiment === 'negative') ? p.sentiment : (p.distance < 0.5 ? 'positive' : 'negative'),
         distance: p.distance ?? Math.random(),
       }));

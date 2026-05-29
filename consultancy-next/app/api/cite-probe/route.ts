@@ -173,6 +173,19 @@ export async function POST(request: Request) {
     if (dbAdmin && userId !== 'anonymous') {
       try {
         await dbAdmin.collection('citation_tests').add(probeResult);
+        // Log the probe action for the training data pipeline (action → outcome join)
+        dbAdmin.collection('audit_logs').add({
+          userId,
+          action: 'Ran Citation Probe',
+          details: {
+            citationRate,
+            citedCount,
+            totalQueries: testQueries.length,
+            activePlatforms,
+            platformRates,
+          },
+          timestamp: new Date().toISOString(),
+        }).catch(() => {});
         // Estimated cost across active platforms
         const cost =
           (platformRates.gemini !== null ? (testQueries.length * 500 / 1_000_000) * 0.40 : 0) +

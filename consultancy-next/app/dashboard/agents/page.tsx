@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Search, FileText, Code2, PenTool, CheckCircle2, Loader2, Play, ArrowRight, X, BrainCircuit } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
@@ -14,6 +15,7 @@ type AgentStatus = 'idle' | 'running' | 'completed' | 'error';
 
 export default function AgentsPage() {
   const { tier, userData, user, role } = useAuth();
+  const router = useRouter();
   const [topic, setTopic] = useState('');
   const [isOrchestrating, setIsOrchestrating] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
@@ -62,9 +64,16 @@ export default function AgentsPage() {
       if (user) {
         try {
           const { query: fsQuery, collection: fsCollection, getDocs, where } = await import('firebase/firestore');
-          const q = fsQuery(fsCollection(db, 'knowledge_graph'), where('userId', '==', user.uid));
-          const snapshot = await getDocs(q);
-          const factsArray = snapshot.docs.map(doc => doc.data().fact);
+          // Primary: Fact Vault (user-entered verified facts)
+          const qVault = fsQuery(fsCollection(db, 'facts'), where('userId', '==', user.uid));
+          const vaultSnap = await getDocs(qVault);
+          let factsArray = vaultSnap.docs.map(doc => (doc.data().statement as string)).filter(Boolean);
+          // Fallback: Perplexity-synced facts
+          if (factsArray.length === 0) {
+            const qKg = fsQuery(fsCollection(db, 'knowledge_graph'), where('userId', '==', user.uid));
+            const kgSnap = await getDocs(qKg);
+            factsArray = kgSnap.docs.map(doc => (doc.data().fact as string)).filter(Boolean);
+          }
           if (factsArray.length > 0) vaultContext = factsArray.join('\n- ');
         } catch (e) { console.warn('Failed to fetch vault for extraction', e); }
       }
@@ -240,7 +249,8 @@ export default function AgentsPage() {
                   <div className="flex justify-end gap-3">
                     <button
                       onClick={() => {
-                        window.dispatchEvent(new CustomEvent('draft-content', { detail: { content: finalArticle, type: 'blog' } }));
+                        localStorage.setItem('contentScorer_draft', JSON.stringify({ content: finalArticle, type: 'blog' }));
+                        router.push('/dashboard/content-scorer');
                       }}
                       className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
                     >
