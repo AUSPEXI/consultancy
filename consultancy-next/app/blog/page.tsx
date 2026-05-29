@@ -27,10 +27,10 @@ export const metadata: Metadata = {
 
 export default function BlogPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30 overflow-x-hidden">
+    <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30">
       <PublicHeader />
 
-      <main className="pt-32 pb-24">
+      <main className="pt-32 pb-24 bg-zinc-950">
         <div className="max-w-7xl mx-auto px-6">
           <div className="mb-16 text-center">
             <h1 className="text-4xl md:text-6xl font-bold font-heading mb-6">GEO Strategy Insights</h1>
@@ -41,20 +41,20 @@ export default function BlogPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogPosts.map((post) => (
-              <Link href={`/blog/${post.slug}`} key={post.slug} className="group cursor-pointer bg-zinc-900/30 rounded-2xl overflow-hidden flex flex-col shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
-                <div className="w-full flex min-h-[220px] overflow-hidden border-b border-zinc-800 relative bg-[#0B0E14]">
+              <Link href={`/blog/${post.slug}`} key={post.slug} className="group cursor-pointer bg-zinc-900 rounded-2xl overflow-hidden flex flex-col shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+                <div className="w-full h-[220px] flex-shrink-0 overflow-hidden border-b border-zinc-800 relative bg-[#0B0E14]">
                   <BlogHero title={post.title} category={post.category} compact={true} />
                 </div>
-                <div className="p-6 flex flex-col flex-1">
+                <div className="p-6 flex flex-col flex-1 bg-zinc-900">
                   <div className="flex items-center gap-3 text-xs font-medium text-zinc-500 mb-3">
                     <span className="text-pink-400 bg-pink-400/10 px-2 py-1 rounded-md">{post.category}</span>
                     <span>•</span>
                     <span>{post.date}</span>
                   </div>
-                  <h3 className="text-xl font-semibold text-zinc-200 group-hover:text-white transition-colors leading-snug mb-3">
+                  <h3 className="text-xl font-semibold text-zinc-200 group-hover:text-white transition-colors leading-snug mb-3 line-clamp-2">
                     {post.title}
                   </h3>
-                  <p className="text-zinc-400 text-sm line-clamp-3 mt-auto font-sans">
+                  <p className="text-zinc-400 text-sm line-clamp-2 mt-auto font-sans">
                     {post.excerpt}
                   </p>
                 </div>

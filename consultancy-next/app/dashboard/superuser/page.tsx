@@ -21,11 +21,21 @@ interface FeatureBreakdown {
   outputTokens: number;
 }
 
+interface PlatformRate {
+  label: string;
+  model: string;
+  perQuery: number;
+  color: string;
+}
+
 interface CostAuditData {
   totalCalls: number;
   grandTotalCost: number;
   featureBreakdown: FeatureBreakdown[];
+  providerBreakdown?: { provider: string; calls: number; totalCost: number }[];
   dailySpend: { date: string; cost: number }[];
+  platformRates?: Record<string, PlatformRate>;
+  probeCostPerRun?: number;
 }
 
 const FEATURE_LABELS: Record<string, string> = {
@@ -34,7 +44,9 @@ const FEATURE_LABELS: Record<string, string> = {
   'agent-synthesize': 'Agent · Synthesize',
   'agent-schema': 'Agent · Schema',
   'agent-crawl': 'Agent · Crawl (Exa)',
-  'cite-probe': 'Citation Probe',
+  'cite-probe': 'Citation Probe (Gemini)',
+  'cite-probe-multi': 'Citation Probe (4-Platform)',
+  'latent-space-map': 'Latent Space Map',
   'content-scorer': 'Content Scorer',
   'simulator': 'Simulator',
   'amplify': 'Fact Amplifier',
@@ -238,6 +250,34 @@ function CostAuditPanel({ userId }: { userId: string }) {
             <p className="text-[10px] text-zinc-600 mt-4">
               Based on your actual API usage pattern. 3× cost margin is conservative — SaaS tooling typically runs 5–10×. Assumes usage scales linearly with subscribers.
             </p>
+
+            {/* Platform rate card */}
+            {data.platformRates && (
+              <div className="mt-6 pt-6 border-t border-zinc-800">
+                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">
+                  Per-Query API Rate Card
+                  {data.probeCostPerRun !== undefined && (
+                    <span className="ml-3 text-pink-400 normal-case font-normal">
+                      Full probe (7q × 4 platforms) = ${data.probeCostPerRun.toFixed(4)}
+                    </span>
+                  )}
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {Object.entries(data.platformRates).map(([key, p]) => (
+                    <div key={key} className="bg-zinc-900 border border-zinc-800 rounded-xl p-3 flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-white truncate">{p.label}</p>
+                        <p className="text-[10px] text-zinc-500 truncate">{p.model}</p>
+                      </div>
+                      <span className="ml-auto text-xs font-mono text-emerald-400 shrink-0">
+                        ${p.perQuery.toFixed(p.perQuery < 0.001 ? 6 : 4)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { Header } from '@/components/dashboard/Header';
 
@@ -49,20 +49,31 @@ function DashboardSkeleton() {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // Only redirect to sign-in if user is not on the sign-in page itself.
+  // Previously redirected to '/' creating an infinite loop: landing → /dashboard → redirect → landing.
   useEffect(() => {
-    if (!loading && !user && !ADMIN_BYPASS) {
-      router.replace('/');
+    if (!loading && !user && !ADMIN_BYPASS && pathname !== '/dashboard') {
+      router.replace('/dashboard');
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, pathname]);
 
   useEffect(() => {
     setIsSidebarOpen(false);
   }, []);
 
-  if (loading || (!user && !ADMIN_BYPASS)) {
+  // During auth loading, always show skeleton.
+  // When unauthenticated and NOT on the sign-in page, show skeleton (redirect fires above).
+  // When unauthenticated and ON the sign-in page, render children (the sign-in form).
+  if (loading || (!user && !ADMIN_BYPASS && pathname !== '/dashboard')) {
     return <DashboardSkeleton />;
+  }
+
+  // Sign-in page: render without sidebar/header chrome
+  if (!user && !ADMIN_BYPASS && pathname === '/dashboard') {
+    return <>{children}</>;
   }
 
   return (

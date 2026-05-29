@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     const result = await llmOrchestrator.executeCall<any>({
       userId,
       provider: 'gemini',
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       prompt,
       schema: FactExtractionSchema,
       feature: 'research-facts',

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { collection, getDocs, query, orderBy, limit, addDoc, where } from 'firebase/firestore';
 import { db, auth } from '@/firebase';
 import { useAuth } from '@/contexts/AuthContext';
-import { FAQ_CATEGORIES } from '@/data/faqData';
+import { AURA_FAQ_KNOWLEDGE } from '@/data/faqData';
 
 function base64ToInt16Array(base64: string) {
   const binaryString = window.atob(base64);
@@ -109,7 +109,7 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
       const ai = new GoogleGenAI({ apiKey });
       const conversationText = transcript.map(t => `${t.role}: ${t.text}`).join("\n");
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash",
         contents: `Analyze the following conversation between a user and an Auspexi AI agent.
 Extract any NEW, USEFUL facts, frequently asked questions, or insights about the user's needs or Auspexi's services that the agent should remember for future conversations.
 Do not extract personal information (like names or emails).
@@ -216,42 +216,23 @@ ${conversationText}`,
       await fetchKnowledgeGraph();
       const weeklyMetricsContext = await fetchWeeklyMetrics();
 
-      const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-      let ai: GoogleGenAI;
-      if (apiKey && apiKey !== 'dummy') {
-        ai = new GoogleGenAI({ apiKey });
-      } else {
-        const baseUrl = `${window.location.protocol}//${window.location.host}/api/genai`;
-        ai = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl } });
-      }
+      const proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
+        `${window.location.protocol}//${window.location.host}/api/genai`;
+      const ai = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl } });
 
       const visitorContext = userData?.brand
         ? `\n\nVISITOR CONTEXT: You are speaking with someone from "${userData.brand}"${userData.domain ? ` (${userData.domain})` : ''}. They are already an Auspexi customer. Welcome them warmly and offer to guide them through the site or help them get back to their dashboard.`
         : '';
 
-      // Build a concise GEO knowledge snippet from FAQ data
-      const geoKnowledge = FAQ_CATEGORIES.slice(0, 3).flatMap(cat =>
-        cat.items.slice(0, 3).map(item => `Q: ${item.question}\nA: ${item.answer}`)
-      ).join('\n\n');
-
-      const systemInstruction = `You are Aura — Auspexi's friendly voice guide on the public website. You are a warm, knowledgeable brand ambassador and customer service agent for Auspexi.
+      const systemInstruction = `You are Aura — Auspexi's voice brand guide on the public website. You are warm, knowledgeable, and concise. Your job is to help visitors understand GEO, what Auspexi does, how it works, and guide them to the right place on the site.
 
 YOUR ROLE:
-You are NOT the dashboard AI (that is Citacious, a separate agent who lives inside the Auspexi platform). You are the public-facing guide on auspexi.com. Help visitors understand what Auspexi does, answer questions about GEO strategy, explain pricing, and guide them to the right page on the site using the navigateToPage tool when helpful.
+You are NOT the dashboard AI — that is Citacious, a separate agent who lives inside the Auspexi platform for paying customers. You are the public-facing guide on auspexi.com. You answer questions, explain concepts, handle objections, discuss pricing, and use navigateToPage to take visitors where they want to go.
 
-You have NO knowledge of or access to any user's private dashboard, internal metrics, Fact-Vault, or account data. If asked about dashboard features, explain what they do at a high level and invite the visitor to sign up or log in.
+You have NO knowledge of any user's private dashboard data, Fact-Vault contents, or live metrics. If asked about those, explain what they are at a high level and invite the visitor to sign up or log in.
 
-WHAT YOU KNOW ABOUT AUSPEXI:
-- Auspexi is the leading Generative Engine Optimization (GEO) platform. GEO is the practice of engineering your brand so AI models — ChatGPT, Gemini, Claude, and Perplexity — cite you as an authoritative source.
-- Auspexi tracks AI Share of Voice (A-SoV): the % of relevant AI responses that mention your brand, measured live across 4 engines.
-- Platform tools (high-level): GEO-Pulse (keyword scanning), Fact-Vault (brand knowledge base), Content Scorer, Brand Monitor, Competitors intelligence, Citacious (the dashboard AI strategist), Technical Analyzer, AI Simulator, and Agents (automated GEO content pipeline).
-- Auspexi uses 768-dimensional semantic mapping to measure how closely AI models associate your brand with target concepts — called the Moat Score.
-- Subscriptions: monthly or annual, cancel anytime. See auspexi.com/#pricing for current plans.
-- GDPR compliant, UK operated, AES-256 encrypted, TLS 1.3 in transit, data in Google Cloud.
-- Contact for questions or enterprise pricing: sales@auspexi.com
-
-GEO KNOWLEDGE (for accurate answers to visitor questions):
-${geoKnowledge}
+FULL KNOWLEDGE BASE (answer from this accurately — do not guess or contradict it):
+${AURA_FAQ_KNOWLEDGE}
 
 YOUR TONE:
 - Warm, confident, and concise. Friendly but professional. Not gimmicky.
@@ -263,7 +244,7 @@ NAVIGATION: Use navigateToPage when a visitor asks to go somewhere or when it wo
 ${visitorContext}`;
 
       const sessionPromise = ai.live.connect({
-        model: "gemini-2.0-flash-live-001",
+        model: "gemini-2.5-flash-live-001",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {

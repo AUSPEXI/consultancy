@@ -31,13 +31,11 @@ export async function generateMetadata(
       description: post.excerpt,
       url: `https://auspexi.com/blog/${post.slug}`,
       type: 'article',
-      images: [{ url: post.image || '/geo-infographic.png', width: 1200, height: 630, alt: post.title }],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.excerpt,
-      images: [post.image || '/geo-infographic.png'],
     },
   };
 }
@@ -57,7 +55,7 @@ export default async function BlogPostPage(
     description: post.excerpt,
     url: `https://auspexi.com/blog/${post.slug}`,
     datePublished: post.date,
-    image: post.image || 'https://auspexi.com/geo-infographic.png',
+    image: `https://auspexi.com/blog/${post.slug}/opengraph-image`,
     articleSection: post.category,
     author: {
       '@type': 'Organization',
@@ -67,17 +65,17 @@ export default async function BlogPostPage(
     publisher: {
       '@type': 'Organization',
       name: 'Auspexi',
-      logo: { '@type': 'ImageObject', url: 'https://auspexi.com/geo-infographic.png' },
+      logo: { '@type': 'ImageObject', url: 'https://auspexi.com/auspexi-logo.png' },
     },
     isPartOf: { '@id': 'https://auspexi.com/blog' },
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30 overflow-x-hidden">
+    <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-500/30">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJsonLd) }} />
       <PublicHeader />
 
-      <main className="pt-32 pb-24">
+      <main className="pt-32 pb-24 bg-zinc-950">
         <article className="max-w-3xl mx-auto px-6">
           <Link href="/blog" className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-white mb-8 transition-colors">
             <ArrowLeft className="w-4 h-4" />

@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     const result = await llmOrchestrator.executeCall<string>({
       userId: email || 'anonymous',
       provider: 'gemini',
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       prompt,
       feature: 'generate-report',
     });

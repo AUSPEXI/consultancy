@@ -5,6 +5,7 @@ import { X, Loader2, Sparkles, Activity, HelpCircle, Save, Plus } from 'lucide-r
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { logAuditAction } from '@/lib/audit';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Anchor {
   label: string;
@@ -35,6 +36,10 @@ export function SemanticAnchorsModal({
   onSaved,
   showToast
 }: SemanticAnchorsModalProps) {
+  const { userData: authUserData } = useAuth();
+  const effectiveBrand = brand || authUserData?.brand || '';
+  const effectiveDomain = domain || authUserData?.domain || '';
+
   const [editAnchorsState, setEditAnchorsState] = useState<Anchor[]>(initialAnchors);
   const [isSavingAnchors, setIsSavingAnchors] = useState(false);
   const [isSuggestingAnchors, setIsSuggestingAnchors] = useState(false);
@@ -46,7 +51,7 @@ export function SemanticAnchorsModal({
   if (!isOpen) return null;
 
   const handleSuggestAnchors = async () => {
-    if (!brand || !domain) {
+    if (!effectiveBrand || !effectiveDomain) {
       showToast?.("Brand and domain required for autosuggest", "error");
       return;
     }
@@ -60,8 +65,8 @@ export function SemanticAnchorsModal({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId,
-          brand,
-          domain,
+          brand: effectiveBrand,
+          domain: effectiveDomain,
           domainContext: keywords?.join(', ')
         })
       });
@@ -213,7 +218,7 @@ export function SemanticAnchorsModal({
                   </div>
                </div>
             ))}
-            {editAnchorsState.length < 5 && (
+            {editAnchorsState.length < 7 && (
                <button onClick={() => setEditAnchorsState([...editAnchorsState, { label: "New Anchor", color: "#ec4899", baseType: "Signal Point" }])} className="group w-full p-10 border-2 border-dashed border-zinc-800 hover:border-pink-500/30 rounded-3xl text-zinc-600 hover:text-pink-400 bg-zinc-950/20 hover:bg-pink-500/5 transition-all duration-500 text-sm font-bold flex flex-col items-center justify-center gap-4">
                   <div className="p-4 bg-zinc-900 rounded-2xl group-hover:bg-pink-500/10 transition-colors border border-zinc-800 group-hover:border-pink-500/20">
                     <Plus className="w-8 h-8" />

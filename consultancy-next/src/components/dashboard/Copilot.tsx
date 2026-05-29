@@ -13,17 +13,9 @@ let aiClient: GoogleGenAI | null = null;
 
 function getAIClient(): GoogleGenAI {
   if (!aiClient) {
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-    if (apiKey && apiKey !== 'dummy') {
-      aiClient = new GoogleGenAI({ apiKey });
-    } else {
-      // Fallback to proxy
-      const baseUrl = `${window.location.protocol}//${window.location.host}/api/genai`;
-      aiClient = new GoogleGenAI({
-        apiKey: 'dummy',
-        httpOptions: { baseUrl }
-      });
-    }
+    const proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
+      `${window.location.protocol}//${window.location.host}/api/genai`;
+    aiClient = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl } });
   }
   return aiClient;
 }
@@ -128,7 +120,7 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
   useEffect(() => {
     const fetchKnowledge = async () => {
       try {
-        const user = auth.currentUser;
+        const user = auth?.currentUser;
         if (!user) return;
 
         // Primary: Fact Vault (user-entered verified facts)
@@ -247,7 +239,7 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
       }
     };
 
-    // We listen to auth changes to ensure we fetch once logged in
+    if (!auth) return;
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) fetchKnowledge();
     });
@@ -396,7 +388,7 @@ ${knowledgeContext}`;
       const ai = getAIClient();
 
       const sessionPromise = ai.live.connect({
-        model: "gemini-3.1-flash-live-preview",
+        model: "gemini-2.5-flash-live-001",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
@@ -641,7 +633,7 @@ ${knowledgeContext}`;
         body: JSON.stringify({
           userMessage,
           chatHistory: history,
-          userId: auth.currentUser?.uid || 'copilot-user',
+          userId: auth?.currentUser?.uid || 'copilot-user',
           activeTab,
         })
       });

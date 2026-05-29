@@ -1,6 +1,6 @@
 'use client'
 
-import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, Wrench, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert, Zap } from 'lucide-react';
+import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, Wrench, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert, Zap, RefreshCw, Building2, Layers } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -35,6 +35,9 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     { id: 'technical', label: 'Edge & Schema', icon: Code, requiredTier: 'Premium' as UserTier, path: '/dashboard/technical' },
     { id: 'cite-probe', label: 'Citation Probe', icon: Zap, requiredTier: 'Pro' as UserTier, path: '/dashboard/cite-probe' },
     { id: 'agents', label: 'Multi-Agent Crawler', icon: Bot, requiredTier: 'Premium' as UserTier, path: '/dashboard/agents' },
+    { id: 'autopilot', label: 'GEO Autopilot', icon: RefreshCw, requiredTier: 'Pro' as UserTier, path: '/dashboard/autopilot' },
+    { id: 'entity-hub', label: 'Entity Hub', icon: Building2, requiredTier: 'Premium' as UserTier, path: '/dashboard/entity-hub' },
+    { id: 'schema-deploy', label: 'Schema Deploy', icon: Layers, requiredTier: 'Premium' as UserTier, path: '/dashboard/schema-deploy' },
     { id: 'audit-logs', label: 'Audit Logs', icon: ShieldCheck, requiredTier: 'Basic' as UserTier, path: '/dashboard/audit-logs' },
     { id: 'settings', label: 'Settings', icon: Settings, requiredTier: 'Basic' as UserTier, path: '/dashboard/settings' },
   ];

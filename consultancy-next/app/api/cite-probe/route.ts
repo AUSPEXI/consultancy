@@ -1,29 +1,9 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import OpenAI from 'openai';
 import { dbAdmin } from '@/lib/firebase-admin';
 
-// Gemini 2.0 Flash: $0.10/1M input, $0.40/1M output tokens
-async function logCiteProbesCost(userId: string, results: any[]): Promise<void> {
-  if (!dbAdmin || userId === 'anonymous') return;
-  // Rough estimate: each probe ~300 input + 200 output tokens
-  const totalInputTokens = results.length * 300;
-  const totalOutputTokens = results.length * 200;
-  const estimatedCostUsd = (totalInputTokens / 1_000_000) * 0.10 + (totalOutputTokens / 1_000_000) * 0.40;
-  await dbAdmin.collection('cost_audit').add({
-    userId,
-    feature: 'cite-probe',
-    model: 'gemini-2.0-flash',
-    provider: 'gemini',
-    inputTokens: totalInputTokens,
-    outputTokens: totalOutputTokens,
-    estimatedCostUsd,
-    totalCostUsd: estimatedCostUsd,
-    queriesRun: results.length,
-    timestamp: new Date().toISOString(),
-  });
-}
-
-// Default GEO-space queries — auspexi's target citation territory
+// Default GEO-space queries — Auspexi's target citation territory
 const DEFAULT_QUERIES = [
   'What are the best tools for generative engine optimization?',
   'How do I get my brand cited by AI like ChatGPT and Perplexity?',
@@ -41,16 +21,97 @@ function checkCitation(response: string, brand: string, domain: string): {
   const lower = response.toLowerCase();
   const brandLower = brand.toLowerCase();
   const domainLower = domain.toLowerCase().replace(/^https?:\/\//, '');
-
   const cited = lower.includes(brandLower) || lower.includes(domainLower);
   if (!cited) return { cited: false, excerpt: null };
-
-  // Extract the sentence(s) containing the citation
   const sentences = response.split(/(?<=[.!?])\s+/);
   const match = sentences.find(s =>
     s.toLowerCase().includes(brandLower) || s.toLowerCase().includes(domainLower)
   );
   return { cited: true, excerpt: match || null };
+}
+
+interface PlatformResult {
+  cited: boolean;
+  excerpt: string | null;
+  error?: string;
+  skipped?: boolean;
+}
+
+async function probeGemini(query: string, brand: string, domain: string): Promise<PlatformResult> {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
+  if (!apiKey) return { cited: false, excerpt: null, skipped: true };
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: query,
+      config: { temperature: 0.3, maxOutputTokens: 600 },
+    });
+    const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    return checkCitation(text, brand, domain);
+  } catch (e: any) {
+    return { cited: false, excerpt: null, error: e.message };
+  }
+}
+
+async function probeChatGPT(query: string, brand: string, domain: string): Promise<PlatformResult> {
+  const apiKey = process.env.OPENAI_API_KEY || '';
+  if (!apiKey) return { cited: false, excerpt: null, skipped: true };
+  try {
+    const client = new OpenAI({ apiKey });
+    const response = await client.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: query }],
+      max_tokens: 600,
+      temperature: 0.3,
+    });
+    const text = response.choices[0]?.message?.content || '';
+    return checkCitation(text, brand, domain);
+  } catch (e: any) {
+    return { cited: false, excerpt: null, error: e.message };
+  }
+}
+
+async function probePerplexity(query: string, brand: string, domain: string): Promise<PlatformResult> {
+  const apiKey = process.env.PERPLEXITY_API_KEY || '';
+  if (!apiKey) return { cited: false, excerpt: null, skipped: true };
+  try {
+    const client = new OpenAI({ apiKey, baseURL: 'https://api.perplexity.ai' });
+    const response = await client.chat.completions.create({
+      model: 'sonar',
+      messages: [{ role: 'user', content: query }],
+      max_tokens: 600,
+    } as any);
+    const text = response.choices[0]?.message?.content || '';
+    return checkCitation(text, brand, domain);
+  } catch (e: any) {
+    return { cited: false, excerpt: null, error: e.message };
+  }
+}
+
+async function probeClaude(query: string, brand: string, domain: string): Promise<PlatformResult> {
+  const apiKey = process.env.ANTHROPIC_API_KEY || '';
+  if (!apiKey) return { cited: false, excerpt: null, skipped: true };
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 600,
+        messages: [{ role: 'user', content: query }],
+      }),
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    return checkCitation(text, brand, domain);
+  } catch (e: any) {
+    return { cited: false, excerpt: null, error: e.message };
+  }
 }
 
 export async function POST(request: Request) {
@@ -61,62 +122,70 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'brand and domain are required' }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
-    if (!apiKey) {
-      return NextResponse.json({ error: 'GEMINI_API_KEY not configured' }, { status: 500 });
-    }
-
-    const ai = new GoogleGenAI({ apiKey });
     const testQueries: string[] = queries?.length > 0 ? queries : DEFAULT_QUERIES;
     const timestamp = new Date().toISOString();
 
-    const results = await Promise.all(
+    // Each query is sent to all platforms in parallel
+    const queryResults = await Promise.all(
       testQueries.map(async (query) => {
-        try {
-          const response = await ai.models.generateContent({
-            model: 'gemini-2.0-flash',
-            contents: query,
-            config: {
-              temperature: 0.3,
-              maxOutputTokens: 600,
-            },
-          });
+        const [gemini, chatgpt, perplexity, claude] = await Promise.all([
+          probeGemini(query, brand, domain),
+          probeChatGPT(query, brand, domain),
+          probePerplexity(query, brand, domain),
+          probeClaude(query, brand, domain),
+        ]);
 
-          const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          const { cited, excerpt } = checkCitation(text, brand, domain);
+        const platforms = { gemini, chatgpt, perplexity, claude };
+        const active = Object.values(platforms).filter(p => !p.skipped);
+        const citedOnAny = active.some(p => p.cited);
+        const firstExcerpt = active.find(p => p.cited && p.excerpt)?.excerpt || null;
 
-          return {
-            query,
-            cited,
-            excerpt,
-            responseLength: text.length,
-            timestamp,
-          };
-        } catch (err: any) {
-          return { query, cited: false, excerpt: null, error: err.message, timestamp };
-        }
+        return { query, cited: citedOnAny, excerpt: firstExcerpt, platforms, timestamp };
       })
     );
 
-    const citedCount = results.filter(r => r.cited).length;
-    const citationRate = Math.round((citedCount / results.length) * 100);
+    // Per-platform citation rates (null = API key not configured)
+    const platformNames = ['gemini', 'chatgpt', 'perplexity', 'claude'] as const;
+    const platformRates: Record<string, number | null> = {};
+    for (const p of platformNames) {
+      const pResults = queryResults.map(r => r.platforms[p]);
+      const active = pResults.filter(r => !r.skipped);
+      platformRates[p] = active.length === 0 ? null
+        : Math.round((active.filter(r => r.cited).length / active.length) * 100);
+    }
+
+    const activeRates = Object.values(platformRates).filter(r => r !== null) as number[];
+    const citationRate = activeRates.length > 0
+      ? Math.round(activeRates.reduce((a, b) => a + b, 0) / activeRates.length)
+      : 0;
+
+    const citedCount = queryResults.filter(r => r.cited).length;
+    const activePlatforms = activeRates.length;
 
     const probeResult = {
-      brand,
-      domain,
-      userId,
-      timestamp,
-      citationRate,
-      citedCount,
-      totalQueries: results.length,
-      results,
+      brand, domain, userId, timestamp,
+      citationRate, citedCount,
+      totalQueries: testQueries.length,
+      activePlatforms, platformRates,
+      results: queryResults,
     };
 
-    // Persist to Firestore for trend tracking + cost audit
     if (dbAdmin && userId !== 'anonymous') {
       try {
         await dbAdmin.collection('citation_tests').add(probeResult);
-        logCiteProbesCost(userId, results).catch(() => {});
+        // Estimated cost across active platforms
+        const cost =
+          (platformRates.gemini !== null ? (testQueries.length * 500 / 1_000_000) * 0.40 : 0) +
+          (platformRates.chatgpt !== null ? (testQueries.length * 800 / 1_000_000) * 0.60 : 0) +
+          (platformRates.perplexity !== null ? testQueries.length * 0.005 : 0) +
+          (platformRates.claude !== null ? (testQueries.length * 800 / 1_000_000) * 4.00 : 0);
+        dbAdmin.collection('cost_audit').add({
+          userId, feature: 'cite-probe-multi', timestamp,
+          platforms: platformNames.filter(p => platformRates[p] !== null),
+          queriesRun: testQueries.length,
+          estimatedCostUsd: cost,
+          totalCostUsd: cost,
+        }).catch(() => {});
       } catch (err) {
         console.error('Failed to persist citation test:', err);
       }

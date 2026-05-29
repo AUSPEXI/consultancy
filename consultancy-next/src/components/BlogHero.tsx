@@ -34,8 +34,8 @@ export function BlogHero({ title, category, className = '', compact = false }: B
       />
 
       {/* Glowing nodes */}
-      <div className="absolute top-[20%] left-[20%] w-[40%] h-[40%] bg-pink-500/20 rounded-full blur-[60px] mix-blend-screen pointer-events-none" />
-      <div className="absolute bottom-[20%] right-[20%] w-[50%] h-[50%] bg-[#DB2777]/20 rounded-full blur-[80px] mix-blend-screen pointer-events-none" />
+      <div className="absolute top-[20%] left-[20%] w-[40%] h-[40%] bg-pink-500/25 rounded-full blur-[60px] pointer-events-none" />
+      <div className="absolute bottom-[20%] right-[20%] w-[50%] h-[50%] bg-[#DB2777]/25 rounded-full blur-[80px] pointer-events-none" />
 
       {/* Top label */}
       <div className="relative z-10 w-full flex items-center gap-2 mb-4">
@@ -50,12 +50,12 @@ export function BlogHero({ title, category, className = '', compact = false }: B
 
         {/* Logo orb */}
         <div className={`flex-shrink-0 flex items-center justify-center rounded-full border border-pink-500/30 ${compact ? 'w-12 h-12 sm:w-14 sm:h-14' : 'w-20 h-20 md:w-28 md:h-28'} bg-zinc-900/50 relative overflow-hidden mx-auto ${!compact ? 'sm:mx-0' : ''}`}>
-          <div className="absolute inset-0 bg-pink-500/10 animate-pulse" style={{ animationDuration: '4s' }} />
+          <div className={`absolute inset-0 bg-pink-500/10 ${!compact ? 'animate-pulse' : ''}`} style={!compact ? { animationDuration: '4s' } : undefined} />
           <img
             src="/auspexi-logo.png"
             alt="Auspexi"
-            className={`relative z-10 object-contain drop-shadow-[0_0_12px_rgba(236,72,153,0.8)] animate-pulse ${compact ? 'w-6 h-6 sm:w-8 sm:h-8' : 'w-12 h-12 md:w-16 md:h-16'}`}
-            style={{ animationDuration: '4s' }}
+            className={`relative z-10 object-contain drop-shadow-[0_0_12px_rgba(236,72,153,0.8)] ${!compact ? 'animate-pulse' : ''} ${compact ? 'w-6 h-6 sm:w-8 sm:h-8' : 'w-12 h-12 md:w-16 md:h-16'}`}
+            style={!compact ? { animationDuration: '4s' } : undefined}
           />
         </div>
 

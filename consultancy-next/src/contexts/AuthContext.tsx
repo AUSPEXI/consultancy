@@ -15,6 +15,7 @@ export interface UserData {
   brand?: string
   domain?: string
   competitors?: string[]
+  watchlistCompetitors?: string[]
   keywords?: string[]
   sentimentPrompts?: string[]
   latentAnchors?: Array<{ label: string; color: string; baseType: string }>
@@ -44,6 +45,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!auth) {
+      // Firebase not initialized — NEXT_PUBLIC_FIREBASE_* env vars missing from build
+      setLoading(false)
+      return
+    }
+
     let unsubscribeUserDoc: (() => void) | undefined
 
     const safetyTimeout = setTimeout(() => {
@@ -129,6 +136,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [])
 
   const handleSignInWithGoogle = async () => {
+    if (!auth) throw new Error('Firebase is not initialised — check NEXT_PUBLIC_FIREBASE_* env vars in Netlify (scope: Builds).')
     try {
       await signInWithPopup(auth, googleProvider)
     } catch (error) {

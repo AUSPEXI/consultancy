@@ -72,8 +72,10 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[]; onHov
       cols[i * 3 + 1] = c.g;
       cols[i * 3 + 2] = c.b;
 
-      if (p.type && (p.type.includes('Anchor') || i % 15 === 0)) {
-        anchorMap.set(p.label, { x, y, z, sentiment: p.sentiment, isYellow: true });
+      // One pillar per unique anchor name — dedup by Map key, cap at 7
+      const anchorName = (p as any).anchorName;
+      if (anchorName && anchorMap.size < 7 && !anchorMap.has(anchorName)) {
+        anchorMap.set(anchorName, { x, y, z, sentiment: p.sentiment, isYellow: true });
       }
     });
 
@@ -212,12 +214,14 @@ export default function UmapScene({ points = [] }: { points?: any[] }) {
     if (points && points.length > 0) {
       return points.map((p: any, i: number) => ({
         id: i,
-        x: (p.x ?? 0) * 10,
-        y: (p.y ?? 0) * 10,
-        z: (p.z ?? 0) * 10,
-        label: p.type || p.label || ['Security', 'API', 'Founder', 'Market', 'Patent', 'Enterprise'][i % 6],
-        type: p.type,
-        sentiment: p.distance < 0.3 ? 'positive' : 'negative',
+        x: p.x ?? 0,
+        y: p.y ?? 0,
+        z: p.z ?? 0,
+        // label = fact text for hover tooltip (truncated); anchorName = TEO anchor for pillar
+        label: (p.label || p.type || 'Signal').substring(0, 50),
+        anchorName: p.type || 'Anchor',
+        type: p.groupType || p.type,
+        sentiment: (p.sentiment === 'positive' || p.sentiment === 'negative') ? p.sentiment : (p.distance < 0.5 ? 'positive' : 'negative'),
         distance: p.distance ?? Math.random(),
       }));
     }
@@ -249,7 +253,7 @@ export default function UmapScene({ points = [] }: { points?: any[] }) {
   }, [points]);
 
   return (
-    <Canvas camera={{ position: [0, 0, 15], fov: 45 }}>
+    <Canvas camera={{ position: [0, 0, 15], fov: 45 }} frameloop="demand">
       <color attach="background" args={['#09090b']} />
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} intensity={1} />

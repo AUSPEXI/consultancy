@@ -60,6 +60,13 @@ export class TokenBucketLimiter {
       maxRetries: 5,
       initialBackoffMs: 500,
     });
+
+    this.configs.set('perplexity', {
+      maxRequests: 5000,
+      windowMs: 60000,
+      maxRetries: 5,
+      initialBackoffMs: 500,
+    });
   }
 
   /**

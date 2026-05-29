@@ -186,11 +186,15 @@ export type AmplifyResult = z.infer<typeof AmplifySchema>;
 
 /**
  * Anchors Schema
+ * AnchorObjectSchema is lenient for backwards-compat with saved anchors (axisAlignment optional).
+ * AnchorsTEOSchema is strict for new generation: enforces the 2-2-2-1 TEO contract.
  */
 const AnchorObjectSchema = z.object({
   label: z.string().min(1).max(100),
   color: z.string().regex(/^#[0-9a-fA-F]{3}$|^#[0-9a-fA-F]{6}$|rgba?\(.*\)/, 'Invalid color format'),
   baseType: z.string().min(1),
+  axisAlignment: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
+  description: z.string().max(200).optional(),
 });
 
 export const AnchorsSchema = z.union([
@@ -204,6 +208,29 @@ export const AnchorsSchema = z.union([
 });
 
 export type AnchorsResult = z.infer<typeof AnchorsSchema>;
+
+const AnchorTEOObjectSchema = z.object({
+  label: z.string().min(1).max(40),
+  color: z.enum(['#ec4899', '#06b6d4', '#8b5cf6', '#f59e0b']),
+  baseType: z.enum(['Systemic Anchor', 'Signal Point', 'Emergent Trend', 'Risk Vector']),
+  axisAlignment: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+  description: z.string().max(200),
+});
+
+export const AnchorsTEOSchema = z.array(AnchorTEOObjectSchema)
+  .length(7)
+  .refine(a => a.filter(x => x.baseType === 'Systemic Anchor').length === 2, 'Must have exactly 2 Systemic Anchors (Ontological)')
+  .refine(a => a.filter(x => x.baseType === 'Signal Point').length === 2, 'Must have exactly 2 Signal Points (Epistemological)')
+  .refine(a => a.filter(x => x.baseType === 'Emergent Trend').length === 2, 'Must have exactly 2 Emergent Trends (Teleological)')
+  .refine(a => a.filter(x => x.baseType === 'Risk Vector').length === 1, 'Must have exactly 1 Risk Vector');
+
+export type AnchorsTEOResult = z.infer<typeof AnchorsTEOSchema>;
+
+export const CompetitorSuggestSchema = z.object({
+  competitors: z.array(z.string().min(1)).min(1).max(6),
+});
+
+export type CompetitorSuggestResult = z.infer<typeof CompetitorSuggestSchema>;
 
 /**
  * Schema Validation Result
