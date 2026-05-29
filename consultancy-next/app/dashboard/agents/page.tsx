@@ -33,9 +33,11 @@ export default function AgentsPage() {
   const [publishMsg, setPublishMsg] = useState('');
 
   useEffect(() => {
-    const handleSetTopic = (e: any) => { if (e.detail?.topic) setTopic(e.detail.topic); };
-    window.addEventListener('set-agent-topic', handleSetTopic);
-    return () => window.removeEventListener('set-agent-topic', handleSetTopic);
+    const queued = localStorage.getItem('agents_topic');
+    if (queued) {
+      setTopic(queued);
+      localStorage.removeItem('agents_topic');
+    }
   }, []);
 
   if (role !== 'admin' && !checkTierAccess(tier, 'Premium')) {

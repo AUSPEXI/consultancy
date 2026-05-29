@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Zap, Loader2, CheckCircle2, XCircle, TrendingUp, Target, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
@@ -53,6 +54,7 @@ type PlatformKey = keyof typeof PLATFORM_META;
 
 export default function CiteProbePage() {
   const { tier, role, userData, user } = useAuth();
+  const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
   const [probeData, setProbeData] = useState<ProbeRun | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -322,7 +324,16 @@ export default function CiteProbePage() {
                         )}
                         {!r.cited && (
                           <p className="text-xs text-zinc-500 mt-1">
-                            Not cited — <a href="/dashboard/agents" className="text-pink-400 underline">generate content targeting this query</a>
+                            Not cited —{' '}
+                            <button
+                              onClick={() => {
+                                localStorage.setItem('agents_topic', r.query);
+                                router.push('/dashboard/agents');
+                              }}
+                              className="text-pink-400 underline hover:text-pink-300 transition-colors"
+                            >
+                              generate content targeting this query
+                            </button>
                           </p>
                         )}
                       </div>

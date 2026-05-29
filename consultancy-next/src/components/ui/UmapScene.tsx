@@ -189,16 +189,16 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[]; onHov
                 opacity={0.9}
               />
             </mesh>
-            {/* Floating label */}
-            <Html distanceFactor={15} position={[0, 1.2, 0]} center zIndexRange={[100, 0]}>
+            {/* Floating label — height staggered by index to reduce screen-space overlap */}
+            <Html distanceFactor={15} position={[0, 1.4 + (i % 4) * 0.55, 0]} center occlude zIndexRange={[100, 0]}>
               <div
-                className="pointer-events-none px-4 py-2 bg-black/80 backdrop-blur-md border-2 rounded shadow-[0_0_25px_rgba(0,0,0,0.9)]"
+                className="pointer-events-none px-3 py-1.5 bg-black/85 backdrop-blur-md border rounded shadow-[0_0_20px_rgba(0,0,0,0.9)]"
                 style={{ borderColor: color }}
               >
-                <p className="text-[8px] font-black uppercase tracking-[0.3em] mb-0.5 opacity-80" style={{ color }}>
+                <p className="text-[7px] font-black uppercase tracking-[0.25em] mb-0.5 opacity-70" style={{ color }}>
                   {p.isYellow ? 'Master Anchor' : 'Semantic Anchor'}
                 </p>
-                <span className="text-xs font-bold text-white whitespace-nowrap tracking-tight">{p.label}</span>
+                <span className="text-[10px] font-bold text-white whitespace-nowrap tracking-tight">{p.label}</span>
               </div>
             </Html>
           </group>

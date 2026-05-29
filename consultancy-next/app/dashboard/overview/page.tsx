@@ -339,11 +339,18 @@ export default function OverviewPage() {
           <h1 className="text-2xl font-bold text-white tracking-tight">Executive Performance Hub</h1>
           <p className="text-sm text-zinc-400 mt-1">Track Absolute SOV, Entity Recall, and the growth of your Proprietary Neural Moat.</p>
         </div>
-        <div className="flex gap-3">
-          {metrics.length === 0 && (<span className="inline-flex items-center px-3 py-1.5 rounded-md bg-amber-500/10 text-amber-400 text-xs font-medium border border-amber-500/20">Demo Data Mode</span>)}
+        <div className="flex items-center gap-3">
+          {(() => {
+            const isLive = !!(userData?.brand && userData?.domain && userData?.keywords?.length > 0);
+            return (
+              <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border ${isLive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}`}>
+                {isLive ? '● LIVE' : '◌ SIMULATED'}
+              </span>
+            );
+          })()}
           <button onClick={runAudit} disabled={isAuditing} className={`${auditSuccess ? 'bg-emerald-600' : 'bg-pink-600 hover:bg-pink-700'} disabled:opacity-50 text-white px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 shadow-lg ${auditSuccess ? 'shadow-emerald-500/20' : 'shadow-pink-500/20'}`}>
             {isAuditing ? <Loader2 className="w-4 h-4 animate-spin" /> : auditSuccess ? <div className="flex items-center gap-2">✓ Updated</div> : <Activity className="w-4 h-4" />}
-            {!isAuditing && !auditSuccess && "Refresh Metrics"}
+            {!isAuditing && !auditSuccess && "Refresh SOV Metrics"}
           </button>
         </div>
       </div>
