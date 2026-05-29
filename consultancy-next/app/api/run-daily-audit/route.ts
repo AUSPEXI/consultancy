@@ -107,7 +107,8 @@ If the context is sparse, use a baseline of 5-15% for the brand if it's mentione
 }
 `;
 
-    const result = await llmOrchestrator.executeCall<any>({
+    // Try Gemini first; fall back to GPT-4o-mini if quota is exceeded
+    let result = await llmOrchestrator.executeCall<any>({
       userId,
       provider: 'gemini',
       model: 'gemini-2.0-flash',
@@ -115,12 +116,29 @@ If the context is sparse, use a baseline of 5-15% for the brand if it's mentione
       schema: SOVMetricsSchema,
     });
 
+    const geminiQuotaExceeded =
+      !result.success &&
+      (result.error?.includes('429') ||
+        result.error?.includes('RESOURCE_EXHAUSTED') ||
+        result.error?.includes('quota'));
+
+    if (geminiQuotaExceeded && process.env.OPENAI_API_KEY) {
+      console.log('[run-daily-audit] Gemini quota exceeded — falling back to GPT-4o-mini');
+      result = await llmOrchestrator.executeCall<any>({
+        userId,
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        prompt,
+        schema: SOVMetricsSchema,
+      });
+    }
+
     if (!result.success) {
       const isQuota = result.error?.includes('429') || result.error?.includes('RESOURCE_EXHAUSTED') || result.error?.includes('quota');
       return NextResponse.json(
         {
           error: isQuota
-            ? 'Gemini API quota exceeded (free tier). Enable billing at console.cloud.google.com → APIs & Services → Gemini API, then retry.'
+            ? 'Gemini API quota exceeded. Enable billing at console.cloud.google.com → APIs → Generative Language API and ensure your API key is created in that project.'
             : result.error,
           validationErrors: result.validationErrors,
           rawOutput: result.rawOutput,
