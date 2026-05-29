@@ -122,11 +122,35 @@ export class LLMOrchestrator {
         500
       );
     } catch (error: any) {
-      return {
-        success: false,
-        error: `Failed to call ${provider}: ${error.message}`,
-        retriesAttempted: maxRetries,
-      };
+      // Auto-fallback: if Gemini quota is exhausted and OpenAI is available, retry transparently
+      const isGeminiQuota =
+        provider === 'gemini' &&
+        (error.message?.includes('429') ||
+          error.message?.includes('RESOURCE_EXHAUSTED') ||
+          error.message?.includes('quota'));
+      if (isGeminiQuota && process.env.OPENAI_API_KEY) {
+        console.log('[llm-orchestrator] Gemini quota exceeded — auto-falling back to gpt-4o-mini');
+        try {
+          rawOutput = await callWithExponentialBackoff(
+            async () => this.callProvider('openai', 'gpt-4o-mini', finalPrompt, temperature, undefined, logCtx),
+            'openai',
+            maxRetries,
+            500
+          );
+        } catch (fallbackError: any) {
+          return {
+            success: false,
+            error: `Gemini quota exceeded and OpenAI fallback also failed: ${fallbackError.message}`,
+            retriesAttempted: maxRetries,
+          };
+        }
+      } else {
+        return {
+          success: false,
+          error: `Failed to call ${provider}: ${error.message}`,
+          retriesAttempted: maxRetries,
+        };
+      }
     }
 
     // ===== STEP 3: Validate Output Against Schema =====
