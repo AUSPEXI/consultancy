@@ -136,6 +136,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [])
 
   const handleSignInWithGoogle = async () => {
+    if (!auth) throw new Error('Firebase is not initialised — check NEXT_PUBLIC_FIREBASE_* env vars in Netlify (scope: Builds).')
     try {
       await signInWithPopup(auth, googleProvider)
     } catch (error) {

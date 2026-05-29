@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
@@ -8,6 +8,7 @@ import { Loader2 } from 'lucide-react';
 export default function DashboardPage() {
   const { user, loading, signInWithGoogle } = useAuth();
   const router = useRouter();
+  const [signInError, setSignInError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && user) {
@@ -45,8 +46,12 @@ export default function DashboardPage() {
             <p className="text-zinc-400 text-sm">Access your GEO analytics, brand monitor, and fact vault.</p>
           </div>
 
+          {signInError && (
+            <p className="text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg px-4 py-2">{signInError}</p>
+          )}
+
           <button
-            onClick={signInWithGoogle}
+            onClick={async () => { setSignInError(null); try { await signInWithGoogle(); } catch (e: any) { setSignInError(e.message || 'Sign-in failed'); } }}
             className="w-full flex items-center justify-center gap-3 bg-white hover:bg-zinc-100 text-black font-semibold py-3 px-6 rounded-xl transition-colors"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
