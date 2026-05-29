@@ -212,12 +212,12 @@ export default function UmapScene({ points = [] }: { points?: any[] }) {
     if (points && points.length > 0) {
       return points.map((p: any, i: number) => ({
         id: i,
-        x: (p.x ?? 0) * 10,
-        y: (p.y ?? 0) * 10,
-        z: (p.z ?? 0) * 10,
-        label: p.type || p.label || ['Security', 'API', 'Founder', 'Market', 'Patent', 'Enterprise'][i % 6],
-        type: p.type,
-        sentiment: p.distance < 0.3 ? 'positive' : 'negative',
+        x: p.x ?? 0,
+        y: p.y ?? 0,
+        z: p.z ?? 0,
+        label: p.label || p.type || ['Security', 'API', 'Founder', 'Market', 'Patent', 'Enterprise'][i % 6],
+        type: p.groupType || p.type,
+        sentiment: (p.sentiment === 'positive' || p.sentiment === 'negative') ? p.sentiment : (p.distance < 0.5 ? 'positive' : 'negative'),
         distance: p.distance ?? Math.random(),
       }));
     }
