@@ -212,6 +212,16 @@ export default function FactVault() {
           <span className="text-sm font-bold tracking-tight">{toast.text}</span>
         </div>
       )}
+      {/* Pipeline workflow guide */}
+      <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 font-mono overflow-x-auto pb-1">
+        <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">1 · Fact Vault</span>
+        <span>→</span>
+        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">2 · Agent Orchestration</span>
+        <span>→</span>
+        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">3 · Cite Probe</span>
+        <span className="ml-2 text-zinc-600 hidden sm:inline">— Add brand facts here. Agents use them to write GEO articles. Cite Probe checks how often AI cites you.</span>
+      </div>
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">The Fact-Vault</h1>
@@ -333,8 +343,11 @@ export default function FactVault() {
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Injected
+                      <span
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20 cursor-help"
+                        title="This fact is active in your Vault — it gets automatically included in every AI request as context (Retrieval-Augmented Generation). AI models citing your brand will draw from it."
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" /> AI Active
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -389,7 +402,7 @@ export default function FactVault() {
                               }
                             } else {
                               downloadFallback();
-                              showToast('JSON-LD downloaded. Add a webhook in Settings to auto-inject to your CMS.', 'info');
+                              showToast('JSON-LD schema downloaded. Paste it into your website <head> as: <script type="application/ld+json">…</script>. Or add a Webhook URL in Settings to push automatically.', 'info');
                             }
                           }}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 transition-colors text-xs font-medium border border-indigo-500/20"

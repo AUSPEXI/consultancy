@@ -135,9 +135,9 @@ export default function AgentsPage() {
         const response = await fetch(userData.cmsWebhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(articlePayload) });
         if (!response.ok) throw new Error(`Webhook returned ${response.status}`);
         const webhookData = await response.json().catch(() => ({}));
-        setPublishMsg(webhookData.emailed ? `Saved and emailed to ${webhookData.to}` : 'Saved to database and sent to webhook.');
+        setPublishMsg(webhookData.emailed ? `Saved and pushed to your CMS (email receipt sent to ${webhookData.to}).` : 'Article saved and pushed to your CMS via webhook.');
       } else {
-        setPublishMsg('Saved to database. Add a webhook URL in Settings to also receive email notifications.');
+        setPublishMsg('Article saved. Add a CMS Webhook URL in Settings → Integrations to automatically push articles to your website or headless CMS on publish.');
       }
     } catch (error: any) {
       console.error('Publish error:', error);
@@ -158,6 +158,16 @@ export default function AgentsPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+      {/* Pipeline workflow guide */}
+      <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 font-mono overflow-x-auto pb-1">
+        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">1 · Fact Vault</span>
+        <span>→</span>
+        <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 whitespace-nowrap">2 · Agent Orchestration</span>
+        <span>→</span>
+        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">3 · Cite Probe</span>
+        <span className="ml-2 text-zinc-600 hidden sm:inline">— Enter a topic, agents crawl + extract + write a GEO article, then publish to your CMS via webhook.</span>
+      </div>
+
       <div>
         <h1 className="text-2xl font-bold text-white tracking-tight">Agent Orchestration</h1>
         <p className="text-sm text-zinc-400 mt-1">Run specialized AI crews to prevent hallucinations and generate GEO content.</p>
