@@ -15,12 +15,20 @@ let aiClient: GoogleGenAI | null = null;
 
 async function fetchAIClient(): Promise<GoogleGenAI> {
   if (aiClient) return aiClient;
-  const proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL;
-  if (proxyUrl) {
-    aiClient = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl } });
-  } else {
+  let rawProxy = process.env.NEXT_PUBLIC_GENAI_PROXY_URL || '';
+  // Normalise: ensure absolute URL — Netlify env vars are sometimes saved without the protocol
+  if (rawProxy && !rawProxy.startsWith('http')) rawProxy = `https://${rawProxy}`;
+  if (rawProxy) {
+    try {
+      new URL(rawProxy); // validate before passing to SDK — SDK's new URL() will throw on relative URLs
+      aiClient = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: rawProxy } });
+    } catch (e) {
+      console.warn('[Citacious] Invalid NEXT_PUBLIC_GENAI_PROXY_URL, falling back to direct key:', rawProxy);
+    }
+  }
+  if (!aiClient) {
     const res = await fetch('/api/live-token');
-    if (!res.ok) throw new Error('Gemini API key not configured — set NEXT_PUBLIC_GENAI_PROXY_URL or GEMINI_API_KEY');
+    if (!res.ok) throw new Error('Gemini API key not configured — set NEXT_PUBLIC_GENAI_PROXY_URL or GEMINI_API_KEY on the server');
     const { key } = await res.json();
     if (!key) throw new Error('Gemini API key missing');
     aiClient = new GoogleGenAI({ apiKey: key });

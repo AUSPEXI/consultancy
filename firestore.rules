@@ -211,6 +211,20 @@ service cloud.firestore {
       allow update: if false;
     }
 
+    match /copilot_conversations/{convId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if false; // written only by server-side Admin SDK
+      allow update: if false;
+      allow delete: if isDocOwner() || isAdmin();
+    }
+
+    match /brand_profiles/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if false; // written only by server-side Admin SDK
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
     match /cost_audit/{entryId} {
       allow read: if isAdmin();
       allow create: if false; // Written only by server-side admin SDK
