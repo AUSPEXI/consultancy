@@ -4,6 +4,18 @@ const nextConfig = {
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
   images: { unoptimized: true },
+  async headers() {
+    return [
+      {
+        // Allow Google Sign-In popup to communicate with the parent window.
+        // 'same-origin' (the Next.js default) blocks window.closed checks from popups.
+        source: '/(.*)',
+        headers: [
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       // ── Existing anchors ─────────────────────────────────────────────────
@@ -47,6 +59,12 @@ const nextConfig = {
   },
   webpack: (config) => {
     config.externals = [...(config.externals || [])];
+    // Force single Three.js instance — @react-three/fiber and @react-three/drei
+    // both pull in Three.js causing the "Multiple instances" warning.
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      three: require.resolve('three'),
+    };
     return config;
   },
 };

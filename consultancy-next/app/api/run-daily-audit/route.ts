@@ -116,13 +116,16 @@ If the context is sparse, use a baseline of 5-15% for the brand if it's mentione
     });
 
     if (!result.success) {
+      const isQuota = result.error?.includes('429') || result.error?.includes('RESOURCE_EXHAUSTED') || result.error?.includes('quota');
       return NextResponse.json(
         {
-          error: result.error,
+          error: isQuota
+            ? 'Gemini API quota exceeded (free tier). Enable billing at console.cloud.google.com → APIs & Services → Gemini API, then retry.'
+            : result.error,
           validationErrors: result.validationErrors,
           rawOutput: result.rawOutput,
         },
-        { status: 500 }
+        { status: isQuota ? 429 : 500 }
       );
     }
 

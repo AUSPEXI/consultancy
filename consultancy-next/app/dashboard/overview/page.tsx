@@ -178,7 +178,10 @@ export default function OverviewPage() {
           logAuditAction(user.uid, 'Ran Real SOV Audit', { date: dateStr });
           refetchGeo();
         } else {
-          throw new Error(data.error || 'Failed to run audit');
+          const msg = response.status === 429
+            ? 'Gemini quota exceeded — enable billing at console.cloud.google.com → APIs → Gemini API'
+            : (data.error || 'Audit failed');
+          throw new Error(msg);
         }
       } else {
         await new Promise(resolve => setTimeout(resolve, 1500));
