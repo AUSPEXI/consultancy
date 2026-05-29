@@ -72,8 +72,10 @@ function PointCloud({ points: data, onHoverChange }: { points: MapPoint[]; onHov
       cols[i * 3 + 1] = c.g;
       cols[i * 3 + 2] = c.b;
 
-      if (p.type && (p.type.includes('Anchor') || i % 15 === 0)) {
-        anchorMap.set(p.label, { x, y, z, sentiment: p.sentiment, isYellow: true });
+      // One pillar per unique anchor name — dedup by Map key, cap at 7
+      const anchorName = (p as any).anchorName;
+      if (anchorName && anchorMap.size < 7 && !anchorMap.has(anchorName)) {
+        anchorMap.set(anchorName, { x, y, z, sentiment: p.sentiment, isYellow: true });
       }
     });
 
@@ -215,7 +217,9 @@ export default function UmapScene({ points = [] }: { points?: any[] }) {
         x: p.x ?? 0,
         y: p.y ?? 0,
         z: p.z ?? 0,
-        label: p.label || p.type || ['Security', 'API', 'Founder', 'Market', 'Patent', 'Enterprise'][i % 6],
+        // label = fact text for hover tooltip (truncated); anchorName = TEO anchor for pillar
+        label: (p.label || p.type || 'Signal').substring(0, 50),
+        anchorName: p.type || 'Anchor',
         type: p.groupType || p.type,
         sentiment: (p.sentiment === 'positive' || p.sentiment === 'negative') ? p.sentiment : (p.distance < 0.5 ? 'positive' : 'negative'),
         distance: p.distance ?? Math.random(),

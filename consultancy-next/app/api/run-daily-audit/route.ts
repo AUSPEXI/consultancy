@@ -48,11 +48,13 @@ async function syncPerplexityGroundTruth(
       const text = response.choices[0]?.message?.content || '';
       if (!text) continue;
 
+      const noInfoPatterns = /could not find|no information|no results|not mentioned|no specific|unable to find|don't have|no data|not available|couldn't find|not indexed/i;
+
       // Split into individual sentences as discrete fact units
       const sentences = text
         .split(/(?<=[.!?])\s+/)
         .map((s: string) => s.trim())
-        .filter((s: string) => s.length > 25 && s.length < 300 && !s.startsWith('#'));
+        .filter((s: string) => s.length > 25 && s.length < 300 && !s.startsWith('#') && !noInfoPatterns.test(s));
 
       const writeBatch = dbAdmin.batch();
       for (const sentence of sentences.slice(0, 6)) {
