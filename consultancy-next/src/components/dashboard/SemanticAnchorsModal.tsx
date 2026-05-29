@@ -5,6 +5,7 @@ import { X, Loader2, Sparkles, Activity, HelpCircle, Save, Plus } from 'lucide-r
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { logAuditAction } from '@/lib/audit';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Anchor {
   label: string;
@@ -35,6 +36,10 @@ export function SemanticAnchorsModal({
   onSaved,
   showToast
 }: SemanticAnchorsModalProps) {
+  const { userData: authUserData } = useAuth();
+  const effectiveBrand = brand || authUserData?.brand || '';
+  const effectiveDomain = domain || authUserData?.domain || '';
+
   const [editAnchorsState, setEditAnchorsState] = useState<Anchor[]>(initialAnchors);
   const [isSavingAnchors, setIsSavingAnchors] = useState(false);
   const [isSuggestingAnchors, setIsSuggestingAnchors] = useState(false);
@@ -46,7 +51,7 @@ export function SemanticAnchorsModal({
   if (!isOpen) return null;
 
   const handleSuggestAnchors = async () => {
-    if (!brand || !domain) {
+    if (!effectiveBrand || !effectiveDomain) {
       showToast?.("Brand and domain required for autosuggest", "error");
       return;
     }
@@ -60,8 +65,8 @@ export function SemanticAnchorsModal({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId,
-          brand,
-          domain,
+          brand: effectiveBrand,
+          domain: effectiveDomain,
           domainContext: keywords?.join(', ')
         })
       });
