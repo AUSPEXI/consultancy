@@ -31,13 +31,14 @@ function clamp(v: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, v));
 }
 
-// Map baseType to its TEO axis for legacy anchors without axisAlignment
 function inferAxis(baseType: string): 1 | 2 | 3 {
   if (baseType === 'Systemic Anchor') return 1;
   if (baseType === 'Signal Point') return 2;
   if (baseType === 'Emergent Trend') return 3;
   return 2;
 }
+
+type CitationStatus = 'cited' | 'uncited' | 'untested';
 
 export async function GET(req: NextRequest) {
   try {
@@ -91,14 +92,13 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Group anchors by TEO axis
     const anchorsByAxis: Record<number, typeof anchorLabels> = { 1: [], 2: [], 3: [] };
     anchorLabels.forEach(a => {
       const axis = (a as any).axisAlignment ?? inferAxis(a.baseType);
       anchorsByAxis[axis].push(a);
     });
 
-    // TEO axis embeddings — static strings, cache in Firestore to avoid re-embedding on every request
+    // TEO axis embeddings — static, cache in Firestore
     let axisEmbeddings: number[][];
     let axisEmbeddingsWereNew = false;
     if (dbAdmin) {
@@ -122,7 +122,7 @@ export async function GET(req: NextRequest) {
     let newlyEmbeddedCount = 0;
 
     if (vaultFacts.length > 0) {
-      // Split facts into cached (have stored embedding) and uncached (need embedding API call)
+      // Split facts into cached / uncached
       const needsEmbedding = vaultFacts.filter(f => !f.embedding || f.embedding.length === 0);
       const hasCached      = vaultFacts.filter(f =>  f.embedding && f.embedding.length > 0);
 
@@ -130,8 +130,6 @@ export async function GET(req: NextRequest) {
       if (needsEmbedding.length > 0) {
         freshEmbeddings = await embeddingService.generateEmbeddings(needsEmbedding.map(f => f.text));
         newlyEmbeddedCount = needsEmbedding.length;
-
-        // Write new embeddings back to their source collection — fire-and-forget
         if (dbAdmin) {
           const batch = dbAdmin.batch();
           needsEmbedding.forEach((f, i) => {
@@ -141,11 +139,13 @@ export async function GET(req: NextRequest) {
         }
       }
 
-      // Build id → embedding map and reconstruct in original order
       const embMap = new Map<string, number[]>();
-      hasCached.forEach(f    => embMap.set(f.id, f.embedding!));
+      hasCached.forEach(f         => embMap.set(f.id, f.embedding!));
       needsEmbedding.forEach((f, i) => embMap.set(f.id, freshEmbeddings[i]));
       const factEmbeddings = vaultFacts.map(f => embMap.get(f.id)!);
+
+      // Compute citation status for each fact using the most recent cite-probe run
+      const citationStatuses = await computeCitationStatuses(factEmbeddings, userId, dbAdmin);
 
       points = factEmbeddings.map((emb, i) => {
         const x = clamp(dotProduct(emb, axisEmbeddings[0]) * 80, -90, 90);
@@ -159,6 +159,8 @@ export async function GET(req: NextRequest) {
           ? candidates[i % candidates.length]
           : anchorLabels[i % anchorLabels.length];
 
+        const status = citationStatuses[i];
+
         return {
           id: i,
           x: parseFloat(x.toFixed(2)),
@@ -170,12 +172,13 @@ export async function GET(req: NextRequest) {
           source: platform === 'All' ? platforms[i % 3] : platform,
           label: vaultFacts[i].text.substring(0, 60),
           distance: parseFloat((Math.sqrt(x * x + y * y + z * z) / (90 * Math.sqrt(3))).toFixed(4)),
-          sentiment: y > 0 ? 'positive' : 'negative',
+          citationStatus: status,
+          sentiment: status === 'cited' ? 'positive' : status === 'uncited' ? 'negative' : (y > 0 ? 'positive' : 'negative'),
           real: true,
         };
       });
     } else {
-      // Fallback: embed anchor labels as placeholder point clouds
+      // Fallback: placeholder point clouds around anchor positions
       const anchorTexts = anchorLabels.map(a => `${a.label}: ${a.baseType}`);
       const anchorEmbs = await embeddingService.generateEmbeddings(anchorTexts);
       newlyEmbeddedCount = anchorTexts.length;
@@ -197,6 +200,7 @@ export async function GET(req: NextRequest) {
           source: platform === 'All' ? platforms[i % 3] : platform,
           label: anchor.label,
           distance: Math.random(),
+          citationStatus: 'untested' as CitationStatus,
           sentiment: anchor.baseType === 'Risk Vector' ? 'negative' : (Math.random() > 0.3 ? 'positive' : 'negative'),
           real: false,
         }));
@@ -205,7 +209,6 @@ export async function GET(req: NextRequest) {
 
     const engineInfo = embeddingService.getActiveEngine();
 
-    // Log cost only for texts that actually hit the embedding API this request
     const billableTexts = newlyEmbeddedCount + (axisEmbeddingsWereNew ? 3 : 0);
     if (userId && dbAdmin && billableTexts > 0) {
       const estimatedTokens = billableTexts * 20;
@@ -249,5 +252,69 @@ export async function GET(req: NextRequest) {
   } catch (error: any) {
     console.error('Error in analytics/map:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+// Fetch the most recent cite-probe result, embed its queries (cached by probe ID),
+// and compute cosine similarity between each fact and each query.
+// A fact is 'cited' if it is semantically closest to a query where the brand was cited.
+async function computeCitationStatuses(
+  factEmbeddings: number[][],
+  userId: string | null,
+  db: typeof dbAdmin
+): Promise<CitationStatus[]> {
+  const untested: CitationStatus[] = factEmbeddings.map(() => 'untested');
+  if (!userId || !db) return untested;
+
+  try {
+    const probeSnap = await db
+      .collection('citation_tests')
+      .where('userId', '==', userId)
+      .orderBy('timestamp', 'desc')
+      .limit(1)
+      .get()
+      .catch(() => null);
+
+    if (!probeSnap || probeSnap.empty) return untested;
+
+    const probeDoc = probeSnap.docs[0];
+    const probeId  = probeDoc.id;
+    const queryResults: { query: string; cited: boolean }[] = probeDoc.data().results || [];
+    if (queryResults.length === 0) return untested;
+
+    // Query embeddings cached by probe document ID — each probe's queries are embedded once
+    const queryCacheRef = db.collection('_embeddings_cache').doc(`probe_${probeId}`);
+    const queryCacheDoc = await queryCacheRef.get().catch(() => null);
+
+    let queryEmbeddings: number[][];
+    const cachedEmbs = queryCacheDoc?.data()?.embeddings as number[][] | undefined;
+    if (cachedEmbs?.length === queryResults.length) {
+      queryEmbeddings = cachedEmbs;
+    } else {
+      queryEmbeddings = await embeddingService.generateEmbeddings(queryResults.map(q => q.query));
+      queryCacheRef.set({ embeddings: queryEmbeddings, cachedAt: new Date().toISOString() }).catch(() => {});
+    }
+
+    // For each fact, find the highest cosine similarity to any cited query
+    // vs any uncited query. Similarity > 0.5 = semantically in that territory.
+    const THRESHOLD = 0.5;
+
+    return factEmbeddings.map(factEmb => {
+      let maxCited   = 0;
+      let maxUncited = 0;
+
+      queryResults.forEach((q, qi) => {
+        const sim = dotProduct(factEmb, queryEmbeddings[qi]);
+        if (q.cited)  { if (sim > maxCited)   maxCited   = sim; }
+        else          { if (sim > maxUncited)  maxUncited = sim; }
+      });
+
+      if (maxCited > THRESHOLD && maxCited >= maxUncited) return 'cited';
+      if (maxUncited > THRESHOLD)                         return 'uncited';
+      return 'untested';
+    });
+  } catch (err) {
+    console.error('Citation status computation failed:', err);
+    return untested;
   }
 }
