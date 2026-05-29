@@ -6,22 +6,53 @@ import { dbAdmin } from '@/lib/firebase-admin';
 async function fetchUserContext(userId: string) {
   if (!dbAdmin || !userId || userId === 'copilot-user') return null;
   try {
-    const [userDoc, factsSnap, metricsSnap, citationsSnap, competitorsSnap, articlesSnap] = await Promise.all([
+    const [userDoc, factsSnap, metricsSnap, citationsSnap, competitorsSnap, articlesSnap, auditSnap] = await Promise.all([
       dbAdmin.collection('users').doc(userId).get(),
       dbAdmin.collection('facts').where('userId', '==', userId).limit(30).get(),
       dbAdmin.collection('sovMetrics').where('userId', '==', userId).orderBy('date', 'desc').limit(1).get(),
       dbAdmin.collection('citation_tests').where('userId', '==', userId).orderBy('timestamp', 'desc').limit(10).get().catch(() => null),
       dbAdmin.collection('competitors').where('userId', '==', userId).limit(10).get().catch(() => null),
       dbAdmin.collection('articles').where('userId', '==', userId).orderBy('timestamp', 'desc').limit(5).get().catch(() => null),
+      dbAdmin.collection('audit_logs').where('userId', '==', userId).orderBy('timestamp', 'desc').limit(30).get().catch(() => null),
     ]);
 
     const userData = userDoc.exists ? userDoc.data() : null;
     let vaultFacts = factsSnap.docs.map(d => d.data().statement || '').filter(Boolean);
-    // Fallback: Perplexity-synced facts if vault is empty
     if (vaultFacts.length === 0) {
       const kgSnap = await dbAdmin.collection('knowledge_graph').where('userId', '==', userId).limit(30).get().catch(() => null);
       if (kgSnap) vaultFacts = kgSnap.docs.map(d => d.data().fact || '').filter(Boolean);
     }
+
+    // Build action→outcome history: show recent actions with citation rate context
+    const citations = citationsSnap ? citationsSnap.docs.map(d => ({ ...d.data(), _id: d.id })) : [];
+    const auditActions = auditSnap ? auditSnap.docs.map(d => d.data()) : [];
+
+    let actionHistory = '';
+    if (citations.length >= 2) {
+      const newest = citations[0];
+      const oldest = citations[citations.length - 1];
+      const delta   = (newest.citationRate || 0) - (oldest.citationRate || 0);
+      const oldest_ts = oldest.timestamp ? new Date(oldest.timestamp).toLocaleDateString() : '?';
+      const newest_ts = newest.timestamp ? new Date(newest.timestamp).toLocaleDateString() : '?';
+      actionHistory += `CITATION RATE TREND: ${oldest.citationRate}% (${oldest_ts}) → ${newest.citationRate}% (${newest_ts}), delta: ${delta > 0 ? '+' : ''}${delta}%\n`;
+
+      // Surface what happened between the first and last probe
+      const relevantActions = auditActions.filter(a => {
+        if (!a.timestamp) return false;
+        const ts = typeof a.timestamp === 'string' ? new Date(a.timestamp) : a.timestamp?.toDate?.();
+        if (!ts) return false;
+        const oldestDate = new Date(oldest.timestamp);
+        const newestDate = new Date(newest.timestamp);
+        return ts >= oldestDate && ts <= newestDate;
+      });
+      if (relevantActions.length > 0) {
+        actionHistory += `ACTIONS BETWEEN PROBES:\n${relevantActions.map(a => `  · ${a.action}${a.details ? ` (${JSON.stringify(a.details).substring(0, 80)})` : ''}`).join('\n')}\n`;
+      }
+    }
+    if (auditActions.length > 0 && !actionHistory) {
+      actionHistory = `RECENT ACTIONS (last 10):\n${auditActions.slice(0, 10).map(a => `  · ${a.action}`).join('\n')}\n`;
+    }
+
     return {
       brand:           userData?.brand || '',
       domain:          userData?.domain || '',
@@ -30,9 +61,10 @@ async function fetchUserContext(userId: string) {
       tier:            userData?.tier || 'Free',
       facts:           vaultFacts,
       latestMetrics:   metricsSnap.empty ? null : metricsSnap.docs[0].data(),
-      citations:       citationsSnap ? citationsSnap.docs.map(d => d.data()) : [],
+      citations,
       competitors:     competitorsSnap ? competitorsSnap.docs.map(d => d.data()) : [],
       articles:        articlesSnap ? articlesSnap.docs.map(d => d.data()) : [],
+      actionHistory,
     };
   } catch (err) {
     console.error('[copilot] context fetch failed:', err);
@@ -46,7 +78,7 @@ function buildSystemInstruction(ctx: ReturnType<typeof fetchUserContext> extends
     return `You are Citacious, the GEO advisor at Auspexi. Help users understand Generative Engine Optimization and get their brand cited by AI engines. Ask about their business first before giving advice. Current tab: ${activeTab}.`;
   }
 
-  const { brand, domain, keywords, competitorsList, tier, facts, latestMetrics, citations, competitors, articles } = ctx;
+  const { brand, domain, keywords, competitorsList, tier, facts, latestMetrics, citations, competitors, articles, actionHistory } = ctx;
 
   const isNewUser   = !brand;
   const hasVault    = facts.length > 0;
@@ -104,6 +136,11 @@ function buildSystemInstruction(ctx: ReturnType<typeof fetchUserContext> extends
 
   if (competitors.length) {
     dataBlock += `\nTracked Competitors: ${competitors.map((c: any) => `${c.name} (decay: ${c.decayScore ?? 'unknown'})`).join(', ')}\n`;
+  }
+
+  if (actionHistory) {
+    dataBlock += `\n─── ACTION HISTORY & OUTCOMES ───\n${actionHistory}`;
+    dataBlock += `Use this history when asked "what's working?" or "what should I do differently?" — reference actual numbers, not generic advice.\n`;
   }
 
   dataBlock += `\n═══════════════════════════════════\n`;

@@ -1,6 +1,6 @@
 'use client'
 
-import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, Wrench, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert, Zap, RefreshCw, Building2, Layers } from 'lucide-react';
+import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, Wrench, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert, Zap, RefreshCw, Building2, Layers, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -24,22 +24,42 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const isAdmin = user?.email === 'hopiumcalculator@gmail.com';
   const role = isAdmin ? 'admin' : 'user';
 
-  const navItems = [
-    { id: 'overview', label: 'AI SOV Overview', icon: LayoutDashboard, requiredTier: 'Basic' as UserTier, path: '/dashboard/overview' },
-    { id: 'geo-pulse', label: 'GEO Pulse Index (Beta)', icon: Activity, requiredTier: 'Premium' as UserTier, path: '/dashboard/geo-pulse' },
-    { id: 'competitors', label: 'Competitor Radar', icon: Radar, requiredTier: 'Medium' as UserTier, path: '/dashboard/competitors' },
-    { id: 'fact-vault', label: 'Fact-Vault', icon: Database, requiredTier: 'Basic' as UserTier, path: '/dashboard/fact-vault' },
-    { id: 'content-scorer', label: 'Content Scorer', icon: PenTool, requiredTier: 'Basic' as UserTier, path: '/dashboard/content-scorer' },
-    { id: 'simulator', label: 'SOV Simulator', icon: MonitorPlay, requiredTier: 'Medium' as UserTier, path: '/dashboard/simulator' },
-    { id: 'brand-monitor', label: 'Brand Monitor', icon: Radar, requiredTier: 'Medium' as UserTier, path: '/dashboard/brand-monitor' },
-    { id: 'technical', label: 'Edge & Schema', icon: Code, requiredTier: 'Premium' as UserTier, path: '/dashboard/technical' },
-    { id: 'cite-probe', label: 'Citation Probe', icon: Zap, requiredTier: 'Pro' as UserTier, path: '/dashboard/cite-probe' },
-    { id: 'agents', label: 'Multi-Agent Crawler', icon: Bot, requiredTier: 'Premium' as UserTier, path: '/dashboard/agents' },
-    { id: 'autopilot', label: 'GEO Autopilot', icon: RefreshCw, requiredTier: 'Pro' as UserTier, path: '/dashboard/autopilot' },
-    { id: 'entity-hub', label: 'Entity Hub', icon: Building2, requiredTier: 'Premium' as UserTier, path: '/dashboard/entity-hub' },
-    { id: 'schema-deploy', label: 'Schema Deploy', icon: Layers, requiredTier: 'Premium' as UserTier, path: '/dashboard/schema-deploy' },
-    { id: 'audit-logs', label: 'Audit Logs', icon: ShieldCheck, requiredTier: 'Basic' as UserTier, path: '/dashboard/audit-logs' },
-    { id: 'settings', label: 'Settings', icon: Settings, requiredTier: 'Basic' as UserTier, path: '/dashboard/settings' },
+  // Sidebar groups reflect the GEO quest workflow order
+  const navGroups = [
+    {
+      label: 'THE QUEST',
+      items: [
+        { id: 'cite-probe',     label: 'Citation Probe',       icon: Zap,           requiredTier: 'Basic'   as UserTier, path: '/dashboard/cite-probe',     step: '1' },
+        { id: 'fact-vault',     label: 'Fact Vault',           icon: Database,      requiredTier: 'Basic'   as UserTier, path: '/dashboard/fact-vault',      step: '2' },
+        { id: 'agents',         label: 'Content Pipeline',     icon: Bot,           requiredTier: 'Basic'   as UserTier, path: '/dashboard/agents',          step: '3' },
+        { id: 'content-scorer', label: 'Content Scorer',       icon: PenTool,       requiredTier: 'Basic'   as UserTier, path: '/dashboard/content-scorer',  step: '4' },
+        { id: 'technical',      label: 'Schema & Edge',        icon: Code,          requiredTier: 'Basic'   as UserTier, path: '/dashboard/technical',       step: '5' },
+      ],
+    },
+    {
+      label: 'COMMAND CENTRE',
+      items: [
+        { id: 'overview',       label: 'SOV Overview',         icon: LayoutDashboard, requiredTier: 'Basic'  as UserTier, path: '/dashboard/overview' },
+        { id: 'geo-pulse',      label: 'GEO Pulse',            icon: Activity,        requiredTier: 'Medium' as UserTier, path: '/dashboard/geo-pulse' },
+        { id: 'autopilot',      label: 'GEO Autopilot',        icon: RefreshCw,       requiredTier: 'Pro'    as UserTier, path: '/dashboard/autopilot' },
+      ],
+    },
+    {
+      label: 'INTELLIGENCE',
+      items: [
+        { id: 'competitors',    label: 'Competitor Radar',     icon: Radar,           requiredTier: 'Medium' as UserTier, path: '/dashboard/competitors' },
+        { id: 'brand-monitor',  label: 'Brand Monitor',        icon: Target,          requiredTier: 'Medium' as UserTier, path: '/dashboard/brand-monitor' },
+        { id: 'simulator',      label: 'SOV Simulator',        icon: MonitorPlay,     requiredTier: 'Medium' as UserTier, path: '/dashboard/simulator' },
+      ],
+    },
+    {
+      label: 'ADVANCED',
+      items: [
+        { id: 'entity-hub',     label: 'Entity Hub',           icon: Building2,       requiredTier: 'Premium' as UserTier, path: '/dashboard/entity-hub' },
+        { id: 'schema-deploy',  label: 'Schema Deploy',        icon: Layers,          requiredTier: 'Premium' as UserTier, path: '/dashboard/schema-deploy' },
+        { id: 'audit-logs',     label: 'Audit Logs',           icon: ShieldCheck,     requiredTier: 'Basic'   as UserTier, path: '/dashboard/audit-logs' },
+      ],
+    },
   ];
 
   const hasAccess = (requiredTier: UserTier) => {
@@ -85,31 +105,48 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           </button>
         </div>
 
-        <nav className="flex-1 px-4 space-y-1 mt-4 overflow-y-auto overflow-x-hidden">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname.includes(item.path);
-            const isLocked = !hasAccess(item.requiredTier as UserTier);
-            return (
-              <Link
-                key={item.id}
-                href={item.path}
-                onClick={() => setIsOpen(false)}
-                className={cn(
-                  "flex items-center justify-between px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-zinc-800 text-white"
-                    : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className="w-5 h-5" />
-                  {item.label}
-                </div>
-                {isLocked && <Lock className="w-3.5 h-3.5 text-zinc-500" />}
-              </Link>
-            );
-          })}
+        <nav className="flex-1 px-4 mt-4 overflow-y-auto overflow-x-hidden space-y-4">
+          {navGroups.map((group) => (
+            <div key={group.label}>
+              <p className="px-3 mb-1 text-[9px] font-black tracking-[0.2em] text-zinc-600 uppercase">
+                {group.label}
+              </p>
+              <div className="space-y-0.5">
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = pathname.includes(item.path);
+                  const isLocked = !hasAccess(item.requiredTier as UserTier);
+                  const step = (item as any).step;
+                  return (
+                    <Link
+                      key={item.id}
+                      href={item.path}
+                      onClick={() => setIsOpen(false)}
+                      className={cn(
+                        "flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                        isActive
+                          ? "bg-zinc-800 text-white"
+                          : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        {step ? (
+                          <span className={cn(
+                            "w-5 h-5 rounded-full text-[9px] font-black flex items-center justify-center flex-shrink-0",
+                            isActive ? "bg-pink-500 text-white" : "bg-zinc-800 text-zinc-500"
+                          )}>{step}</span>
+                        ) : (
+                          <Icon className="w-5 h-5 flex-shrink-0" />
+                        )}
+                        {item.label}
+                      </div>
+                      {isLocked && <Lock className="w-3.5 h-3.5 text-zinc-500" />}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         <div className="p-4 border-t border-zinc-800 space-y-3">
