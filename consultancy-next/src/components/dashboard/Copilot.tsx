@@ -8,15 +8,17 @@ import { collection, getDocs, getDoc, doc, query, orderBy, limit, where } from '
 import { db, auth } from '@/firebase';
 import { CITACIOUS_GEO_KNOWLEDGE } from '@/data/faqData';
 
-// Lazy initialization of Gemini API
+// Fetch a real Gemini key from the server for the Live WebSocket API.
+// The Live API is a direct browser→Google WebSocket — proxy URLs don't work.
 let aiClient: GoogleGenAI | null = null;
 
-function getAIClient(): GoogleGenAI {
-  if (!aiClient) {
-    const proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
-      `${window.location.protocol}//${window.location.host}/api/genai`;
-    aiClient = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl } });
-  }
+async function fetchAIClient(): Promise<GoogleGenAI> {
+  if (aiClient) return aiClient;
+  const res = await fetch('/api/live-token');
+  if (!res.ok) throw new Error('Gemini API key not configured on server');
+  const { key } = await res.json();
+  if (!key) throw new Error('Gemini API key missing');
+  aiClient = new GoogleGenAI({ apiKey: key });
   return aiClient;
 }
 
@@ -414,7 +416,7 @@ ${knowledgeContext}`;
 
     try {
       setIsConnectingVoice(true);
-      const ai = getAIClient();
+      const ai = await fetchAIClient();
 
       const sessionPromise = ai.live.connect({
         model: "gemini-2.5-flash-live-001",
