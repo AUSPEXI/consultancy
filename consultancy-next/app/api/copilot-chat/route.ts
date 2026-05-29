@@ -8,7 +8,7 @@ async function fetchUserContext(userId: string) {
   try {
     const [userDoc, factsSnap, metricsSnap, citationsSnap, competitorsSnap, articlesSnap] = await Promise.all([
       dbAdmin.collection('users').doc(userId).get(),
-      dbAdmin.collection('knowledge_graph').where('userId', '==', userId).limit(30).get(),
+      dbAdmin.collection('facts').where('userId', '==', userId).limit(30).get(),
       dbAdmin.collection('sovMetrics').where('userId', '==', userId).orderBy('date', 'desc').limit(1).get(),
       dbAdmin.collection('citation_tests').where('userId', '==', userId).orderBy('timestamp', 'desc').limit(10).get().catch(() => null),
       dbAdmin.collection('competitors').where('userId', '==', userId).limit(10).get().catch(() => null),
@@ -16,13 +16,19 @@ async function fetchUserContext(userId: string) {
     ]);
 
     const userData = userDoc.exists ? userDoc.data() : null;
+    let vaultFacts = factsSnap.docs.map(d => d.data().statement || '').filter(Boolean);
+    // Fallback: Perplexity-synced facts if vault is empty
+    if (vaultFacts.length === 0) {
+      const kgSnap = await dbAdmin.collection('knowledge_graph').where('userId', '==', userId).limit(30).get().catch(() => null);
+      if (kgSnap) vaultFacts = kgSnap.docs.map(d => d.data().fact || '').filter(Boolean);
+    }
     return {
       brand:           userData?.brand || '',
       domain:          userData?.domain || '',
       keywords:        userData?.keywords || [],
       competitorsList: userData?.competitors || [],
       tier:            userData?.tier || 'Free',
-      facts:           factsSnap.docs.map(d => d.data().fact || d.data().topic || '').filter(Boolean),
+      facts:           vaultFacts,
       latestMetrics:   metricsSnap.empty ? null : metricsSnap.docs[0].data(),
       citations:       citationsSnap ? citationsSnap.docs.map(d => d.data()) : [],
       competitors:     competitorsSnap ? competitorsSnap.docs.map(d => d.data()) : [],

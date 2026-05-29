@@ -131,8 +131,9 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
         const user = auth.currentUser;
         if (!user) return;
 
+        // Primary: Fact Vault (user-entered verified facts)
         const qFacts = query(
-          collection(db, 'knowledge_graph'),
+          collection(db, 'facts'),
           where('userId', '==', user.uid),
           limit(50)
         );
@@ -169,9 +170,16 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
           getDocs(qArticles).catch(() => null),
         ]);
 
-        const docs = snapshotFacts.docs.map(d => d.data());
-        docs.sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-        const facts = docs.slice(0, 30).map((d: any) => d.fact);
+        let docs = snapshotFacts.docs.map(d => d.data());
+        // Fallback: if Fact Vault is empty, try Perplexity-synced knowledge_graph
+        if (docs.length === 0) {
+          try {
+            const kgSnap = await getDocs(query(collection(db, 'knowledge_graph'), where('userId', '==', user.uid), limit(50)));
+            docs = kgSnap.docs.map(d => ({ ...d.data(), statement: d.data().fact }));
+          } catch (_) {}
+        }
+        docs.sort((a: any, b: any) => new Date(b.createdAt || b.timestamp || 0).getTime() - new Date(a.createdAt || a.timestamp || 0).getTime());
+        const facts = docs.slice(0, 30).map((d: any) => d.statement || d.fact).filter(Boolean);
 
         const latestMetrics = snapshotMetrics.empty ? null : snapshotMetrics.docs[0].data();
         const userData = userDocSnap.exists() ? userDocSnap.data() : null;
