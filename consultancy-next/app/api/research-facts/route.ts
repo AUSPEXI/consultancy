@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getExa } from '@/lib/exa';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
 import { FactExtractionSchema } from '@/lib/output-validation';
+import { embeddingService } from '@/lib/embeddings';
 
 export async function POST(request: Request) {
   try {
@@ -52,7 +53,20 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({ success: true, facts: result.data });
+    let facts: any[] = result.data || [];
+
+    // Embed all fact statements in one batch call — stored on fact docs for UMAP
+    if (facts.length > 0) {
+      try {
+        const statements = facts.map((f: any) => f.statement || '').filter(Boolean);
+        const embeddings = await embeddingService.generateEmbeddings(statements);
+        facts = facts.map((f: any, i: number) => ({ ...f, embedding: embeddings[i] ?? [] }));
+      } catch (embErr) {
+        console.warn('[research-facts] embedding failed, returning without vectors:', embErr);
+      }
+    }
+
+    return NextResponse.json({ success: true, facts });
   } catch (error: any) {
     console.error('Research facts endpoint error:', error);
     return NextResponse.json({ error: 'Failed to research facts' }, { status: 500 });

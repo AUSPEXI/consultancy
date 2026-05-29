@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
+import { embeddingService } from '@/lib/embeddings';
 
 export async function POST(req: NextRequest) {
   try {
@@ -34,6 +35,17 @@ Return ONLY valid JSON:
       facts = JSON.parse(result.rawOutput || '[]');
     } catch {
       facts = [];
+    }
+
+    // Embed all fact statements in one batch call — stored on fact docs for UMAP
+    if (facts.length > 0) {
+      try {
+        const statements = facts.map((f: any) => f.statement || '').filter(Boolean);
+        const embeddings = await embeddingService.generateEmbeddings(statements);
+        facts = facts.map((f: any, i: number) => ({ ...f, embedding: embeddings[i] ?? [] }));
+      } catch (embErr) {
+        console.warn('[extract-high-entropy-facts] embedding failed, returning without vectors:', embErr);
+      }
     }
 
     return NextResponse.json({ success: true, facts });

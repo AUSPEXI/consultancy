@@ -112,7 +112,7 @@ export default function FactVault() {
         // Save extracted facts to Firestore
         const newFactsPayloads = [];
         for (const fact of extractedFacts) {
-          const payload = {
+          const payload: Record<string, any> = {
             userId: user.uid,
             statement: fact.statement,
             entropyScore: fact.entropyScore,
@@ -120,6 +120,7 @@ export default function FactVault() {
             category: 'Extracted',
             createdAt: new Date().toISOString().split('T')[0],
           };
+          if (fact.embedding?.length > 0) payload.embedding = fact.embedding;
           await addDoc(collection(db, 'facts'), payload);
           newFactsPayloads.push(payload);
         }
@@ -170,7 +171,7 @@ export default function FactVault() {
       if (extractedFacts && Array.isArray(extractedFacts)) {
         const newFactsPayloads = [];
         for (const fact of extractedFacts) {
-          const payload = {
+          const payload: Record<string, any> = {
             userId: user.uid,
             statement: fact.statement,
             entropyScore: fact.entropyScore,
@@ -178,6 +179,7 @@ export default function FactVault() {
             category: 'Auto-Researched',
             createdAt: new Date().toISOString().split('T')[0],
           };
+          if (fact.embedding?.length > 0) payload.embedding = fact.embedding;
           await addDoc(collection(db, 'facts'), payload);
           newFactsPayloads.push(payload);
         }
