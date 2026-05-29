@@ -531,7 +531,7 @@ export default function OverviewPage() {
             </div>
           </div>
           <div className="h-[500px] w-full relative z-10 border border-zinc-800 rounded-3xl bg-zinc-950/20 overflow-hidden">
-            <UmapVisualization />
+            <UmapVisualization points={mapPoints} />
           </div>
           <NeuralLegend />
         </div>

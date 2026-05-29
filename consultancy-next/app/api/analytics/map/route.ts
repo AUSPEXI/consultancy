@@ -65,13 +65,11 @@ export async function GET(req: NextRequest) {
         const vaultSnap = await dbAdmin
           .collection('knowledge_graph')
           .where('userId', '==', userId)
-          .orderBy('timestamp', 'desc')
           .limit(40)
           .get();
         vaultFacts = vaultSnap.docs.map(d => ({
           id: d.id,
           text: (d.data().fact as string) || '',
-          source: (d.data().source as string) || 'vault',
         })).filter(f => f.text.length > 10);
       } catch (err) {
         console.error('Firestore fetch error in analytics/map:', err);
