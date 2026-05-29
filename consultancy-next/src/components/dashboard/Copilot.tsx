@@ -99,6 +99,7 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const hydratedRef = useRef(false);
   const sessionRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -116,6 +117,34 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
   useEffect(() => {
     scrollToBottom();
   }, [messages, isOpen]);
+
+  // Hydrate conversation history from Firestore on first auth — enables cross-device continuity
+  useEffect(() => {
+    if (!auth) return;
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (!user || hydratedRef.current) return;
+      hydratedRef.current = true;
+      try {
+        const q = query(
+          collection(db, 'copilot_conversations'),
+          where('userId', '==', user.uid),
+          orderBy('timestamp', 'desc'),
+          limit(30)
+        );
+        const snap = await getDocs(q);
+        if (snap.empty) return;
+        const turns: Message[] = snap.docs
+          .map(d => d.data())
+          .reverse()
+          .map(d => ({ role: (d.role === 'user' ? 'user' : 'model') as 'user' | 'model', content: d.content || '' }))
+          .filter(m => m.content.trim());
+        if (turns.length > 0) setMessages(turns);
+      } catch (err) {
+        console.error('[Copilot] history hydration failed:', err);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const fetchKnowledge = async () => {
