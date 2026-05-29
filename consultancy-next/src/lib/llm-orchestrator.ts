@@ -35,7 +35,7 @@ import {
 
 interface LLMCallOptions {
   userId: string;
-  provider: 'openai' | 'anthropic' | 'gemini';
+  provider: 'openai' | 'anthropic' | 'gemini' | 'perplexity';
   model: string;
   prompt?: string;
   contents?: any[]; // For chat history or multi-part contents
@@ -59,6 +59,7 @@ interface LLMCallResult<T> {
   retriesAttempted: number;
   validationErrors?: string[];
   hallucationDetected?: boolean;
+  providerUsed?: string;
 }
 
 /**
@@ -105,6 +106,7 @@ export class LLMOrchestrator {
     // ===== STEP 2: Call LLM with Exponential Backoff =====
     let rawOutput: string;
     let retriesAttempted = 0;
+    let providerUsed = provider;
 
     const finalPrompt = prompt || (contents ? JSON.stringify(contents) : '');
     const logCtx: LogCtx | undefined = options.feature
@@ -122,13 +124,50 @@ export class LLMOrchestrator {
         500
       );
     } catch (error: any) {
-      // Auto-fallback: if Gemini quota is exhausted and OpenAI is available, retry transparently
+      // Auto-fallback: if Gemini quota is exhausted and OpenAI/Perplexity is available, retry transparently
       const isGeminiQuota =
         provider === 'gemini' &&
         (error.message?.includes('429') ||
           error.message?.includes('RESOURCE_EXHAUSTED') ||
           error.message?.includes('quota'));
-      if (isGeminiQuota && process.env.OPENAI_API_KEY) {
+      if (isGeminiQuota && process.env.PERPLEXITY_API_KEY) {
+        console.log('[llm-orchestrator] Gemini quota exceeded — auto-falling back to perplexity sonar');
+        try {
+          rawOutput = await callWithExponentialBackoff(
+            async () => this.callPerplexity('llama-3.1-sonar-large-128k-online', finalPrompt, temperature),
+            'perplexity',
+            maxRetries,
+            500
+          );
+          providerUsed = 'perplexity';
+        } catch (fallbackError: any) {
+          // Perplexity failed — try OpenAI as last resort
+          if (process.env.OPENAI_API_KEY) {
+            console.log('[llm-orchestrator] Perplexity fallback failed — trying gpt-4o-mini');
+            try {
+              rawOutput = await callWithExponentialBackoff(
+                async () => this.callProvider('openai', 'gpt-4o-mini', finalPrompt, temperature, undefined, logCtx),
+                'openai',
+                maxRetries,
+                500
+              );
+              providerUsed = 'openai';
+            } catch (openAIError: any) {
+              return {
+                success: false,
+                error: `All providers failed. Gemini: quota. Perplexity: ${fallbackError.message}. OpenAI: ${openAIError.message}`,
+                retriesAttempted: maxRetries,
+              };
+            }
+          } else {
+            return {
+              success: false,
+              error: `Gemini quota exceeded and Perplexity fallback also failed: ${fallbackError.message}`,
+              retriesAttempted: maxRetries,
+            };
+          }
+        }
+      } else if (isGeminiQuota && process.env.OPENAI_API_KEY) {
         console.log('[llm-orchestrator] Gemini quota exceeded — auto-falling back to gpt-4o-mini');
         try {
           rawOutput = await callWithExponentialBackoff(
@@ -137,6 +176,7 @@ export class LLMOrchestrator {
             maxRetries,
             500
           );
+          providerUsed = 'openai';
         } catch (fallbackError: any) {
           return {
             success: false,
@@ -160,6 +200,7 @@ export class LLMOrchestrator {
         data: rawOutput as T,
         rawOutput,
         retriesAttempted,
+        providerUsed,
       };
     }
 
@@ -229,6 +270,7 @@ export class LLMOrchestrator {
             data: validation.data as T,
             rawOutput,
             retriesAttempted,
+            providerUsed,
           };
         } else {
           // Validation failed - retry with lower temperature
@@ -307,6 +349,8 @@ export class LLMOrchestrator {
         return this.callAnthropic(model, prompt, temperature);
       case 'gemini':
         return this.callGemini(model, prompt, temperature, contents, logCtx);
+      case 'perplexity':
+        return this.callPerplexity(model, prompt, temperature);
       default:
         throw new Error(`Unknown provider: ${provider}`);
     }
@@ -327,6 +371,20 @@ export class LLMOrchestrator {
 
   private async callAnthropic(model: string, prompt: string, temperature: number): Promise<string> {
     throw new Error('Anthropic SDK not yet integrated. Please install @anthropic-ai/sdk.');
+  }
+
+  // Perplexity uses the OpenAI-compatible chat completions API
+  async callPerplexity(model: string, prompt: string, temperature: number): Promise<string> {
+    const key = process.env.PERPLEXITY_API_KEY;
+    if (!key) throw new Error('PERPLEXITY_API_KEY is not set');
+
+    const client = new OpenAI({ apiKey: key, baseURL: 'https://api.perplexity.ai' });
+    const response = await client.chat.completions.create({
+      model,
+      messages: [{ role: 'user', content: prompt }],
+      temperature,
+    });
+    return response.choices[0].message.content || '';
   }
 
   private async callGemini(modelName: string, prompt: string, temperature: number, contents?: any[], logCtx?: LogCtx): Promise<string> {
@@ -390,6 +448,7 @@ export class LLMOrchestrator {
         openai: tokenBucketLimiter.getStatus('openai'),
         anthropic: tokenBucketLimiter.getStatus('anthropic'),
         gemini: tokenBucketLimiter.getStatus('gemini'),
+        perplexity: tokenBucketLimiter.getStatus('perplexity'),
       },
     };
   }

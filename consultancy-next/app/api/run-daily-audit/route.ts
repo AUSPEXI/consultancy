@@ -133,6 +133,7 @@ If the context is sparse, use a baseline of 5-15% for the brand if it's mentione
 
     return NextResponse.json({
       success: true,
+      providerUsed: result.providerUsed || 'gemini',
       metrics: {
         aSov: parsedData.aSov || 12,
         err: parsedData.err || 20,
