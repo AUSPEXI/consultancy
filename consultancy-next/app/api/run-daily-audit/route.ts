@@ -31,17 +31,6 @@ async function syncPerplexityGroundTruth(
   let { dbAdmin } = await import('@/lib/firebase-admin');
   if (!dbAdmin) return 0;
 
-  // Delete stale perplexity-sonar facts for this user
-  const stale = await dbAdmin
-    .collection('knowledge_graph')
-    .where('userId', '==', userId)
-    .where('source', '==', 'perplexity-sonar')
-    .limit(50)
-    .get();
-  const delBatch = dbAdmin.batch();
-  stale.docs.forEach(d => delBatch.delete(d.ref));
-  await delBatch.commit();
-
   const client = new OpenAI({ apiKey: key, baseURL: 'https://api.perplexity.ai' });
   let factsWritten = 0;
 
