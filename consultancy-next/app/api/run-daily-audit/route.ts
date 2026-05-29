@@ -102,18 +102,23 @@ export async function POST(req: NextRequest) {
 
     const exa = getExa();
 
-    // 1. Search Exa for the keywords
+    // 1. Search Exa for the keywords — run in parallel to cut sequential wait time
+    const searchResults = await Promise.all(
+      keywords.slice(0, 3).map((keyword: string) =>
+        exa.searchAndContents(keyword, {
+          type: 'neural',
+          useAutoprompt: true,
+          numResults: 5,
+          text: true,
+        }).then((r: any) => ({ keyword, results: r.results }))
+        .catch(() => ({ keyword, results: [] }))
+      )
+    );
     let combinedContext = '';
-    for (const keyword of keywords.slice(0, 3)) {
-      const searchResult = await exa.searchAndContents(keyword, {
-        type: 'neural',
-        useAutoprompt: true,
-        numResults: 5,
-        text: true,
-      });
+    for (const { keyword, results } of searchResults) {
       combinedContext += `\n\n--- Results for keyword: ${keyword} ---\n`;
-      combinedContext += searchResult.results
-        .map((r: any) => r.text)
+      combinedContext += results
+        .map((r: any) => r.text ?? '')
         .join('\n\n')
         .substring(0, 5000);
     }

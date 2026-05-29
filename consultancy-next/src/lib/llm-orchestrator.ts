@@ -399,8 +399,10 @@ export class LLMOrchestrator {
       model: modelName,
       contents: contents || prompt,
       config: {
-        generationConfig: { temperature },
-        responseMimeType: isJsonRequested ? "application/json" : undefined
+        temperature,
+        responseMimeType: isJsonRequested ? 'application/json' : undefined,
+        // Disable extended thinking on 2.5 models — keeps latency under Netlify's 26s timeout
+        thinkingConfig: { thinkingBudget: 0 },
       }
     });
 
