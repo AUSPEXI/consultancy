@@ -42,7 +42,7 @@ Return ONLY a JSON object with this exact structure:
     const result = await llmOrchestrator.executeCall<any>({
       userId: userId || 'anonymous',
       provider: 'gemini',
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       prompt,
       temperature: 0.2,
       schema: EntityProfileSchema,

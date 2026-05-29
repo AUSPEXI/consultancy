@@ -36,7 +36,7 @@ Rules: bare domains only (no https://, no paths, no www), real domains only, exa
     const result = await llmOrchestrator.executeCall<{ competitors: string[] }>({
       userId: userId || 'anonymous',
       provider: 'gemini',
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       prompt,
       schema: CompetitorSuggestSchema,
       feature: 'competitor-discovery',

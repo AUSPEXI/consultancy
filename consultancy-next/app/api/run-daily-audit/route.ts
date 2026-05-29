@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
       llmOrchestrator.executeCall<any>({
         userId,
         provider: 'gemini',
-        model: 'gemini-2.0-flash',
+        model: 'gemini-2.5-flash',
         prompt: `
 You are an expert Generative Engine Optimization (GEO) analyst.
 Analyze the following search results for the target keywords.

@@ -21,7 +21,7 @@ Return ONLY valid JSON:
     const result = await llmOrchestrator.executeCall<any>({
       userId,
       provider: 'gemini',
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       prompt,
     });
 

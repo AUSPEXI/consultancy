@@ -200,7 +200,7 @@ export async function POST(req: NextRequest) {
     const result = await llmOrchestrator.executeCall<string>({
       userId: effectiveUserId,
       provider: 'gemini',
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       contents: contentsWithSystem,
       temperature: 0.7,
       feature: 'copilot',

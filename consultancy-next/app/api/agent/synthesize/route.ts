@@ -36,7 +36,7 @@ Return ONLY the markdown article. No preamble, no explanation.`;
     const result = await llmOrchestrator.executeCall<string>({
       userId,
       provider: 'gemini',
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       prompt,
       feature: 'agent-synthesize',
     });

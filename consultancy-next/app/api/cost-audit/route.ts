@@ -3,7 +3,7 @@ import { dbAdmin } from '@/lib/firebase-admin';
 
 // Real-time per-query rate card (USD) — used for pricing calculator
 export const PLATFORM_RATES = {
-  gemini:     { label: 'Google Gemini',  model: 'gemini-2.0-flash',        perQuery: 0.000011, color: '#4285f4' },
+  gemini:     { label: 'Google Gemini',  model: 'gemini-2.5-flash',        perQuery: 0.000011, color: '#4285f4' },
   chatgpt:    { label: 'ChatGPT',        model: 'gpt-4o-mini',             perQuery: 0.000120, color: '#10a37f' },
   perplexity: { label: 'Perplexity',     model: 'sonar',                   perQuery: 0.005000, color: '#22d3ee' },
   claude:     { label: 'Claude',         model: 'claude-haiku-4-5',        perQuery: 0.000240, color: '#d97757' },

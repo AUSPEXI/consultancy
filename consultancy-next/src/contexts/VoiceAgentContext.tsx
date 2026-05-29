@@ -109,7 +109,7 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
       const ai = new GoogleGenAI({ apiKey });
       const conversationText = transcript.map(t => `${t.role}: ${t.text}`).join("\n");
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash",
         contents: `Analyze the following conversation between a user and an Auspexi AI agent.
 Extract any NEW, USEFUL facts, frequently asked questions, or insights about the user's needs or Auspexi's services that the agent should remember for future conversations.
 Do not extract personal information (like names or emails).
@@ -244,7 +244,7 @@ NAVIGATION: Use navigateToPage when a visitor asks to go somewhere or when it wo
 ${visitorContext}`;
 
       const sessionPromise = ai.live.connect({
-        model: "gemini-2.0-flash-live-001",
+        model: "gemini-2.5-flash-live-001",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {

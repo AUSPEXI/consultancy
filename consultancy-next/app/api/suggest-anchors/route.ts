@@ -85,7 +85,7 @@ Hard rules:
     const result = await llmOrchestrator.executeCall<any>({
       userId: userId || 'anonymous',
       provider: 'gemini',
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       prompt,
       temperature: 0.1,
       schema: AnchorsTEOSchema,
