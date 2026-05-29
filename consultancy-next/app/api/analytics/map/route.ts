@@ -62,15 +62,29 @@ export async function GET(req: NextRequest) {
           }
         }
 
-        const vaultSnap = await dbAdmin
-          .collection('knowledge_graph')
+        // Primary source: facts collection (field: statement) — this is where the Fact Vault writes
+        const factsSnap = await dbAdmin
+          .collection('facts')
           .where('userId', '==', userId)
           .limit(40)
           .get();
-        vaultFacts = vaultSnap.docs.map(d => ({
+        vaultFacts = factsSnap.docs.map(d => ({
           id: d.id,
-          text: (d.data().fact as string) || '',
+          text: (d.data().statement as string) || '',
         })).filter(f => f.text.length > 10);
+
+        // Fallback: knowledge_graph (Perplexity-synced facts)
+        if (vaultFacts.length === 0) {
+          const kgSnap = await dbAdmin
+            .collection('knowledge_graph')
+            .where('userId', '==', userId)
+            .limit(40)
+            .get();
+          vaultFacts = kgSnap.docs.map(d => ({
+            id: d.id,
+            text: (d.data().fact as string) || '',
+          })).filter(f => f.text.length > 10);
+        }
       } catch (err) {
         console.error('Firestore fetch error in analytics/map:', err);
       }
