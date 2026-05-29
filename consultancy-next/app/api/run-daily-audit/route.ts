@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
 import { SOVMetricsSchema } from '@/lib/output-validation';
+import OpenAI from 'openai';
 import Exa from 'exa-js';
 
 let exaInstance: Exa | null = null;
@@ -12,6 +13,78 @@ function getExa(): Exa {
     exaInstance = new Exa(apiKey);
   }
   return exaInstance;
+}
+
+/**
+ * Query Perplexity Sonar (real-time web search) for brand-specific facts
+ * and write them to knowledge_graph as ground truth for the UMAP latent space map.
+ * Old perplexity-sonar entries for this user are replaced on each audit run.
+ */
+async function syncPerplexityGroundTruth(
+  userId: string,
+  brand: string,
+  keywords: string[]
+): Promise<number> {
+  const key = process.env.PERPLEXITY_API_KEY;
+  if (!key) return 0;
+
+  let { dbAdmin } = await import('@/lib/firebase-admin');
+  if (!dbAdmin) return 0;
+
+  // Delete stale perplexity-sonar facts for this user
+  const stale = await dbAdmin
+    .collection('knowledge_graph')
+    .where('userId', '==', userId)
+    .where('source', '==', 'perplexity-sonar')
+    .limit(50)
+    .get();
+  const delBatch = dbAdmin.batch();
+  stale.docs.forEach(d => delBatch.delete(d.ref));
+  await delBatch.commit();
+
+  const client = new OpenAI({ apiKey: key, baseURL: 'https://api.perplexity.ai' });
+  let factsWritten = 0;
+
+  for (const keyword of keywords.slice(0, 2)) {
+    try {
+      const response = await client.chat.completions.create({
+        model: 'sonar',
+        messages: [{
+          role: 'user',
+          content: `What specific facts, features, differentiators, or claims is "${brand}" known for in the context of "${keyword}"? List concrete, citable statements only.`,
+        }],
+        max_tokens: 600,
+      } as any);
+
+      const text = response.choices[0]?.message?.content || '';
+      if (!text) continue;
+
+      // Split into individual sentences as discrete fact units
+      const sentences = text
+        .split(/(?<=[.!?])\s+/)
+        .map((s: string) => s.trim())
+        .filter((s: string) => s.length > 25 && s.length < 300 && !s.startsWith('#'));
+
+      const writeBatch = dbAdmin.batch();
+      for (const sentence of sentences.slice(0, 6)) {
+        const ref = dbAdmin.collection('knowledge_graph').doc();
+        writeBatch.set(ref, {
+          userId,
+          fact: sentence,
+          source: 'perplexity-sonar',
+          keyword,
+          brand,
+          timestamp: new Date().toISOString(),
+        });
+        factsWritten++;
+      }
+      await writeBatch.commit();
+    } catch {
+      // Non-critical — silent fail per keyword
+    }
+  }
+
+  return factsWritten;
 }
 
 export async function POST(req: NextRequest) {
@@ -43,7 +116,6 @@ export async function POST(req: NextRequest) {
     // 1. Search Exa for the keywords
     let combinedContext = '';
     for (const keyword of keywords.slice(0, 3)) {
-      // Limit to 3 keywords to save time/tokens
       const searchResult = await exa.searchAndContents(keyword, {
         type: 'neural',
         useAutoprompt: true,
@@ -57,8 +129,13 @@ export async function POST(req: NextRequest) {
         .substring(0, 5000);
     }
 
-    // 2. Ask Gemini to calculate SOV based on the context
-    const prompt = `
+    // 2. Run main SOV analysis + Perplexity ground truth sync in parallel
+    const [result, perplexityFacts] = await Promise.all([
+      llmOrchestrator.executeCall<any>({
+        userId,
+        provider: 'gemini',
+        model: 'gemini-2.0-flash',
+        prompt: `
 You are an expert Generative Engine Optimization (GEO) analyst.
 Analyze the following search results for the target keywords.
 Calculate the "Share of Voice" (SOV) percentage for the primary brand and its competitors.
@@ -105,15 +182,11 @@ If the context is sparse, use a baseline of 5-15% for the brand if it's mentione
     { "path": "/features", "citations": <int> }
   ]
 }
-`;
-
-    const result = await llmOrchestrator.executeCall<any>({
-      userId,
-      provider: 'gemini',
-      model: 'gemini-2.0-flash',
-      prompt,
-      schema: SOVMetricsSchema,
-    });
+`,
+        schema: SOVMetricsSchema,
+      }),
+      syncPerplexityGroundTruth(userId, brand, keywords).catch(() => 0),
+    ]);
 
     if (!result.success) {
       const isQuota = result.error?.includes('429') || result.error?.includes('RESOURCE_EXHAUSTED') || result.error?.includes('quota');
@@ -134,6 +207,7 @@ If the context is sparse, use a baseline of 5-15% for the brand if it's mentione
     return NextResponse.json({
       success: true,
       providerUsed: result.providerUsed || 'gemini',
+      perplexityFactsSynced: perplexityFacts,
       metrics: {
         aSov: parsedData.aSov || 12,
         err: parsedData.err || 20,
