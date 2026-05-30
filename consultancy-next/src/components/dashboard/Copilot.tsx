@@ -417,7 +417,7 @@ ${knowledgeContext}`;
       const ai = getAIClient();
 
       const sessionPromise = ai.live.connect({
-        model: "gemini-2.5-flash-live-001",
+        model: "gemini-2.0-flash-live-001",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
@@ -483,14 +483,27 @@ ${knowledgeContext}`;
               mediaStreamRef.current = stream;
 
               const source = audioCtx.createMediaStreamSource(stream);
-              const processor = audioCtx.createScriptProcessor(4096, 1, 1);
 
-              processor.onaudioprocess = (e) => {
-                // ABSOLUTE MUTE: Input is dropped if bot is speaking OR in the echo-cooldown phase
+              // Use AudioWorklet (modern, non-deprecated) for PCM capture
+              const workletCode = `
+class PCMCaptureProcessor extends AudioWorkletProcessor {
+  process(inputs) {
+    const ch = inputs[0]?.[0];
+    if (ch && ch.length > 0) this.port.postMessage(ch.slice(0));
+    return true;
+  }
+}
+registerProcessor('pcm-capture', PCMCaptureProcessor);
+`;
+              const workletUrl = URL.createObjectURL(new Blob([workletCode], { type: 'application/javascript' }));
+              await audioCtx.audioWorklet.addModule(workletUrl);
+              URL.revokeObjectURL(workletUrl);
+
+              const workletNode = new AudioWorkletNode(audioCtx, 'pcm-capture');
+              workletNode.port.onmessage = (e) => {
+                // ABSOLUTE MUTE: drop input while bot is speaking or in echo-cooldown
                 if (isOutputtingRef.current || activeSourcesRef.current.length > 0) return;
-
-                const inputData = e.inputBuffer.getChannelData(0);
-                const int16Data = float32ToInt16(inputData);
+                const int16Data = float32ToInt16(e.data as Float32Array);
                 const base64 = int16ToBase64(int16Data);
                 sessionPromise.then((session) => {
                   session.sendRealtimeInput({
@@ -499,13 +512,11 @@ ${knowledgeContext}`;
                 });
               };
 
-              const gainNode = audioCtx.createGain();
-              gainNode.gain.value = 0;
-              source.connect(processor);
-              processor.connect(gainNode);
-              gainNode.connect(audioCtx.destination);
+              source.connect(workletNode);
+              // Must connect to destination for worklet to run in all browsers
+              workletNode.connect(audioCtx.destination);
 
-              scriptProcessorRef.current = processor;
+              scriptProcessorRef.current = workletNode as any;
               setIsVoiceActive(true);
               setIsConnectingVoice(false);
             } catch (err) {
@@ -517,7 +528,7 @@ ${knowledgeContext}`;
           onmessage: (message: any) => {
             if (message.serverContent?.interrupted) {
               stopAllSources();
-              nextPlayTimeRef.current = audioContextRef.current?.currentTime || 0;
+              nextPlayTimeRef.current = playbackContextRef.current?.currentTime || 0;
             }
 
             if (message.toolCall) {
@@ -590,11 +601,16 @@ ${knowledgeContext}`;
               playAudio(base64Audio);
             }
           },
-          onclose: () => {
+          onclose: (event?: any) => {
+            console.warn('[Voice] Session closed — code:', event?.code, 'reason:', event?.reason || '(none)');
+            if (event?.code && event.code !== 1000) {
+              setMessages(prev => [...prev, { role: 'model', content: `Voice session closed (code ${event.code}${event.reason ? ': ' + event.reason : ''}). Click the mic to reconnect.` }]);
+            }
             disconnectVoice();
           },
-          onerror: (err) => {
-            console.error("Live API Error:", err);
+          onerror: (err: any) => {
+            console.error('[Voice] Live API error:', err);
+            setMessages(prev => [...prev, { role: 'model', content: `Voice error: ${err?.message || String(err)}. Please try again.` }]);
             disconnectVoice();
           }
         }
