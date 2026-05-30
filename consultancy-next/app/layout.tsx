@@ -40,6 +40,25 @@ export const metadata: Metadata = {
   },
 }
 
+async function SiteSchemas() {
+  try {
+    const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://auspexi.com';
+    const res = await fetch(`${base}/api/schema-registry?domain=auspexi.com`, { next: { revalidate: 300 } });
+    if (!res.ok) return null;
+    const { schemas } = await res.json();
+    if (!schemas?.length) return null;
+    return (
+      <>
+        {schemas.map((schema: any, i: number) => (
+          <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+        ))}
+      </>
+    );
+  } catch {
+    return null;
+  }
+}
+
 export default function RootLayout({
   children,
 }: {
@@ -52,6 +71,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://prod.spline.design" crossOrigin="" />
         <link rel="dns-prefetch" href="https://prod.spline.design" />
         <link rel="preconnect" href="https://unpkg.com" crossOrigin="" />
+        {/* @ts-expect-error async server component */}
+        <SiteSchemas />
       </head>
       <body className="antialiased bg-[#050505] text-white">
         <NavigationProgress />

@@ -390,6 +390,15 @@ export default function FactVault() {
                             };
                             const jsonStr = JSON.stringify(ontologyData, null, 2);
 
+                            // Always save to schema registry (admin SDK writes to Firestore → layout injects into page head)
+                            if (user && userData?.domain) {
+                              fetch('/api/schema-registry', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ userId: user.uid, domain: userData.domain, schema: ontologyData, factId: fact.id }),
+                              }).catch(() => {});
+                            }
+
                             if (userData?.cmsWebhookUrl) {
                               try {
                                 const res = await fetch('/api/webhook-proxy', {
@@ -398,17 +407,15 @@ export default function FactVault() {
                                   body: JSON.stringify({ webhookUrl: userData.cmsWebhookUrl.trim(), payload: { type: 'ontology_injection', ontology: ontologyData } }),
                                 });
                                 if (!res.ok) throw new Error((await res.json()).error || `HTTP ${res.status}`);
-                                showToast('Schema pushed to CMS. Use "Verify on site" to confirm it appears in your page HTML.', 'success');
-                                setSchemaVerify(null);
-                                setSchemaPanel({ json: jsonStr, factId: fact.id, factStatement: fact.statement });
+                                showToast('Schema saved to registry and pushed to CMS. Use "Verify on site" below to confirm.', 'success');
                               } catch (e: any) {
-                                setSchemaPanel({ json: jsonStr, factId: fact.id, factStatement: fact.statement });
-                                showToast(`Webhook failed: ${e.message} — copy the schema below and add it to your site manually.`, 'error');
+                                showToast(`Webhook failed: ${e.message} — schema saved to registry. Copy snippet below to add manually.`, 'error');
                               }
                             } else {
-                              setSchemaVerify(null);
-                              setSchemaPanel({ json: jsonStr, factId: fact.id, factStatement: fact.statement });
+                              showToast('Schema saved to site registry. Copy the snippet below to also add it manually to your site head.', 'info');
                             }
+                            setSchemaVerify(null);
+                            setSchemaPanel({ json: jsonStr, factId: fact.id, factStatement: fact.statement });
                           }}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 transition-colors text-xs font-medium border border-indigo-500/20"
                         >
@@ -554,7 +561,10 @@ export default function FactVault() {
 
       {/* Schema Panel */}
       {schemaPanel && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-end sm:items-center justify-center p-4 overflow-y-auto">
+        <div
+          className="fixed inset-0 bg-black/80 z-50 flex items-end sm:items-center justify-center p-4 overflow-y-auto"
+          onClick={e => { if (e.target === e.currentTarget) { setSchemaPanel(null); setSchemaVerify(null); } }}
+        >
           <div className="bg-zinc-900 border border-zinc-700 rounded-2xl w-full max-w-2xl shadow-2xl my-4">
             <div className="flex items-center justify-between p-5 border-b border-zinc-800">
               <div>
@@ -656,10 +666,16 @@ export default function FactVault() {
                         </div>
                       )}
                       {schemaVerify.schemasFound === 0 && (
-                        <p className="text-amber-400">No structured data found on your homepage. The schema was not injected into the page HTML — check your webhook endpoint is actually embedding it.</p>
+                        <p className="text-amber-400/80 text-[11px] leading-relaxed">No structured data found on your homepage. The schema was not written to page HTML — the webhook server received the data but isn't embedding it.</p>
                       )}
                       {schemaVerify.schemasFound > 0 && !schemaVerify.hasClaim && (
-                        <p className="text-amber-400">Schemas present but no Claim type found. The webhook may have been received but not written to the page.</p>
+                        <p className="text-amber-400/80 text-[11px] leading-relaxed">Schemas found (Organization/WebSite) but no Claim type yet. Your webhook was received but the JSON-LD from Map Ontology hasn't been embedded — copy it manually from above and paste into your site's &lt;head&gt;.</p>
+                      )}
+                      {schemaVerify.schemasFound > 0 && schemaVerify.hasClaim && !schemaVerify.factFound && (
+                        <p className="text-emerald-400/70 text-[11px] leading-relaxed">Claim schema is present on the page. This specific fact statement wasn't detected in the schema text — may be a different claim or a truncation. Check the schema content on your site.</p>
+                      )}
+                      {schemaVerify.schemasFound > 0 && schemaVerify.hasClaim && schemaVerify.factFound && (
+                        <p className="text-emerald-400 text-[11px] leading-relaxed">This fact is live in your page structured data. AI crawlers will see it as an authoritative Claim attributed to your brand.</p>
                       )}
                     </div>
                   )}
