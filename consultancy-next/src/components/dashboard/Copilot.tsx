@@ -100,7 +100,8 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hydratedRef = useRef(false);
   const sessionRef = useRef<any>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);       // 16kHz — mic capture only
+  const playbackContextRef = useRef<AudioContext | null>(null);    // 24kHz — model audio output
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const scriptProcessorRef = useRef<ScriptProcessorNode | null>(null);
   const activeSourcesRef = useRef<AudioBufferSourceNode[]>([]);
@@ -285,8 +286,15 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
   };
 
   const playAudio = (base64: string) => {
-    const audioCtx = audioContextRef.current;
-    if (!audioCtx) return;
+    // Use (or lazily create) a dedicated 24kHz playback context.
+    // Gemini Live outputs 24kHz PCM — mixing this into the 16kHz capture context
+    // causes a 1.5x speed mismatch that makes audio play garbled or silent.
+    if (!playbackContextRef.current || playbackContextRef.current.state === 'closed') {
+      playbackContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+      nextPlayTimeRef.current = playbackContextRef.current.currentTime;
+    }
+    const audioCtx = playbackContextRef.current;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
 
     const int16Data = base64ToInt16Array(base64);
     const float32Data = int16ToFloat32(int16Data);
@@ -398,6 +406,10 @@ ${knowledgeContext}`;
     if (audioContextRef.current) {
       audioContextRef.current.close();
       audioContextRef.current = null;
+    }
+    if (playbackContextRef.current) {
+      playbackContextRef.current.close();
+      playbackContextRef.current = null;
     }
     stopAllSources();
     setIsVoiceActive(false);

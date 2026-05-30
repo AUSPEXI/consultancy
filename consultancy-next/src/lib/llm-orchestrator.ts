@@ -393,7 +393,9 @@ export class LLMOrchestrator {
 
     const genAI: any = new GoogleGenAI({ apiKey: key });
 
-    const isJsonRequested = prompt.toLowerCase().includes('json') || prompt.toLowerCase().includes('schema');
+    // Only request JSON output for single-turn prompt calls — never for chat (contents array)
+    // The system instruction contains "JSON-LD Schema" etc. which would otherwise trigger JSON mode on every chat turn
+    const isJsonRequested = !contents && (prompt.toLowerCase().includes('return') && (prompt.toLowerCase().includes('json') || prompt.toLowerCase().includes('schema')));
 
     const result = await genAI.models.generateContent({
       model: modelName,
