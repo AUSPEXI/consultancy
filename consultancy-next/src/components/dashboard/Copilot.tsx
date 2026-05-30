@@ -8,14 +8,25 @@ import { collection, getDocs, getDoc, doc, query, orderBy, limit, where } from '
 import { db, auth } from '@/firebase';
 import { CITACIOUS_GEO_KNOWLEDGE } from '@/data/faqData';
 
-// Initialise the GenAI client for the Live WebSocket voice API.
-// Live API (WebSocket) must connect directly browser→Google.
-// Railway HTTP proxy cannot handle WebSocket upgrades — always fetch a real key here.
+// Lazy initialization of Gemini API (text/HTTP calls via proxy)
+let aiClient: GoogleGenAI | null = null;
+
+function getAIClient(): GoogleGenAI {
+  if (!aiClient) {
+    const proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
+      `${window.location.protocol}//${window.location.host}/api/genai`;
+    aiClient = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl } });
+  }
+  return aiClient;
+}
+
+// Live WebSocket voice API must connect directly browser→Google.
+// HTTP proxies cannot handle WebSocket upgrades — always use a real key here.
 async function fetchLiveClient(): Promise<GoogleGenAI> {
   const res = await fetch('/api/live-token');
-  if (!res.ok) throw new Error('Gemini API key not configured — set GEMINI_API_KEY in environment');
+  if (!res.ok) throw new Error('Gemini API key not configured — set GEMINI_API_KEY in Netlify env vars');
   const { key } = await res.json();
-  if (!key) throw new Error('Gemini API key missing from server');
+  if (!key) throw new Error('Gemini API key missing from server response');
   return new GoogleGenAI({ apiKey: key });
 }
 
@@ -286,9 +297,8 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
   };
 
   const playAudio = (base64: string) => {
-    // Use (or lazily create) a dedicated 24kHz playback context.
-    // Gemini Live outputs 24kHz PCM — mixing this into the 16kHz capture context
-    // causes a 1.5x speed mismatch that makes audio play garbled or silent.
+    // Gemini Live outputs 24kHz PCM. Use a dedicated 24kHz context — mixing into
+    // the 16kHz capture context causes a 1.5x speed mismatch (silent/garbled audio).
     if (!playbackContextRef.current || playbackContextRef.current.state === 'closed') {
       playbackContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
       nextPlayTimeRef.current = playbackContextRef.current.currentTime;
