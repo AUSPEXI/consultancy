@@ -164,8 +164,10 @@ export default function AgentsPage() {
         <span>→</span>
         <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 whitespace-nowrap">2 · Agent Orchestration</span>
         <span>→</span>
-        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">3 · Cite Probe</span>
-        <span className="ml-2 text-zinc-600 hidden sm:inline">— Enter a topic, agents crawl + extract + write a GEO article, then publish to your CMS via webhook.</span>
+        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">3 · Content Scorer</span>
+        <span>→</span>
+        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">4 · Cite Probe</span>
+        <span className="ml-2 text-zinc-600 hidden sm:inline">— After generating, hit "Verify AI Extractability" to score the article before publishing.</span>
       </div>
 
       <div>

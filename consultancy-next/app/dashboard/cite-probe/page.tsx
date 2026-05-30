@@ -132,7 +132,9 @@ export default function CiteProbePage() {
         <span>→</span>
         <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">2 · Agent Orchestration</span>
         <span>→</span>
-        <span className="px-2 py-0.5 rounded bg-pink-500/10 text-pink-400 border border-pink-500/20 whitespace-nowrap">3 · Cite Probe</span>
+        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">3 · Content Scorer</span>
+        <span>→</span>
+        <span className="px-2 py-0.5 rounded bg-pink-500/10 text-pink-400 border border-pink-500/20 whitespace-nowrap">4 · Cite Probe</span>
         <span className="ml-2 text-zinc-600 hidden sm:inline">— Query AI platforms to see if they cite your brand. Use "Generate content" on any gap to send it to Agents.</span>
       </div>
 

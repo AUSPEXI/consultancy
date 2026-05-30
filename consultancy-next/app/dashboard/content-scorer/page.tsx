@@ -165,6 +165,17 @@ export default function ContentScorerPage() {
           <span className="text-sm font-bold tracking-tight">{toast.text}</span>
         </div>
       )}
+      {/* Pipeline workflow guide */}
+      <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 font-mono overflow-x-auto pb-1">
+        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">1 · Fact Vault</span>
+        <span>→</span>
+        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">2 · Agent Orchestration</span>
+        <span>→</span>
+        <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 whitespace-nowrap">3 · Content Scorer</span>
+        <span>→</span>
+        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">4 · Cite Probe</span>
+        <span className="ml-2 text-zinc-600 hidden sm:inline">— Paste or receive article from Agents. Score it for GEO extractability before publishing.</span>
+      </div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">

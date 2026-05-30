@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Database, Lock, Unlock, CheckCircle2, AlertCircle, Plus, X, Loader2, Megaphone, Sparkles, Search, Network } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Database, Lock, Unlock, CheckCircle2, AlertCircle, Plus, X, Loader2, Megaphone, Sparkles, Search, Network, FileText, BarChart2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
@@ -24,6 +25,7 @@ interface Fact {
 
 export default function FactVault() {
   const { user, tier, userData, role } = useAuth();
+  const router = useRouter();
   const [facts, setFacts] = useState<Fact[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isResearchModalOpen, setIsResearchModalOpen] = useState(false);
@@ -218,8 +220,10 @@ export default function FactVault() {
         <span>→</span>
         <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">2 · Agent Orchestration</span>
         <span>→</span>
-        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">3 · Cite Probe</span>
-        <span className="ml-2 text-zinc-600 hidden sm:inline">— Add brand facts here. Agents use them to write GEO articles. Cite Probe checks how often AI cites you.</span>
+        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">3 · Content Scorer</span>
+        <span>→</span>
+        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">4 · Cite Probe</span>
+        <span className="ml-2 text-zinc-600 hidden sm:inline">— Use "Write Article" on any fact to send it to Agents as the topic.</span>
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -351,7 +355,25 @@ export default function FactVault() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-2 flex-wrap">
+                        <button
+                          onClick={() => {
+                            localStorage.setItem('agents_topic', fact.statement);
+                            router.push('/dashboard/agents');
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 hover:text-violet-300 transition-colors text-xs font-medium border border-violet-500/20"
+                        >
+                          <FileText className="w-3.5 h-3.5" /> Write Article
+                        </button>
+                        <button
+                          onClick={() => {
+                            localStorage.setItem('contentScorer_draft', JSON.stringify({ content: fact.statement, type: 'blog' }));
+                            router.push('/dashboard/content-scorer');
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300 transition-colors text-xs font-medium border border-cyan-500/20"
+                        >
+                          <BarChart2 className="w-3.5 h-3.5" /> Score
+                        </button>
                         <button
                           onClick={async () => {
                             const ontologyData = {
