@@ -34,6 +34,7 @@ export default function FactVault() {
   const [isExtracting, setIsExtracting] = useState(false);
   const [isResearching, setIsResearching] = useState(false);
   const [amplifyingFact, setAmplifyingFact] = useState<string | null>(null);
+  const [schemaPanel, setSchemaPanel] = useState<{ json: string; factId: string } | null>(null);
   const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   const showToast = (text: string, type: 'success' | 'error' | 'info' = 'info') => {
@@ -380,53 +381,28 @@ export default function FactVault() {
                           onClick={async () => {
                             const ontologyData = {
                               "@context": "https://schema.org",
-                              "@type": "Fact",
+                              "@type": "Claim",
                               "text": fact.statement,
-                              "entropyScore": fact.entropyScore,
-                              "status": fact.cliffhangerActive ? "gated" : "public",
-                              "about": {
-                                "@type": "Thing",
-                                "name": "Brand Fact"
-                              }
+                              "about": { "@type": "Organization", "name": userData?.brand || "Brand" },
+                              "appearance": { "@type": "WebPage", "url": userData?.domain ? `https://${userData.domain}` : undefined },
                             };
-
-                            const downloadFallback = () => {
-                              const blob = new Blob([JSON.stringify(ontologyData, null, 2)], { type: 'application/ld+json' });
-                              const url = URL.createObjectURL(blob);
-                              const a = document.createElement('a');
-                              a.href = url;
-                              a.download = `ontology-fact-${fact.id}.json`;
-                              document.body.appendChild(a);
-                              a.click();
-                              document.body.removeChild(a);
-                              URL.revokeObjectURL(url);
-                            };
+                            const jsonStr = JSON.stringify(ontologyData, null, 2);
 
                             if (userData?.cmsWebhookUrl) {
                               try {
-                                let webhookUrl = userData.cmsWebhookUrl.trim();
-                                // If the user provided the frontend URL but they are on a different environment,
-                                // it may fail due to CORS.
-                                // To make testing easier, use a local URL if it seems they want the current app backend:
-                                if (webhookUrl.includes('/api/webhooks/auspexi')) {
-                                   webhookUrl = '/api/webhooks/auspexi';
-                                }
-
-                                const response = await fetch(webhookUrl, {
+                                const res = await fetch('/api/webhook-proxy', {
                                   method: 'POST',
                                   headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({ type: 'ontology_injection', ontology: ontologyData })
+                                  body: JSON.stringify({ webhookUrl: userData.cmsWebhookUrl.trim(), payload: { type: 'ontology_injection', ontology: ontologyData } }),
                                 });
-                                if (!response.ok) throw new Error('Webhook rejected');
-                                showToast('Ontology schema injected via webhook.', 'success');
+                                if (!res.ok) throw new Error((await res.json()).error || `HTTP ${res.status}`);
+                                showToast('Ontology schema pushed to your CMS via webhook.', 'success');
                               } catch (e: any) {
-                                console.error(e);
-                                showToast('Webhook push failed — downloading instead. Check your webhook URL in Settings.', 'error');
-                                downloadFallback();
+                                showToast(`Webhook failed: ${e.message} — showing schema below to copy manually.`, 'error');
+                                setSchemaPanel({ json: jsonStr, factId: fact.id });
                               }
                             } else {
-                              downloadFallback();
-                              showToast('JSON-LD schema downloaded. Paste it into your website <head> as: <script type="application/ld+json">…</script>. Or add a Webhook URL in Settings to push automatically.', 'info');
+                              setSchemaPanel({ json: jsonStr, factId: fact.id });
                             }
                           }}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 transition-colors text-xs font-medium border border-indigo-500/20"
@@ -569,6 +545,58 @@ export default function FactVault() {
           fact={amplifyingFact}
           onClose={() => setAmplifyingFact(null)}
         />
+      )}
+
+      {/* Schema Panel — shown when Map Ontology is clicked and no webhook is configured (or webhook failed) */}
+      {schemaPanel && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-2xl w-full max-w-2xl shadow-2xl">
+            <div className="flex items-center justify-between p-5 border-b border-zinc-800">
+              <div>
+                <h3 className="text-white font-semibold flex items-center gap-2">
+                  <Network className="w-4 h-4 text-indigo-400" /> JSON-LD Schema
+                </h3>
+                <p className="text-xs text-zinc-500 mt-0.5">
+                  {userData?.cmsWebhookUrl
+                    ? 'Webhook push failed — copy this and add it to your site manually.'
+                    : 'No webhook configured — add this to your website to establish the entity signal.'}
+                </p>
+              </div>
+              <button onClick={() => setSchemaPanel(null)} className="p-2 hover:bg-zinc-800 rounded-lg transition-colors">
+                <X className="w-4 h-4 text-zinc-400" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 relative">
+                <pre className="text-xs text-emerald-300 font-mono overflow-x-auto whitespace-pre-wrap">{schemaPanel.json}</pre>
+                <button
+                  onClick={() => { navigator.clipboard.writeText(schemaPanel.json); showToast('Schema copied.', 'success'); }}
+                  className="absolute top-3 right-3 p-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5 text-zinc-400" />
+                </button>
+              </div>
+              <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 space-y-2">
+                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">How to use this</p>
+                <ol className="text-xs text-zinc-400 space-y-1.5 list-decimal list-inside">
+                  <li>Copy the JSON above.</li>
+                  <li>In your website's HTML, paste it inside your <code className="text-indigo-300">&lt;head&gt;</code> tag as:<br />
+                    <code className="text-indigo-300 text-[11px]">&lt;script type="application/ld+json"&gt;…paste here…&lt;/script&gt;</code>
+                  </li>
+                  <li>Alternatively go to <strong className="text-white">Settings → Integrations</strong> and add your CMS Webhook URL to push schemas automatically without downloading.</li>
+                </ol>
+              </div>
+              {!userData?.cmsWebhookUrl && (
+                <button
+                  onClick={() => { setSchemaPanel(null); router.push('/dashboard/settings'); }}
+                  className="w-full text-xs text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/10 rounded-lg py-2 transition-colors"
+                >
+                  Set up webhook in Settings →
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
