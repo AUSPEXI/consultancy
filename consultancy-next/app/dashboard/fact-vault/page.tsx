@@ -34,7 +34,9 @@ export default function FactVault() {
   const [isExtracting, setIsExtracting] = useState(false);
   const [isResearching, setIsResearching] = useState(false);
   const [amplifyingFact, setAmplifyingFact] = useState<string | null>(null);
-  const [schemaPanel, setSchemaPanel] = useState<{ json: string; factId: string } | null>(null);
+  const [schemaPanel, setSchemaPanel] = useState<{ json: string; factId: string; factStatement?: string } | null>(null);
+  const [schemaVerify, setSchemaVerify] = useState<any>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   const showToast = (text: string, type: 'success' | 'error' | 'info' = 'info') => {
@@ -396,13 +398,16 @@ export default function FactVault() {
                                   body: JSON.stringify({ webhookUrl: userData.cmsWebhookUrl.trim(), payload: { type: 'ontology_injection', ontology: ontologyData } }),
                                 });
                                 if (!res.ok) throw new Error((await res.json()).error || `HTTP ${res.status}`);
-                                showToast('Ontology schema pushed to your CMS via webhook.', 'success');
+                                showToast('Schema pushed to CMS. Use "Verify on site" to confirm it appears in your page HTML.', 'success');
+                                setSchemaVerify(null);
+                                setSchemaPanel({ json: jsonStr, factId: fact.id, factStatement: fact.statement });
                               } catch (e: any) {
-                                showToast(`Webhook failed: ${e.message} — showing schema below to copy manually.`, 'error');
-                                setSchemaPanel({ json: jsonStr, factId: fact.id });
+                                setSchemaPanel({ json: jsonStr, factId: fact.id, factStatement: fact.statement });
+                                showToast(`Webhook failed: ${e.message} — copy the schema below and add it to your site manually.`, 'error');
                               }
                             } else {
-                              setSchemaPanel({ json: jsonStr, factId: fact.id });
+                              setSchemaVerify(null);
+                              setSchemaPanel({ json: jsonStr, factId: fact.id, factStatement: fact.statement });
                             }
                           }}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 transition-colors text-xs font-medium border border-indigo-500/20"
@@ -547,51 +552,129 @@ export default function FactVault() {
         />
       )}
 
-      {/* Schema Panel — shown when Map Ontology is clicked and no webhook is configured (or webhook failed) */}
+      {/* Schema Panel */}
       {schemaPanel && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-end sm:items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-zinc-700 rounded-2xl w-full max-w-2xl shadow-2xl">
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-end sm:items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-2xl w-full max-w-2xl shadow-2xl my-4">
             <div className="flex items-center justify-between p-5 border-b border-zinc-800">
               <div>
                 <h3 className="text-white font-semibold flex items-center gap-2">
-                  <Network className="w-4 h-4 text-indigo-400" /> JSON-LD Schema
+                  <Network className="w-4 h-4 text-indigo-400" /> JSON-LD Schema · Claim
                 </h3>
                 <p className="text-xs text-zinc-500 mt-0.5">
                   {userData?.cmsWebhookUrl
-                    ? 'Webhook push failed — copy this and add it to your site manually.'
-                    : 'No webhook configured — add this to your website to establish the entity signal.'}
+                    ? 'Sent to CMS — verify below that it appears in your live page HTML.'
+                    : 'No webhook configured. Add this to your site manually.'}
                 </p>
               </div>
-              <button onClick={() => setSchemaPanel(null)} className="p-2 hover:bg-zinc-800 rounded-lg transition-colors">
+              <button onClick={() => { setSchemaPanel(null); setSchemaVerify(null); }} className="p-2 hover:bg-zinc-800 rounded-lg transition-colors">
                 <X className="w-4 h-4 text-zinc-400" />
               </button>
             </div>
             <div className="p-5 space-y-4">
+
+              {/* JSON display */}
               <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 relative">
                 <pre className="text-xs text-emerald-300 font-mono overflow-x-auto whitespace-pre-wrap">{schemaPanel.json}</pre>
                 <button
                   onClick={() => { navigator.clipboard.writeText(schemaPanel.json); showToast('Schema copied.', 'success'); }}
                   className="absolute top-3 right-3 p-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
+                  title="Copy JSON"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5 text-zinc-400" />
                 </button>
               </div>
+
+              {/* How to add manually */}
               <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 space-y-2">
-                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">How to use this</p>
-                <ol className="text-xs text-zinc-400 space-y-1.5 list-decimal list-inside">
-                  <li>Copy the JSON above.</li>
-                  <li>In your website's HTML, paste it inside your <code className="text-indigo-300">&lt;head&gt;</code> tag as:<br />
-                    <code className="text-indigo-300 text-[11px]">&lt;script type="application/ld+json"&gt;…paste here…&lt;/script&gt;</code>
-                  </li>
-                  <li>Alternatively go to <strong className="text-white">Settings → Integrations</strong> and add your CMS Webhook URL to push schemas automatically without downloading.</li>
-                </ol>
+                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">If adding manually</p>
+                <p className="text-xs text-zinc-400">Paste inside your page's <code className="text-indigo-300">&lt;head&gt;</code> tag:</p>
+                <div className="bg-black rounded-lg px-3 py-2 flex items-center justify-between gap-2">
+                  <code className="text-[11px] text-indigo-300 font-mono">{`<script type="application/ld+json">${schemaPanel.json.replace(/\n/g, ' ')}</script>`}</code>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(`<script type="application/ld+json">${schemaPanel.json}</script>`); showToast('HTML snippet copied.', 'success'); }}
+                    className="shrink-0 p-1.5 bg-zinc-800 hover:bg-zinc-700 rounded transition-colors"
+                    title="Copy HTML snippet"
+                  >
+                    <CheckCircle2 className="w-3 h-3 text-zinc-500" />
+                  </button>
+                </div>
               </div>
+
+              {/* Verify on site */}
+              {userData?.domain && (
+                <div className="space-y-3">
+                  <button
+                    onClick={async () => {
+                      setIsVerifying(true);
+                      setSchemaVerify(null);
+                      try {
+                        const res = await fetch('/api/verify-schema', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ domain: userData.domain, factStatement: schemaPanel.factStatement }),
+                        });
+                        const data = await res.json();
+                        setSchemaVerify(data);
+                      } catch (e: any) {
+                        setSchemaVerify({ error: e.message });
+                      } finally {
+                        setIsVerifying(false);
+                      }
+                    }}
+                    disabled={isVerifying}
+                    className="w-full flex items-center justify-center gap-2 text-xs text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/10 rounded-lg py-2.5 transition-colors disabled:opacity-50"
+                  >
+                    {isVerifying ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Checking {userData.domain}…</> : <><Search className="w-3.5 h-3.5" /> Verify schema is live on {userData.domain}</>}
+                  </button>
+
+                  {schemaVerify && !schemaVerify.error && (
+                    <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 space-y-3 text-xs">
+                      <div className="flex items-center justify-between">
+                        <p className="font-bold text-zinc-400 uppercase tracking-widest">Live schema check — {schemaVerify.url}</p>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${schemaVerify.schemasFound > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                          {schemaVerify.schemasFound} schema{schemaVerify.schemasFound !== 1 ? 's' : ''} found
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { label: 'Organization schema', ok: schemaVerify.hasOrganization },
+                          { label: 'Claim schema', ok: schemaVerify.hasClaim },
+                          { label: 'WebSite schema', ok: schemaVerify.hasWebSite },
+                          { label: 'This fact in schema', ok: schemaVerify.factFound },
+                        ].map(({ label, ok }) => (
+                          <div key={label} className={`flex items-center gap-2 px-2 py-1.5 rounded-lg ${ok ? 'bg-emerald-500/10 text-emerald-400' : 'bg-zinc-900 text-zinc-500'}`}>
+                            {ok ? <CheckCircle2 className="w-3 h-3 shrink-0" /> : <AlertCircle className="w-3 h-3 shrink-0" />}
+                            {label}
+                          </div>
+                        ))}
+                      </div>
+                      {schemaVerify.sameAsLinks?.length > 0 && (
+                        <div>
+                          <p className="text-zinc-500 mb-1">sameAs links found:</p>
+                          {schemaVerify.sameAsLinks.map((l: string, i: number) => <p key={i} className="text-zinc-400 font-mono truncate">{l}</p>)}
+                        </div>
+                      )}
+                      {schemaVerify.schemasFound === 0 && (
+                        <p className="text-amber-400">No structured data found on your homepage. The schema was not injected into the page HTML — check your webhook endpoint is actually embedding it.</p>
+                      )}
+                      {schemaVerify.schemasFound > 0 && !schemaVerify.hasClaim && (
+                        <p className="text-amber-400">Schemas present but no Claim type found. The webhook may have been received but not written to the page.</p>
+                      )}
+                    </div>
+                  )}
+                  {schemaVerify?.error && (
+                    <p className="text-xs text-rose-400 bg-rose-500/10 rounded-lg px-3 py-2">{schemaVerify.error}</p>
+                  )}
+                </div>
+              )}
+
               {!userData?.cmsWebhookUrl && (
                 <button
-                  onClick={() => { setSchemaPanel(null); router.push('/dashboard/settings'); }}
-                  className="w-full text-xs text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/10 rounded-lg py-2 transition-colors"
+                  onClick={() => { setSchemaPanel(null); setSchemaVerify(null); router.push('/dashboard/settings'); }}
+                  className="w-full text-xs text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-700 rounded-lg py-2 transition-colors"
                 >
-                  Set up webhook in Settings →
+                  Set up CMS webhook in Settings to push automatically →
                 </button>
               )}
             </div>
