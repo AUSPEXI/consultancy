@@ -8,7 +8,7 @@ import { collection, getDocs, getDoc, doc, query, orderBy, limit, where } from '
 import { db, auth } from '@/firebase';
 import { CITACIOUS_GEO_KNOWLEDGE } from '@/data/faqData';
 
-// Lazy initialization of Gemini API
+// Lazy initialization of Gemini API (text/HTTP calls via proxy)
 let aiClient: GoogleGenAI | null = null;
 
 function getAIClient(): GoogleGenAI {
@@ -18,6 +18,16 @@ function getAIClient(): GoogleGenAI {
     aiClient = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl } });
   }
   return aiClient;
+}
+
+// Live WebSocket voice API must connect directly browser→Google.
+// HTTP proxies cannot handle WebSocket upgrades — always use a real key here.
+async function fetchLiveClient(): Promise<GoogleGenAI> {
+  const res = await fetch('/api/live-token');
+  if (!res.ok) throw new Error('Gemini API key not configured — set GEMINI_API_KEY in Netlify env vars');
+  const { key } = await res.json();
+  if (!key) throw new Error('Gemini API key missing from server response');
+  return new GoogleGenAI({ apiKey: key });
 }
 
 // Audio helpers
@@ -101,7 +111,8 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hydratedRef = useRef(false);
   const sessionRef = useRef<any>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);       // 16kHz — mic capture only
+  const playbackContextRef = useRef<AudioContext | null>(null);    // 24kHz — model audio output
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const scriptProcessorRef = useRef<ScriptProcessorNode | null>(null);
   const activeSourcesRef = useRef<AudioBufferSourceNode[]>([]);
@@ -286,8 +297,14 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
   };
 
   const playAudio = (base64: string) => {
-    const audioCtx = audioContextRef.current;
-    if (!audioCtx) return;
+    // Gemini Live outputs 24kHz PCM. Use a dedicated 24kHz context — mixing into
+    // the 16kHz capture context causes a 1.5x speed mismatch (silent/garbled audio).
+    if (!playbackContextRef.current || playbackContextRef.current.state === 'closed') {
+      playbackContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+      nextPlayTimeRef.current = playbackContextRef.current.currentTime;
+    }
+    const audioCtx = playbackContextRef.current;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
 
     const int16Data = base64ToInt16Array(base64);
     const float32Data = int16ToFloat32(int16Data);
@@ -400,6 +417,10 @@ ${knowledgeContext}`;
       audioContextRef.current.close();
       audioContextRef.current = null;
     }
+    if (playbackContextRef.current) {
+      playbackContextRef.current.close();
+      playbackContextRef.current = null;
+    }
     stopAllSources();
     setIsVoiceActive(false);
     setIsConnectingVoice(false);
@@ -414,7 +435,7 @@ ${knowledgeContext}`;
 
     try {
       setIsConnectingVoice(true);
-      const ai = getAIClient();
+      const ai = await fetchLiveClient();
 
       const sessionPromise = ai.live.connect({
         model: "gemini-2.0-flash-live-001",
