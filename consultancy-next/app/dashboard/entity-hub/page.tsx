@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Globe, Sparkles, Loader2, Copy, CheckCircle2, ExternalLink, AlertCircle, Building2, BookOpen, Link2 } from 'lucide-react';
+import { Globe, Sparkles, Loader2, Copy, CheckCircle2, ExternalLink, AlertCircle, Building2, BookOpen, Link2, Pencil } from 'lucide-react';
 import { checkTierAccess } from '@/constants/tiers';
 import { logAuditAction } from '@/lib/audit';
 
@@ -37,6 +37,8 @@ export default function EntityHubPage() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [checklist, setChecklist] = useState<Record<string, boolean>>({});
+  const [country, setCountry] = useState('');
+  const [extraContext, setExtraContext] = useState('');
 
   const isAdmin = user?.email === 'hopiumcalculator@gmail.com';
   const hasAccess = isAdmin || checkTierAccess(tier, 'Premium');
@@ -45,6 +47,28 @@ export default function EntityHubPage() {
     navigator.clipboard.writeText(text);
     setCopied(key);
     setTimeout(() => setCopied(null), 2000);
+  };
+
+  const updateProfile = (field: keyof EntityProfile, value: any) => {
+    setProfile(prev => prev ? { ...prev, [field]: value } : prev);
+  };
+
+  const updateStatement = (index: number, value: string) => {
+    setProfile(prev => {
+      if (!prev) return prev;
+      const updated = [...prev.keyStatements];
+      updated[index] = value;
+      return { ...prev, keyStatements: updated };
+    });
+  };
+
+  const updateSameAs = (index: number, value: string) => {
+    setProfile(prev => {
+      if (!prev) return prev;
+      const updated = [...prev.sameAsUrls];
+      updated[index] = value;
+      return { ...prev, sameAsUrls: updated };
+    });
   };
 
   const generateProfile = async () => {
@@ -60,6 +84,8 @@ export default function EntityHubPage() {
           brand: userData.brand,
           domain: userData.domain,
           keywords: userData.keywords,
+          country: country.trim() || undefined,
+          description: extraContext.trim() || undefined,
         }),
       });
       const data = await res.json();
@@ -123,106 +149,177 @@ export default function EntityHubPage() {
       {/* Entity profile generator */}
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
-          <div className="flex items-start justify-between">
+          <CardTitle className="text-white flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-purple-400" /> Entity Profile Generator
+          </CardTitle>
+          <CardDescription className="text-zinc-400 mt-1">
+            Generates your complete entity profile — Wikidata description, Knowledge Panel triggers, key statements, and sameAs links. All fields are editable after generation.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Pre-generation inputs */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-400" /> Entity Profile Generator
-              </CardTitle>
-              <CardDescription className="text-zinc-400 mt-1">
-                Generates your complete entity profile — Wikidata description, Knowledge Panel triggers, key statements, and sameAs links — ready to copy and submit.
-              </CardDescription>
+              <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">
+                Country / HQ Location <span className="text-rose-400">*</span>
+              </label>
+              <input
+                type="text"
+                value={country}
+                onChange={e => setCountry(e.target.value)}
+                placeholder="e.g. United Kingdom"
+                className="w-full bg-zinc-950 border border-zinc-700 focus:border-purple-500 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-600 outline-none transition-colors"
+              />
             </div>
+            <div>
+              <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">
+                Additional Context <span className="text-zinc-600">(optional)</span>
+              </label>
+              <input
+                type="text"
+                value={extraContext}
+                onChange={e => setExtraContext(e.target.value)}
+                placeholder="e.g. Founded 2022, B2B SaaS, 10 employees"
+                className="w-full bg-zinc-950 border border-zinc-700 focus:border-purple-500 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-600 outline-none transition-colors"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-zinc-600">
+              Brand: <span className="text-zinc-400">{userData?.brand || '—'}</span>
+              {userData?.domain && <> · Domain: <span className="text-zinc-400">{userData.domain}</span></>}
+            </p>
             <Button
               onClick={generateProfile}
-              disabled={isGenerating || !userData?.brand}
-              className="bg-purple-600 hover:bg-purple-700 text-white shrink-0 ml-4"
+              disabled={isGenerating || !userData?.brand || !country.trim()}
+              className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white"
             >
-              {isGenerating ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Generating...</> : <><Sparkles className="w-4 h-4 mr-2" />Generate Profile</>}
+              {isGenerating ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Generating...</> : <><Sparkles className="w-4 h-4 mr-2" />{profile ? 'Regenerate' : 'Generate Profile'}</>}
             </Button>
           </div>
-        </CardHeader>
-        {error && (
-          <CardContent>
+
+          {!country.trim() && (
+            <p className="text-xs text-amber-400/70 flex items-center gap-1.5">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+              Enter your country so the profile is generated correctly — the AI cannot reliably guess it.
+            </p>
+          )}
+
+          {error && (
             <p className="text-rose-400 text-sm bg-rose-500/10 border border-rose-500/20 rounded-xl p-3">{error}</p>
-          </CardContent>
-        )}
-        {profile && (
-          <CardContent className="space-y-5">
-            {/* Core identity */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {[
-                { label: 'Instance Of', value: profile.instanceOf },
-                { label: 'Industry', value: profile.industry },
-                { label: 'Country', value: profile.country },
-              ].map(({ label, value }) => (
-                <div key={label} className="bg-zinc-950 border border-zinc-800 rounded-xl p-3">
-                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">{label}</p>
-                  <p className="text-sm text-white font-medium">{value}</p>
+          )}
+
+          {profile && (
+            <div className="space-y-5 pt-2">
+              <div className="flex items-center gap-2 text-[10px] text-zinc-500 font-mono">
+                <Pencil className="w-3 h-3" /> All fields below are editable — click any value to correct it
+              </div>
+
+              {/* Core identity */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {([
+                  { label: 'Instance Of', field: 'instanceOf' as const },
+                  { label: 'Industry', field: 'industry' as const },
+                  { label: 'Country', field: 'country' as const },
+                ]).map(({ label, field }) => (
+                  <div key={field} className="bg-zinc-950 border border-zinc-800 rounded-xl p-3">
+                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">{label}</p>
+                    <input
+                      type="text"
+                      value={profile[field] as string}
+                      onChange={e => updateProfile(field, e.target.value)}
+                      className="w-full bg-transparent text-sm text-white font-medium outline-none border-b border-transparent hover:border-zinc-700 focus:border-purple-500 transition-colors pb-0.5"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Wikidata description */}
+              <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Wikidata Description</p>
+                  <button onClick={() => copy(profile.wikidataDescription, 'wikidata')} className="p-1.5 hover:bg-zinc-800 rounded-lg transition-colors">
+                    {copied === 'wikidata' ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-zinc-500" />}
+                  </button>
                 </div>
-              ))}
-            </div>
+                <textarea
+                  value={profile.wikidataDescription}
+                  onChange={e => updateProfile('wikidataDescription', e.target.value)}
+                  rows={3}
+                  className="w-full bg-transparent text-sm text-zinc-300 outline-none resize-none border border-transparent hover:border-zinc-700 focus:border-purple-500 rounded-lg px-2 py-1 -mx-2 transition-colors"
+                />
+                <div className="flex items-center gap-2 mt-2">
+                  <p className="text-[10px] text-zinc-600 flex-1">Short tagline:</p>
+                  <input
+                    type="text"
+                    value={profile.shortDescription}
+                    onChange={e => updateProfile('shortDescription', e.target.value)}
+                    className="flex-1 bg-transparent text-[10px] text-zinc-400 outline-none border-b border-transparent hover:border-zinc-700 focus:border-purple-500 transition-colors"
+                  />
+                </div>
+              </div>
 
-            {/* Wikidata description */}
-            <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Wikidata Description</p>
-                <button onClick={() => copy(profile.wikidataDescription, 'wikidata')} className="p-1.5 hover:bg-zinc-800 rounded-lg transition-colors">
-                  {copied === 'wikidata' ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-zinc-500" />}
-                </button>
+              {/* Key statements */}
+              <div>
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Key Statements for Knowledge Graph</p>
+                <div className="space-y-2">
+                  {profile.keyStatements.map((s, i) => (
+                    <div key={i} className="flex items-start gap-3 bg-zinc-950 border border-zinc-800 rounded-xl p-3">
+                      <span className="text-xs font-black text-pink-500/40 font-mono mt-0.5 shrink-0">{String(i + 1).padStart(2, '0')}</span>
+                      <textarea
+                        value={s}
+                        onChange={e => updateStatement(i, e.target.value)}
+                        rows={2}
+                        className="flex-1 bg-transparent text-sm text-zinc-300 leading-relaxed outline-none resize-none border border-transparent hover:border-zinc-700 focus:border-purple-500 rounded px-1 -mx-1 transition-colors"
+                      />
+                      <button onClick={() => copy(s, `stmt-${i}`)} className="p-1.5 hover:bg-zinc-800 rounded-lg transition-colors shrink-0">
+                        {copied === `stmt-${i}` ? <CheckCircle2 className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-zinc-600" />}
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <p className="text-sm text-zinc-300">{profile.wikidataDescription}</p>
-              <p className="text-[10px] text-zinc-600 mt-2">Short tagline: <span className="text-zinc-400">{profile.shortDescription}</span></p>
-            </div>
 
-            {/* Key statements */}
-            <div>
-              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Key Statements for Knowledge Graph</p>
-              <div className="space-y-2">
-                {profile.keyStatements.map((s, i) => (
-                  <div key={i} className="flex items-start gap-3 bg-zinc-950 border border-zinc-800 rounded-xl p-3">
-                    <span className="text-xs font-black text-pink-500/40 font-mono mt-0.5 shrink-0">{String(i + 1).padStart(2, '0')}</span>
-                    <p className="text-sm text-zinc-300 leading-relaxed">{s}</p>
-                    <button onClick={() => copy(s, `stmt-${i}`)} className="p-1.5 hover:bg-zinc-800 rounded-lg transition-colors shrink-0">
-                      {copied === `stmt-${i}` ? <CheckCircle2 className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-zinc-600" />}
-                    </button>
-                  </div>
-                ))}
+              {/* Knowledge Panel triggers */}
+              <div>
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Knowledge Panel Triggers</p>
+                <div className="flex flex-wrap gap-2">
+                  {profile.knowledgePanelTriggers.map((t, i) => (
+                    <span key={i} className="px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs text-blue-300 font-medium">{t}</span>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Knowledge Panel triggers */}
-            <div>
-              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Knowledge Panel Triggers</p>
-              <div className="flex flex-wrap gap-2">
-                {profile.knowledgePanelTriggers.map((t, i) => (
-                  <span key={i} className="px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs text-blue-300 font-medium">{t}</span>
-                ))}
+              {/* sameAs URLs */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">sameAs Links for Schema</p>
+                  <button
+                    onClick={() => copy(JSON.stringify(profile.sameAsUrls, null, 2), 'sameas')}
+                    className="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1 transition-colors"
+                  >
+                    {copied === 'sameas' ? <CheckCircle2 className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    Copy all
+                  </button>
+                </div>
+                <div className="space-y-1.5">
+                  {profile.sameAsUrls.map((url, i) => (
+                    <div key={i} className="flex items-center gap-2 bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2">
+                      <Link2 className="w-3 h-3 text-zinc-600 shrink-0" />
+                      <input
+                        type="text"
+                        value={url}
+                        onChange={e => updateSameAs(i, e.target.value)}
+                        className="flex-1 bg-transparent text-xs text-zinc-400 font-mono outline-none border-b border-transparent hover:border-zinc-700 focus:border-purple-500 transition-colors"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-
-            {/* sameAs URLs */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">sameAs Links for Schema</p>
-                <button
-                  onClick={() => copy(JSON.stringify(profile.sameAsUrls, null, 2), 'sameas')}
-                  className="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1 transition-colors"
-                >
-                  {copied === 'sameas' ? <CheckCircle2 className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                  Copy all
-                </button>
-              </div>
-              <div className="space-y-1.5">
-                {profile.sameAsUrls.map((url, i) => (
-                  <div key={i} className="flex items-center gap-2 text-xs text-zinc-400 font-mono bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2">
-                    <Link2 className="w-3 h-3 text-zinc-600 shrink-0" />
-                    {url}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        )}
+          )}
+        </CardContent>
       </Card>
 
       {/* Submission checklist */}

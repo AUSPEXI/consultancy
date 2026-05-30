@@ -15,17 +15,20 @@ const EntityProfileSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, brand, domain, keywords, description } = await req.json();
+    const { userId, brand, domain, keywords, country, description } = await req.json();
     if (!brand) return NextResponse.json({ error: 'Brand required' }, { status: 400 });
 
     const prompt = `You are an entity intelligence expert specialising in knowledge graph establishment for brand GEO (Generative Engine Optimization).
 
 Brand: ${brand}
 Domain: ${domain || 'unknown'}
+Country / HQ: ${country || 'unknown — do not guess, use "unknown" if not provided'}
 Industry/Keywords: ${keywords?.join(', ') || 'not provided'}
 Additional context: ${description || 'none'}
 
 Generate a complete entity profile for establishing this brand in structured knowledge systems (Wikidata, Google Knowledge Panel, schema.org).
+
+IMPORTANT: Use the exact country provided above. Do not infer or guess the country from the domain or brand name.
 
 Return ONLY a JSON object with this exact structure:
 {
@@ -33,7 +36,7 @@ Return ONLY a JSON object with this exact structure:
   "shortDescription": "10-word max description for Knowledge Panel tagline",
   "instanceOf": "The most appropriate Wikidata P31 'instance of' value (e.g. 'software company', 'technology startup', 'SaaS platform')",
   "industry": "Primary industry classification (e.g. 'Software', 'Marketing Technology', 'Artificial Intelligence')",
-  "country": "Country of incorporation/headquarters (use proper country name)",
+  "country": "Use exactly the country value provided above",
   "keyStatements": ["3-6 verifiable factual statements about the brand suitable for knowledge graph ingestion. Each should contain a specific claim, be attribution-ready, and be no more than 2 sentences."],
   "knowledgePanelTriggers": ["2-5 specific content types/formats that would trigger a Google Knowledge Panel for this brand (e.g. 'Wikipedia article', 'Wikidata entity with sitelinks', 'Google Business Profile')"],
   "sameAsUrls": ["2-8 authoritative URLs where this brand should be listed for entity disambiguation — use realistic platform URLs for this brand type"]

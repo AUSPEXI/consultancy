@@ -128,6 +128,18 @@ export default function CiteProbePage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+      {/* Pipeline workflow guide */}
+      <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 font-mono overflow-x-auto pb-1">
+        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">1 · Fact Vault</span>
+        <span>→</span>
+        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">2 · Agent Orchestration</span>
+        <span>→</span>
+        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">3 · Content Scorer</span>
+        <span>→</span>
+        <span className="px-2 py-0.5 rounded bg-pink-500/10 text-pink-400 border border-pink-500/20 whitespace-nowrap">4 · Cite Probe</span>
+        <span className="ml-2 text-zinc-600 hidden sm:inline">— Query AI platforms to see if they cite your brand. Use "Generate content" on any gap to send it to Agents.</span>
+      </div>
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">AI Citation Probe</h1>
