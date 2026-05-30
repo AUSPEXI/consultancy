@@ -27,7 +27,9 @@ async function fetchLiveClient(): Promise<GoogleGenAI> {
   if (!res.ok) throw new Error('Gemini API key not configured — set GEMINI_API_KEY in Netlify env vars');
   const { key } = await res.json();
   if (!key) throw new Error('Gemini API key missing from server response');
-  return new GoogleGenAI({ apiKey: key });
+  // v1alpha is required for gemini-2.0-flash-live-001 (stable non-preview model).
+  // The SDK defaults to v1beta where this model is not found.
+  return new GoogleGenAI({ apiKey: key, httpOptions: { apiVersion: 'v1alpha' } });
 }
 
 // Audio helpers
@@ -438,7 +440,7 @@ ${knowledgeContext}`;
       const ai = await fetchLiveClient();
 
       const sessionPromise = ai.live.connect({
-        model: "gemini-live-2.5-flash-preview",
+        model: "gemini-2.0-flash-live-001",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
