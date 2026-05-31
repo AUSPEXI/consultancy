@@ -13,7 +13,7 @@ import { collection, addDoc } from 'firebase/firestore';
 type ContentType = 'sales' | 'blog' | 'technical';
 
 export default function ContentScorerPage() {
-  const { tier, role, user } = useAuth();
+  const { tier, role, user, userData } = useAuth();
   const [content, setContent] = useState(() => {
     if (typeof window !== 'undefined') return localStorage.getItem('contentScorer_content') || '';
     return '';
@@ -73,13 +73,36 @@ export default function ContentScorerPage() {
   }, []);
 
   const handlePublish = async () => {
-    if (!user) return;
+    if (!user || !content.trim()) return;
     setIsPublishing(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    await logAuditAction(user.uid, 'Published Content', { contentType, score: result?.overallScore });
-    setIsPublishing(false);
-    setPublishSuccess(true);
-    setTimeout(() => { setPublishSuccess(false); setIsPreviewingUpdate(false); }, 3000);
+    try {
+      if (userData?.cmsWebhookUrl) {
+        const payload = { content, contentType, score: result?.overallScore, rewrittenSnippet: result?.rewrittenSnippet || '', brand: userData?.brand || '', timestamp: new Date().toISOString() };
+        const res = await fetch(userData.cmsWebhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if (!res.ok) throw new Error(`Webhook returned ${res.status}`);
+        showToast('Published to your CMS via webhook.', 'success');
+      } else {
+        // No webhook — download as Markdown
+        const header = `# Content (${contentType}) — GEO Score: ${result?.overallScore ?? '?'}/100\n\n`;
+        const blob = new Blob([header + content], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `article-${Date.now()}.md`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Downloaded as Markdown. Add a CMS Webhook in Settings to publish directly.', 'info');
+      }
+      await logAuditAction(user.uid, 'Published Content', { contentType, score: result?.overallScore, method: userData?.cmsWebhookUrl ? 'webhook' : 'download' });
+      setPublishSuccess(true);
+      setTimeout(() => { setPublishSuccess(false); setIsPreviewingUpdate(false); }, 3000);
+    } catch (err: any) {
+      showToast(`Publish failed: ${err.message}`, 'error');
+    } finally {
+      setIsPublishing(false);
+    }
   };
 
   const handleSaveFacts = async () => {
@@ -264,7 +287,7 @@ export default function ContentScorerPage() {
                     <p className="text-sm text-zinc-400 mb-4">To automatically apply these changes, Auspexi needs access to your website&apos;s CMS or codebase via our secure API integration.</p>
                     <div className="flex items-center gap-3">
                       <button onClick={handlePublish} disabled={isPublishing || publishSuccess} className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
-                        {isPublishing ? <><Loader2 className="w-4 h-4 animate-spin" /> Publishing...</> : publishSuccess ? <><CheckCircle2 className="w-4 h-4" /> Published Successfully</> : <><CheckCircle2 className="w-4 h-4" /> Approve &amp; Publish</>}
+                        {isPublishing ? <><Loader2 className="w-4 h-4 animate-spin" /> Publishing...</> : publishSuccess ? <><CheckCircle2 className="w-4 h-4" /> Done</> : <><CheckCircle2 className="w-4 h-4" /> {userData?.cmsWebhookUrl ? 'Publish to CMS' : 'Download Markdown'}</>}
                       </button>
                       <button onClick={() => setIsPreviewingUpdate(false)} disabled={isPublishing} className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg text-sm font-medium transition-colors disabled:opacity-50">Cancel</button>
                     </div>

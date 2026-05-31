@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Zap, Loader2, CheckCircle2, XCircle, TrendingUp, Target, RefreshCw } from 'lucide-react';
+import { Zap, Loader2, CheckCircle2, XCircle, TrendingUp, Target, RefreshCw, Layers } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { checkTierAccess } from '@/constants/tiers';
@@ -233,6 +233,34 @@ export default function CiteProbePage() {
               )}
             </div>
           </div>
+
+          {/* Bulk process missed queries */}
+          {probeData.results.some(r => !r.cited) && (
+            <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <Layers className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold text-white">
+                    {probeData.results.filter(r => !r.cited).length} missed {probeData.results.filter(r => !r.cited).length === 1 ? 'query' : 'queries'} — process them all at once
+                  </p>
+                  <p className="text-xs text-zinc-400 mt-0.5">
+                    Sends every uncited query through the full agent pipeline (crawl → extract → schema → article) and auto-saves each result.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  const missed = probeData.results.filter(r => !r.cited).map(r => r.query);
+                  localStorage.setItem('agents_bulk_queue', JSON.stringify(missed));
+                  router.push('/dashboard/agents');
+                }}
+                className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors whitespace-nowrap shrink-0"
+              >
+                <Layers className="w-4 h-4" />
+                Process All {probeData.results.filter(r => !r.cited).length} Missed
+              </button>
+            </div>
+          )}
 
           {/* Per-platform rates */}
           {probeData.platformRates && (

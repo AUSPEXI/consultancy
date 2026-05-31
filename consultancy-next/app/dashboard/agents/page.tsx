@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, FileText, Code2, PenTool, CheckCircle2, Loader2, Play, ArrowRight, X, BrainCircuit } from 'lucide-react';
+import { Search, FileText, Code2, PenTool, CheckCircle2, Loader2, Play, ArrowRight, X, BrainCircuit, Layers } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import ReactMarkdown from 'react-markdown';
@@ -12,6 +12,7 @@ import { checkTierAccess } from '@/constants/tiers';
 import { logAuditAction } from '@/lib/audit';
 
 type AgentStatus = 'idle' | 'running' | 'completed' | 'error';
+type BulkStatus = 'pending' | 'running' | 'done' | 'error';
 
 export default function AgentsPage() {
   const { tier, userData, user, role } = useAuth();
@@ -32,13 +33,55 @@ export default function AgentsPage() {
   const [showResults, setShowResults] = useState(false);
   const [publishMsg, setPublishMsg] = useState('');
 
+  // Bulk queue
+  const [bulkQueue, setBulkQueue] = useState<{ topic: string; status: BulkStatus }[]>([]);
+  const [isBulkRunning, setIsBulkRunning] = useState(false);
+  const [bulkDoneCount, setBulkDoneCount] = useState(0);
+
+  // On mount: load queued topic, bulk queue, or last result
   useEffect(() => {
     const queued = localStorage.getItem('agents_topic');
+    const bulkRaw = localStorage.getItem('agents_bulk_queue');
+
     if (queued) {
       setTopic(queued);
       localStorage.removeItem('agents_topic');
     }
+
+    if (bulkRaw) {
+      try {
+        const queries: string[] = JSON.parse(bulkRaw);
+        if (queries.length > 0) setBulkQueue(queries.map(q => ({ topic: q, status: 'pending' })));
+      } catch (_) {}
+      localStorage.removeItem('agents_bulk_queue');
+    }
+
+    // Restore last result only when nothing new is queued
+    if (!queued && !bulkRaw) {
+      try {
+        const saved = localStorage.getItem('agents_last_result');
+        if (saved) {
+          const r = JSON.parse(saved);
+          if (r.finalArticle) {
+            setTopic(r.topic || '');
+            setExtractedFacts(r.extractedFacts || '');
+            setGeneratedSchema(r.generatedSchema || '');
+            setFinalArticle(r.finalArticle || '');
+            setCrawlerStatus('completed'); setExtractionStatus('completed');
+            setSchemaStatus('completed'); setSynthesisStatus('completed');
+            setShowResults(true);
+          }
+        }
+      } catch (_) {}
+    }
   }, []);
+
+  // Persist latest completed result
+  useEffect(() => {
+    if (showResults && finalArticle) {
+      localStorage.setItem('agents_last_result', JSON.stringify({ topic, extractedFacts, generatedSchema, finalArticle }));
+    }
+  }, [showResults, finalArticle]);
 
   if (role !== 'admin' && !checkTierAccess(tier, 'Premium')) {
     return (
@@ -57,37 +100,39 @@ export default function AgentsPage() {
     setExtractedFacts(''); setGeneratedSchema(''); setFinalArticle(''); setShowResults(false); setRateLimitWarning(''); setPublishMsg('');
   };
 
-  const runOrchestration = async () => {
-    if (!topic.trim()) return;
+  // Core pipeline — accepts optional topic override, returns results, always cleans up isOrchestrating
+  const runOrchestration = async (topicOverride?: string): Promise<{ article: string; facts: string; schema: string; topic: string }> => {
+    const effectiveTopic = (topicOverride ?? topic).trim();
+    if (!effectiveTopic) throw new Error('No topic');
+
     setIsOrchestrating(true);
     resetState();
+
     try {
       let vaultContext = '';
       if (user) {
         try {
           const { query: fsQuery, collection: fsCollection, getDocs, where } = await import('firebase/firestore');
-          // Primary: Fact Vault (user-entered verified facts)
           const qVault = fsQuery(fsCollection(db, 'facts'), where('userId', '==', user.uid));
           const vaultSnap = await getDocs(qVault);
           let factsArray = vaultSnap.docs.map(doc => (doc.data().statement as string)).filter(Boolean);
-          // Fallback: Perplexity-synced facts
           if (factsArray.length === 0) {
             const qKg = fsQuery(fsCollection(db, 'knowledge_graph'), where('userId', '==', user.uid));
             const kgSnap = await getDocs(qKg);
             factsArray = kgSnap.docs.map(doc => (doc.data().fact as string)).filter(Boolean);
           }
           if (factsArray.length > 0) vaultContext = factsArray.join('\n- ');
-        } catch (e) { console.warn('Failed to fetch vault for extraction', e); }
+        } catch (e) { console.warn('Failed to fetch vault', e); }
       }
 
       setCrawlerStatus('running');
-      const crawlRes = await fetch('/api/agent/crawl', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic }) });
+      const crawlRes = await fetch('/api/agent/crawl', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: effectiveTopic }) });
       const crawlData = await crawlRes.json();
       if (!crawlData.success) throw new Error(crawlData.error);
       setCrawlerStatus('completed');
 
       setExtractionStatus('running');
-      const extractRes = await fetch('/api/agent/extract', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic, crawlerData: crawlData.result, vaultContext }) });
+      const extractRes = await fetch('/api/agent/extract', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: effectiveTopic, crawlerData: crawlData.result, vaultContext }) });
       const extractData = await extractRes.json();
       if (!extractData.success) throw new Error(extractData.error);
       const facts = extractData.result || 'No facts extracted.';
@@ -107,23 +152,73 @@ export default function AgentsPage() {
       await new Promise(res => setTimeout(res, 5000));
 
       setSynthesisStatus('running');
-      const synthRes = await fetch('/api/agent/synthesize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic, facts, brandName: userData?.brand || '' }) });
+      const synthRes = await fetch('/api/agent/synthesize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: effectiveTopic, facts, brandName: userData?.brand || '' }) });
       const synthData = await synthRes.json();
       if (!synthData.success) throw new Error(synthData.error);
-      setFinalArticle(synthData.result || 'Failed to generate article.');
+      const article = synthData.result || 'Failed to generate article.';
+      setFinalArticle(article);
       setSynthesisStatus('completed');
       setShowResults(true);
-    } catch (error: any) {
-      console.error('Orchestration failed:', error);
-      if (error?.message?.includes('429')) setRateLimitWarning('Google API rate limit exceeded. Please wait a bit before retrying.');
-      else setRateLimitWarning(error?.message || 'Agent workflow failed. Check console for details.');
+
+      return { article, facts, schema, topic: effectiveTopic };
+    } catch (error) {
       setCrawlerStatus(prev => prev === 'running' ? 'error' : prev);
       setExtractionStatus(prev => prev === 'running' ? 'error' : prev);
       setSchemaStatus(prev => prev === 'running' ? 'error' : prev);
       setSynthesisStatus(prev => prev === 'running' ? 'error' : prev);
+      throw error;
     } finally {
       setIsOrchestrating(false);
     }
+  };
+
+  const handleRunOrchestration = async () => {
+    try {
+      await runOrchestration();
+    } catch (error: any) {
+      if (error?.message?.includes('429')) setRateLimitWarning('Google API rate limit exceeded. Please wait a bit before retrying.');
+      else setRateLimitWarning(error?.message || 'Agent workflow failed. Check console for details.');
+    }
+  };
+
+  // Bulk: runs all pending queue items in sequence, auto-saves each to Firestore
+  const runBulkQueue = async () => {
+    setIsBulkRunning(true);
+    let done = 0;
+
+    for (let i = 0; i < bulkQueue.length; i++) {
+      if (bulkQueue[i].status === 'done') { done++; continue; }
+
+      setBulkQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status: 'running' } : q));
+      try {
+        const result = await runOrchestration(bulkQueue[i].topic);
+
+        if (user) {
+          const payload = {
+            userId: user.uid, topic: result.topic, article: result.article,
+            facts: result.facts, schema: result.schema,
+            brand: userData?.brand || '', timestamp: new Date().toISOString(), source: 'bulk_run',
+          };
+          await addDoc(collection(db, 'articles'), payload);
+          await logAuditAction(user.uid, 'Bulk Article Saved', { topic: result.topic });
+          if (userData?.cmsWebhookUrl) {
+            fetch(userData.cmsWebhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(() => {});
+          }
+        }
+
+        done++;
+        setBulkDoneCount(done);
+        setBulkQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status: 'done' } : q));
+      } catch (err: any) {
+        setBulkQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status: 'error' } : q));
+        console.error('Bulk item failed:', bulkQueue[i].topic, err);
+      }
+
+      // Pause between runs to avoid rate limits
+      if (i < bulkQueue.length - 1) await new Promise(res => setTimeout(res, 4000));
+    }
+
+    setIsBulkRunning(false);
   };
 
   const handlePublishToCms = async () => {
@@ -139,10 +234,9 @@ export default function AgentsPage() {
         const webhookData = await response.json().catch(() => ({}));
         setPublishMsg(webhookData.emailed ? `Saved and pushed to your CMS (email receipt sent to ${webhookData.to}).` : 'Article saved and pushed to your CMS via webhook.');
       } else {
-        setPublishMsg('Article saved. Add a CMS Webhook URL in Settings → Integrations to automatically push articles to your website or headless CMS on publish.');
+        setPublishMsg('Article saved to Auspexi. Add a CMS Webhook URL in Settings → Integrations to automatically push to your site.');
       }
     } catch (error: any) {
-      console.error('Publish error:', error);
       setPublishMsg(`Error: ${error.message}`);
     } finally {
       setIsPublishing(false);
@@ -177,6 +271,62 @@ export default function AgentsPage() {
         <p className="text-sm text-zinc-400 mt-1">Run specialized AI crews to prevent hallucinations and generate GEO content.</p>
       </div>
 
+      {/* Bulk queue panel */}
+      {bulkQueue.length > 0 && (
+        <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Layers className="w-4 h-4 text-indigo-400" />
+              <h3 className="text-sm font-semibold text-white">Bulk Run Queue</h3>
+              <span className="text-xs text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full">
+                {bulkQueue.filter(q => q.status === 'done').length}/{bulkQueue.length} done
+              </span>
+            </div>
+            {!isBulkRunning && !bulkQueue.every(q => q.status === 'done') && (
+              <button
+                onClick={runBulkQueue}
+                disabled={isOrchestrating}
+                className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+              >
+                <Play className="w-3 h-3 fill-current" />
+                Start Bulk Run
+              </button>
+            )}
+            {bulkQueue.every(q => q.status === 'done') && (
+              <span className="text-xs text-emerald-400 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" /> All articles saved
+              </span>
+            )}
+          </div>
+          <div className="space-y-2">
+            {bulkQueue.map((item, i) => (
+              <div key={i} className="flex items-center gap-3 text-sm">
+                <div className={`w-2 h-2 rounded-full shrink-0 ${
+                  item.status === 'done' ? 'bg-emerald-400' :
+                  item.status === 'running' ? 'bg-amber-400 animate-pulse' :
+                  item.status === 'error' ? 'bg-rose-400' : 'bg-zinc-600'
+                }`} />
+                <span className={`flex-1 truncate ${item.status === 'done' ? 'text-zinc-400 line-through' : 'text-zinc-200'}`}>
+                  {item.topic}
+                </span>
+                <span className={`text-[10px] font-medium uppercase tracking-wide shrink-0 ${
+                  item.status === 'done' ? 'text-emerald-400' :
+                  item.status === 'running' ? 'text-amber-400' :
+                  item.status === 'error' ? 'text-rose-400' : 'text-zinc-600'
+                }`}>
+                  {item.status}
+                </span>
+              </div>
+            ))}
+          </div>
+          {isBulkRunning && (
+            <p className="text-xs text-zinc-500">
+              Processing queries one at a time. Each article is auto-saved to Firestore{userData?.cmsWebhookUrl ? ' and pushed to your CMS' : ''}. Do not close this tab.
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden relative p-4 sm:p-8">
         <div className="max-w-4xl mx-auto">
           {rateLimitWarning && (
@@ -192,8 +342,8 @@ export default function AgentsPage() {
           <div className="mb-12 bg-zinc-950 border border-zinc-800 rounded-xl p-6 shadow-lg">
             <h3 className="text-base font-semibold text-white mb-4">Initialize GEO Content Run</h3>
             <div className="flex gap-3">
-              <input type="text" value={topic} onChange={e => setTopic(e.target.value)} placeholder="Enter a topic (e.g., 'Serverless Edge Computing Latency')" className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50" disabled={isOrchestrating} />
-              <button onClick={runOrchestration} disabled={isOrchestrating || !topic.trim()} className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+              <input type="text" value={topic} onChange={e => setTopic(e.target.value)} placeholder="Enter a topic (e.g., 'Serverless Edge Computing Latency')" className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50" disabled={isOrchestrating || isBulkRunning} />
+              <button onClick={handleRunOrchestration} disabled={isOrchestrating || isBulkRunning || !topic.trim()} className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
                 {isOrchestrating ? <><Loader2 className="w-4 h-4 animate-spin" />Running Crew...</> : <><Play className="w-4 h-4 fill-current" />Start Workflow</>}
               </button>
             </div>
@@ -260,7 +410,7 @@ export default function AgentsPage() {
                       {publishMsg}
                     </p>
                   )}
-                  <div className="flex justify-end gap-3">
+                  <div className="flex justify-end gap-3 flex-wrap">
                     <button
                       onClick={() => {
                         localStorage.setItem('contentScorer_draft', JSON.stringify({ content: finalArticle, type: 'blog' }));
@@ -272,7 +422,7 @@ export default function AgentsPage() {
                     </button>
                     <button onClick={handlePublishToCms} disabled={isPublishing} className="bg-white hover:bg-zinc-200 disabled:opacity-50 text-black px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2">
                       {isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                      {isPublishing ? 'Publishing...' : 'Publish to Database & CMS'} <ArrowRight className="w-4 h-4" />
+                      {isPublishing ? 'Publishing...' : userData?.cmsWebhookUrl ? 'Publish to CMS' : 'Save Article'} <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
