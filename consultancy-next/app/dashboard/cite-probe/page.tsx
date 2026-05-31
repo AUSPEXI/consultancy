@@ -105,7 +105,7 @@ export default function CiteProbePage() {
       const res = await fetch('/api/cite-probe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ brand, domain, userId: user?.uid || 'anonymous' }),
+        body: JSON.stringify({ brand, domain, userId: user?.uid || 'anonymous', keywords: userData?.keywords || [] }),
       });
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || 'Probe failed');

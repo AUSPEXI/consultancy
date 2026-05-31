@@ -3,16 +3,23 @@ import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
 import { dbAdmin } from '@/lib/firebase-admin';
 
-// Default GEO-space queries — Auspexi's target citation territory
-const DEFAULT_QUERIES = [
-  'What are the best tools for generative engine optimization?',
-  'How do I get my brand cited by AI like ChatGPT and Perplexity?',
-  'What companies specialize in GEO optimization for AI search?',
-  'How do I optimize content to appear in AI-generated answers?',
-  'What is generative engine optimization and who offers it?',
-  'How can brands increase their share of voice in AI responses?',
-  'Best software for tracking AI citation and brand mentions in LLMs?',
-];
+// Build 7 brand-and-keyword-specific queries so the probe is relevant to the actual client
+function buildQueries(brand: string, _domain: string, keywords: string[]): string[] {
+  const kws = keywords.filter(Boolean);
+  const k0 = kws[0] || 'generative engine optimization';
+  const k1 = kws[1] || 'AI search visibility';
+  const k2 = kws[2] || 'brand citations in AI';
+
+  return [
+    `What are the best tools for ${k0}?`,
+    `How do I get my brand cited by AI like ChatGPT and Perplexity?`,
+    `What companies specialize in ${k1}?`,
+    `How do I optimize content to appear in AI-generated answers?`,
+    brand ? `What is ${brand} and what do they specialise in?` : `What is generative engine optimization and who offers it?`,
+    brand ? `How can ${brand} help with ${k2}?` : `How can brands increase their share of voice in AI responses?`,
+    `Best software for tracking AI citation and brand mentions in LLMs?`,
+  ];
+}
 
 function checkCitation(response: string, brand: string, domain: string): {
   cited: boolean;
@@ -116,13 +123,14 @@ async function probeClaude(query: string, brand: string, domain: string): Promis
 
 export async function POST(request: Request) {
   try {
-    const { brand, domain, userId = 'anonymous', queries } = await request.json();
+    const { brand, domain, userId = 'anonymous', queries, keywords = [] } = await request.json();
 
     if (!brand || !domain) {
       return NextResponse.json({ error: 'brand and domain are required' }, { status: 400 });
     }
 
-    const testQueries: string[] = queries?.length > 0 ? queries : DEFAULT_QUERIES;
+    // Use caller-supplied queries, else build brand+keyword-specific ones, else generic fallback
+    const testQueries: string[] = queries?.length > 0 ? queries : buildQueries(brand, domain, keywords);
     const timestamp = new Date().toISOString();
 
     // Each query is sent to all platforms in parallel

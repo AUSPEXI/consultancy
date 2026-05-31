@@ -283,8 +283,14 @@ export default function ContentScorerPage() {
               ) : (
                 <div className="space-y-4 animate-in fade-in duration-300">
                   <div className="p-4 bg-zinc-950 border border-zinc-800 rounded-lg">
-                    <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Website Integration Required</h4>
-                    <p className="text-sm text-zinc-400 mb-4">To automatically apply these changes, Auspexi needs access to your website&apos;s CMS or codebase via our secure API integration.</p>
+                    <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
+                      {userData?.cmsWebhookUrl ? 'Publish via Configured Webhook' : 'Download for Manual Publishing'}
+                    </h4>
+                    <p className="text-sm text-zinc-400 mb-4">
+                      {userData?.cmsWebhookUrl
+                        ? `This will POST the scored content to ${userData.cmsWebhookUrl}.`
+                        : 'No CMS webhook configured — the article will download as a Markdown file. Add a webhook URL in Settings to push directly to your CMS.'}
+                    </p>
                     <div className="flex items-center gap-3">
                       <button onClick={handlePublish} disabled={isPublishing || publishSuccess} className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
                         {isPublishing ? <><Loader2 className="w-4 h-4 animate-spin" /> Publishing...</> : publishSuccess ? <><CheckCircle2 className="w-4 h-4" /> Done</> : <><CheckCircle2 className="w-4 h-4" /> {userData?.cmsWebhookUrl ? 'Publish to CMS' : 'Download Markdown'}</>}
