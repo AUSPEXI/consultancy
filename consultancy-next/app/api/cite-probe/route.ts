@@ -3,43 +3,129 @@ import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
 import { dbAdmin } from '@/lib/firebase-admin';
 
-// Default GEO-space queries — Auspexi's target citation territory
-const DEFAULT_QUERIES = [
-  'What are the best tools for generative engine optimization?',
-  'How do I get my brand cited by AI like ChatGPT and Perplexity?',
-  'What companies specialize in GEO optimization for AI search?',
-  'How do I optimize content to appear in AI-generated answers?',
-  'What is generative engine optimization and who offers it?',
-  'How can brands increase their share of voice in AI responses?',
-  'Best software for tracking AI citation and brand mentions in LLMs?',
-];
+function buildQueries(brand: string, _domain: string, keywords: string[]): string[] {
+  const kws = keywords.filter(Boolean);
+  const k0 = kws[0] || 'generative engine optimization';
+  const k1 = kws[1] || 'AI search visibility';
+  const k2 = kws[2] || 'brand citations in AI';
 
-function checkCitation(response: string, brand: string, domain: string): {
+  return [
+    `What are the best tools for ${k0}?`,
+    `How do I get my brand cited by AI like ChatGPT and Perplexity?`,
+    `What companies specialize in ${k1}?`,
+    `How do I optimize content to appear in AI-generated answers?`,
+    brand ? `What is ${brand} and what do they specialise in?` : `What is generative engine optimization and who offers it?`,
+    brand ? `How can ${brand} help with ${k2}?` : `How can brands increase their share of voice in AI responses?`,
+    `Best software for tracking AI citation and brand mentions in LLMs?`,
+  ];
+}
+
+// Extract meaningful keywords from a statement, excluding stopwords
+function extractKeywords(statement: string): string[] {
+  const STOP_WORDS = new Set([
+    'the', 'and', 'for', 'are', 'this', 'that', 'with', 'they', 'have', 'from',
+    'your', 'been', 'were', 'said', 'each', 'which', 'their', 'will', 'about',
+    'would', 'there', 'could', 'other', 'into', 'more', 'also', 'than', 'them',
+    'then', 'some', 'these', 'when', 'what', 'where', 'who', 'how', 'its', 'but',
+    'not', 'any', 'can', 'our', 'was', 'has', 'had', 'his', 'her', 'all',
+  ]);
+  return statement
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .split(/\s+/)
+    .filter(w => w.length > 3 && !STOP_WORDS.has(w));
+}
+
+function checkCitation(
+  response: string,
+  brand: string,
+  domain: string,
+  knownFalses: string[] = [],
+): {
   cited: boolean;
+  accurate: boolean;
+  misinformation: string | null;
   excerpt: string | null;
 } {
   const lower = response.toLowerCase();
   const brandLower = brand.toLowerCase();
   const domainLower = domain.toLowerCase().replace(/^https?:\/\//, '');
-  const cited = lower.includes(brandLower) || lower.includes(domainLower);
-  if (!cited) return { cited: false, excerpt: null };
+
+  const NEGATIVE_PATTERNS = [
+    "couldn't find any information",
+    "could not find any information",
+    "don't have any information",
+    "do not have any information",
+    "no information about",
+    "not familiar with",
+    "not in my knowledge",
+    "outside my knowledge",
+    "i cannot find",
+    "i can't find",
+    "unable to find information",
+    "doesn't appear in my",
+    "does not appear in my",
+    "isn't a company",
+    "is not a company",
+    "let me imagine",
+    "let's imagine",
+    "hypothetically",
+    "as a hypothetical",
+    "i'll assume",
+    "i will assume",
+  ];
+
+  const hasNegative = NEGATIVE_PATTERNS.some(p => lower.includes(p));
+  const mentionsBrand = lower.includes(brandLower) || lower.includes(domainLower);
+
+  if (!mentionsBrand || hasNegative) {
+    return { cited: false, accurate: true, misinformation: null, excerpt: null };
+  }
+
   const sentences = response.split(/(?<=[.!?])\s+/);
   const match = sentences.find(s =>
     s.toLowerCase().includes(brandLower) || s.toLowerCase().includes(domainLower)
   );
-  return { cited: true, excerpt: match || null };
+
+  // Misinformation detection: keyword cluster matching against known-false statements
+  let misinformationSnippet: string | null = null;
+  if (knownFalses.length > 0) {
+    for (const falseStmt of knownFalses) {
+      const keywords = extractKeywords(falseStmt);
+      if (keywords.length < 2) continue;
+      // Require at least 40% of keywords to match (minimum 2)
+      const matchThreshold = Math.max(2, Math.floor(keywords.length * 0.4));
+      const matchCount = keywords.filter(kw => lower.includes(kw)).length;
+      if (matchCount >= matchThreshold) {
+        misinformationSnippet = sentences.find(s => {
+          const sl = s.toLowerCase();
+          return keywords.filter(kw => sl.includes(kw)).length >= 2;
+        }) || match || null;
+        break;
+      }
+    }
+  }
+
+  return {
+    cited: true,
+    accurate: misinformationSnippet === null,
+    misinformation: misinformationSnippet,
+    excerpt: match || null,
+  };
 }
 
 interface PlatformResult {
   cited: boolean;
+  accurate: boolean;
+  misinformation: string | null;
   excerpt: string | null;
   error?: string;
   skipped?: boolean;
 }
 
-async function probeGemini(query: string, brand: string, domain: string): Promise<PlatformResult> {
+async function probeGemini(query: string, brand: string, domain: string, knownFalses: string[]): Promise<PlatformResult> {
   const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
-  if (!apiKey) return { cited: false, excerpt: null, skipped: true };
+  if (!apiKey) return { cited: false, accurate: true, misinformation: null, excerpt: null, skipped: true };
   try {
     const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
@@ -48,15 +134,15 @@ async function probeGemini(query: string, brand: string, domain: string): Promis
       config: { temperature: 0.3, maxOutputTokens: 600 },
     });
     const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    return checkCitation(text, brand, domain);
+    return checkCitation(text, brand, domain, knownFalses);
   } catch (e: any) {
-    return { cited: false, excerpt: null, error: e.message };
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
   }
 }
 
-async function probeChatGPT(query: string, brand: string, domain: string): Promise<PlatformResult> {
+async function probeChatGPT(query: string, brand: string, domain: string, knownFalses: string[]): Promise<PlatformResult> {
   const apiKey = process.env.OPENAI_API_KEY || '';
-  if (!apiKey) return { cited: false, excerpt: null, skipped: true };
+  if (!apiKey) return { cited: false, accurate: true, misinformation: null, excerpt: null, skipped: true };
   try {
     const client = new OpenAI({ apiKey });
     const response = await client.chat.completions.create({
@@ -66,15 +152,15 @@ async function probeChatGPT(query: string, brand: string, domain: string): Promi
       temperature: 0.3,
     });
     const text = response.choices[0]?.message?.content || '';
-    return checkCitation(text, brand, domain);
+    return checkCitation(text, brand, domain, knownFalses);
   } catch (e: any) {
-    return { cited: false, excerpt: null, error: e.message };
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
   }
 }
 
-async function probePerplexity(query: string, brand: string, domain: string): Promise<PlatformResult> {
+async function probePerplexity(query: string, brand: string, domain: string, knownFalses: string[]): Promise<PlatformResult> {
   const apiKey = process.env.PERPLEXITY_API_KEY || '';
-  if (!apiKey) return { cited: false, excerpt: null, skipped: true };
+  if (!apiKey) return { cited: false, accurate: true, misinformation: null, excerpt: null, skipped: true };
   try {
     const client = new OpenAI({ apiKey, baseURL: 'https://api.perplexity.ai' });
     const response = await client.chat.completions.create({
@@ -83,15 +169,15 @@ async function probePerplexity(query: string, brand: string, domain: string): Pr
       max_tokens: 600,
     } as any);
     const text = response.choices[0]?.message?.content || '';
-    return checkCitation(text, brand, domain);
+    return checkCitation(text, brand, domain, knownFalses);
   } catch (e: any) {
-    return { cited: false, excerpt: null, error: e.message };
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
   }
 }
 
-async function probeClaude(query: string, brand: string, domain: string): Promise<PlatformResult> {
+async function probeClaude(query: string, brand: string, domain: string, knownFalses: string[]): Promise<PlatformResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY || '';
-  if (!apiKey) return { cited: false, excerpt: null, skipped: true };
+  if (!apiKey) return { cited: false, accurate: true, misinformation: null, excerpt: null, skipped: true };
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -108,43 +194,63 @@ async function probeClaude(query: string, brand: string, domain: string): Promis
     });
     const data = await res.json();
     const text = data.content?.[0]?.text || '';
-    return checkCitation(text, brand, domain);
+    return checkCitation(text, brand, domain, knownFalses);
   } catch (e: any) {
-    return { cited: false, excerpt: null, error: e.message };
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const { brand, domain, userId = 'anonymous', queries } = await request.json();
+    const {
+      brand, domain, userId = 'anonymous', queries, keywords = [],
+      negativeStatements: clientFalses = [],
+    } = await request.json();
 
     if (!brand || !domain) {
       return NextResponse.json({ error: 'brand and domain are required' }, { status: 400 });
     }
 
-    const testQueries: string[] = queries?.length > 0 ? queries : DEFAULT_QUERIES;
+    // Load known-false statements: prefer client-supplied, fall back to Firestore
+    let knownFalses: string[] = clientFalses;
+    if (dbAdmin && userId !== 'anonymous' && knownFalses.length === 0) {
+      try {
+        const userDoc = await dbAdmin.collection('users').doc(userId).get();
+        knownFalses = userDoc.data()?.negativeStatements || [];
+      } catch (_) {}
+    }
+
+    const testQueries: string[] = queries?.length > 0 ? queries : buildQueries(brand, domain, keywords);
     const timestamp = new Date().toISOString();
 
-    // Each query is sent to all platforms in parallel
     const queryResults = await Promise.all(
       testQueries.map(async (query) => {
         const [gemini, chatgpt, perplexity, claude] = await Promise.all([
-          probeGemini(query, brand, domain),
-          probeChatGPT(query, brand, domain),
-          probePerplexity(query, brand, domain),
-          probeClaude(query, brand, domain),
+          probeGemini(query, brand, domain, knownFalses),
+          probeChatGPT(query, brand, domain, knownFalses),
+          probePerplexity(query, brand, domain, knownFalses),
+          probeClaude(query, brand, domain, knownFalses),
         ]);
 
         const platforms = { gemini, chatgpt, perplexity, claude };
         const active = Object.values(platforms).filter(p => !p.skipped);
         const citedOnAny = active.some(p => p.cited);
-        const firstExcerpt = active.find(p => p.cited && p.excerpt)?.excerpt || null;
+        const hasMisinformation = active.some(p => p.cited && !p.accurate);
+        // Prefer a verified-accurate excerpt; fall back to any excerpt
+        const firstExcerpt = active.find(p => p.cited && p.accurate && p.excerpt)?.excerpt
+          || active.find(p => p.cited && p.excerpt)?.excerpt || null;
+        const misinformationSnippet = active.find(p => p.misinformation)?.misinformation || null;
 
-        return { query, cited: citedOnAny, excerpt: firstExcerpt, platforms, timestamp };
+        return {
+          query, cited: citedOnAny,
+          accurate: !hasMisinformation,
+          misinformation: misinformationSnippet,
+          excerpt: firstExcerpt,
+          platforms, timestamp,
+        };
       })
     );
 
-    // Per-platform citation rates (null = API key not configured)
     const platformNames = ['gemini', 'chatgpt', 'perplexity', 'claude'] as const;
     const platformRates: Record<string, number | null> = {};
     for (const p of platformNames) {
@@ -160,11 +266,12 @@ export async function POST(request: Request) {
       : 0;
 
     const citedCount = queryResults.filter(r => r.cited).length;
+    const misinformationCount = queryResults.filter(r => r.cited && !r.accurate).length;
     const activePlatforms = activeRates.length;
 
     const probeResult = {
       brand, domain, userId, timestamp,
-      citationRate, citedCount,
+      citationRate, citedCount, misinformationCount,
       totalQueries: testQueries.length,
       activePlatforms, platformRates,
       results: queryResults,
@@ -173,20 +280,12 @@ export async function POST(request: Request) {
     if (dbAdmin && userId !== 'anonymous') {
       try {
         await dbAdmin.collection('citation_tests').add(probeResult);
-        // Log the probe action for the training data pipeline (action → outcome join)
         dbAdmin.collection('audit_logs').add({
           userId,
           action: 'Ran Citation Probe',
-          details: {
-            citationRate,
-            citedCount,
-            totalQueries: testQueries.length,
-            activePlatforms,
-            platformRates,
-          },
+          details: { citationRate, citedCount, misinformationCount, totalQueries: testQueries.length, activePlatforms, platformRates },
           timestamp: new Date().toISOString(),
         }).catch(() => {});
-        // Estimated cost across active platforms
         const cost =
           (platformRates.gemini !== null ? (testQueries.length * 500 / 1_000_000) * 0.40 : 0) +
           (platformRates.chatgpt !== null ? (testQueries.length * 800 / 1_000_000) * 0.60 : 0) +

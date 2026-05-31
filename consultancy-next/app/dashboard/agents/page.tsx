@@ -174,7 +174,7 @@ export default function AgentsPage() {
       await new Promise(res => setTimeout(res, 5000));
 
       setSynthesisStatus('running');
-      const synthRes = await fetch('/api/agent/synthesize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: effectiveTopic, facts, brandName: userData?.brand || '' }) });
+      const synthRes = await fetch('/api/agent/synthesize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: effectiveTopic, facts, brandName: userData?.brand || '', negativeStatements: userData?.negativeStatements || [] }) });
       const synthData = await synthRes.json();
       if (!synthData.success) throw new Error(synthData.error);
       const article = synthData.result || 'Failed to generate article.';
