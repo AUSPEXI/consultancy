@@ -84,6 +84,7 @@ export default function OverviewPage() {
   );
 
   const [metrics, setMetrics] = useState<any[]>([]);
+  const [citationData, setCitationData] = useState<any>(null);
   const [isAuditing, setIsAuditing] = useState(false);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const [shadowUrl, setShadowUrl] = useState('');
@@ -124,6 +125,21 @@ export default function OverviewPage() {
     }, (error) => {
       handleFirestoreError(error, OperationType.LIST, 'sovMetrics');
     });
+    return () => unsubscribe();
+  }, [user, tier]);
+
+  // Real citation data — actual LLM queries, not estimates
+  useEffect(() => {
+    if (!user || !checkTierAccess(tier, 'Basic')) return;
+    const q = query(
+      collection(db, 'citation_tests'),
+      where('userId', '==', user.uid),
+      orderBy('timestamp', 'desc'),
+      limit(1)
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) setCitationData({ id: snapshot.docs[0].id, ...snapshot.docs[0].data() });
+    }, () => {});
     return () => unsubscribe();
   }, [user, tier]);
 
@@ -291,11 +307,35 @@ export default function OverviewPage() {
   const lp = safeLatest.platforms || {};
   const safePlatforms = { chatgpt: lp.chatgpt || (safeLatest.aSov > 0 ? safeLatest.aSov + 15 : 20), perplexity: lp.perplexity || (safeLatest.aSov > 0 ? Math.max(2, safeLatest.aSov - 25) : 10), claude: lp.claude || (safeLatest.aSov > 0 ? safeLatest.aSov + 5 : 15), gemini: lp.gemini || (safeLatest.aSov > 0 ? safeLatest.aSov + 25 : 30) };
   const finalPlatformSync = Math.round((safePlatforms.chatgpt + safePlatforms.claude + safePlatforms.gemini) / 3);
+
+  // Citation Probe data — real measurements from actual LLM queries
+  const cpRates = citationData?.platformRates as Record<string, number | null> | undefined;
+  const cpRate = citationData?.citationRate as number | undefined;
+  const cpCited = citationData?.citedCount as number | undefined;
+  const cpTotal = citationData?.totalQueries as number | undefined;
+
+  // Per-platform rates: prefer Citation Probe (real), fall back to sovMetrics (estimated)
+  const activePlatforms = cpRates ? {
+    chatgpt: cpRates.chatgpt ?? null,
+    perplexity: cpRates.perplexity ?? null,
+    claude: cpRates.claude ?? null,
+    gemini: cpRates.gemini ?? null,
+  } : safePlatforms;
+  const activePlatformValues = Object.values(activePlatforms).filter((v): v is number => v !== null && v !== undefined);
+  const displayPlatformSync = activePlatformValues.length > 0
+    ? Math.round(activePlatformValues.reduce((a, b) => a + b, 0) / activePlatformValues.length)
+    : finalPlatformSync;
+
+  // A-SoV: Citation Probe citationRate IS share of voice (% of queries that cited the brand)
+  const displayAsov = cpRate !== undefined ? Math.round(cpRate) : Math.round(safeLatest.aSov);
+  const asovSource = cpRate !== undefined ? '● CITE-PROBE' : metrics.length > 0 ? '◌ ESTIMATED' : '◌ SIMULATED';
+  const platSource = cpRates ? '● CITE-PROBE' : metrics.length > 0 ? '◌ ESTIMATED' : '◌ SIMULATED';
+
   const platformData = [
-    { name: 'ChatGPT', visibility: Math.min(100, Math.max(0, safePlatforms.chatgpt)), fill: '#10a37f' },
-    { name: 'Perplexity', visibility: Math.min(100, Math.max(0, safePlatforms.perplexity)), fill: '#22d3ee' },
-    { name: 'Claude', visibility: Math.min(100, Math.max(0, safePlatforms.claude)), fill: '#d97757' },
-    { name: 'Google AI', visibility: Math.min(100, Math.max(0, safePlatforms.gemini)), fill: '#4285f4' },
+    { name: 'ChatGPT', visibility: Math.min(100, Math.max(0, activePlatforms.chatgpt ?? safePlatforms.chatgpt)), fill: '#10a37f' },
+    { name: 'Perplexity', visibility: Math.min(100, Math.max(0, activePlatforms.perplexity ?? safePlatforms.perplexity)), fill: '#22d3ee' },
+    { name: 'Claude', visibility: Math.min(100, Math.max(0, activePlatforms.claude ?? safePlatforms.claude)), fill: '#d97757' },
+    { name: 'Google AI', visibility: Math.min(100, Math.max(0, activePlatforms.gemini ?? safePlatforms.gemini)), fill: '#4285f4' },
   ];
 
   const chartData = metrics.length > 0 ? metrics.slice(-5) : displayData.slice(-5);
@@ -391,16 +431,17 @@ export default function OverviewPage() {
       <TooltipProvider>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'A-SOV Dominance', value: Math.round(safeLatest.aSov), color: '#ec4899', icon: Target, desc: 'Absolute Share of Voice - % of AI responses dominated by your brand' },
-            { label: 'Entity Recall', value: Math.round(safeLatest.err), color: '#a855f7', icon: BrainCircuit, desc: 'Entity Recall Rate - how often specific facts about your brand are correctly retrieved' },
-            { label: 'Platform Sync', value: finalPlatformSync, color: '#3b82f6', icon: Activity, desc: 'Across-model consistency index' },
-            { label: 'Sentiment Index', value: 78, color: '#10b981', icon: TrendingUp, desc: 'Average qualitative sentiment score across tracked vectors' },
+            { label: 'A-SOV Dominance', value: displayAsov, color: '#ec4899', icon: Target, source: asovSource, desc: cpRate !== undefined ? `Citation Probe: ${cpCited} of ${cpTotal} queries cited your brand` : 'Absolute Share of Voice — run Citation Probe for real data' },
+            { label: 'Entity Recall', value: Math.round(safeLatest.err), color: '#a855f7', icon: BrainCircuit, source: metrics.length > 0 ? '◌ ESTIMATED' : '◌ SIMULATED', desc: 'Gemini-estimated — run Citation Probe with fact-specific queries for real ERR' },
+            { label: 'Platform Sync', value: displayPlatformSync, color: '#3b82f6', icon: Activity, source: platSource, desc: cpRates ? 'Average citation rate across ChatGPT, Claude, Gemini, Perplexity (Citation Probe)' : 'Across-model consistency — run Citation Probe for real data' },
+            { label: 'Sentiment Index', value: 78, color: '#10b981', icon: TrendingUp, source: '◌ ESTIMATED', desc: 'Average qualitative sentiment score across tracked vectors' },
           ].map((dial, i) => (
             <UITooltip key={i}>
               <TooltipTrigger asChild>
                 <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden group hover:border-zinc-700 transition-all cursor-help">
                   <RacingDial value={dial.value} label={dial.label} color={dial.color} />
                   <div className="absolute top-4 right-4 opacity-40 group-hover:opacity-100 transition-opacity"><dial.icon className="w-4 h-4 text-zinc-400" /></div>
+                  <span className={`text-[9px] font-mono mt-1 ${dial.source.startsWith('●') ? 'text-emerald-500' : 'text-zinc-600'}`}>{dial.source}</span>
                 </div>
               </TooltipTrigger>
               <TooltipContent className="max-w-[200px] text-center z-[200] bg-black border-zinc-800 text-zinc-200 shadow-2xl font-medium"><p>{dial.desc}</p></TooltipContent>
@@ -411,14 +452,15 @@ export default function OverviewPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[
-          { label: 'Competitor Gap', value: `${safeLatest.compGap > 0 ? '+' : ''}${Math.round(safeLatest.compGap)}%`, trend: `${gapTrend >= 0 ? '+' : ''}${gapTrend} pts`, icon: TrendingUp, color: 'text-blue-400', desc: 'Margin over top enterprise rival' },
-          { label: 'AI Referral Clicks', value: safeLatest.aiTraffic.toLocaleString(), trend: `${trafficTrend >= 0 ? '+' : ''}${trafficTrend}`, icon: Users, color: 'text-emerald-400', desc: 'Direct attributed sessions from generative responses' },
+          { label: 'Competitor Gap', value: `${safeLatest.compGap > 0 ? '+' : ''}${Math.round(safeLatest.compGap)}%`, trend: `${gapTrend >= 0 ? '+' : ''}${gapTrend} pts`, source: '◌ ESTIMATED', icon: TrendingUp, color: 'text-blue-400', desc: 'Estimated gap vs top competitor — run competitor Citation Probe for real data' },
+          { label: 'Citations Found', value: cpCited !== undefined ? `${cpCited} / ${cpTotal}` : '— / —', trend: cpRate !== undefined ? `${Math.round(cpRate)}% rate` : 'Run Citation Probe', source: cpCited !== undefined ? '● CITE-PROBE' : '◌ NO DATA', icon: Users, color: 'text-emerald-400', desc: cpCited !== undefined ? 'Queries where your brand was cited by LLMs' : 'Run Citation Probe to measure real brand citations across LLMs' },
         ].map((kpi, i) => (
           <div key={i} className="bg-zinc-900/40 border border-zinc-800/60 rounded-xl p-5 flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">{kpi.label}</span>
                 <span className={`text-[10px] font-mono ${(kpi.trend.startsWith('+') || kpi.trend.includes('+')) ? 'text-emerald-500' : 'text-rose-500'}`}>{kpi.trend}</span>
+                <span className={`text-[9px] font-mono ${(kpi as any).source?.startsWith('●') ? 'text-emerald-500' : 'text-zinc-600'}`}>{(kpi as any).source}</span>
               </div>
               <div className="flex items-baseline gap-3">
                 <span className="text-2xl font-black text-white">{kpi.value}</span>
