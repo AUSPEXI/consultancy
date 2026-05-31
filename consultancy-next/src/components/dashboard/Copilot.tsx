@@ -25,14 +25,15 @@ function getAIClient(): GoogleGenAI {
   return aiClient;
 }
 
-// Fetch the real Gemini key and return a direct client for WebSocket (Live API).
-// Railway is HTTP-only — it cannot proxy WebSocket upgrades, so voice connects directly to Google.
+// Obtain a short-lived ephemeral token from the server (real key stays server-side).
+// The token is single-use and expires shortly — safe to use in the browser.
+// Requires v1alpha which is the only version that supports ephemeral tokens.
 async function buildLiveClient(): Promise<GoogleGenAI> {
-  const res = await fetch('/api/live-token');
-  if (!res.ok) throw new Error(`Failed to get voice API key (${res.status})`);
-  const { key, error } = await res.json();
-  if (!key) throw new Error(error || 'Voice API key not configured on server');
-  return new GoogleGenAI({ apiKey: key });
+  const res = await fetch('/api/live-token', { method: 'POST' });
+  if (!res.ok) throw new Error(`Voice token request failed (${res.status})`);
+  const { token, error } = await res.json();
+  if (!token) throw new Error(error || 'Voice token not returned from server');
+  return new GoogleGenAI({ apiKey: token, httpOptions: { apiVersion: 'v1alpha' } });
 }
 
 // Audio helpers
