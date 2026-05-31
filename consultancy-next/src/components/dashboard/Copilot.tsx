@@ -126,6 +126,9 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
   const chatRef = useRef<any>(null);
   const isOutputtingRef = useRef<boolean>(false);
   const echoCooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isManualDisconnectRef = useRef(false);
+  const reconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const toggleVoiceRef = useRef<(() => Promise<void>) | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -407,6 +410,7 @@ ${CITACIOUS_GEO_KNOWLEDGE}
 ${knowledgeContext}`;
 
   const disconnectVoice = () => {
+    if (reconnectTimerRef.current) { clearTimeout(reconnectTimerRef.current); reconnectTimerRef.current = null; }
     if (sessionRef.current) {
       sessionRef.current.close();
       sessionRef.current = null;
@@ -435,9 +439,12 @@ ${knowledgeContext}`;
 
   const toggleVoice = async () => {
     if (isVoiceActive || isConnectingVoice) {
+      isManualDisconnectRef.current = true;
       disconnectVoice();
       return;
     }
+
+    isManualDisconnectRef.current = false;
 
     try {
       setIsConnectingVoice(true);
@@ -630,10 +637,27 @@ registerProcessor('pcm-capture', PCMCaptureProcessor);
           },
           onclose: (event?: any) => {
             console.warn('[Voice] Session closed — code:', event?.code, 'reason:', event?.reason || '(none)');
-            if (event?.code && event.code !== 1000) {
-              setMessages(prev => [...prev, { role: 'model', content: `Voice session closed (code ${event.code}${event.reason ? ': ' + event.reason : ''}). Click the mic to reconnect.` }]);
+            // Null the ref immediately — session is already closed by the server
+            sessionRef.current = null;
+            if (isManualDisconnectRef.current) return; // user-initiated, cleanup already done
+
+            // Server-initiated close — clean up audio/mic resources
+            if (scriptProcessorRef.current) { scriptProcessorRef.current.disconnect(); scriptProcessorRef.current = null; }
+            if (mediaStreamRef.current) { mediaStreamRef.current.getTracks().forEach(t => t.stop()); mediaStreamRef.current = null; }
+            if (audioContextRef.current) { audioContextRef.current.close(); audioContextRef.current = null; }
+            if (playbackContextRef.current) { playbackContextRef.current.close(); playbackContextRef.current = null; }
+            stopAllSources();
+            setIsVoiceActive(false);
+            setIsConnectingVoice(false);
+            setIsSpeaking(false);
+
+            const code = event?.code ?? 1000;
+            if (code === 1011) {
+              setMessages(prev => [...prev, { role: 'model', content: 'Session refreshed — reconnecting...' }]);
+              reconnectTimerRef.current = setTimeout(() => toggleVoiceRef.current?.(), 1500);
+            } else if (code !== 1000) {
+              setMessages(prev => [...prev, { role: 'model', content: 'Voice session ended. Click the mic button to reconnect.' }]);
             }
-            disconnectVoice();
           },
           onerror: (err: any) => {
             console.error('[Voice] Live API error:', err);
@@ -656,6 +680,9 @@ registerProcessor('pcm-capture', PCMCaptureProcessor);
       disconnectVoice();
     };
   }, []);
+
+  // Keep ref to latest toggleVoice so onclose auto-reconnect always calls current version
+  useEffect(() => { toggleVoiceRef.current = toggleVoice; });
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;

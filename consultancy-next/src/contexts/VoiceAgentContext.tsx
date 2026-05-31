@@ -73,6 +73,9 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
   const cachedFactsRef = useRef<string[]>([]);
   const isOutputtingRef = useRef<boolean>(false);
   const echoCooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isManualDisconnectRef = useRef(false);
+  const reconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const connectRef = useRef<(() => Promise<void>) | null>(null);
 
   const stopAllSources = () => {
     activeSourcesRef.current.forEach(source => {
@@ -209,6 +212,7 @@ ${conversationText}`,
   };
 
   const connect = async () => {
+    isManualDisconnectRef.current = false;
     try {
       setIsConnecting(true);
       setError(null);
@@ -409,7 +413,25 @@ ${visitorContext}`;
             const base64Audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
             if (base64Audio) playAudio(base64Audio);
           },
-          onclose: () => { disconnect(); },
+          onclose: (event?: any) => {
+            console.warn('[Aura] Session closed — code:', event?.code, 'reason:', event?.reason || '(none)');
+            sessionRef.current = null;
+            if (isManualDisconnectRef.current) return;
+
+            if (scriptProcessorRef.current) { scriptProcessorRef.current.disconnect(); scriptProcessorRef.current = null; }
+            if (mediaStreamRef.current) { mediaStreamRef.current.getTracks().forEach(t => t.stop()); mediaStreamRef.current = null; }
+            if (audioContextRef.current) { audioContextRef.current.close(); audioContextRef.current = null; }
+            stopAllSources();
+            setIsConnected(false);
+            setIsConnecting(false);
+
+            const code = (event as any)?.code ?? 1000;
+            if (code === 1011) {
+              reconnectTimerRef.current = setTimeout(() => connectRef.current?.(), 1500);
+            } else if (code !== 1000) {
+              setError('Voice session ended. Tap the mic to reconnect.');
+            }
+          },
           onerror: (err) => {
             console.error("Live API Error:", err);
             setError("Connection error occurred.");
@@ -427,6 +449,8 @@ ${visitorContext}`;
   };
 
   const disconnect = () => {
+    isManualDisconnectRef.current = true;
+    if (reconnectTimerRef.current) { clearTimeout(reconnectTimerRef.current); reconnectTimerRef.current = null; }
     if (transcriptRef.current.length > 0) {
       processTranscriptAndExtractKnowledge([...transcriptRef.current]);
       transcriptRef.current = [];
@@ -443,6 +467,9 @@ ${visitorContext}`;
   useEffect(() => {
     return () => { disconnect(); };
   }, []);
+
+  // Keep ref to latest connect so onclose auto-reconnect always calls current version
+  useEffect(() => { connectRef.current = connect; });
 
   return (
     <VoiceAgentContext.Provider value={{ isConnected, isConnecting, isSpeaking, error, connect, disconnect }}>
