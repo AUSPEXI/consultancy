@@ -47,7 +47,7 @@ const RacingDial = ({ value, label, color = "#ec4899", size = "sm" }: { value: n
   return (
     <div className="flex flex-col items-center">
       <div className={`relative ${isLarge ? 'w-48 h-28' : 'w-32 h-20'}`}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <PieChart>
             <Pie data={data} cx="50%" cy="100%" startAngle={180} endAngle={0} innerRadius={isLarge ? 60 : 40} outerRadius={isLarge ? 80 : 55} paddingAngle={0} dataKey="value" stroke="none" />
           </PieChart>
@@ -434,7 +434,7 @@ export default function OverviewPage() {
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
           <div className="mb-6"><h3 className="text-base font-semibold text-white">Absolute Share of Voice (A-SOV)</h3><p className="text-xs text-zinc-400 mt-1">Your exact response dominance across all LLM matrices.</p></div>
           <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <AreaChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs><linearGradient id="colorBrand" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#ec4899" stopOpacity={0.3}/><stop offset="95%" stopColor="#ec4899" stopOpacity={0}/></linearGradient></defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
@@ -451,7 +451,7 @@ export default function OverviewPage() {
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
           <div className="mb-6"><h3 className="text-base font-semibold text-white">Entity Recall Rate & AI Traffic</h3><p className="text-xs text-zinc-400 mt-1">Proof that injecting Facts into the Vault creates actual referral clicks.</p></div>
           <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <ComposedChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                 <XAxis dataKey="shortDate" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
@@ -468,7 +468,7 @@ export default function OverviewPage() {
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
           <div className="mb-6"><h3 className="text-base font-semibold text-white">Competitive Citation Dominance</h3><p className="text-xs text-zinc-400 mt-1">Relative neural dominance per vector: Brands vs Nearest Enterprise Rival.</p></div>
           <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <BarChart data={computedRadarData} layout="vertical" margin={{ top: 5, right: 30, left: 100, bottom: 5 }} stackOffset="sign">
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={false} />
                 <XAxis type="number" hide domain={[-100, 100]} />
@@ -489,7 +489,7 @@ export default function OverviewPage() {
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
           <div className="mb-6"><h3 className="text-base font-semibold text-white">Platform-Specific Visibility</h3><p className="text-xs text-zinc-400 mt-1">Breakdown of A-SOV across major AI engines.</p></div>
           <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <BarChart data={platformData} layout="vertical" margin={{ top: 10, right: 30, left: 20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={false} />
                 <XAxis type="number" domain={[0, 100]} stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}%`} />
@@ -583,7 +583,7 @@ export default function OverviewPage() {
             {scorecardData.map((item: any, idx: number) => (
               <div key={idx} className="flex items-center justify-between border-b border-zinc-800/50 pb-4 last:border-0 last:pb-0">
                 <div className="overflow-hidden pr-4 max-w-[55%]"><p className="text-sm font-medium text-zinc-200 truncate">{item.url}</p><p className="text-xs text-zinc-500 mt-1">Citation Freq: {item.citations} <span className={item.trend.startsWith('+') ? 'text-emerald-400' : 'text-rose-400'}>({item.trend})</span></p></div>
-                <div className="w-24 h-10"><ResponsiveContainer width="100%" height="100%"><LineChart data={item.metrics.map((v: number) => ({ value: v }))}><Line type="monotone" dataKey="value" stroke={item.trend.startsWith('-') ? '#f43f5e' : '#10b981'} strokeWidth={2} dot={{ r: 2, fill: item.trend.startsWith('-') ? '#f43f5e' : '#10b981', strokeWidth: 0 }} /></LineChart></ResponsiveContainer></div>
+                <div className="w-24 h-10"><ResponsiveContainer width="100%" height="100%" minWidth={0}><LineChart data={item.metrics.map((v: number) => ({ value: v }))}><Line type="monotone" dataKey="value" stroke={item.trend.startsWith('-') ? '#f43f5e' : '#10b981'} strokeWidth={2} dot={{ r: 2, fill: item.trend.startsWith('-') ? '#f43f5e' : '#10b981', strokeWidth: 0 }} /></LineChart></ResponsiveContainer></div>
               </div>
             ))}
           </div>
@@ -607,7 +607,7 @@ export default function OverviewPage() {
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
           <div className="mb-6"><h3 className="text-base font-semibold text-white">LLM Conversion Pipeline</h3><p className="text-xs text-zinc-400 mt-1">Attribution funnel for AI-referred traffic.</p></div>
           <div className="h-[280px] w-full mt-2">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <ComposedChart data={[
                 { stage: 'AI Citations', amount: Math.round(500 + safeLatest.aSov * 10), fill: '#3b82f6' },
                 { stage: 'AI Referral Clicks', amount: Math.round(safeLatest.aiTraffic), fill: '#8b5cf6' },

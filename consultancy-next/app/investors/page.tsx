@@ -187,7 +187,7 @@ function MarginExpansionChart() {
       </div>
 
       <div className="h-[250px] w-full mb-8">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <AreaChart data={MARGIN_EXPANSION_DATA}>
             <defs>
               <linearGradient id="marginGrad" x1="0" y1="0" x2="0" y2="1">
@@ -839,7 +839,7 @@ export default function InvestorHubPage() {
                       <TrendingUp className="w-6 h-6 text-pink-500" />
                     </div>
                     <div className="h-[300px] w-full">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                         <AreaChart data={REVENUE_DATA}>
                           <defs>
                             <linearGradient id="colorArr" x1="0" y1="0" x2="0" y2="1">
@@ -1104,7 +1104,7 @@ export default function InvestorHubPage() {
                   <div className={`p-8 bg-zinc-900 rounded-3xl ${NEON}`}>
                     <h3 className="text-xl font-bold text-white mb-6">Use of Funds</h3>
                     <div className="h-[200px] mb-8">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                         <BarChart layout="vertical" data={USE_OF_FUNDS} margin={{ left: 80 }}>
                           <XAxis type="number" hide />
                           <YAxis dataKey="name" type="category" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />

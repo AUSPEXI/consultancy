@@ -123,7 +123,7 @@ export function SyntheticDataPanel() {
                   </div>
                 </div>
                 <div className="h-[260px]">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <LineChart data={data.sovTimeSeries} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                       <XAxis dataKey="month" stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} />
@@ -152,7 +152,7 @@ export function SyntheticDataPanel() {
                 <div>
                   <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">Average SOV by Brand</h4>
                   <div className="h-[160px]">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                       <BarChart data={data.sovByBrand} margin={{ top: 0, right: 0, bottom: 0, left: -20 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                         <XAxis dataKey="brand" stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} />
@@ -203,7 +203,7 @@ export function SyntheticDataPanel() {
                   ];
                   return (
                     <div className="h-[200px]">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                         <RadarChart data={radarData}>
                           <PolarGrid stroke="#27272a" />
                           <PolarAngleAxis dataKey="subject" tick={{ fill: '#a1a1aa', fontSize: 11 }} />
@@ -217,7 +217,7 @@ export function SyntheticDataPanel() {
 
                 {/* Grouped bar for all brands */}
                 <div className="h-[220px]">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <BarChart
                       data={selectedBrand === 'All' ? data.platformByBrand : data.platformByBrand.filter(p => p.brand === selectedBrand)}
                       margin={{ top: 0, right: 0, bottom: 0, left: -20 }}
@@ -296,7 +296,7 @@ export function SyntheticDataPanel() {
                 <div className="pt-4 border-t border-zinc-800">
                   <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">Citation Rate by AI Engine</h4>
                   <div className="h-[120px]">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                       <BarChart data={data.citationByEngine} margin={{ top: 0, right: 0, bottom: 0, left: -20 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                         <XAxis dataKey="engine" stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} />
@@ -359,7 +359,7 @@ export function SyntheticDataPanel() {
                   <p className="text-xs text-zinc-500 mt-0.5">5 dimensions · averaged across all content types</p>
                 </div>
                 <div className="h-[240px]">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <BarChart data={data.contentScores} margin={{ top: 0, right: 0, bottom: 0, left: -20 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                       <XAxis dataKey="brand" stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} />
