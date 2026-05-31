@@ -20,14 +20,18 @@ function getAIClient(): GoogleGenAI {
   return aiClient;
 }
 
-// Voice uses the Railway WebSocket proxy (auspexi-genai-proxy-production.up.railway.app).
-// The proxy injects the real Gemini key server-side — the browser only sends 'dummy'.
-// Railway can handle WebSocket upgrades; Next.js API routes cannot.
-function getLiveProxyClient(): GoogleGenAI {
-  let proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
-    `${window.location.protocol}//${window.location.host}/api/genai`;
-  if (!proxyUrl.startsWith('http')) proxyUrl = 'https://' + proxyUrl;
-  return new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl, apiVersion: 'v1alpha' } });
+// The Live API requires a direct browser→Google WebSocket (can't be proxied via HTTP).
+// Key is gated behind Firebase auth on the server — only returned to signed-in users.
+async function fetchLiveClient(): Promise<GoogleGenAI> {
+  const idToken = await auth?.currentUser?.getIdToken();
+  if (!idToken) throw new Error('You must be signed in to use voice');
+  const res = await fetch('/api/live-token', {
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
+  if (!res.ok) throw new Error(`Voice API unavailable (${res.status})`);
+  const { key, error } = await res.json();
+  if (!key) throw new Error(error || 'Voice API key not configured on server');
+  return new GoogleGenAI({ apiKey: key, httpOptions: { apiVersion: 'v1alpha' } });
 }
 
 // Audio helpers
@@ -435,7 +439,7 @@ ${knowledgeContext}`;
 
     try {
       setIsConnectingVoice(true);
-      const ai = getLiveProxyClient();
+      const ai = await fetchLiveClient();
 
       const sessionPromise = ai.live.connect({
         model: "gemini-2.5-flash-native-audio-latest",
