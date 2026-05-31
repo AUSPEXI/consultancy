@@ -247,7 +247,7 @@ YOUR TONE:
 - Keep answers to 2-4 sentences unless more detail is clearly needed.
 - If you don't know something, say so and offer to connect them with the team at sales@auspexi.com.
 
-NAVIGATION: Use navigateToPage when a visitor asks to go somewhere or when it would help. Valid pages: home, about, blog, faq, resources, roadmap, voice-agents, pricing.
+NAVIGATION: Use navigateToPage when a visitor asks to go somewhere or when it would help. Valid pages: home, about, blog, faq, resources, roadmap, voice-agents, pricing, features.
 ${visitorContext}`;
 
       const sessionPromise = ai.live.connect({
@@ -263,21 +263,12 @@ ${visitorContext}`;
           tools: [{
             functionDeclarations: [
               {
-                name: "searchFactVault",
-                description: "Searches the user's Fact-Vault database for specific facts or knowledge.",
-                parameters: {
-                  type: Type.OBJECT,
-                  properties: { query: { type: Type.STRING, description: "The search term to look for in their facts." } },
-                  required: ["query"]
-                }
-              },
-              {
                 name: "navigateToPage",
                 description: "Navigates the user's browser to a specific page on the Auspexi website.",
                 parameters: {
                   type: Type.OBJECT,
                   properties: {
-                    page: { type: Type.STRING, description: "Page to navigate to: 'pricing', 'features', 'blog', 'faq', 'home', 'voice-agents', 'about'" }
+                    page: { type: Type.STRING, description: "Page to navigate to: 'home', 'about', 'blog', 'faq', 'resources', 'roadmap', 'voice-agents', 'pricing', 'features'" }
                   },
                   required: ["page"]
                 }
@@ -348,8 +339,11 @@ ${visitorContext}`;
                   let hash = "";
                   if (page === "pricing") { path = "/"; hash = "#pricing"; }
                   else if (page === "features") { path = "/"; hash = "#features"; }
+                  else if (page === "home") path = "/";
                   else if (page === "blog") path = "/blog";
                   else if (page === "faq") path = "/faq";
+                  else if (page === "resources") path = "/resources";
+                  else if (page === "roadmap") path = "/roadmap";
                   else if (page === "voice-agents") path = "/voice-agents";
                   else if (page === "about") path = "/about";
                   router.push(path + hash);
@@ -381,18 +375,6 @@ ${visitorContext}`;
                       session.sendToolResponse({
                         functionResponses: [{ id: call.id, name: call.name, response: { result: "Failed to send call log due to a network error." } }]
                       });
-                    });
-                  });
-                } else if (call.name === "searchFactVault") {
-                  const queryTerm = ((call.args as any).query || "").toLowerCase();
-                  const matches = cachedFactsRef.current.filter(f => f.toLowerCase().includes(queryTerm));
-                  const topMatches = matches.length > 0 ? matches.slice(0, 3) : cachedFactsRef.current.slice(0, 3);
-                  const resultText = topMatches.length > 0
-                    ? "Found these relevant facts in the Fact-Vault:\n" + topMatches.map(f => "- " + f).join("\n")
-                    : "No specific facts found matching that query. Rely on general knowledge.";
-                  sessionPromise.then((session) => {
-                    session.sendToolResponse({
-                      functionResponses: [{ id: call.id, name: call.name, response: { result: resultText } }]
                     });
                   });
                 }
