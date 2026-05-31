@@ -2276,19 +2276,25 @@ async function setupFrontendAndStart() {
         console.log('[WS Proxy] Original Path:', path);
         
         let newPath = path.replace('/api/genai', '');
-        const key = process.env.VITE_GEMINI_API_KEY || process.env.GEMINI_LIVE_API_KEY || process.env.GEMINI_API_KEY;
-        
+        const key = process.env.GEMINI_LIVE_API_KEY || process.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+
+        if (!key) {
+          console.error('[WS Proxy] ERROR: No Gemini API key set in Railway env vars (GEMINI_LIVE_API_KEY / VITE_GEMINI_API_KEY / GEMINI_API_KEY)');
+        } else {
+          console.log('[WS Proxy] Using key:', key.slice(0, 8) + '...' + key.slice(-4));
+        }
+
         // Remove any existing key to avoid duplication or conflicts
         newPath = newPath.replace(/([?&])key=[^&]*/, '$1').replace(/&$/, '').replace(/\?$/, '');
-        
+
         // Append the server-side key
         if (newPath.includes('?')) {
           newPath = `${newPath}&key=${key}`;
         } else {
           newPath = `${newPath}?key=${key}`;
         }
-        
-        console.log('[WS Proxy] Rewritten Path:', newPath);
+
+        console.log('[WS Proxy] Rewritten Path:', newPath.replace(/key=[^&]+/, 'key=***'));
         return newPath;
       }
     });
