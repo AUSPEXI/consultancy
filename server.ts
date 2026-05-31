@@ -223,6 +223,27 @@ app.use(express.json());
     res.json({ status: "ok", message: "Auspexi Backend is running" });
   });
 
+  // Diagnostic: shows which Gemini key Railway has and whether it has Live API access.
+  // Visit https://auspexi-genai-proxy-production.up.railway.app/api/voice-key-check
+  app.get("/api/voice-key-check", async (req, res) => {
+    const key = process.env.GEMINI_LIVE_API_KEY || process.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY || '';
+    if (!key) {
+      return res.json({ error: 'No Gemini key set in Railway env vars', checked: ['GEMINI_LIVE_API_KEY', 'VITE_GEMINI_API_KEY', 'GEMINI_API_KEY'] });
+    }
+    const masked = key.slice(0, 8) + '...' + key.slice(-4);
+    const whichVar = process.env.GEMINI_LIVE_API_KEY ? 'GEMINI_LIVE_API_KEY' : process.env.VITE_GEMINI_API_KEY ? 'VITE_GEMINI_API_KEY' : 'GEMINI_API_KEY';
+    try {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}&pageSize=200`);
+      const data = await r.json() as any;
+      if (!r.ok) return res.json({ masked, whichVar, error: data?.error?.message || r.status });
+      const models: any[] = data.models || [];
+      const liveModels = models.filter((m: any) => (m.supportedGenerationMethods || []).includes('bidiGenerateContent')).map((m: any) => m.name);
+      return res.json({ masked, whichVar, keyValid: true, liveModels, liveApiAccess: liveModels.length > 0 });
+    } catch (err: any) {
+      return res.json({ masked, whichVar, error: err.message });
+    }
+  });
+
   app.get("/api/analytics/map", async (req, res) => {
     const { userId, platform = "All", timeframe = "current" } = req.query as any;
     
