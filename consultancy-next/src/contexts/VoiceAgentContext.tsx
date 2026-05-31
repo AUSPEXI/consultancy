@@ -216,10 +216,12 @@ ${conversationText}`,
       await fetchKnowledgeGraph();
       const weeklyMetricsContext = await fetchWeeklyMetrics();
 
-      let proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
-        `${window.location.protocol}//${window.location.host}/api/genai`;
-      if (proxyUrl && !proxyUrl.startsWith('http')) proxyUrl = 'https://' + proxyUrl;
-      const ai = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl } });
+      const tokenRes = await fetch('/api/aura-token');
+      if (!tokenRes.ok) throw new Error(`Voice API unavailable (${tokenRes.status})`);
+      const { token, key: tokenKey } = await tokenRes.json();
+      const credential = token || tokenKey;
+      if (!credential) throw new Error('Voice credential not configured on server');
+      const ai = new GoogleGenAI({ apiKey: credential, httpOptions: { apiVersion: 'v1alpha' } });
 
       const visitorContext = userData?.brand
         ? `\n\nVISITOR CONTEXT: You are speaking with someone from "${userData.brand}"${userData.domain ? ` (${userData.domain})` : ''}. They are already an Auspexi customer. Welcome them warmly and offer to guide them through the site or help them get back to their dashboard.`
@@ -245,7 +247,7 @@ NAVIGATION: Use navigateToPage when a visitor asks to go somewhere or when it wo
 ${visitorContext}`;
 
       const sessionPromise = ai.live.connect({
-        model: "gemini-2.5-flash-live-001",
+        model: "gemini-2.5-flash-native-audio-latest",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {

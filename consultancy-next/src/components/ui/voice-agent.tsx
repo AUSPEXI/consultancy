@@ -27,11 +27,11 @@ export function VoiceAgent() {
       </div>
 
       <h2 className="text-2xl font-bold mb-4">
-        {isConnected ? "Citacious is Active" : "Talk to Citacious, Your GEO Guide"}
+        {isConnected ? "Aura is Active" : "Talk to Aura, Your GEO Guide"}
       </h2>
       <p className="text-zinc-400 mb-8 h-12">
         {isConnected
-          ? (isSpeaking ? "Citacious is speaking..." : "Listening...")
+          ? (isSpeaking ? "Aura is speaking..." : "Listening...")
           : "Click below to start a live voice conversation about GEO and your brand strategy."}
       </p>
 
