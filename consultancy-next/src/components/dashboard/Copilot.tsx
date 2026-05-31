@@ -11,11 +11,16 @@ import { CITACIOUS_GEO_KNOWLEDGE } from '@/data/faqData';
 // Lazy initialization of Gemini API (text/HTTP calls via proxy)
 let aiClient: GoogleGenAI | null = null;
 
+function normalizeProxyUrl(): string {
+  let url = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
+    `${window.location.protocol}//${window.location.host}/api/genai`;
+  if (url && !url.startsWith('http')) url = 'https://' + url;
+  return url;
+}
+
 function getAIClient(): GoogleGenAI {
   if (!aiClient) {
-    const proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
-      `${window.location.protocol}//${window.location.host}/api/genai`;
-    aiClient = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl } });
+    aiClient = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: normalizeProxyUrl() } });
   }
   return aiClient;
 }
@@ -23,9 +28,7 @@ function getAIClient(): GoogleGenAI {
 // Live API uses the Railway proxy (same as getAIClient / VoiceAgentContext).
 // Railway forwards WebSocket connections to Google with its own validated key.
 function fetchLiveClient(): GoogleGenAI {
-  const proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
-    `${window.location.protocol}//${window.location.host}/api/genai`;
-  return new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl } });
+  return new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: normalizeProxyUrl() } });
 }
 
 // Audio helpers

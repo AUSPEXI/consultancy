@@ -216,8 +216,9 @@ ${conversationText}`,
       await fetchKnowledgeGraph();
       const weeklyMetricsContext = await fetchWeeklyMetrics();
 
-      const proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
+      let proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
         `${window.location.protocol}//${window.location.host}/api/genai`;
+      if (proxyUrl && !proxyUrl.startsWith('http')) proxyUrl = 'https://' + proxyUrl;
       const ai = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl } });
 
       const visitorContext = userData?.brand
