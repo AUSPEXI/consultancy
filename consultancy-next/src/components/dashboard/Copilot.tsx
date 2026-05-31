@@ -488,10 +488,7 @@ ${knowledgeContext}`;
         callbacks: {
           onopen: async () => {
             try {
-              const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
-              audioContextRef.current = audioCtx;
-              nextPlayTimeRef.current = audioCtx.currentTime;
-
+              // Request mic access first so the indicator turns on immediately
               const stream = await navigator.mediaDevices.getUserMedia({
                 audio: {
                   sampleRate: 16000,
@@ -503,9 +500,19 @@ ${knowledgeContext}`;
               });
               mediaStreamRef.current = stream;
 
+              // Bail out silently if onclose fired while we were awaiting getUserMedia
+              if (!sessionRef.current) {
+                stream.getTracks().forEach(t => t.stop());
+                return;
+              }
+
+              const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
+              audioContextRef.current = audioCtx;
+              nextPlayTimeRef.current = audioCtx.currentTime;
+
               const source = audioCtx.createMediaStreamSource(stream);
 
-              // Use AudioWorklet (modern, non-deprecated) for PCM capture
+              // Use AudioWorklet (non-deprecated) for PCM capture
               const workletCode = `
 class PCMCaptureProcessor extends AudioWorkletProcessor {
   process(inputs) {
@@ -520,9 +527,11 @@ registerProcessor('pcm-capture', PCMCaptureProcessor);
               await audioCtx.audioWorklet.addModule(workletUrl);
               URL.revokeObjectURL(workletUrl);
 
+              // Bail out if session closed while loading worklet
+              if (!sessionRef.current || audioCtx.state === 'closed') return;
+
               const workletNode = new AudioWorkletNode(audioCtx, 'pcm-capture');
               workletNode.port.onmessage = (e) => {
-                // ABSOLUTE MUTE: drop input while bot is speaking or in echo-cooldown
                 if (isOutputtingRef.current || activeSourcesRef.current.length > 0) return;
                 const int16Data = float32ToInt16(e.data as Float32Array);
                 const base64 = int16ToBase64(int16Data);
@@ -534,16 +543,18 @@ registerProcessor('pcm-capture', PCMCaptureProcessor);
               };
 
               source.connect(workletNode);
-              // Must connect to destination for worklet to run in all browsers
               workletNode.connect(audioCtx.destination);
 
               scriptProcessorRef.current = workletNode as any;
               setIsVoiceActive(true);
               setIsConnectingVoice(false);
-            } catch (err) {
-              console.error("Microphone access error:", err);
-              setMessages(prev => [...prev, { role: 'model', content: "CRITICAL: Citacious was unable to access your microphone. Please ensure permissions are granted in your browser." }]);
-              disconnectVoice();
+            } catch (err: any) {
+              // Only show mic error if session is still open (not a side-effect of 1008 close)
+              if (sessionRef.current) {
+                console.error('[Voice] Microphone setup error:', err);
+                setMessages(prev => [...prev, { role: 'model', content: `Microphone error: ${err?.message || err}. Please grant mic permission and try again.` }]);
+                disconnectVoice();
+              }
             }
           },
           onmessage: (message: any) => {
