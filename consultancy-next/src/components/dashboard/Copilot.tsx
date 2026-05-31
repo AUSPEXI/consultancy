@@ -24,8 +24,9 @@ function getAIClient(): GoogleGenAI {
 // The proxy injects the real Gemini key server-side — the browser only sends 'dummy'.
 // Railway can handle WebSocket upgrades; Next.js API routes cannot.
 function getLiveProxyClient(): GoogleGenAI {
-  const proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
+  let proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
     `${window.location.protocol}//${window.location.host}/api/genai`;
+  if (!proxyUrl.startsWith('http')) proxyUrl = 'https://' + proxyUrl;
   return new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl, apiVersion: 'v1alpha' } });
 }
 
