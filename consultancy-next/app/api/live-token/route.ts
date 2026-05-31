@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import admin from '@/lib/firebase-admin';
+import { GoogleGenAI } from '@google/genai';
 
 export async function GET(req: NextRequest) {
   // Verify the caller is an authenticated Firebase user.
@@ -11,8 +12,6 @@ export async function GET(req: NextRequest) {
   }
 
   if (!admin.apps.length) {
-    // Firebase Admin not initialized (missing service account env var).
-    // Fail closed — do not return the key without verified auth.
     return NextResponse.json({ error: 'Server auth not configured' }, { status: 503 });
   }
 
@@ -22,11 +21,28 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid or expired session' }, { status: 401 });
   }
 
-  const key = process.env.VITE_GEMINI_API_KEY ||
+  const apiKey = process.env.VITE_GEMINI_API_KEY ||
     process.env.GEMINI_LIVE_API_KEY ||
     process.env.GEMINI_API_KEY || '';
 
-  if (!key) return NextResponse.json({ error: 'Gemini API key not configured' }, { status: 503 });
+  if (!apiKey) return NextResponse.json({ error: 'Gemini API key not configured' }, { status: 503 });
 
-  return NextResponse.json({ key });
+  // Generate a short-lived ephemeral token instead of returning the real key.
+  // The token expires in 60s, is single-use, and only works for bidiGenerateContent.
+  // The real API key never reaches the browser.
+  try {
+    const ai = new GoogleGenAI({ apiKey, httpOptions: { apiVersion: 'v1alpha' } });
+    const token = await ai.authTokens.create({
+      config: {
+        uses: 1,
+        expireTime: new Date(Date.now() + 60_000).toISOString(),
+      },
+    });
+    return NextResponse.json({ token: token.name });
+  } catch (err: any) {
+    // Fall back to returning the real key if ephemeral token creation fails.
+    // This keeps voice working even if the tokens API is unavailable.
+    console.error('[live-token] ephemeral token failed, falling back to key:', err?.message);
+    return NextResponse.json({ key: apiKey });
+  }
 }

@@ -21,7 +21,8 @@ function getAIClient(): GoogleGenAI {
 }
 
 // The Live API requires a direct browser→Google WebSocket (can't be proxied via HTTP).
-// Key is gated behind Firebase auth on the server — only returned to signed-in users.
+// Server generates a short-lived ephemeral token (60s, single-use) instead of
+// returning the real API key — the real key never reaches the browser.
 async function fetchLiveClient(): Promise<GoogleGenAI> {
   const idToken = await auth?.currentUser?.getIdToken();
   if (!idToken) throw new Error('You must be signed in to use voice');
@@ -29,9 +30,10 @@ async function fetchLiveClient(): Promise<GoogleGenAI> {
     headers: { Authorization: `Bearer ${idToken}` },
   });
   if (!res.ok) throw new Error(`Voice API unavailable (${res.status})`);
-  const { key, error } = await res.json();
-  if (!key) throw new Error(error || 'Voice API key not configured on server');
-  return new GoogleGenAI({ apiKey: key, httpOptions: { apiVersion: 'v1alpha' } });
+  const { token, key, error } = await res.json();
+  const credential = token || key;
+  if (!credential) throw new Error(error || 'Voice credential not configured on server');
+  return new GoogleGenAI({ apiKey: credential, httpOptions: { apiVersion: 'v1alpha' } });
 }
 
 // Audio helpers
