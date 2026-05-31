@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import admin from '@/src/lib/firebase-admin';
+import admin from '@/lib/firebase-admin';
 
 export async function GET(req: NextRequest) {
   // Verify the caller is an authenticated Firebase user.
