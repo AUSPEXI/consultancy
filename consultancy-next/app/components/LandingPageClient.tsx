@@ -14,6 +14,7 @@ import { ArrowRight, Bot, Target, Zap, Search, BarChart3, ShieldAlert, CheckCirc
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LeadCaptureModal } from '@/components/ui/lead-capture-modal';
+import { FloatingAura } from '@/components/ui/floating-aura';
 import { useAuth } from '@/contexts/AuthContext';
 import { PublicHeader } from '@/components/ui/public-header';
 import Link from 'next/link';
@@ -700,6 +701,8 @@ export function LandingPageClient() {
         initialEmail={email}
         initialDomain={domain}
       />
+
+      <FloatingAura />
     </div>
   );
 }
