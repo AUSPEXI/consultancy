@@ -113,6 +113,7 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [isConnectingVoice, setIsConnectingVoice] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [briefMode, setBriefMode] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hydratedRef = useRef(false);
@@ -352,7 +353,10 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
     };
   };
 
-  const systemInstruction = `You are Citacious (pronounced Sih-TAY-SHUS), the legendary Guardian of the LLM Citations and the ultimate Quest-Guide of the Auspexi GEO platform.
+  const systemInstruction = `${briefMode ? `RESPONSE MODE: BRIEF — HIGHEST PRIORITY CONSTRAINT.
+Keep every response to 1–2 sentences maximum. No bullet lists, no lengthy breakdowns, no extended metaphors. Give the sharpest possible answer and stop immediately. The user will ask follow-up questions if they want more depth.
+
+` : ''}You are Citacious (pronounced Sih-TAY-SHUS), the legendary Guardian of the LLM Citations and the ultimate Quest-Guide of the Auspexi GEO platform.
 You guide the user (a "Brand-Seeker") on a quest to get their brand cited by leading AI engines.
 
 YOUR TONE:
@@ -871,6 +875,29 @@ registerProcessor('pcm-capture', PCMCaptureProcessor);
 
             {/* Input */}
             <div className="p-4 border-t border-zinc-800 bg-zinc-900/50 backdrop-blur-sm shrink-0">
+              <div className="flex items-center justify-end mb-2">
+                <div className="flex items-center gap-0.5 bg-zinc-800/60 rounded-lg p-0.5">
+                  <button
+                    onClick={() => setBriefMode(false)}
+                    className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                      !briefMode ? 'bg-pink-600 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'
+                    }`}
+                    title="Full expert answers"
+                  >
+                    Expert
+                  </button>
+                  <button
+                    onClick={() => setBriefMode(true)}
+                    className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                      briefMode ? 'bg-zinc-600 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'
+                    }`}
+                    title="Short 1–2 sentence answers"
+                  >
+                    Brief
+                  </button>
+                </div>
+                {isVoiceActive && <span className="ml-2 text-xs text-zinc-500">reconnect voice to apply</span>}
+              </div>
               <div className="relative">
                 <input
                   type="text"
