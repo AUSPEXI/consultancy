@@ -74,7 +74,7 @@ export default function AutopilotPage() {
       await fetch('/api/geo-pulse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ keyword: kw, userId: user!.uid }),
+        body: JSON.stringify({ keyword: kw, userId: user!.uid, brand: userData?.brand || '', domain: userData?.domain || '' }),
       });
     } catch { /* non-blocking */ }
 
