@@ -2276,7 +2276,7 @@ async function setupFrontendAndStart() {
         console.log('[WS Proxy] Original Path:', path);
         
         let newPath = path.replace('/api/genai', '');
-        const key = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+        const key = process.env.VITE_GEMINI_API_KEY || process.env.GEMINI_LIVE_API_KEY || process.env.GEMINI_API_KEY;
         
         // Remove any existing key to avoid duplication or conflicts
         newPath = newPath.replace(/([?&])key=[^&]*/, '$1').replace(/&$/, '').replace(/\?$/, '');
