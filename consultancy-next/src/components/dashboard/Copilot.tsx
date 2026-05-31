@@ -32,7 +32,7 @@ async function buildLiveClient(): Promise<GoogleGenAI> {
   if (!res.ok) throw new Error(`Voice API key not available (${res.status})`);
   const { key, error } = await res.json();
   if (!key) throw new Error(error || 'Voice API key not configured on server');
-  return new GoogleGenAI({ apiKey: key });
+  return new GoogleGenAI({ apiKey: key, httpOptions: { apiVersion: 'v1alpha' } });
 }
 
 // Audio helpers
