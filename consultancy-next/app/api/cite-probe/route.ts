@@ -28,8 +28,39 @@ function checkCitation(response: string, brand: string, domain: string): {
   const lower = response.toLowerCase();
   const brandLower = brand.toLowerCase();
   const domainLower = domain.toLowerCase().replace(/^https?:\/\//, '');
-  const cited = lower.includes(brandLower) || lower.includes(domainLower);
-  if (!cited) return { cited: false, excerpt: null };
+
+  // Negative-intent phrases — if the response contains these alongside the brand name
+  // it means the AI explicitly doesn't know the brand, which is NOT a citation
+  const NEGATIVE_PATTERNS = [
+    "couldn't find any information",
+    "could not find any information",
+    "don't have any information",
+    "do not have any information",
+    "no information about",
+    "not familiar with",
+    "not in my knowledge",
+    "outside my knowledge",
+    "i cannot find",
+    "i can't find",
+    "unable to find information",
+    "doesn't appear in my",
+    "does not appear in my",
+    "isn't a company",
+    "is not a company",
+    "let me imagine",
+    "let's imagine",
+    "hypothetically",
+    "as a hypothetical",
+    "i'll assume",
+    "i will assume",
+  ];
+
+  const hasNegative = NEGATIVE_PATTERNS.some(p => lower.includes(p));
+  const mentionsBrand = lower.includes(brandLower) || lower.includes(domainLower);
+
+  // Brand mentioned but only in a negative/unknown context → not a citation
+  if (!mentionsBrand || hasNegative) return { cited: false, excerpt: null };
+
   const sentences = response.split(/(?<=[.!?])\s+/);
   const match = sentences.find(s =>
     s.toLowerCase().includes(brandLower) || s.toLowerCase().includes(domainLower)
