@@ -25,15 +25,14 @@ function getAIClient(): GoogleGenAI {
   return aiClient;
 }
 
-// Obtain a short-lived ephemeral token from the server (real key stays server-side).
-// The token is single-use and expires shortly — safe to use in the browser.
-// Requires v1alpha which is the only version that supports ephemeral tokens.
+// Fetch the API key that has Live API access (same key that worked in the Vite version).
+// The Live API is a direct browser→Google WebSocket — Railway's HTTP proxy cannot handle it.
 async function buildLiveClient(): Promise<GoogleGenAI> {
-  const res = await fetch('/api/live-token', { method: 'POST' });
-  if (!res.ok) throw new Error(`Voice token request failed (${res.status})`);
-  const { token, error } = await res.json();
-  if (!token) throw new Error(error || 'Voice token not returned from server');
-  return new GoogleGenAI({ apiKey: token, httpOptions: { apiVersion: 'v1alpha' } });
+  const res = await fetch('/api/live-token');
+  if (!res.ok) throw new Error(`Voice API key not available (${res.status})`);
+  const { key, error } = await res.json();
+  if (!key) throw new Error(error || 'Voice API key not configured on server');
+  return new GoogleGenAI({ apiKey: key });
 }
 
 // Audio helpers
@@ -449,7 +448,7 @@ ${knowledgeContext}`;
       const ai = await buildLiveClient();
 
       const sessionPromise = ai.live.connect({
-        model: "gemini-2.0-flash-live-001",
+        model: "gemini-2.5-flash-live-001",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
