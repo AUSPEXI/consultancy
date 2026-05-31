@@ -22,11 +22,16 @@ function getAIClient(): GoogleGenAI {
 
 // Live WebSocket voice API must connect directly browser→Google.
 // HTTP proxies cannot handle WebSocket upgrades — always use a real key here.
+// The /api/live-token endpoint requires a Firebase ID token to authenticate the request.
 async function fetchLiveClient(): Promise<GoogleGenAI> {
-  const res = await fetch('/api/live-token');
-  if (!res.ok) throw new Error('Gemini API key not configured — set GEMINI_API_KEY in Netlify env vars');
-  const { key } = await res.json();
-  if (!key) throw new Error('Gemini API key missing from server response');
+  const idToken = await auth?.currentUser?.getIdToken();
+  if (!idToken) throw new Error('You must be signed in to use voice');
+  const res = await fetch('/api/live-token', {
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
+  if (!res.ok) throw new Error('Gemini API key not available — check Netlify env vars');
+  const { key, error } = await res.json();
+  if (!key) throw new Error(error || 'Gemini API key missing from server response');
   return new GoogleGenAI({ apiKey: key });
 }
 
