@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { NavigationProgress } from '@/components/ui/NavigationProgress'
 import { CookieConsent } from '@/components/ui/cookie-consent'
@@ -78,6 +79,14 @@ export default function RootLayout({
         <NavigationProgress />
         <AuthProvider>{children}</AuthProvider>
         <CookieConsent />
+        {/* GA4 */}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-W1C3XBTET3" strategy="afterInteractive" />
+        <Script id="ga4-init" strategy="afterInteractive">{`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-W1C3XBTET3');
+        `}</Script>
       </body>
     </html>
   )
