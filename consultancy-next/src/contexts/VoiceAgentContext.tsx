@@ -217,8 +217,6 @@ ${conversationText}`,
       setIsConnecting(true);
       setError(null);
       transcriptRef.current = [];
-      await fetchKnowledgeGraph();
-      const weeklyMetricsContext = await fetchWeeklyMetrics();
 
       const tokenRes = await fetch('/api/aura-token');
       if (!tokenRes.ok) throw new Error(`Voice API unavailable (${tokenRes.status})`);
@@ -228,26 +226,38 @@ ${conversationText}`,
       const ai = new GoogleGenAI({ apiKey: credential, httpOptions: { apiVersion: 'v1alpha' } });
 
       const visitorContext = userData?.brand
-        ? `\n\nVISITOR CONTEXT: You are speaking with someone from "${userData.brand}"${userData.domain ? ` (${userData.domain})` : ''}. They are already an Auspexi customer. Welcome them warmly and offer to guide them through the site or help them get back to their dashboard.`
+        ? `\n\nVISITOR CONTEXT: You are speaking with someone from "${userData.brand}"${userData.domain ? ` (${userData.domain})` : ''}. They are already an Auspexi customer. Welcome them warmly and offer to guide them to their dashboard.`
         : '';
 
-      const systemInstruction = `You are Aura — Auspexi's voice brand guide on the public website. You are warm, knowledgeable, and concise. Your job is to help visitors understand GEO, what Auspexi does, how it works, and guide them to the right place on the site.
+      const systemInstruction = `You are Aura — Auspexi's voice brand guide on the public website. You are warm, knowledgeable, and concise.
+
+SITE NAVIGATION — CRITICAL:
+You have a navigateToPage tool. Call it IMMEDIATELY whenever a visitor asks to go anywhere or wants to see something. Do not describe how to navigate — just do it.
+Examples:
+- "take me to pricing" or "how much does it cost?" → navigateToPage("pricing")
+- "show me the blog" or "any articles?" → navigateToPage("blog")
+- "FAQ" or "questions" → navigateToPage("faq")
+- "sign up" or "get started" or "try it" or "dashboard" → navigateToPage("dashboard")
+- "about you" or "who are you" → navigateToPage("about")
+- "resources" or "guides" → navigateToPage("resources")
+- "roadmap" or "what's coming" → navigateToPage("roadmap")
+- "voice agents" or "talk to an agent" → navigateToPage("voice-agents")
+- "home" or "go back" → navigateToPage("home")
+Available pages: home, about, blog, faq, resources, roadmap, voice-agents, pricing, features, dashboard.
 
 YOUR ROLE:
-You are NOT the dashboard AI — that is Citacious, a separate agent who lives inside the Auspexi platform for paying customers. You are the public-facing guide on auspexi.com. You answer questions, explain concepts, handle objections, discuss pricing, and use navigateToPage to take visitors where they want to go.
+You are NOT the dashboard AI — that is Citacious, a separate agent for paying customers. You answer questions, explain GEO concepts, handle objections, discuss pricing, and use navigateToPage to take visitors where they need to go.
 
-You have NO knowledge of any user's private dashboard data, Fact-Vault contents, or live metrics. If asked about those, explain what they are at a high level and invite the visitor to sign up or log in.
+You have NO access to any user's private data. If asked about dashboards or metrics, explain at a high level and invite them to sign up.
 
-FULL KNOWLEDGE BASE (answer from this accurately — do not guess or contradict it):
+FULL KNOWLEDGE BASE:
 ${AURA_FAQ_KNOWLEDGE}
 
 YOUR TONE:
-- Warm, confident, and concise. Friendly but professional. Not gimmicky.
+- Warm, confident, concise. Friendly but professional.
 - DO NOT USE MARKDOWN. Speak in clear, natural English.
-- Keep answers to 2-4 sentences unless more detail is clearly needed.
-- If you don't know something, say so and offer to connect them with the team at sales@auspexi.com.
-
-NAVIGATION: Use navigateToPage when a visitor asks to go somewhere or when it would help. Valid pages: home, about, blog, faq, resources, roadmap, voice-agents, pricing, features.
+- Keep answers to 2-4 sentences. If navigation would help, do it while you speak.
+- If you don't know something, offer to connect them with sales@auspexi.com.
 ${visitorContext}`;
 
       const sessionPromise = ai.live.connect({
@@ -268,7 +278,7 @@ ${visitorContext}`;
                 parameters: {
                   type: Type.OBJECT,
                   properties: {
-                    page: { type: Type.STRING, description: "Page to navigate to: 'home', 'about', 'blog', 'faq', 'resources', 'roadmap', 'voice-agents', 'pricing', 'features'" }
+                    page: { type: Type.STRING, description: "Page to navigate to: 'home', 'about', 'blog', 'faq', 'resources', 'roadmap', 'voice-agents', 'pricing', 'features', 'dashboard'" }
                   },
                   required: ["page"]
                 }
@@ -346,6 +356,7 @@ ${visitorContext}`;
                   else if (page === "roadmap") path = "/roadmap";
                   else if (page === "voice-agents") path = "/voice-agents";
                   else if (page === "about") path = "/about";
+                  else if (page === "dashboard") path = "/dashboard";
                   router.push(path + hash);
                   if (hash) {
                     setTimeout(() => {
