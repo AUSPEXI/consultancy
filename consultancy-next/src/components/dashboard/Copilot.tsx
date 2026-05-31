@@ -494,19 +494,11 @@ ${knowledgeContext}`;
         callbacks: {
           onopen: async () => {
             try {
-              // Request mic access first so the indicator turns on immediately
               const stream = await navigator.mediaDevices.getUserMedia({
-                audio: {
-                  sampleRate: 16000,
-                  channelCount: 1,
-                  echoCancellation: true,
-                  noiseSuppression: true,
-                  autoGainControl: true
-                }
+                audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true }
               });
               mediaStreamRef.current = stream;
 
-              // Bail out silently if onclose fired while we were awaiting getUserMedia
               if (!voiceSessionLiveRef.current) {
                 stream.getTracks().forEach(t => t.stop());
                 return;
@@ -517,49 +509,32 @@ ${knowledgeContext}`;
               nextPlayTimeRef.current = audioCtx.currentTime;
 
               const source = audioCtx.createMediaStreamSource(stream);
-
-              // Use AudioWorklet (non-deprecated) for PCM capture
-              const workletCode = `
-class PCMCaptureProcessor extends AudioWorkletProcessor {
-  process(inputs) {
-    const ch = inputs[0]?.[0];
-    if (ch && ch.length > 0) this.port.postMessage(ch.slice(0));
-    return true;
-  }
-}
-registerProcessor('pcm-capture', PCMCaptureProcessor);
-`;
-              const workletUrl = URL.createObjectURL(new Blob([workletCode], { type: 'application/javascript' }));
-              await audioCtx.audioWorklet.addModule(workletUrl);
-              URL.revokeObjectURL(workletUrl);
-
-              // Bail out if session closed while loading worklet
-              if (!voiceSessionLiveRef.current || audioCtx.state === 'closed') return;
-
-              const workletNode = new AudioWorkletNode(audioCtx, 'pcm-capture');
-              workletNode.port.onmessage = (e) => {
+              const processor = audioCtx.createScriptProcessor(4096, 1, 1);
+              processor.onaudioprocess = (e) => {
                 if (isOutputtingRef.current || activeSourcesRef.current.length > 0) return;
-                const int16Data = float32ToInt16(e.data as Float32Array);
+                const inputData = e.inputBuffer.getChannelData(0);
+                const int16Data = float32ToInt16(inputData);
                 const base64 = int16ToBase64(int16Data);
                 sessionPromise.then((session) => {
-                  session.sendRealtimeInput({
-                    audio: { data: base64, mimeType: 'audio/pcm;rate=16000' }
-                  });
+                  session.sendRealtimeInput({ audio: { data: base64, mimeType: 'audio/pcm;rate=16000' } });
                 });
               };
+              const gainNode = audioCtx.createGain();
+              gainNode.gain.value = 0;
+              source.connect(processor);
+              processor.connect(gainNode);
+              gainNode.connect(audioCtx.destination);
 
-              source.connect(workletNode);
-              workletNode.connect(audioCtx.destination);
-
-              scriptProcessorRef.current = workletNode as any;
+              scriptProcessorRef.current = processor as any;
               setIsVoiceActive(true);
               setIsConnectingVoice(false);
             } catch (err: any) {
-              // Only show mic error if session is still open (not a side-effect of 1008 close)
-              if (sessionRef.current) {
-                console.error('[Voice] Microphone setup error:', err);
+              console.error('[Voice] Microphone setup error:', err);
+              if (voiceSessionLiveRef.current) {
                 setMessages(prev => [...prev, { role: 'model', content: `Microphone error: ${err?.message || err}. Please grant mic permission and try again.` }]);
                 disconnectVoice();
+              } else {
+                setIsConnectingVoice(false);
               }
             }
           },
