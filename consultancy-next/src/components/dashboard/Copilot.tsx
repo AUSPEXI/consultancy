@@ -121,6 +121,9 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
   const chatRef = useRef<any>(null);
   const isOutputtingRef = useRef<boolean>(false);
   const echoCooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Set to true before connect(), false in disconnectVoice(). Lets onopen bail-out
+  // checks work even though sessionRef.current is still null when onopen fires.
+  const voiceSessionLiveRef = useRef<boolean>(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -402,6 +405,7 @@ ${CITACIOUS_GEO_KNOWLEDGE}
 ${knowledgeContext}`;
 
   const disconnectVoice = () => {
+    voiceSessionLiveRef.current = false;
     if (sessionRef.current) {
       sessionRef.current.close();
       sessionRef.current = null;
@@ -436,6 +440,7 @@ ${knowledgeContext}`;
 
     try {
       setIsConnectingVoice(true);
+      voiceSessionLiveRef.current = true;
       const ai = fetchLiveClient();
 
       const sessionPromise = ai.live.connect({
@@ -502,7 +507,7 @@ ${knowledgeContext}`;
               mediaStreamRef.current = stream;
 
               // Bail out silently if onclose fired while we were awaiting getUserMedia
-              if (!sessionRef.current) {
+              if (!voiceSessionLiveRef.current) {
                 stream.getTracks().forEach(t => t.stop());
                 return;
               }
@@ -529,7 +534,7 @@ registerProcessor('pcm-capture', PCMCaptureProcessor);
               URL.revokeObjectURL(workletUrl);
 
               // Bail out if session closed while loading worklet
-              if (!sessionRef.current || audioCtx.state === 'closed') return;
+              if (!voiceSessionLiveRef.current || audioCtx.state === 'closed') return;
 
               const workletNode = new AudioWorkletNode(audioCtx, 'pcm-capture');
               workletNode.port.onmessage = (e) => {
