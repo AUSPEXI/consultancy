@@ -20,14 +20,12 @@ function getAIClient(): GoogleGenAI {
   return aiClient;
 }
 
-// Live WebSocket voice API must connect directly browser→Google.
-// HTTP proxies cannot handle WebSocket upgrades — always use a real key here.
-async function fetchLiveClient(): Promise<GoogleGenAI> {
-  const res = await fetch('/api/live-token');
-  if (!res.ok) throw new Error('Gemini API key not configured — set GEMINI_API_KEY in Netlify env vars');
-  const { key } = await res.json();
-  if (!key) throw new Error('Gemini API key missing from server response');
-  return new GoogleGenAI({ apiKey: key, httpOptions: { apiVersion: 'v1alpha' } });
+// Live API uses the Railway proxy (same as getAIClient / VoiceAgentContext).
+// Railway forwards WebSocket connections to Google with its own validated key.
+function fetchLiveClient(): GoogleGenAI {
+  const proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
+    `${window.location.protocol}//${window.location.host}/api/genai`;
+  return new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl } });
 }
 
 // Audio helpers
@@ -435,10 +433,10 @@ ${knowledgeContext}`;
 
     try {
       setIsConnectingVoice(true);
-      const ai = await fetchLiveClient();
+      const ai = fetchLiveClient();
 
       const sessionPromise = ai.live.connect({
-        model: "gemini-live-2.5-flash-preview",
+        model: "gemini-2.5-flash-live-001",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
