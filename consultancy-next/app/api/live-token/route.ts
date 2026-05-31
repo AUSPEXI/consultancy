@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     const token = await ai.authTokens.create({
       config: {
         uses: 1,
-        expireTime: new Date(Date.now() + 60_000).toISOString(),
+        expireTime: new Date(Date.now() + 30 * 60_000).toISOString(), // 30 min — covers full session
       },
     });
     return NextResponse.json({ token: token.name });
