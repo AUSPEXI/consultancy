@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { GoogleGenAI, Type, Modality } from '@google/genai';
 import { Bot, X, Send, Maximize2, Minimize2, Sparkles, Mic, MicOff, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -83,7 +84,11 @@ interface CopilotProps {
   setActiveTab?: (tab: string) => void;
 }
 
-export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) {
+export function Copilot({ setActiveTab }: CopilotProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const activeTab = pathname?.split('/dashboard/')[1]?.split('/')[0] || 'overview';
+
   const [isOpen, setIsOpen] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMinimized, setIsMinimized] = useState(true);
@@ -382,6 +387,9 @@ DASHBOARD TOOLS — what each one does:
 10. agents: Multi-Agent Orchestration Guild. The full pipeline: Crawler (Auspexi Neural Crawler) → Extraction Agent (fact isolation, no hallucinations) → Schema Agent (JSON-LD generator) → Synthesis Agent (GEO-optimised article). Output can be published directly to the CMS via webhook.
 11. audit-logs: Scribe's Journal. Security and activity logs.
 12. settings: Brand configuration. Set brand name and domain here — required before Citation Probe and Agent runs.
+13. entity-hub: Entity Hub. Manage and enrich brand entities for improved AI recognition.
+14. schema-deploy: Schema Deploy. Deploy JSON-LD schema directly to live pages.
+15. autopilot: Autopilot. Automated GEO task scheduling and execution.
 
 THE BRAND-SEEKER'S QUEST PATH (in order):
 0. CONFIGURE (settings) → Set brand name and domain. Nothing works without this.
@@ -474,7 +482,7 @@ ${knowledgeContext}`;
                   properties: {
                     tabId: {
                       type: Type.STRING,
-                      description: 'The ID of the tab to navigate to. Valid values: overview, cite-probe, geo-pulse, competitors, fact-vault, content-scorer, simulator, brand-monitor, technical, agents, audit-logs, settings',
+                      description: 'The dashboard route to navigate to. Valid values: overview, cite-probe, geo-pulse, competitors, fact-vault, content-scorer, simulator, brand-monitor, technical, agents, audit-logs, settings, entity-hub, schema-deploy, autopilot',
                     }
                   },
                   required: ['tabId']
@@ -575,6 +583,7 @@ registerProcessor('pcm-capture', PCMCaptureProcessor);
                 const call = functionCalls[0];
                 if (call.name === "navigateToTab") {
                   const tabId = (call.args as any).tabId;
+                  router.push(`/dashboard/${tabId}`);
                   setActiveTab?.(tabId);
 
                   sessionPromise.then((session: any) => {
