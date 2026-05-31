@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Code, Server, RefreshCw, Loader2, ArrowRight, Copy, CheckCircle2, FileJson, Download, Target } from 'lucide-react';
+import { Code, Server, RefreshCw, Loader2, ArrowRight, Copy, CheckCircle2, FileJson, Download, Target, Sparkles } from 'lucide-react';
+import { WorkflowProgress, markStepComplete } from '@/components/dashboard/WorkflowProgress';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
@@ -31,6 +32,17 @@ export default function TechnicalPage() {
     setToast({ text, type });
     setTimeout(() => setToast(null), 4000);
   };
+
+  const [fromScorerContent, setFromScorerContent] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('technical_content_source');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.content) setFromScorerContent(parsed.content);
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -114,6 +126,7 @@ export default function TechnicalPage() {
       if (!data.success) throw new Error(data.error);
 
       setSchemaResult(data.schema);
+      markStepComplete(5);
       if (user) {
         await logAuditAction(user.uid, 'Generated JSON-LD Schema', { factLength: factText.length });
       }
@@ -235,10 +248,34 @@ export default {
           <span className="text-sm font-bold tracking-tight">{toast.text}</span>
         </div>
       )}
+      <WorkflowProgress currentStep={5} />
+
+      {fromScorerContent && (
+        <div className="flex items-center justify-between p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
+          <div className="flex items-center gap-3">
+            <Sparkles className="w-4 h-4 text-emerald-400" />
+            <div>
+              <p className="text-sm font-medium text-emerald-300">Scored content received from Step 4</p>
+              <p className="text-xs text-zinc-500">Use this content to generate your JSON-LD schema below.</p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              setInputText(fromScorerContent);
+              setFromScorerContent(null);
+              localStorage.removeItem('technical_content_source');
+            }}
+            className="px-3 py-1.5 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors"
+          >
+            Load into Schema Builder
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Enterprise Infrastructure</h1>
-          <p className="text-sm text-zinc-400 mt-1">Manage semantic indexing, compliant data pipelines, and edge-injection architecture.</p>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Schema & Deploy</h1>
+          <p className="text-sm text-zinc-400 mt-1">Generate JSON-LD schema markup and deploy it to your site for AI engine visibility.</p>
         </div>
       </div>
 

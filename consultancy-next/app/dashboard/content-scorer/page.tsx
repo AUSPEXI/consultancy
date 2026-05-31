@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { PenTool, Loader2, CheckCircle2, AlertTriangle, ArrowRight, LayoutTemplate, FileText, BookOpen, Database, Megaphone } from 'lucide-react';
+import { PenTool, Loader2, CheckCircle2, AlertTriangle, ArrowRight, LayoutTemplate, FileText, BookOpen, Database, Megaphone, Code2 } from 'lucide-react';
+import { WorkflowProgress, markStepComplete } from '@/components/dashboard/WorkflowProgress';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
@@ -166,6 +167,9 @@ export default function ContentScorerPage() {
       if (!data.success) throw new Error(data.error || 'Analysis failed');
       const parsedResult = data.result;
       setResult(parsedResult);
+      markStepComplete(4);
+      // Pre-load content into Technical page for schema generation
+      localStorage.setItem('technical_content_source', JSON.stringify({ content, score: parsedResult.overallScore }));
       if (user) await logAuditAction(user.uid, 'Scored Content', { contentType, score: parsedResult.overallScore });
     } catch (error) {
       console.error('Error scoring content:', error);
@@ -188,17 +192,7 @@ export default function ContentScorerPage() {
           <span className="text-sm font-bold tracking-tight">{toast.text}</span>
         </div>
       )}
-      {/* Pipeline workflow guide */}
-      <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 font-mono overflow-x-auto pb-1">
-        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">1 · Fact Vault</span>
-        <span>→</span>
-        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">2 · Agent Orchestration</span>
-        <span>→</span>
-        <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 whitespace-nowrap">3 · Content Scorer</span>
-        <span>→</span>
-        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">4 · Cite Probe</span>
-        <span className="ml-2 text-zinc-600 hidden sm:inline">— Paste or receive article from Agents. Score it for GEO extractability before publishing.</span>
-      </div>
+      <WorkflowProgress currentStep={4} />
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
@@ -325,6 +319,25 @@ export default function ContentScorerPage() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Step 5 CTA — only shown after scoring */}
+        {result && (
+          <div className="flex items-center justify-between p-4 bg-zinc-900/60 border border-zinc-800 rounded-xl">
+            <div className="flex items-center gap-3">
+              <Code2 className="w-4 h-4 text-pink-400" />
+              <div>
+                <p className="text-sm font-medium text-white">Ready for Step 5: Schema & Deploy</p>
+                <p className="text-xs text-zinc-500">Your content has been pre-loaded into the Schema generator.</p>
+              </div>
+            </div>
+            <a
+              href="/dashboard/technical"
+              className="flex items-center gap-1.5 px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              Deploy Schema <ArrowRight className="w-3.5 h-3.5" />
+            </a>
           </div>
         )}
       </div>

@@ -1,10 +1,11 @@
 'use client'
 
-import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, Wrench, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert, Zap, RefreshCw, Building2, Layers, Target } from 'lucide-react';
+import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert, Zap, RefreshCw, Building2, Layers, Target, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
@@ -24,16 +25,34 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const isAdmin = user?.email === 'hopiumcalculator@gmail.com';
   const role = isAdmin ? 'admin' : 'user';
 
+  const [workflowDone, setWorkflowDone] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const read = () => {
+      try {
+        const stored = localStorage.getItem('geo_workflow_progress');
+        if (stored) {
+          const p = JSON.parse(stored) as Record<string, boolean>;
+          setWorkflowDone(new Set(Object.keys(p).filter(k => p[k])));
+        }
+      } catch {}
+    };
+    read();
+    window.addEventListener('storage', read);
+    // Refresh on route changes (pathname changes trigger re-render anyway)
+    return () => window.removeEventListener('storage', read);
+  }, [pathname]);
+
   // Sidebar groups reflect the GEO quest workflow order
   const navGroups = [
     {
       label: 'THE QUEST',
       items: [
-        { id: 'cite-probe',     label: 'Citation Probe',       icon: Zap,           requiredTier: 'Basic'   as UserTier, path: '/dashboard/cite-probe',     step: '1' },
-        { id: 'fact-vault',     label: 'Fact Vault',           icon: Database,      requiredTier: 'Basic'   as UserTier, path: '/dashboard/fact-vault',      step: '2' },
-        { id: 'agents',         label: 'Content Pipeline',     icon: Bot,           requiredTier: 'Basic'   as UserTier, path: '/dashboard/agents',          step: '3' },
-        { id: 'content-scorer', label: 'Content Scorer',       icon: PenTool,       requiredTier: 'Basic'   as UserTier, path: '/dashboard/content-scorer',  step: '4' },
-        { id: 'technical',      label: 'Schema & Edge',        icon: Code,          requiredTier: 'Basic'   as UserTier, path: '/dashboard/technical',       step: '5' },
+        { id: 'cite-probe',     label: 'Citation Probe',   icon: Zap,     requiredTier: 'Basic' as UserTier, path: '/dashboard/cite-probe',    step: '1', wfKey: 'step1' },
+        { id: 'fact-vault',     label: 'Fact Vault',       icon: Database,requiredTier: 'Basic' as UserTier, path: '/dashboard/fact-vault',    step: '2', wfKey: 'step2' },
+        { id: 'agents',         label: 'Content Pipeline', icon: Bot,     requiredTier: 'Basic' as UserTier, path: '/dashboard/agents',        step: '3', wfKey: 'step3' },
+        { id: 'content-scorer', label: 'Score & Refine',   icon: PenTool, requiredTier: 'Basic' as UserTier, path: '/dashboard/content-scorer',step: '4', wfKey: 'step4' },
+        { id: 'technical',      label: 'Schema & Deploy',  icon: Code,    requiredTier: 'Basic' as UserTier, path: '/dashboard/technical',     step: '5', wfKey: 'step5' },
       ],
     },
     {
@@ -108,33 +127,56 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         <nav className="flex-1 px-4 mt-4 overflow-y-auto overflow-x-hidden space-y-4">
           {navGroups.map((group) => (
             <div key={group.label}>
-              <p className="px-3 mb-1 text-[9px] font-black tracking-[0.2em] text-zinc-600 uppercase">
-                {group.label}
-              </p>
+              <div className="px-3 mb-1 flex items-center justify-between">
+                <p className="text-[9px] font-black tracking-[0.2em] text-zinc-600 uppercase">
+                  {group.label}
+                </p>
+                {group.label === 'THE QUEST' && (
+                  <span className="text-[9px] text-zinc-600">
+                    {workflowDone.size}/5
+                  </span>
+                )}
+              </div>
+              {group.label === 'THE QUEST' && (
+                <div className="mx-3 mb-2 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-pink-500 rounded-full transition-all duration-500"
+                    style={{ width: `${(workflowDone.size / 5) * 100}%` }}
+                  />
+                </div>
+              )}
               <div className="space-y-0.5">
                 {group.items.map((item) => {
                   const Icon = item.icon;
-                  const isActive = pathname.includes(item.path);
+                  const isActive = pathname === item.path || pathname.startsWith(item.path + '/');
                   const isLocked = !hasAccess(item.requiredTier as UserTier);
                   const step = (item as any).step;
+                  const wfKey = (item as any).wfKey as string | undefined;
+                  const isComplete = wfKey ? workflowDone.has(wfKey) : false;
                   return (
                     <Link
                       key={item.id}
                       href={item.path}
                       onClick={() => setIsOpen(false)}
                       className={cn(
-                        "flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                        "flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors group",
                         isActive
                           ? "bg-zinc-800 text-white"
+                          : isComplete
+                          ? "text-emerald-400/70 hover:bg-zinc-800/50 hover:text-emerald-300"
                           : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
                       )}
                     >
                       <div className="flex items-center gap-3">
                         {step ? (
-                          <span className={cn(
-                            "w-5 h-5 rounded-full text-[9px] font-black flex items-center justify-center flex-shrink-0",
-                            isActive ? "bg-pink-500 text-white" : "bg-zinc-800 text-zinc-500"
-                          )}>{step}</span>
+                          isComplete && !isActive ? (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                          ) : (
+                            <span className={cn(
+                              "w-5 h-5 rounded-full text-[9px] font-black flex items-center justify-center flex-shrink-0",
+                              isActive ? "bg-pink-500 text-white" : "bg-zinc-800 text-zinc-500"
+                            )}>{step}</span>
+                          )
                         ) : (
                           <Icon className="w-5 h-5 flex-shrink-0" />
                         )}

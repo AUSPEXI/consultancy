@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Database, Lock, Unlock, CheckCircle2, AlertCircle, Plus, X, Loader2, Megaphone, Sparkles, Search, Network, FileText, BarChart2 } from 'lucide-react';
+import { WorkflowProgress, markStepComplete } from '@/components/dashboard/WorkflowProgress';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
@@ -142,6 +143,7 @@ export default function FactVault() {
           }
         }
 
+        markStepComplete(2);
         await logAuditAction(user.uid, 'Extracted Facts', { count: extractedFacts.length, source: 'Text Input' });
         setIsModalOpen(false);
         setInputText('');
@@ -219,17 +221,7 @@ export default function FactVault() {
           <span className="text-sm font-bold tracking-tight">{toast.text}</span>
         </div>
       )}
-      {/* Pipeline workflow guide */}
-      <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 font-mono overflow-x-auto pb-1">
-        <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">1 · Fact Vault</span>
-        <span>→</span>
-        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">2 · Agent Orchestration</span>
-        <span>→</span>
-        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">3 · Content Scorer</span>
-        <span>→</span>
-        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">4 · Cite Probe</span>
-        <span className="ml-2 text-zinc-600 hidden sm:inline">— Use "Write Article" on any fact to send it to Agents as the topic.</span>
-      </div>
+      <WorkflowProgress currentStep={2} />
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

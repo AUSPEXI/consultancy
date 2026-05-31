@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, FileText, Code2, PenTool, CheckCircle2, Loader2, Play, ArrowRight, X, BrainCircuit, Layers } from 'lucide-react';
+import { WorkflowProgress, markStepComplete } from '@/components/dashboard/WorkflowProgress';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import ReactMarkdown from 'react-markdown';
@@ -14,6 +15,8 @@ import { logAuditAction } from '@/lib/audit';
 type AgentStatus = 'idle' | 'running' | 'completed' | 'error';
 type BulkStatus = 'pending' | 'running' | 'done' | 'error';
 
+interface PermutationItem { query: string; format: string; intent: string; }
+
 export default function AgentsPage() {
   const { tier, userData, user, role } = useAuth();
   const router = useRouter();
@@ -21,6 +24,12 @@ export default function AgentsPage() {
   const [isOrchestrating, setIsOrchestrating] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [rateLimitWarning, setRateLimitWarning] = useState('');
+
+  // Permutations
+  const [permKeyword, setPermKeyword] = useState('');
+  const [isGeneratingPerms, setIsGeneratingPerms] = useState(false);
+  const [permResult, setPermResult] = useState<{ permutations: PermutationItem[]; byFormat: Record<string, number>; count: number } | null>(null);
+  const [permError, setPermError] = useState<string | null>(null);
 
   const [crawlerStatus, setCrawlerStatus] = useState<AgentStatus>('idle');
   const [extractionStatus, setExtractionStatus] = useState<AgentStatus>('idle');
@@ -80,6 +89,7 @@ export default function AgentsPage() {
   useEffect(() => {
     if (showResults && finalArticle) {
       localStorage.setItem('agents_last_result', JSON.stringify({ topic, extractedFacts, generatedSchema, finalArticle }));
+      markStepComplete(3);
     }
   }, [showResults, finalArticle]);
 
@@ -181,6 +191,27 @@ export default function AgentsPage() {
     }
   };
 
+  const generatePermutations = async () => {
+    if (!permKeyword.trim() || !user) return;
+    setIsGeneratingPerms(true);
+    setPermError(null);
+    setPermResult(null);
+    try {
+      const res = await fetch('/api/permutations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ keyword: permKeyword.trim(), brand: userData?.brand || '', userId: user.uid }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Permutation generation failed');
+      setPermResult(data);
+    } catch (err: any) {
+      setPermError(err.message);
+    } finally {
+      setIsGeneratingPerms(false);
+    }
+  };
+
   // Bulk: runs all pending queue items in sequence, auto-saves each to Firestore
   const runBulkQueue = async () => {
     setIsBulkRunning(true);
@@ -254,21 +285,84 @@ export default function AgentsPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      {/* Pipeline workflow guide */}
-      <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 font-mono overflow-x-auto pb-1">
-        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">1 · Fact Vault</span>
-        <span>→</span>
-        <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 whitespace-nowrap">2 · Agent Orchestration</span>
-        <span>→</span>
-        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">3 · Content Scorer</span>
-        <span>→</span>
-        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">4 · Cite Probe</span>
-        <span className="ml-2 text-zinc-600 hidden sm:inline">— After generating, hit "Verify AI Extractability" to score the article before publishing.</span>
-      </div>
+      <WorkflowProgress currentStep={3} />
 
       <div>
         <h1 className="text-2xl font-bold text-white tracking-tight">Agent Orchestration</h1>
         <p className="text-sm text-zinc-400 mt-1">Run specialized AI crews to prevent hallucinations and generate GEO content.</p>
+      </div>
+
+      {/* Query Permutations Engine */}
+      <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-5 space-y-4">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+              <BrainCircuit className="w-4 h-4 text-violet-400" />
+              Query Permutations Engine
+            </h3>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              Generate ~60 query variants for a keyword (7 formats × ~9 each) — all embedded to 768D vectors and stored to
+              {' '}<code className="text-zinc-400 text-[10px]">fact_permutations</code> for model training. Load into bulk queue to generate GEO articles for the full query space.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={permKeyword}
+            onChange={e => setPermKeyword(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && !isGeneratingPerms && generatePermutations()}
+            placeholder={`e.g. generative engine optimization for ${userData?.brand || 'B2B SaaS'}`}
+            className="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-violet-500/50 focus:border-violet-500"
+          />
+          <button
+            onClick={generatePermutations}
+            disabled={isGeneratingPerms || !permKeyword.trim()}
+            className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors shrink-0"
+          >
+            {isGeneratingPerms ? <><Loader2 className="w-3.5 h-3.5 animate-spin" />Generating…</> : <><Play className="w-3.5 h-3.5 fill-current" />Generate</>}
+          </button>
+        </div>
+
+        {permError && <p className="text-xs text-rose-400">{permError}</p>}
+
+        {permResult && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs text-zinc-400">{permResult.count} queries generated with 768D embeddings</span>
+                {Object.entries(permResult.byFormat).map(([fmt, n]) => (
+                  n > 0 && <span key={fmt} className="text-[10px] px-2 py-0.5 bg-zinc-800 border border-zinc-700 rounded-full text-zinc-400">{fmt}: {n}</span>
+                ))}
+              </div>
+              <button
+                onClick={() => {
+                  setBulkQueue(permResult.permutations.slice(0, 30).map(p => ({ topic: p.query, status: 'pending' as const })));
+                }}
+                className="text-xs px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-medium transition-colors shrink-0"
+              >
+                Load top 30 into Bulk Queue →
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 max-h-48 overflow-y-auto">
+              {permResult.permutations.slice(0, 20).map((p, i) => (
+                <button
+                  key={i}
+                  onClick={() => setTopic(p.query)}
+                  title="Click to use as single topic"
+                  className="text-left text-xs px-2.5 py-1.5 bg-zinc-950 border border-zinc-800 hover:border-zinc-700 rounded-lg text-zinc-400 hover:text-zinc-200 transition-all truncate"
+                >
+                  <span className={`text-[9px] font-bold mr-1.5 ${p.format === 'question' ? 'text-blue-400' : p.format === 'best' ? 'text-emerald-400' : p.format === 'vs' ? 'text-rose-400' : p.format === 'howto' ? 'text-amber-400' : 'text-zinc-600'}`}>
+                    {p.format}
+                  </span>
+                  {p.query}
+                </button>
+              ))}
+            </div>
+            {permResult.count > 20 && <p className="text-[10px] text-zinc-600">+ {permResult.count - 20} more stored in Firestore for model training</p>}
+          </div>
+        )}
       </div>
 
       {/* Bulk queue panel */}
