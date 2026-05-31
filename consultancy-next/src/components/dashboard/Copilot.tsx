@@ -11,28 +11,23 @@ import { CITACIOUS_GEO_KNOWLEDGE } from '@/data/faqData';
 // Lazy initialization of Gemini API (text/HTTP calls via proxy)
 let aiClient: GoogleGenAI | null = null;
 
-function normalizeProxyUrl(): string {
-  let url = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
-    `${window.location.protocol}//${window.location.host}/api/genai`;
-  if (url && !url.startsWith('http')) url = 'https://' + url;
-  return url;
-}
-
 function getAIClient(): GoogleGenAI {
   if (!aiClient) {
-    aiClient = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: normalizeProxyUrl() } });
+    const proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
+      `${window.location.protocol}//${window.location.host}/api/genai`;
+    aiClient = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl } });
   }
   return aiClient;
 }
 
-// Fetch the API key that has Live API access (same key that worked in the Vite version).
-// The Live API is a direct browser→Google WebSocket — Railway's HTTP proxy cannot handle it.
-async function buildLiveClient(): Promise<GoogleGenAI> {
+// Live WebSocket voice API must connect directly browser→Google.
+// HTTP proxies cannot handle WebSocket upgrades — always use a real key here.
+async function fetchLiveClient(): Promise<GoogleGenAI> {
   const res = await fetch('/api/live-token');
-  if (!res.ok) throw new Error(`Voice API key not available (${res.status})`);
-  const { key, error } = await res.json();
-  if (!key) throw new Error(error || 'Voice API key not configured on server');
-  return new GoogleGenAI({ apiKey: key, httpOptions: { apiVersion: 'v1alpha' } });
+  if (!res.ok) throw new Error('Gemini API key not configured — set GEMINI_API_KEY in Netlify env vars');
+  const { key } = await res.json();
+  if (!key) throw new Error('Gemini API key missing from server response');
+  return new GoogleGenAI({ apiKey: key });
 }
 
 // Audio helpers
@@ -125,9 +120,6 @@ export function Copilot({ activeTab = 'overview', setActiveTab }: CopilotProps) 
   const chatRef = useRef<any>(null);
   const isOutputtingRef = useRef<boolean>(false);
   const echoCooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
-  // Set to true before connect(), false in disconnectVoice(). Lets onopen bail-out
-  // checks work even though sessionRef.current is still null when onopen fires.
-  const voiceSessionLiveRef = useRef<boolean>(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -409,7 +401,6 @@ ${CITACIOUS_GEO_KNOWLEDGE}
 ${knowledgeContext}`;
 
   const disconnectVoice = () => {
-    voiceSessionLiveRef.current = false;
     if (sessionRef.current) {
       sessionRef.current.close();
       sessionRef.current = null;
@@ -444,11 +435,10 @@ ${knowledgeContext}`;
 
     try {
       setIsConnectingVoice(true);
-      voiceSessionLiveRef.current = true;
-      const ai = await buildLiveClient();
+      const ai = await fetchLiveClient();
 
       const sessionPromise = ai.live.connect({
-        model: "gemini-2.5-flash-live-001",
+        model: "gemini-2.5-flash-native-audio-latest",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
@@ -498,48 +488,62 @@ ${knowledgeContext}`;
         callbacks: {
           onopen: async () => {
             try {
-              const stream = await navigator.mediaDevices.getUserMedia({
-                audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true }
-              });
-              mediaStreamRef.current = stream;
-
-              if (!voiceSessionLiveRef.current) {
-                stream.getTracks().forEach(t => t.stop());
-                return;
-              }
-
               const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
               audioContextRef.current = audioCtx;
               nextPlayTimeRef.current = audioCtx.currentTime;
 
+              const stream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                  sampleRate: 16000,
+                  channelCount: 1,
+                  echoCancellation: true,
+                  noiseSuppression: true,
+                  autoGainControl: true
+                }
+              });
+              mediaStreamRef.current = stream;
+
               const source = audioCtx.createMediaStreamSource(stream);
-              const processor = audioCtx.createScriptProcessor(4096, 1, 1);
-              processor.onaudioprocess = (e) => {
+
+              // Use AudioWorklet (modern, non-deprecated) for PCM capture
+              const workletCode = `
+class PCMCaptureProcessor extends AudioWorkletProcessor {
+  process(inputs) {
+    const ch = inputs[0]?.[0];
+    if (ch && ch.length > 0) this.port.postMessage(ch.slice(0));
+    return true;
+  }
+}
+registerProcessor('pcm-capture', PCMCaptureProcessor);
+`;
+              const workletUrl = URL.createObjectURL(new Blob([workletCode], { type: 'application/javascript' }));
+              await audioCtx.audioWorklet.addModule(workletUrl);
+              URL.revokeObjectURL(workletUrl);
+
+              const workletNode = new AudioWorkletNode(audioCtx, 'pcm-capture');
+              workletNode.port.onmessage = (e) => {
+                // ABSOLUTE MUTE: drop input while bot is speaking or in echo-cooldown
                 if (isOutputtingRef.current || activeSourcesRef.current.length > 0) return;
-                const inputData = e.inputBuffer.getChannelData(0);
-                const int16Data = float32ToInt16(inputData);
+                const int16Data = float32ToInt16(e.data as Float32Array);
                 const base64 = int16ToBase64(int16Data);
                 sessionPromise.then((session) => {
-                  session.sendRealtimeInput({ audio: { data: base64, mimeType: 'audio/pcm;rate=16000' } });
+                  session.sendRealtimeInput({
+                    audio: { data: base64, mimeType: 'audio/pcm;rate=16000' }
+                  });
                 });
               };
-              const gainNode = audioCtx.createGain();
-              gainNode.gain.value = 0;
-              source.connect(processor);
-              processor.connect(gainNode);
-              gainNode.connect(audioCtx.destination);
 
-              scriptProcessorRef.current = processor as any;
+              source.connect(workletNode);
+              // Must connect to destination for worklet to run in all browsers
+              workletNode.connect(audioCtx.destination);
+
+              scriptProcessorRef.current = workletNode as any;
               setIsVoiceActive(true);
               setIsConnectingVoice(false);
-            } catch (err: any) {
-              console.error('[Voice] Microphone setup error:', err);
-              if (voiceSessionLiveRef.current) {
-                setMessages(prev => [...prev, { role: 'model', content: `Microphone error: ${err?.message || err}. Please grant mic permission and try again.` }]);
-                disconnectVoice();
-              } else {
-                setIsConnectingVoice(false);
-              }
+            } catch (err) {
+              console.error("Microphone access error:", err);
+              setMessages(prev => [...prev, { role: 'model', content: "CRITICAL: Citacious was unable to access your microphone. Please ensure permissions are granted in your browser." }]);
+              disconnectVoice();
             }
           },
           onmessage: (message: any) => {
