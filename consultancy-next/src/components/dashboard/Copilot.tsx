@@ -438,7 +438,7 @@ ${knowledgeContext}`;
       const ai = await fetchLiveClient();
 
       const sessionPromise = ai.live.connect({
-        model: "gemini-2.0-flash-live-001",
+        model: "gemini-2.5-flash-native-audio-latest",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
