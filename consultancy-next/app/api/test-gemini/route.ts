@@ -1,39 +1,10 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
 
+// Diagnostic endpoint — DISABLED in production to prevent key exposure.
+// Re-enable locally by setting ENABLE_DIAGNOSTICS=true in .env.local
 export async function GET() {
-  const key = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
-
-  if (!key) {
-    return NextResponse.json({
-      success: false,
-      stage: 'key-check',
-      error: 'No GEMINI_API_KEY or VITE_GEMINI_API_KEY found in environment',
-      envKeysPresent: Object.keys(process.env).filter(k => k.includes('GEMINI') || k.includes('GOOGLE')),
-    });
+  if (process.env.ENABLE_DIAGNOSTICS !== 'true') {
+    return NextResponse.json({ error: 'Diagnostic endpoints are disabled' }, { status: 404 });
   }
-
-  try {
-    const genAI = new GoogleGenAI({ apiKey: key });
-    const result = await genAI.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: 'Reply with the single word: working',
-      config: { temperature: 0 },
-    });
-
-    return NextResponse.json({
-      success: true,
-      keyPrefix: key.substring(0, 8) + '...',
-      response: result.text,
-    });
-  } catch (e: any) {
-    return NextResponse.json({
-      success: false,
-      stage: 'api-call',
-      keyPrefix: key.substring(0, 8) + '...',
-      error: e.message,
-      status: e.status,
-      errorDetails: e.errorDetails || e.cause || null,
-    });
-  }
+  return NextResponse.json({ message: 'Set ENABLE_DIAGNOSTICS=true in .env.local to use this endpoint locally only.' });
 }
