@@ -124,13 +124,18 @@ export class LLMOrchestrator {
         500
       );
     } catch (error: any) {
-      // Auto-fallback: if Gemini quota is exhausted and OpenAI/Perplexity is available, retry transparently
-      const isGeminiQuota =
+      // Auto-fallback: if Gemini is unavailable (quota, suspension, auth) fall back to Perplexity then OpenAI
+      const isGeminiUnavailable =
         provider === 'gemini' &&
         (error.message?.includes('429') ||
           error.message?.includes('RESOURCE_EXHAUSTED') ||
-          error.message?.includes('quota'));
-      if (isGeminiQuota && process.env.PERPLEXITY_API_KEY) {
+          error.message?.includes('quota') ||
+          error.message?.includes('403') ||
+          error.message?.includes('CONSUMER_SUSPENDED') ||
+          error.message?.includes('suspended') ||
+          error.message?.includes('401') ||
+          error.message?.includes('ACCOUNT_STATE_INVALID'));
+      if (isGeminiUnavailable && process.env.PERPLEXITY_API_KEY) {
         console.log('[llm-orchestrator] Gemini quota exceeded — auto-falling back to perplexity sonar');
         try {
           rawOutput = await callWithExponentialBackoff(
@@ -167,7 +172,7 @@ export class LLMOrchestrator {
             };
           }
         }
-      } else if (isGeminiQuota && process.env.OPENAI_API_KEY) {
+      } else if (isGeminiUnavailable && process.env.OPENAI_API_KEY) {
         console.log('[llm-orchestrator] Gemini quota exceeded — auto-falling back to gpt-4o-mini');
         try {
           rawOutput = await callWithExponentialBackoff(

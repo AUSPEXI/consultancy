@@ -1,6 +1,35 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import OpenAI from 'openai';
 import { dbAdmin } from '@/lib/firebase-admin';
+
+async function probeQuery(query: string, apiKey: string, openaiKey: string): Promise<string> {
+  if (apiKey) {
+    try {
+      const ai = new GoogleGenAI({ apiKey });
+      const r = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: [{ role: 'user', parts: [{ text: query }] }],
+        config: { maxOutputTokens: 512 },
+      });
+      return r.text || '';
+    } catch (e: any) {
+      const fatal = e.message?.includes('403') || e.message?.includes('suspended') ||
+        e.message?.includes('401') || e.message?.includes('ACCOUNT_STATE_INVALID');
+      if (!fatal) throw e;
+    }
+  }
+  if (openaiKey) {
+    const client = new OpenAI({ apiKey: openaiKey });
+    const r = await client.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: query }],
+      max_tokens: 512,
+    });
+    return r.choices[0]?.message?.content || '';
+  }
+  throw new Error('No LLM provider available');
+}
 
 // 3 intent-diverse queries per keyword — enough to get a real citation signal
 // without making this too expensive (3 Gemini calls per probe)
@@ -69,22 +98,18 @@ export async function POST(request: Request) {
       } catch { /* non-blocking */ }
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: 'GEMINI_API_KEY not set' }, { status: 500 });
+    const apiKey = process.env.GEMINI_API_KEY || '';
+    const openaiKey = process.env.OPENAI_API_KEY || '';
+    if (!apiKey && !openaiKey) {
+      return NextResponse.json({ error: 'No LLM API key configured' }, { status: 500 });
     }
 
-    const ai = new GoogleGenAI({ apiKey });
     const queries = buildProbeQueries(keyword.trim(), brand);
 
-    // Query Gemini for each probe question in parallel
     const responses = await Promise.allSettled(
       queries.map(q =>
-        ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: [{ role: 'user', parts: [{ text: q }] }],
-          config: { maxOutputTokens: 512 },
-        }).then(r => ({ query: q, text: r.text || '', cited: checkCited(r.text || '', brand, domain) }))
+        probeQuery(q, apiKey, openaiKey)
+          .then(text => ({ query: q, text, cited: checkCited(text, brand, domain) }))
       )
     );
 
