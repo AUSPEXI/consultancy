@@ -105,48 +105,14 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
   };
 
   const processTranscriptAndExtractKnowledge = async (transcript: { role: string, text: string }[]) => {
-    if (transcript.length < 2) return;
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-    if (!apiKey) return;
+    if (transcript.length < 2 || !auth.currentUser) return;
     try {
-      const ai = new GoogleGenAI({ apiKey });
-      const conversationText = transcript.map(t => `${t.role}: ${t.text}`).join("\n");
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: `Analyze the following conversation between a user and an Auspexi AI agent.
-Extract any NEW, USEFUL facts, frequently asked questions, or insights about the user's needs or Auspexi's services that the agent should remember for future conversations.
-Do not extract personal information (like names or emails).
-Format the output as a JSON array of objects with 'topic' and 'fact' string properties. If there is nothing useful to extract, return an empty array [].
-
-Conversation:
-${conversationText}`,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                topic: { type: Type.STRING },
-                fact: { type: Type.STRING }
-              },
-              required: ["topic", "fact"]
-            }
-          }
-        }
+      const token = await auth.currentUser.getIdToken();
+      await fetch('/api/extract-knowledge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ transcript }),
       });
-      const extractedFacts = JSON.parse(response.text || "[]");
-      if (extractedFacts.length > 0) {
-        for (const factObj of extractedFacts) {
-          await addDoc(collection(db, 'knowledge_graph'), {
-            topic: factObj.topic,
-            fact: factObj.fact,
-            source: "voice_agent_conversation",
-            createdAt: new Date().toISOString(),
-            userId: auth.currentUser?.uid || "anonymous"
-          });
-        }
-      }
     } catch (err) {
       console.error("Failed to extract knowledge from transcript:", err);
     }

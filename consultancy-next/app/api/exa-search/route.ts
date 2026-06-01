@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getExa } from '@/lib/exa';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function POST(request: Request) {
+  const authResult = await requireAuth(request);
+  if (authResult instanceof NextResponse) return authResult;
+
   try {
     const { query, numResults = 5 } = await request.json();
     if (!query) {

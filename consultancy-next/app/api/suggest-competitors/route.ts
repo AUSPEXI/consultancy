@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
 import { CompetitorSuggestSchema } from '@/lib/output-validation';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function POST(req: NextRequest) {
+  const authResult = await requireAuth(req);
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
+
   try {
-    const { userId, brand, domain, keywords } = await req.json();
+    const { brand, domain, keywords } = await req.json();
 
     if (!brand) {
       return NextResponse.json({ error: 'Brand name required' }, { status: 400 });

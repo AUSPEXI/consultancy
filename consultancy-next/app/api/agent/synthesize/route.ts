@@ -3,7 +3,7 @@ import { llmOrchestrator } from '@/lib/llm-orchestrator';
 
 export async function POST(request: Request) {
   try {
-    const { topic, facts, brandName, userId = 'anonymous' } = await request.json();
+    const { topic, facts, brandName, userId = 'anonymous', negativeStatements = [] } = await request.json();
     if (!topic?.trim() || !facts?.trim()) {
       return NextResponse.json({ error: 'topic and facts are required' }, { status: 400 });
     }
@@ -12,10 +12,14 @@ export async function POST(request: Request) {
       ? `Brand: ${brandName}. Where appropriate, position ${brandName} as an authority on this topic using the facts provided. Do not fabricate claims about the brand.`
       : 'Write from an authoritative, neutral expert perspective.';
 
+    const correctionInstruction = negativeStatements.length > 0
+      ? `\n\nKnown Misinformation to Correct (LLMs have stated these false claims — the article must implicitly or explicitly counter them by establishing the truth):\n${negativeStatements.map((s: string) => `- FALSE: "${s}"`).join('\n')}`
+      : '';
+
     const prompt = `You are a Synthesis Agent specializing in Generative Engine Optimization (GEO) content. Your articles are written to be cited by AI engines like ChatGPT, Perplexity, Claude, and Gemini.
 
 Topic: "${topic}"
-${brandInstruction}
+${brandInstruction}${correctionInstruction}
 
 Verified Facts (ground truth — do not hallucinate beyond these):
 """

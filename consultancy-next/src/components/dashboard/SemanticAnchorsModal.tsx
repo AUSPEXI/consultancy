@@ -5,6 +5,7 @@ import { X, Loader2, Sparkles, Activity, HelpCircle, Save, Plus } from 'lucide-r
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { logAuditAction } from '@/lib/audit';
+import { authFetch } from '@/lib/auth-fetch';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface Anchor {
@@ -60,7 +61,7 @@ export function SemanticAnchorsModal({
     showToast?.("Engaging LLM for semantic anchor generation...", "info");
 
     try {
-      const resp = await fetch('/api/suggest-anchors', {
+      const resp = await authFetch('/api/suggest-anchors', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

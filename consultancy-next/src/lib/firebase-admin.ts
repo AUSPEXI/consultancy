@@ -23,5 +23,7 @@ export const dbAdmin = admin.apps.length
   ? getFirestore(admin.app(), DATABASE_ID)
   : null;
 
+export const adminAuth = admin.apps.length ? admin.auth() : null;
+
 export default admin;
 

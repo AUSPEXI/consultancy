@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
+import { authFetch } from '@/lib/auth-fetch';
 import { AmplifyModal } from '@/components/ui/AmplifyModal';
 import { db } from '@/firebase';
 import { collection, addDoc } from 'firebase/firestore';
@@ -158,7 +159,7 @@ export default function ContentScorerPage() {
     setResult(null);
     try {
       if (!user) throw new Error('User required');
-      const res = await fetch('/api/content-scorer', {
+      const res = await authFetch('/api/content-scorer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content, contentType, userId: user.uid })

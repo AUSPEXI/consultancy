@@ -235,8 +235,13 @@ ${dataBlock}`;
 }
 
 export async function POST(req: NextRequest) {
+  const { requireAuth } = await import('@/lib/api-auth');
+  const authResult = await requireAuth(req);
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
+
   try {
-    const { userMessage, chatHistory, userId, activeTab = 'overview' } = await req.json();
+    const { userMessage, chatHistory, activeTab = 'overview' } = await req.json();
 
     if (!userMessage) {
       return NextResponse.json({ error: 'Missing message' }, { status: 400 });

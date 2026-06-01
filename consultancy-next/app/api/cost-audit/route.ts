@@ -16,9 +16,12 @@ export const PROBE_COST_PER_RUN =
    PLATFORM_RATES.perplexity.perQuery + PLATFORM_RATES.claude.perQuery) * 7;
 
 export async function POST(request: Request) {
+  const { requireAuth } = await import('@/lib/api-auth');
+  const authResult = await requireAuth(request);
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
+
   try {
-    const { userId } = await request.json();
-    if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 });
     if (!dbAdmin) return NextResponse.json({ error: 'Admin DB not available' }, { status: 500 });
 
     const snap = await dbAdmin

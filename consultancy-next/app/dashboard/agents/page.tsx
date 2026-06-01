@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, FileText, Code2, PenTool, CheckCircle2, Loader2, Play, ArrowRight, X, BrainCircuit, Layers } from 'lucide-react';
+import { Search, FileText, Code2, PenTool, CheckCircle2, Loader2, Play, ArrowRight, X, BrainCircuit, Layers, Copy, Download, ChevronDown, ChevronUp } from 'lucide-react';
 import { WorkflowProgress, markStepComplete } from '@/components/dashboard/WorkflowProgress';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
@@ -46,9 +46,14 @@ export default function AgentsPage() {
   const [bulkQueue, setBulkQueue] = useState<{ topic: string; status: BulkStatus }[]>([]);
   const [isBulkRunning, setIsBulkRunning] = useState(false);
   const [bulkDoneCount, setBulkDoneCount] = useState(0);
+  const [bulkResults, setBulkResults] = useState<{ topic: string; article: string; schema: string; facts: string }[]>([]);
+  const [expandedBulkIdx, setExpandedBulkIdx] = useState<number | null>(null);
 
   // On mount: load queued topic, bulk queue, or last result
   useEffect(() => {
+    const handleSetTopic = (e: any) => { if (e.detail?.topic) setTopic(e.detail.topic); };
+    window.addEventListener('set-agent-topic', handleSetTopic);
+
     const queued = localStorage.getItem('agents_topic');
     const bulkRaw = localStorage.getItem('agents_bulk_queue');
 
@@ -83,6 +88,8 @@ export default function AgentsPage() {
         }
       } catch (_) {}
     }
+
+    return () => window.removeEventListener('set-agent-topic', handleSetTopic);
   }, []);
 
   // Persist latest completed result
@@ -123,13 +130,18 @@ export default function AgentsPage() {
       if (user) {
         try {
           const { query: fsQuery, collection: fsCollection, getDocs, where } = await import('firebase/firestore');
+          const isCleanFact = (f: string) => {
+            const lower = f.toLowerCase();
+            return !lower.includes('needs deeper analysis') && !lower.includes('run a scan') &&
+              !lower.startsWith('unlike') && !lower.includes('placeholder') && f.length > 20;
+          };
           const qVault = fsQuery(fsCollection(db, 'facts'), where('userId', '==', user.uid));
           const vaultSnap = await getDocs(qVault);
-          let factsArray = vaultSnap.docs.map(doc => (doc.data().statement as string)).filter(Boolean);
+          let factsArray = vaultSnap.docs.map(doc => (doc.data().statement as string)).filter(Boolean).filter(isCleanFact);
           if (factsArray.length === 0) {
             const qKg = fsQuery(fsCollection(db, 'knowledge_graph'), where('userId', '==', user.uid));
             const kgSnap = await getDocs(qKg);
-            factsArray = kgSnap.docs.map(doc => (doc.data().fact as string)).filter(Boolean);
+            factsArray = kgSnap.docs.map(doc => (doc.data().fact as string)).filter(Boolean).filter(isCleanFact);
           }
           if (factsArray.length > 0) vaultContext = factsArray.join('\n- ');
         } catch (e) { console.warn('Failed to fetch vault', e); }
@@ -162,7 +174,7 @@ export default function AgentsPage() {
       await new Promise(res => setTimeout(res, 5000));
 
       setSynthesisStatus('running');
-      const synthRes = await fetch('/api/agent/synthesize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: effectiveTopic, facts, brandName: userData?.brand || '' }) });
+      const synthRes = await fetch('/api/agent/synthesize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: effectiveTopic, facts, brandName: userData?.brand || '', negativeStatements: userData?.negativeStatements || [] }) });
       const synthData = await synthRes.json();
       if (!synthData.success) throw new Error(synthData.error);
       const article = synthData.result || 'Failed to generate article.';
@@ -240,6 +252,7 @@ export default function AgentsPage() {
         done++;
         setBulkDoneCount(done);
         setBulkQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status: 'done' } : q));
+        setBulkResults(prev => [...prev, { topic: result.topic, article: result.article, schema: result.schema, facts: result.facts }]);
       } catch (err: any) {
         setBulkQueue(prev => prev.map((q, idx) => idx === i ? { ...q, status: 'error' } : q));
         console.error('Bulk item failed:', bulkQueue[i].topic, err);
@@ -421,14 +434,109 @@ export default function AgentsPage() {
         </div>
       )}
 
+      {/* Bulk results — one card per generated article */}
+      {bulkResults.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              Generated Articles
+              <span className="text-xs text-zinc-500 font-normal">{bulkResults.length} article{bulkResults.length !== 1 ? 's' : ''}</span>
+            </h3>
+            <button onClick={() => { setBulkResults([]); setExpandedBulkIdx(null); }} className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
+              Clear
+            </button>
+          </div>
+          {bulkResults.map((r, idx) => (
+            <div key={idx} className="bg-zinc-900/60 border border-zinc-800 rounded-xl overflow-hidden">
+              <div className="flex items-center gap-3 p-4">
+                <span className="text-xs font-bold text-zinc-500 shrink-0 w-5 text-center">{idx + 1}</span>
+                <span className="flex-1 text-sm text-zinc-200 font-medium truncate">{r.topic}</span>
+                <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                  <button
+                    onClick={() => navigator.clipboard.writeText(r.article)}
+                    className="flex items-center gap-1 text-xs px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-md transition-colors"
+                    title="Copy article"
+                  >
+                    <Copy className="w-3 h-3" /> Article
+                  </button>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(r.schema)}
+                    className="flex items-center gap-1 text-xs px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-md transition-colors"
+                    title="Copy JSON-LD schema"
+                  >
+                    <Copy className="w-3 h-3" /> Schema
+                  </button>
+                  <button
+                    onClick={() => {
+                      const blob = new Blob([r.article], { type: 'text/markdown' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url; a.download = `${r.topic.replace(/\s+/g, '-').toLowerCase().slice(0, 60)}.md`;
+                      a.click(); URL.revokeObjectURL(url);
+                    }}
+                    className="flex items-center gap-1 text-xs px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-md transition-colors"
+                    title="Download .md"
+                  >
+                    <Download className="w-3 h-3" /> .md
+                  </button>
+                  <button
+                    onClick={() => {
+                      localStorage.setItem('contentScorer_draft', JSON.stringify({ content: r.article, type: 'blog' }));
+                      router.push('/dashboard/content-scorer');
+                    }}
+                    className="flex items-center gap-1 text-xs px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md font-medium transition-colors"
+                  >
+                    Score →
+                  </button>
+                  <button
+                    onClick={() => setExpandedBulkIdx(expandedBulkIdx === idx ? null : idx)}
+                    className="flex items-center gap-1 text-xs px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 rounded-md transition-colors"
+                    title={expandedBulkIdx === idx ? 'Collapse' : 'Preview'}
+                  >
+                    {expandedBulkIdx === idx ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+              </div>
+              {expandedBulkIdx === idx && (
+                <div className="border-t border-zinc-800 p-4 space-y-3">
+                  <div className="bg-zinc-950 rounded-lg p-4 text-xs text-zinc-300 max-h-64 overflow-y-auto prose prose-invert prose-xs max-w-none">
+                    <ReactMarkdown>{r.article}</ReactMarkdown>
+                  </div>
+                  <details>
+                    <summary className="text-xs text-zinc-500 cursor-pointer hover:text-zinc-300 transition-colors select-none flex items-center gap-1">
+                      <Code2 className="w-3 h-3" /> View JSON-LD Schema
+                    </summary>
+                    <div className="mt-2 bg-zinc-950 rounded-lg p-3 font-mono text-xs text-zinc-400 max-h-40 overflow-y-auto">
+                      <pre>{r.schema}</pre>
+                    </div>
+                  </details>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden relative p-4 sm:p-8">
         <div className="max-w-4xl mx-auto">
           {rateLimitWarning && (
             <div className="mb-6 bg-red-900/20 border border-red-500/30 rounded-lg p-4 flex items-start gap-3">
               <X className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-sm font-semibold text-red-400">API Quota Exhausted</h4>
+                <h4 className="text-sm font-semibold text-red-400">
+                  {rateLimitWarning.includes('401') || rateLimitWarning.includes('UNAUTHENTICATED') || rateLimitWarning.includes('service account')
+                    ? 'API Key Invalid — Service Account Disabled'
+                    : rateLimitWarning.includes('429') || rateLimitWarning.includes('rate limit')
+                      ? 'API Rate Limit Exceeded'
+                      : 'Agent Workflow Error'}
+                </h4>
                 <p className="text-sm text-red-300 mt-1">{rateLimitWarning}</p>
+                {(rateLimitWarning.includes('401') || rateLimitWarning.includes('service account')) && (
+                  <p className="text-xs text-red-300/70 mt-2">
+                    The Google Cloud service account tied to your Gemini API key has been disabled. Generate a new key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="underline">aistudio.google.com</a> and update <code className="bg-red-900/30 px-1 rounded">GEMINI_API_KEY</code> in your Netlify environment variables.
+                  </p>
+                )}
               </div>
             </div>
           )}
@@ -480,9 +588,33 @@ export default function AgentsPage() {
                   </div>
                 </div>
                 <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-5">
-                  <div className="flex items-center gap-2 mb-3 text-emerald-400">
-                    <Code2 className="w-4 h-4" />
-                    <h4 className="text-sm font-semibold text-white">Generated JSON-LD Schema</h4>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2 text-emerald-400">
+                      <Code2 className="w-4 h-4" />
+                      <h4 className="text-sm font-semibold text-white">Generated JSON-LD Schema</h4>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => navigator.clipboard.writeText(generatedSchema)}
+                        className="flex items-center gap-1 text-xs px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-md transition-colors"
+                        title="Copy JSON-LD to clipboard"
+                      >
+                        <Copy className="w-3 h-3" /> Copy
+                      </button>
+                      <button
+                        onClick={() => {
+                          const blob = new Blob([generatedSchema], { type: 'application/json' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url; a.download = `${topic.replace(/\s+/g, '-').toLowerCase()}-schema.json`;
+                          a.click(); URL.revokeObjectURL(url);
+                        }}
+                        className="flex items-center gap-1 text-xs px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-md transition-colors"
+                        title="Download as .json"
+                      >
+                        <Download className="w-3 h-3" /> .json
+                      </button>
+                    </div>
                   </div>
                   <div className="bg-zinc-900 rounded-lg p-4 text-sm text-zinc-300 overflow-x-auto font-mono text-xs max-h-[200px] overflow-y-auto">
                     <pre>{generatedSchema}</pre>
@@ -504,19 +636,38 @@ export default function AgentsPage() {
                       {publishMsg}
                     </p>
                   )}
-                  <div className="flex justify-end gap-3 flex-wrap">
+                  <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">What to do next</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => navigator.clipboard.writeText(finalArticle)}
+                      className="flex items-center gap-1.5 text-sm px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-md transition-colors"
+                    >
+                      <Copy className="w-3.5 h-3.5" /> Copy Article
+                    </button>
+                    <button
+                      onClick={() => {
+                        const blob = new Blob([finalArticle], { type: 'text/markdown' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url; a.download = `${topic.replace(/\s+/g, '-').toLowerCase()}.md`;
+                        a.click(); URL.revokeObjectURL(url);
+                      }}
+                      className="flex items-center gap-1.5 text-sm px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-md transition-colors"
+                    >
+                      <Download className="w-3.5 h-3.5" /> Download .md
+                    </button>
                     <button
                       onClick={() => {
                         localStorage.setItem('contentScorer_draft', JSON.stringify({ content: finalArticle, type: 'blog' }));
                         router.push('/dashboard/content-scorer');
                       }}
-                      className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
+                      className="flex items-center gap-1.5 text-sm px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md font-medium transition-colors"
                     >
-                      <BrainCircuit className="w-4 h-4" /> Verify AI Extractability
+                      <BrainCircuit className="w-3.5 h-3.5" /> Score for GEO →
                     </button>
-                    <button onClick={handlePublishToCms} disabled={isPublishing} className="bg-white hover:bg-zinc-200 disabled:opacity-50 text-black px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2">
-                      {isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                      {isPublishing ? 'Publishing...' : userData?.cmsWebhookUrl ? 'Publish to CMS' : 'Save Article'} <ArrowRight className="w-4 h-4" />
+                    <button onClick={handlePublishToCms} disabled={isPublishing} className="flex items-center gap-1.5 text-sm px-3 py-2 bg-white hover:bg-zinc-200 disabled:opacity-50 text-black rounded-md font-medium transition-colors ml-auto">
+                      {isPublishing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ArrowRight className="w-3.5 h-3.5" />}
+                      {isPublishing ? 'Publishing...' : userData?.cmsWebhookUrl ? 'Publish to CMS' : 'Save Article'}
                     </button>
                   </div>
                 </div>

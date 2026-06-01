@@ -79,10 +79,15 @@ async function syncPerplexityGroundTruth(
 }
 
 export async function POST(req: NextRequest) {
-  try {
-    const { userId, brand, domain, competitors, keywords, sentimentPrompts } = await req.json();
+  const { requireAuth } = await import('@/lib/api-auth');
+  const authResult = await requireAuth(req);
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
-    if (!userId || !brand || !domain || !keywords || keywords.length === 0) {
+  try {
+    const { brand, domain, competitors, keywords, sentimentPrompts } = await req.json();
+
+    if (!brand || !domain || !keywords || keywords.length === 0) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
