@@ -4,10 +4,15 @@ import { llmOrchestrator } from '@/lib/llm-orchestrator';
 import { ContentScorerSchema } from '@/lib/output-validation';
 
 export async function POST(request: Request) {
+  const { requireAuth } = await import('@/lib/api-auth');
+  const authResult = await requireAuth(request);
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
+
   try {
-    const { content, contentType, userId } = await request.json();
-    if (!content || !userId) {
-      return NextResponse.json({ error: 'Missing content or userId' }, { status: 400 });
+    const { content, contentType } = await request.json();
+    if (!content) {
+      return NextResponse.json({ error: 'Missing content' }, { status: 400 });
     }
 
     // Retrieve User's Facts for Cross-Referencing

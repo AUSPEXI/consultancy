@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { collection, getDocs, getDoc, doc, query, orderBy, limit, where } from 'firebase/firestore';
 import { db, auth } from '@/firebase';
 import { CITACIOUS_GEO_KNOWLEDGE } from '@/data/faqData';
+import { authFetch } from '@/lib/auth-fetch';
 
 // Lazy initialization of Gemini API (text/HTTP calls via proxy)
 let aiClient: GoogleGenAI | null = null;
@@ -693,7 +694,7 @@ registerProcessor('pcm-capture', PCMCaptureProcessor);
           content: m.content
         }));
 
-      const res = await fetch('/api/copilot-chat', {
+      const res = await authFetch('/api/copilot-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

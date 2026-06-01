@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function POST(req: NextRequest) {
+  const authResult = await requireAuth(req);
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
+
   try {
-    const { content, userId = 'anonymous' } = await req.json();
+    const { content } = await req.json();
     if (!content) return NextResponse.json({ error: 'Missing content' }, { status: 400 });
 
     const prompt = `You are an expert Generative Engine Optimization (GEO) agent.

@@ -12,6 +12,7 @@ import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { AmplifyModal } from '@/components/ui/AmplifyModal';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
+import { authFetch } from '@/lib/auth-fetch';
 
 interface Fact {
   id: string;
@@ -100,7 +101,7 @@ export default function FactVault() {
 
     setIsExtracting(true);
     try {
-      const response = await fetch('/api/extract-high-entropy-facts', {
+      const response = await authFetch('/api/extract-high-entropy-facts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: inputText })

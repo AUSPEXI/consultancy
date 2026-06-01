@@ -9,6 +9,7 @@ import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
+import { authFetch } from '@/lib/auth-fetch';
 import { Chrome, Linkedin, Twitter, MessageCircle, Instagram, Music2, CheckCircle2, Loader2, Sparkles, Network, X, Search } from 'lucide-react';
 
 const AUSPEXI_GEO_KEYWORDS = [
@@ -171,7 +172,7 @@ export default function SettingsPage() {
     if (!user || !formData.brand) return;
     setIsGeneratingAnchors(true);
     try {
-      const res = await fetch('/api/suggest-anchors', {
+      const res = await authFetch('/api/suggest-anchors', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -186,7 +187,7 @@ export default function SettingsPage() {
       const suggested: any[] = data.anchors || [];
       setAnchors(suggested);
       // Save to user doc via admin-safe route
-      await fetch('/api/save-anchors', {
+      await authFetch('/api/save-anchors', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.uid, anchors: suggested }),
@@ -238,7 +239,7 @@ export default function SettingsPage() {
         formData.keyword1, formData.keyword2, formData.keyword3,
         formData.keyword4, formData.keyword5,
       ].filter(Boolean);
-      const res = await fetch('/api/suggest-competitors', {
+      const res = await authFetch('/api/suggest-competitors', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user?.uid, brand: formData.brand, domain: formData.domain, keywords }),

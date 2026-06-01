@@ -7,6 +7,7 @@ import { db } from '@/firebase';
 import { collection, query, where, getDocs, doc, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
+import { authFetch } from '@/lib/auth-fetch';
 import { Button } from '@/components/ui/button';
 import { blogPosts } from '@/data/blogPosts';
 
@@ -67,7 +68,7 @@ function CostAuditPanel({ userId }: { userId: string }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/cost-audit', {
+      const res = await authFetch('/api/cost-audit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),

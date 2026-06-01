@@ -6,6 +6,7 @@ import { TrendingUp, Users, Target, Link as LinkIcon, Plus, Loader2, Activity, B
 import { SyntheticDataPanel } from '@/components/dashboard/SyntheticDataPanel';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
+import { authFetch } from '@/lib/auth-fetch';
 import { db } from '@/firebase';
 import { collection, setDoc, doc, onSnapshot, query, where, orderBy, limit } from 'firebase/firestore';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
@@ -158,7 +159,7 @@ export default function OverviewPage() {
     setToastMessage({ text: "Deep Semantic Audit Engaged... Traversing 1,000+ inference paths.", type: 'info' });
     try {
       if (userData?.brand && userData?.domain && userData?.keywords && userData.keywords.length > 0) {
-        const response = await fetch('/api/run-daily-audit', {
+        const response = await authFetch('/api/run-daily-audit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: user.uid, brand: userData.brand, domain: userData.domain, competitors: userData.competitors || [], keywords: userData.keywords, sentimentPrompts: userPrompts })
