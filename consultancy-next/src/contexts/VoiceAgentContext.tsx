@@ -283,7 +283,9 @@ ${visitorContext}`;
                 const int16Data = float32ToInt16(inputData);
                 const base64 = int16ToBase64(int16Data);
                 sessionPromise.then((session) => {
-                  session.sendRealtimeInput({ audio: { data: base64, mimeType: 'audio/pcm;rate=16000' } });
+                  try {
+                    session.sendRealtimeInput({ audio: { data: base64, mimeType: 'audio/pcm;rate=16000' } });
+                  } catch (_) {}
                 });
               };
               const gainNode = audioCtx.createGain();
@@ -331,9 +333,11 @@ ${visitorContext}`;
                     }, 500);
                   }
                   sessionPromise.then((session) => {
-                    session.sendToolResponse({
-                      functionResponses: [{ id: call.id, name: call.name, response: { result: `Successfully navigated to ${page} page.` } }]
-                    });
+                    try {
+                      session.sendToolResponse({
+                        functionResponses: [{ id: call.id, name: call.name, response: { result: `Successfully navigated to ${page} page.` } }]
+                      });
+                    } catch (_) {}
                   });
                 } else if (call.name === "sendCallLog") {
                   const { name, email, summary } = call.args as any;
@@ -343,15 +347,19 @@ ${visitorContext}`;
                     body: JSON.stringify({ name, email, summary })
                   }).then(res => res.json()).then(data => {
                     sessionPromise.then((session) => {
-                      session.sendToolResponse({
-                        functionResponses: [{ id: call.id, name: call.name, response: { result: data.success ? "Call log sent successfully." : "Failed to send call log." } }]
-                      });
+                      try {
+                        session.sendToolResponse({
+                          functionResponses: [{ id: call.id, name: call.name, response: { result: data.success ? "Call log sent successfully." : "Failed to send call log." } }]
+                        });
+                      } catch (_) {}
                     });
                   }).catch(() => {
                     sessionPromise.then((session) => {
-                      session.sendToolResponse({
-                        functionResponses: [{ id: call.id, name: call.name, response: { result: "Failed to send call log due to a network error." } }]
-                      });
+                      try {
+                        session.sendToolResponse({
+                          functionResponses: [{ id: call.id, name: call.name, response: { result: "Failed to send call log due to a network error." } }]
+                        });
+                      } catch (_) {}
                     });
                   });
                 }
