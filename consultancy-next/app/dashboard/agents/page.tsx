@@ -46,8 +46,18 @@ export default function AgentsPage() {
   const [bulkQueue, setBulkQueue] = useState<{ topic: string; status: BulkStatus }[]>([]);
   const [isBulkRunning, setIsBulkRunning] = useState(false);
   const [bulkDoneCount, setBulkDoneCount] = useState(0);
-  const [bulkResults, setBulkResults] = useState<{ topic: string; article: string; schema: string; facts: string }[]>([]);
+  const [bulkResults, setBulkResults] = useState<{ topic: string; article: string; schema: string; facts: string }[]>(() => {
+    if (typeof window !== 'undefined') {
+      try { return JSON.parse(localStorage.getItem('agents_bulk_results') || '[]'); } catch { return []; }
+    }
+    return [];
+  });
   const [expandedBulkIdx, setExpandedBulkIdx] = useState<number | null>(null);
+
+  // Persist bulk results across navigation
+  useEffect(() => {
+    localStorage.setItem('agents_bulk_results', JSON.stringify(bulkResults));
+  }, [bulkResults]);
 
   // On mount: load queued topic, bulk queue, or last result
   useEffect(() => {
@@ -443,7 +453,7 @@ export default function AgentsPage() {
               Generated Articles
               <span className="text-xs text-zinc-500 font-normal">{bulkResults.length} article{bulkResults.length !== 1 ? 's' : ''}</span>
             </h3>
-            <button onClick={() => { setBulkResults([]); setExpandedBulkIdx(null); }} className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
+            <button onClick={() => { setBulkResults([]); setExpandedBulkIdx(null); localStorage.removeItem('agents_bulk_results'); }} className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
               Clear
             </button>
           </div>

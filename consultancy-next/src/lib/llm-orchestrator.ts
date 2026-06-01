@@ -109,6 +109,7 @@ export class LLMOrchestrator {
     let providerUsed = provider;
 
     const finalPrompt = prompt || (contents ? JSON.stringify(contents) : '');
+    const requiresJson = !!schema;
     const logCtx: LogCtx | undefined = options.feature
       ? { userId, feature: options.feature, model }
       : undefined;
@@ -116,7 +117,7 @@ export class LLMOrchestrator {
     try {
       rawOutput = await callWithExponentialBackoff(
         async () => {
-          const response = await this.callProvider(provider, model, finalPrompt, temperature, contents, logCtx);
+          const response = await this.callProvider(provider, model, finalPrompt, temperature, contents, logCtx, requiresJson);
           return response;
         },
         provider,
@@ -151,7 +152,7 @@ export class LLMOrchestrator {
             console.log('[llm-orchestrator] Perplexity fallback failed — trying gpt-4o-mini');
             try {
               rawOutput = await callWithExponentialBackoff(
-                async () => this.callProvider('openai', 'gpt-4o-mini', finalPrompt, temperature, undefined, logCtx),
+                async () => this.callProvider('openai', 'gpt-4o-mini', finalPrompt, temperature, undefined, logCtx, requiresJson),
                 'openai',
                 maxRetries,
                 500
@@ -345,11 +346,12 @@ export class LLMOrchestrator {
     prompt: string,
     temperature: number,
     contents?: any[],
-    logCtx?: LogCtx
+    logCtx?: LogCtx,
+    requiresJson?: boolean
   ): Promise<string> {
     switch (provider) {
       case 'openai':
-        return this.callOpenAI(model, prompt, temperature);
+        return this.callOpenAI(model, prompt, temperature, requiresJson);
       case 'anthropic':
         return this.callAnthropic(model, prompt, temperature);
       case 'gemini':
@@ -361,15 +363,16 @@ export class LLMOrchestrator {
     }
   }
 
-  private async callOpenAI(model: string, prompt: string, temperature: number): Promise<string> {
+  private async callOpenAI(model: string, prompt: string, temperature: number, requiresJson?: boolean): Promise<string> {
     const key = process.env.OPENAI_API_KEY;
     if (!key) throw new Error('OPENAI_API_KEY is not set');
-    
+
     const openai = new OpenAI({ apiKey: key });
     const response = await openai.chat.completions.create({
       model,
       messages: [{ role: 'user', content: prompt }],
       temperature,
+      ...(requiresJson ? { response_format: { type: 'json_object' } } : {}),
     });
     return response.choices[0].message.content || '';
   }
