@@ -198,8 +198,7 @@ export default function AgentsPage() {
     try {
       await runOrchestration();
     } catch (error: any) {
-      if (error?.message?.includes('429')) setRateLimitWarning('Google API rate limit exceeded. Please wait a bit before retrying.');
-      else setRateLimitWarning(error?.message || 'Agent workflow failed. Check console for details.');
+      setRateLimitWarning(error?.message || 'Agent workflow failed. Check console for details.');
     }
   };
 
@@ -523,8 +522,19 @@ export default function AgentsPage() {
             <div className="mb-6 bg-red-900/20 border border-red-500/30 rounded-lg p-4 flex items-start gap-3">
               <X className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-sm font-semibold text-red-400">API Quota Exhausted</h4>
+                <h4 className="text-sm font-semibold text-red-400">
+                  {rateLimitWarning.includes('401') || rateLimitWarning.includes('UNAUTHENTICATED') || rateLimitWarning.includes('service account')
+                    ? 'API Key Invalid — Service Account Disabled'
+                    : rateLimitWarning.includes('429') || rateLimitWarning.includes('rate limit')
+                      ? 'API Rate Limit Exceeded'
+                      : 'Agent Workflow Error'}
+                </h4>
                 <p className="text-sm text-red-300 mt-1">{rateLimitWarning}</p>
+                {(rateLimitWarning.includes('401') || rateLimitWarning.includes('service account')) && (
+                  <p className="text-xs text-red-300/70 mt-2">
+                    The Google Cloud service account tied to your Gemini API key has been disabled. Generate a new key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="underline">aistudio.google.com</a> and update <code className="bg-red-900/30 px-1 rounded">GEMINI_API_KEY</code> in your Netlify environment variables.
+                  </p>
+                )}
               </div>
             </div>
           )}
