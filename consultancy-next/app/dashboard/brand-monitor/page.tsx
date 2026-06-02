@@ -1,8 +1,6 @@
 'use client';
 import { useState } from 'react';
 import { Radar, Loader2, AlertOctagon, MessageSquare, TrendingDown, PenTool } from 'lucide-react';
-import { SyntheticDataPanel } from '@/components/dashboard/SyntheticDataPanel';
-import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
@@ -108,9 +106,6 @@ export default function BrandMonitorPage() {
           </button>
         </div>
       </div>
-
-      {/* Synthetic Dataset */}
-      <SyntheticDataPanel />
 
       {results && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
