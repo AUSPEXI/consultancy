@@ -91,22 +91,35 @@ function checkCitation(
     s.toLowerCase().includes(brandLower) || s.toLowerCase().includes(domainLower)
   );
 
-  // Misinformation detection: keyword cluster matching against known-false statements
+  // Misinformation detection: only flag sentences that (a) mention the brand and
+  // (b) are not negating/distancing the claim ("unrelated", "not", "isn't", etc.)
+  // Scanning the full response caused false positives when an AI correctly explained
+  // that OTHER companies (not the brand) match the false description.
+  const NEGATION_WORDS = [
+    " not ", " no ", "isn't", "aren't", "doesn't", "don't", "never",
+    "unrelated", "unlike", "different from", "separate from", "distinct",
+    "rather than", "instead of", "as opposed to",
+  ];
   let misinformationSnippet: string | null = null;
   if (knownFalses.length > 0) {
+    const brandSentences = sentences.filter(s => {
+      const sl = s.toLowerCase();
+      return sl.includes(brandLower) || (domainLower && sl.includes(domainLower));
+    });
     for (const falseStmt of knownFalses) {
       const keywords = extractKeywords(falseStmt);
       if (keywords.length < 2) continue;
-      // Require at least 40% of keywords to match (minimum 2)
       const matchThreshold = Math.max(2, Math.floor(keywords.length * 0.4));
-      const matchCount = keywords.filter(kw => lower.includes(kw)).length;
-      if (matchCount >= matchThreshold) {
-        misinformationSnippet = sentences.find(s => {
-          const sl = s.toLowerCase();
-          return keywords.filter(kw => sl.includes(kw)).length >= 2;
-        }) || match || null;
-        break;
+      for (const sentence of brandSentences) {
+        const sl = sentence.toLowerCase();
+        if (NEGATION_WORDS.some(neg => sl.includes(neg))) continue;
+        const matchCount = keywords.filter(kw => sl.includes(kw)).length;
+        if (matchCount >= matchThreshold) {
+          misinformationSnippet = sentence;
+          break;
+        }
       }
+      if (misinformationSnippet) break;
     }
   }
 
