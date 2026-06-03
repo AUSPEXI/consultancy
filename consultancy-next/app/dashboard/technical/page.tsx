@@ -39,7 +39,12 @@ export default function TechnicalPage() {
       const stored = localStorage.getItem('technical_content_source');
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (parsed.content) setFromScorerContent(parsed.content);
+        if (parsed.content) {
+          setInputText(parsed.content);
+          setFactText(parsed.content);
+          setFromScorerContent(parsed.content);
+          localStorage.removeItem('technical_content_source');
+        }
       }
     } catch {}
   }, []);
@@ -251,24 +256,12 @@ export default {
       <WorkflowProgress currentStep={5} />
 
       {fromScorerContent && (
-        <div className="flex items-center justify-between p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
-          <div className="flex items-center gap-3">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
-            <div>
-              <p className="text-sm font-medium text-emerald-300">Scored content received from Step 4</p>
-              <p className="text-xs text-zinc-500">Use this content to generate your JSON-LD schema below.</p>
-            </div>
+        <div className="flex items-center gap-3 p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
+          <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-emerald-300">Content loaded from Step 4</p>
+            <p className="text-xs text-zinc-500">Your scored article has been pre-filled into the fields below — ready to generate schema and restructured HTML.</p>
           </div>
-          <button
-            onClick={() => {
-              setInputText(fromScorerContent);
-              setFromScorerContent(null);
-              localStorage.removeItem('technical_content_source');
-            }}
-            className="px-3 py-1.5 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors"
-          >
-            Load into Schema Builder
-          </button>
         </div>
       )}
 

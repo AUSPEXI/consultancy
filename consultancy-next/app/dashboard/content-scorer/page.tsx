@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { PenTool, Loader2, CheckCircle2, AlertTriangle, ArrowRight, LayoutTemplate, FileText, BookOpen, Database, Megaphone, Code2 } from 'lucide-react';
+import { PenTool, Loader2, CheckCircle2, AlertTriangle, ArrowRight, LayoutTemplate, FileText, BookOpen, Database, Megaphone, Code2, Download } from 'lucide-react';
 import { WorkflowProgress, markStepComplete } from '@/components/dashboard/WorkflowProgress';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
@@ -73,6 +73,21 @@ export default function ContentScorerPage() {
     window.addEventListener('draft-content', handleDraftContent);
     return () => window.removeEventListener('draft-content', handleDraftContent);
   }, []);
+
+  const handleDownloadMarkdown = () => {
+    if (!content.trim()) return;
+    const header = `# Content (${contentType}) — GEO Score: ${result?.overallScore ?? '?'}/100\n\n`;
+    const blob = new Blob([header + content], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `article-${Date.now()}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Downloaded as Markdown.', 'info');
+  };
 
   const handlePublish = async () => {
     if (!user || !content.trim()) return;
@@ -279,16 +294,21 @@ export default function ContentScorerPage() {
                 <div className="space-y-4 animate-in fade-in duration-300">
                   <div className="p-4 bg-zinc-950 border border-zinc-800 rounded-lg">
                     <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
-                      {userData?.cmsWebhookUrl ? 'Publish via Configured Webhook' : 'Download for Manual Publishing'}
+                      {userData?.cmsWebhookUrl ? 'Publish via Configured Webhook' : 'Download Article'}
                     </h4>
                     <p className="text-sm text-zinc-400 mb-4">
                       {userData?.cmsWebhookUrl
-                        ? `This will POST the scored content to ${userData.cmsWebhookUrl}.`
-                        : 'No CMS webhook configured — the article will download as a Markdown file. Add a webhook URL in Settings to push directly to your CMS.'}
+                        ? `This will POST the scored content to ${userData.cmsWebhookUrl}. Use Download if you prefer a local copy.`
+                        : 'No CMS webhook configured. Download as Markdown, or add a webhook URL in Settings to push directly to your CMS.'}
                     </p>
-                    <div className="flex items-center gap-3">
-                      <button onClick={handlePublish} disabled={isPublishing || publishSuccess} className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
-                        {isPublishing ? <><Loader2 className="w-4 h-4 animate-spin" /> Publishing...</> : publishSuccess ? <><CheckCircle2 className="w-4 h-4" /> Done</> : <><CheckCircle2 className="w-4 h-4" /> {userData?.cmsWebhookUrl ? 'Publish to CMS' : 'Download Markdown'}</>}
+                    <div className="flex items-center gap-3 flex-wrap">
+                      {userData?.cmsWebhookUrl && (
+                        <button onClick={handlePublish} disabled={isPublishing || publishSuccess} className="flex-1 min-w-[140px] py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
+                          {isPublishing ? <><Loader2 className="w-4 h-4 animate-spin" /> Publishing...</> : publishSuccess ? <><CheckCircle2 className="w-4 h-4" /> Done</> : <><CheckCircle2 className="w-4 h-4" /> Publish to CMS</>}
+                        </button>
+                      )}
+                      <button onClick={handleDownloadMarkdown} disabled={isPublishing} className="flex-1 min-w-[140px] py-2.5 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
+                        <Download className="w-4 h-4" /> Download Markdown
                       </button>
                       <button onClick={() => setIsPreviewingUpdate(false)} disabled={isPublishing} className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg text-sm font-medium transition-colors disabled:opacity-50">Cancel</button>
                     </div>
@@ -337,7 +357,7 @@ export default function ContentScorerPage() {
               href="/dashboard/technical"
               className="flex items-center gap-1.5 px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-sm font-medium rounded-lg transition-colors"
             >
-              Deploy Schema <ArrowRight className="w-3.5 h-3.5" />
+              Next: Schema & Deploy <ArrowRight className="w-3.5 h-3.5" />
             </a>
           </div>
         )}
