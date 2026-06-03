@@ -53,6 +53,7 @@ export default function AgentsPage() {
     return [];
   });
   const [expandedBulkIdx, setExpandedBulkIdx] = useState<number | null>(null);
+  const [restoredFromSession, setRestoredFromSession] = useState(false);
 
   // Persist bulk results across navigation
   useEffect(() => {
@@ -94,6 +95,7 @@ export default function AgentsPage() {
             setCrawlerStatus('completed'); setExtractionStatus('completed');
             setSchemaStatus('completed'); setSynthesisStatus('completed');
             setShowResults(true);
+            setRestoredFromSession(true);
           }
         }
       } catch (_) {}
@@ -586,7 +588,24 @@ export default function AgentsPage() {
 
           {showResults && (
             <div className="mt-12 space-y-6 animate-in slide-in-from-bottom-8 duration-700">
-              <h3 className="text-lg font-bold text-white border-b border-zinc-800 pb-2">Orchestration Results</h3>
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+                <h3 className="text-lg font-bold text-white">Orchestration Results</h3>
+                {restoredFromSession && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-zinc-500">Restored from last session</span>
+                    <button
+                      onClick={() => {
+                        resetState();
+                        localStorage.removeItem('agents_last_result');
+                        setRestoredFromSession(false);
+                      }}
+                      className="text-xs px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 rounded-md transition-colors"
+                    >
+                      Start fresh
+                    </button>
+                  </div>
+                )}
+              </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-5">
                   <div className="flex items-center gap-2 mb-3 text-amber-400">
