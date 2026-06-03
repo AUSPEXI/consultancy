@@ -70,10 +70,10 @@ export default function CiteProbePage() {
 
   // Known-false statements management
   const [negativeStatements, setNegativeStatements] = useState<string[]>([]);
-  // Dismissed false positives — hidden locally, never written to negativeStatements
-  const [dismissedMisinfo, setDismissedMisinfo] = useState<Set<string>>(new Set());
-  const dismissMisinformation = (snippet: string) => {
-    setDismissedMisinfo(prev => new Set(prev).add(snippet));
+  // Dismissed false positives — tracked by result index so one dismiss never hides another
+  const [dismissedIndices, setDismissedIndices] = useState<Set<number>>(new Set());
+  const dismissMisinformation = (index: number) => {
+    setDismissedIndices(prev => new Set(prev).add(index));
   };
   const [newFalseStatement, setNewFalseStatement] = useState('');
   const [isSavingFalses, setIsSavingFalses] = useState(false);
@@ -513,7 +513,7 @@ export default function CiteProbePage() {
                         )}
 
                         {/* Misinformation block */}
-                        {isMisinfo && !dismissedMisinfo.has(r.misinformation ?? '') && (
+                        {isMisinfo && !dismissedIndices.has(i) && (
                           <div className="mt-2 space-y-2">
                             {r.misinformation && (
                               <div className="bg-amber-500/10 border border-amber-500/30 rounded-md px-3 py-2">
@@ -531,7 +531,7 @@ export default function CiteProbePage() {
                                 <Plus className="w-3 h-3" /> Add to Corrections
                               </button>
                               <button
-                                onClick={() => r.misinformation && dismissMisinformation(r.misinformation)}
+                                onClick={() => dismissMisinformation(i)}
                                 className="flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 bg-zinc-700/50 hover:bg-zinc-700 text-zinc-400 border border-zinc-600/50 rounded-md transition-colors"
                                 title="This information is actually correct — dismiss the alert"
                               >
