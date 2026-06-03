@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, FileText, Code2, PenTool, CheckCircle2, Loader2, Play, ArrowRight, X, BrainCircuit, Layers, Copy, Download, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, FileText, Code2, PenTool, CheckCircle2, Loader2, Play, ArrowRight, X, BrainCircuit, Layers, Copy, Download, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
 import { WorkflowProgress, markStepComplete } from '@/components/dashboard/WorkflowProgress';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
@@ -54,6 +54,7 @@ export default function AgentsPage() {
   });
   const [expandedBulkIdx, setExpandedBulkIdx] = useState<number | null>(null);
   const [restoredFromSession, setRestoredFromSession] = useState(false);
+  const [correctionSnippets, setCorrectionSnippets] = useState<string[]>([]);
 
   // Persist bulk results across navigation
   useEffect(() => {
@@ -71,6 +72,16 @@ export default function AgentsPage() {
     if (queued) {
       setTopic(queued);
       localStorage.removeItem('agents_topic');
+    }
+
+    // Pick up misinformation snippet(s) passed from cite-probe for counter-article generation
+    const snippetRaw = localStorage.getItem('agents_misinfo_snippets');
+    if (snippetRaw) {
+      try {
+        const snippets = JSON.parse(snippetRaw);
+        if (Array.isArray(snippets) && snippets.length > 0) setCorrectionSnippets(snippets);
+      } catch (_) {}
+      localStorage.removeItem('agents_misinfo_snippets');
     }
 
     if (bulkRaw) {
@@ -186,7 +197,8 @@ export default function AgentsPage() {
       await new Promise(res => setTimeout(res, 5000));
 
       setSynthesisStatus('running');
-      const synthRes = await fetch('/api/agent/synthesize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: effectiveTopic, facts, brandName: userData?.brand || '', negativeStatements: userData?.negativeStatements || [] }) });
+      const allCorrections = [...(userData?.negativeStatements || []), ...correctionSnippets].filter(Boolean);
+      const synthRes = await fetch('/api/agent/synthesize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: effectiveTopic, facts, brandName: userData?.brand || '', negativeStatements: allCorrections }) });
       const synthData = await synthRes.json();
       if (!synthData.success) throw new Error(synthData.error);
       const article = synthData.result || 'Failed to generate article.';
@@ -527,6 +539,16 @@ export default function AgentsPage() {
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {correctionSnippets.length > 0 && (
+        <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl flex items-start gap-3">
+          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-amber-300">Counter-article mode</p>
+            <p className="text-xs text-zinc-400 mt-0.5">The article will explicitly counter this misinformation: <span className="italic text-amber-200">"{correctionSnippets[0]}"</span></p>
+          </div>
         </div>
       )}
 

@@ -542,6 +542,10 @@ export default function CiteProbePage() {
                                   const correctionTopic = `Correct AI misinformation about ${brand}: "${r.query}"`;
                                   localStorage.setItem('agents_topic', correctionTopic);
                                   localStorage.removeItem('agents_last_result');
+                                  // Pass the specific misinformation snippet so the synthesis prompt explicitly counters it
+                                  if (r.misinformation) {
+                                    localStorage.setItem('agents_misinfo_snippets', JSON.stringify([r.misinformation]));
+                                  }
                                   router.push('/dashboard/agents');
                                 }}
                                 className="flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 bg-pink-600/20 hover:bg-pink-600/30 text-pink-400 border border-pink-500/30 rounded-md transition-colors"
