@@ -9,10 +9,16 @@
       "variable": "Presence of a specific statistic in the opening sentence",
       "lever": "statistical-anchors",
       "predicted_winner": "B",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 1,
-      "status": "queued"
+      "status": "running",
+      "started_at": "2026-06-06T21:01:12.120Z"
     },
     {
       "id": "002",
@@ -22,7 +28,12 @@
       "variable": "Position of the citable claim (sentence 1 vs paragraph 3)",
       "lever": "inverted-pyramid",
       "predicted_winner": "B",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 2,
       "status": "queued"
@@ -35,7 +46,12 @@
       "variable": "Definitional sentence structure vs hedged narrative prose",
       "lever": "definition-sentences",
       "predicted_winner": "B",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 3,
       "status": "queued"
@@ -48,7 +64,12 @@
       "variable": "Number of named concrete entities per 100 words",
       "lever": "entity-density",
       "predicted_winner": "B",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 4,
       "status": "queued"
@@ -61,7 +82,12 @@
       "variable": "Content format: bulleted list vs flowing paragraph",
       "lever": "list-vs-prose",
       "predicted_winner": "B",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 5,
       "status": "queued"
@@ -74,7 +100,12 @@
       "variable": "Sentence length (≤15 words vs 30+ words per sentence)",
       "lever": "quotability",
       "predicted_winner": "B",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 6,
       "status": "queued"
@@ -87,7 +118,12 @@
       "variable": "Presence of date markers (dated vs undated)",
       "lever": "freshness-signals",
       "predicted_winner": "B",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 7,
       "status": "queued"
@@ -100,7 +136,12 @@
       "variable": "Claim attribution voice (third-party vs first-person brand)",
       "lever": "source-framing",
       "predicted_winner": "B",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 8,
       "status": "queued"
@@ -113,7 +154,12 @@
       "variable": "Presence of explicit contradiction handling vs silence on alternatives",
       "lever": "contradiction-handling",
       "predicted_winner": "B",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 9,
       "status": "queued"
@@ -126,7 +172,12 @@
       "variable": "Brand name repetition count (1× vs 4+× per 200 words)",
       "lever": "brand-frequency",
       "predicted_winner": "B",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 10,
       "status": "queued"
@@ -139,7 +190,12 @@
       "variable": "Grammatical voice (active vs passive)",
       "lever": "active-voice",
       "predicted_winner": "B",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 11,
       "status": "queued"
@@ -152,7 +208,12 @@
       "variable": "Combination of top 3 proven levers vs control",
       "lever": "anchor-stacking",
       "predicted_winner": "B",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 12,
       "status": "queued",
@@ -166,7 +227,12 @@
       "variable": "Engine identity (cross-engine comparison, not a content variable)",
       "lever": "engine-divergence",
       "predicted_winner": "divergent",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 40,
       "priority": 13,
       "status": "queued",
@@ -180,7 +246,12 @@
       "variable": "Presence of H2/H3 heading structure vs unstructured prose",
       "lever": "heading-structure",
       "predicted_winner": "B",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 14,
       "status": "queued"
@@ -193,7 +264,12 @@
       "variable": "Level of specificity (precise metric vs category descriptor)",
       "lever": "claim-specificity",
       "predicted_winner": "B",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 15,
       "status": "queued"
@@ -206,7 +282,12 @@
       "variable": "Compilation episode — no new probe, re-analyzes past non-significant results",
       "lever": "null-results",
       "predicted_winner": "null",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 0,
       "priority": 16,
       "status": "queued",
@@ -220,7 +301,12 @@
       "variable": "Opening sentence structure (question vs declarative answer)",
       "lever": "opening-structure",
       "predicted_winner": "A",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 17,
       "status": "queued"
@@ -233,7 +319,10 @@
       "variable": "Presence of JSON-LD schema (structured vs unstructured)",
       "lever": "json-ld",
       "predicted_winner": "B",
-      "platforms": ["perplexity", "gemini"],
+      "platforms": [
+        "perplexity",
+        "gemini"
+      ],
       "n_per_variant": 40,
       "priority": 18,
       "status": "queued",
@@ -247,7 +336,12 @@
       "variable": "Statistical anchor combined with content length (short vs long)",
       "lever": "anchor-length-interaction",
       "predicted_winner": "B-short",
-      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
       "n_per_variant": 30,
       "priority": 19,
       "status": "queued",
@@ -261,7 +355,10 @@
       "variable": "Statistical anchor presence on live published pages (not in-context)",
       "lever": "live-parametric",
       "predicted_winner": "B",
-      "platforms": ["perplexity", "gemini"],
+      "platforms": [
+        "perplexity",
+        "gemini"
+      ],
       "n_per_variant": 20,
       "priority": 20,
       "status": "queued",
