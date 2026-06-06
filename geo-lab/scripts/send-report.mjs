@@ -40,9 +40,11 @@ async function readFileSafe(p) {
   return fs.readFile(p, 'utf8').catch(() => '');
 }
 
-const [finding, design, script, titles, thumbnail, description] = await Promise.all([
+const [finding, design, shortsHook, contentCalendar, script, titles, thumbnail, description] = await Promise.all([
   readFileSafe(path.join(experimentDir, 'FINDING.md')),
   readFileSafe(path.join(experimentDir, 'DESIGN.md')),
+  readFileSafe(path.join(experimentDir, 'video', 'shorts-hook.md')),
+  readFileSafe(path.join(experimentDir, 'video', 'content-calendar.md')),
   readFileSafe(path.join(experimentDir, 'video', 'script.md')),
   readFileSafe(path.join(experimentDir, 'video', 'titles.md')),
   readFileSafe(path.join(experimentDir, 'video', 'thumbnail.md')),
@@ -116,10 +118,12 @@ const html = `
   <!-- Body -->
   <div style="padding:20px 32px">
     ${section('Statistical Finding', finding)}
+    ${section('📅 Content Calendar (this week)', contentCalendar)}
+    ${section('⚡ Shorts Hook Script (45–60s)', shortsHook)}
     ${section('Title Options', titles)}
     ${section('Thumbnail Brief', thumbnail)}
     ${section('Video Description', description)}
-    ${section('Spoken Script', script)}
+    ${section('Long-Form Script', script)}
   </div>
 
   <!-- Footer -->
