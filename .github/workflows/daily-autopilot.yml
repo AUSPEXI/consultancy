@@ -12,28 +12,44 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      - name: Validate required secrets
+      - name: Resolve and validate config
+        id: config
         run: |
+          # Accept either APP_URL or SITE_URL — whichever is set
+          SITE="${{ secrets.APP_URL }}"
+          if [ -z "$SITE" ]; then
+            SITE="${{ secrets.SITE_URL }}"
+          fi
+          SITE="${SITE%/}"  # strip trailing slash if present
+
+          SECRET="${{ secrets.CRON_SECRET }}"
+
+          echo "::debug::URL resolved to: $SITE"
+
           missing=()
-          [ -z "${{ secrets.SITE_URL }}" ] && missing+=("SITE_URL")
-          [ -z "${{ secrets.CRON_SECRET }}" ] && missing+=("CRON_SECRET")
+          [ -z "$SITE" ]   && missing+=("APP_URL (or SITE_URL)")
+          [ -z "$SECRET" ] && missing+=("CRON_SECRET")
+
           if [ ${#missing[@]} -gt 0 ]; then
             echo "❌ Missing GitHub Secrets: ${missing[*]}"
             echo ""
-            echo "Fix: Go to repo Settings → Secrets and variables → Actions → New repository secret"
-            echo "  SITE_URL     = your deployed Netlify URL, e.g. https://auspexi.com"
-            echo "  CRON_SECRET  = the value of CRON_SECRET in your Netlify environment variables"
+            echo "Fix: GitHub repo → Settings → Secrets and variables → Actions → New repository secret"
+            echo "  APP_URL      = https://auspexi.com"
+            echo "  CRON_SECRET  = copy the CRON_SECRET value from Netlify env vars"
             exit 1
           fi
-          echo "✓ Secrets present"
+
+          echo "✓ Config valid — endpoint: ${SITE}/api/cron/daily-autopilot"
+          echo "site=$SITE" >> "$GITHUB_OUTPUT"
+          echo "secret=$SECRET" >> "$GITHUB_OUTPUT"
 
       - name: Trigger daily autopilot pipeline
         run: |
           echo "Triggering daily GEO autopilot at $(date -u)"
 
           RESPONSE=$(curl -s -w "\n%{http_code}" \
-            -X POST "${{ secrets.SITE_URL }}/api/cron/daily-autopilot" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -X POST "${{ steps.config.outputs.site }}/api/cron/daily-autopilot" \
+            -H "Authorization: Bearer ${{ steps.config.outputs.secret }}" \
             -H "Content-Type: application/json" \
             --connect-timeout 15 \
             --max-time 1800)
@@ -49,7 +65,7 @@ jobs:
               echo "✓ Autopilot completed successfully"
               ;;
             000)
-              echo "❌ Could not reach ${{ secrets.SITE_URL }} — check SITE_URL secret and that your Netlify site is deployed"
+              echo "❌ Could not connect — check APP_URL is correct and Netlify site is live"
               exit 1
               ;;
             401)
@@ -57,7 +73,7 @@ jobs:
               exit 1
               ;;
             404)
-              echo "❌ Not found (404) — /api/cron/daily-autopilot route does not exist at ${{ secrets.SITE_URL }}"
+              echo "❌ Not found (404) — /api/cron/daily-autopilot route missing. Check Netlify deploy is current."
               exit 1
               ;;
             500)
