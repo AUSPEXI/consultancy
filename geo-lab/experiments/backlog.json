@@ -1,5 +1,6 @@
 {
-  "description": "Pre-seeded experiment queue. Each entry is a GEO hypothesis. The orchestrator picks from the top of the queue. Status: queued | running | complete | filmed.",
+  "description": "Pre-seeded experiment queue. Reordered for YouTube channel growth: fundamentals first, high-virality early, contrarian mid-season, synthesis experiments after their dependencies, live-mode flagship last. Status: queued | running | complete | filmed.",
+  "reorder_rationale": "001→013 back-to-back uses same variants immediately (no extra probe cost). 017 (contrarian) early builds trust. 012/019 (synthesis) placed after all their dependencies complete. 016 (null compilation) at week 16 when enough null data exists. 018 (JSON-LD) and 020 (live) stay late — most technical/slow.",
   "experiments": [
     {
       "id": "001",
@@ -9,16 +10,27 @@
       "variable": "Presence of a specific statistic in the opening sentence",
       "lever": "statistical-anchors",
       "predicted_winner": "B",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
       "n_per_variant": 30,
       "priority": 1,
       "status": "running",
-      "started_at": "2026-06-06T21:01:12.120Z"
+      "started_at": "2026-06-06T21:01:12.120Z",
+      "youtube_angle": "The most fundamental GEO claim tested for the first time with real data."
+    },
+    {
+      "id": "013",
+      "slug": "engine-divergence",
+      "title": "Engine Divergence Special",
+      "hypothesis": "The four engines (GPT-4o, Gemini, Perplexity, Claude) will disagree on which variant wins for at least one lever, revealing engine-specific citation biases rather than a universal principle.",
+      "variable": "Engine identity (cross-engine comparison using 001 variants, not a content variable)",
+      "lever": "engine-divergence",
+      "predicted_winner": "divergent",
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "n_per_variant": 40,
+      "priority": 2,
+      "status": "queued",
+      "note": "Re-run 001 variants but report by engine. Zero extra content work — reuses 001 design.",
+      "youtube_angle": "Engine Wars episode — 'ChatGPT cites this. Perplexity ignores it.' Most shareable early video."
     },
     {
       "id": "002",
@@ -28,15 +40,11 @@
       "variable": "Position of the citable claim (sentence 1 vs paragraph 3)",
       "lever": "inverted-pyramid",
       "predicted_winner": "B",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
       "n_per_variant": 30,
-      "priority": 2,
-      "status": "queued"
+      "priority": 3,
+      "status": "queued",
+      "youtube_angle": "Structural writing advice with data behind it — broad appeal beyond GEO."
     },
     {
       "id": "003",
@@ -46,252 +54,11 @@
       "variable": "Definitional sentence structure vs hedged narrative prose",
       "lever": "definition-sentences",
       "predicted_winner": "B",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
-      "n_per_variant": 30,
-      "priority": 3,
-      "status": "queued"
-    },
-    {
-      "id": "004",
-      "slug": "entity-density",
-      "title": "Entity Density",
-      "hypothesis": "If content names 3+ concrete entities (products, people, standards, organisations) per 100 words, then citation rate will be higher than sparse entity usage, because entity density makes content more 'graspable' to retrieval systems.",
-      "variable": "Number of named concrete entities per 100 words",
-      "lever": "entity-density",
-      "predicted_winner": "B",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
       "n_per_variant": 30,
       "priority": 4,
-      "status": "queued"
-    },
-    {
-      "id": "005",
-      "slug": "list-vs-prose",
-      "title": "List vs Prose",
-      "hypothesis": "If facts are presented as a bulleted list, then citation rate will be higher than equivalent paragraph prose, because list items are discrete, copy-pasteable, and easier for LLMs to extract and attribute.",
-      "variable": "Content format: bulleted list vs flowing paragraph",
-      "lever": "list-vs-prose",
-      "predicted_winner": "B",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
-      "n_per_variant": 30,
-      "priority": 5,
-      "status": "queued"
-    },
-    {
-      "id": "006",
-      "slug": "short-sentences",
-      "title": "Short Punchy Sentences vs Compound",
-      "hypothesis": "If each claim is a single short sentence (≤15 words), then citation rate will be higher than the same claims expressed in long compound sentences, because short sentences are more quote-able in LLM answers.",
-      "variable": "Sentence length (≤15 words vs 30+ words per sentence)",
-      "lever": "quotability",
-      "predicted_winner": "B",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
-      "n_per_variant": 30,
-      "priority": 6,
-      "status": "queued"
-    },
-    {
-      "id": "007",
-      "slug": "freshness-signal",
-      "title": "Freshness Signals",
-      "hypothesis": "If content includes explicit date markers ('As of 2026…', 'Updated June 2026'), then citation rate will be higher than undated equivalent content, because LLMs prefer temporally anchored sources for factual queries.",
-      "variable": "Presence of date markers (dated vs undated)",
-      "lever": "freshness-signals",
-      "predicted_winner": "B",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
-      "n_per_variant": 30,
-      "priority": 7,
-      "status": "queued"
-    },
-    {
-      "id": "008",
-      "slug": "source-framing",
-      "title": "Source Framing: First-Person vs Third-Party",
-      "hypothesis": "If claims are framed as third-party attributions ('According to independent testing…'), then citation rate will be higher than first-person brand claims ('We found that…'), because LLMs trust attributed claims over self-promotion.",
-      "variable": "Claim attribution voice (third-party vs first-person brand)",
-      "lever": "source-framing",
-      "predicted_winner": "B",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
-      "n_per_variant": 30,
-      "priority": 8,
-      "status": "queued"
-    },
-    {
-      "id": "009",
-      "slug": "contradiction-handling",
-      "title": "Contradiction Handling",
-      "hypothesis": "If content explicitly addresses and refutes a common false claim about the topic, then citation rate will be higher than content that ignores competing narratives, because LLMs prioritise sources that resolve ambiguity.",
-      "variable": "Presence of explicit contradiction handling vs silence on alternatives",
-      "lever": "contradiction-handling",
-      "predicted_winner": "B",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
-      "n_per_variant": 30,
-      "priority": 9,
-      "status": "queued"
-    },
-    {
-      "id": "010",
-      "slug": "brand-name-frequency",
-      "title": "Brand Name Frequency",
-      "hypothesis": "If the brand name appears 4+ times in 200 words, then citation rate will be higher than content where it appears once, because repetition strengthens the signal connecting the brand to the topic.",
-      "variable": "Brand name repetition count (1× vs 4+× per 200 words)",
-      "lever": "brand-frequency",
-      "predicted_winner": "B",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
-      "n_per_variant": 30,
-      "priority": 10,
-      "status": "queued"
-    },
-    {
-      "id": "011",
-      "slug": "active-vs-passive",
-      "title": "Active vs Passive Voice",
-      "hypothesis": "If claims use active voice ('Auspexi reduced onboarding time by 60%'), then citation rate will be higher than passive voice equivalents ('Onboarding time was reduced by 60%'), because active constructions are more attribution-ready.",
-      "variable": "Grammatical voice (active vs passive)",
-      "lever": "active-voice",
-      "predicted_winner": "B",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
-      "n_per_variant": 30,
-      "priority": 11,
-      "status": "queued"
-    },
-    {
-      "id": "012",
-      "slug": "anchor-stacking",
-      "title": "Anchor Stacking (Multi-Lever Combined)",
-      "hypothesis": "If content combines the three highest-performing individual levers (statistical anchor + definition sentence + answer-first), then citation rate will be higher than a control with none of these — and higher than any single lever alone.",
-      "variable": "Combination of top 3 proven levers vs control",
-      "lever": "anchor-stacking",
-      "predicted_winner": "B",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
-      "n_per_variant": 30,
-      "priority": 12,
       "status": "queued",
-      "note": "Run after experiments 001-003 are complete so you know which levers are actually proven."
-    },
-    {
-      "id": "013",
-      "slug": "engine-divergence",
-      "title": "Engine Divergence Special",
-      "hypothesis": "The four engines (GPT-4o, Gemini, Perplexity, Claude) will disagree on which variant wins for at least one lever, revealing engine-specific citation biases rather than a universal principle.",
-      "variable": "Engine identity (cross-engine comparison, not a content variable)",
-      "lever": "engine-divergence",
-      "predicted_winner": "divergent",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
-      "n_per_variant": 40,
-      "priority": 13,
-      "status": "queued",
-      "note": "Re-run the variants from experiment 001 but report by engine rather than by variant. Great 'engine wars' episode."
-    },
-    {
-      "id": "014",
-      "slug": "heading-hierarchy",
-      "title": "Heading Hierarchy",
-      "hypothesis": "If content uses H2/H3 heading hierarchy to label facts, then citation rate will be higher than flat prose without headings, because structural markup gives retrieval systems clear extraction anchors.",
-      "variable": "Presence of H2/H3 heading structure vs unstructured prose",
-      "lever": "heading-structure",
-      "predicted_winner": "B",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
-      "n_per_variant": 30,
-      "priority": 14,
-      "status": "queued"
-    },
-    {
-      "id": "015",
-      "slug": "specificity-of-claim",
-      "title": "Claim Specificity",
-      "hypothesis": "If claims use highly specific metrics ('reduced median API latency from 340ms to 197ms'), then citation rate will be higher than category-level claims ('significantly improved API performance'), because specificity signals measurability.",
-      "variable": "Level of specificity (precise metric vs category descriptor)",
-      "lever": "claim-specificity",
-      "predicted_winner": "B",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
-      "n_per_variant": 30,
-      "priority": 15,
-      "status": "queued"
-    },
-    {
-      "id": "016",
-      "slug": "null-result-compilation",
-      "title": "Null Results Compilation",
-      "hypothesis": "Multiple levers tested individually will show no statistically significant effect, revealing which popular GEO advice is unsupported by data — a null result is a valid, publishable finding.",
-      "variable": "Compilation episode — no new probe, re-analyzes past non-significant results",
-      "lever": "null-results",
-      "predicted_winner": "null",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
-      "n_per_variant": 0,
-      "priority": 16,
-      "status": "queued",
-      "note": "Run this after ~8 experiments when there's enough data for a 'myth-busting' compilation."
+      "youtube_angle": "One sentence structure change that makes AI quote you — highly actionable."
     },
     {
       "id": "017",
@@ -301,15 +68,167 @@
       "variable": "Opening sentence structure (question vs declarative answer)",
       "lever": "opening-structure",
       "predicted_winner": "A",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
       "n_per_variant": 30,
-      "priority": 17,
-      "status": "queued"
+      "priority": 5,
+      "status": "queued",
+      "note": "Contrarian — predicts the control (A) wins. Great 'I was wrong about this' angle.",
+      "youtube_angle": "Counterintuitive result builds credibility. Most content advice says 'start with a question' — this tests it."
+    },
+    {
+      "id": "005",
+      "slug": "list-vs-prose",
+      "title": "List vs Prose",
+      "hypothesis": "If facts are presented as a bulleted list, then citation rate will be higher than equivalent paragraph prose, because list items are discrete, copy-pasteable, and easier for LLMs to extract and attribute.",
+      "variable": "Content format: bulleted list vs flowing paragraph",
+      "lever": "list-vs-prose",
+      "predicted_winner": "B",
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "n_per_variant": 30,
+      "priority": 6,
+      "status": "queued",
+      "youtube_angle": "Instantly actionable. Everyone can restructure their content as bullets today."
+    },
+    {
+      "id": "008",
+      "slug": "source-framing",
+      "title": "Source Framing: First-Person vs Third-Party",
+      "hypothesis": "If claims are framed as third-party attributions ('According to independent testing…'), then citation rate will be higher than first-person brand claims ('We found that…'), because LLMs trust attributed claims over self-promotion.",
+      "variable": "Claim attribution voice (third-party vs first-person brand)",
+      "lever": "source-framing",
+      "predicted_winner": "B",
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "n_per_variant": 30,
+      "priority": 7,
+      "status": "queued",
+      "youtube_angle": "Surprising implication: writing about yourself in third person may actually work."
+    },
+    {
+      "id": "004",
+      "slug": "entity-density",
+      "title": "Entity Density",
+      "hypothesis": "If content names 3+ concrete entities (products, people, standards, organisations) per 100 words, then citation rate will be higher than sparse entity usage, because entity density makes content more 'graspable' to retrieval systems.",
+      "variable": "Number of named concrete entities per 100 words",
+      "lever": "entity-density",
+      "predicted_winner": "B",
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "n_per_variant": 30,
+      "priority": 8,
+      "status": "queued",
+      "youtube_angle": "Name-dropping as a strategy — counterintuitive but grounded in how retrieval works."
+    },
+    {
+      "id": "007",
+      "slug": "freshness-signal",
+      "title": "Freshness Signals",
+      "hypothesis": "If content includes explicit date markers ('As of 2026…', 'Updated June 2026'), then citation rate will be higher than undated equivalent content, because LLMs prefer temporally anchored sources for factual queries.",
+      "variable": "Presence of date markers (dated vs undated)",
+      "lever": "freshness-signals",
+      "predicted_winner": "B",
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "n_per_variant": 30,
+      "priority": 9,
+      "status": "queued",
+      "youtube_angle": "Does adding a year to your content make AI cite it more? Simple test, big implications."
+    },
+    {
+      "id": "006",
+      "slug": "short-sentences",
+      "title": "Short Punchy Sentences vs Compound",
+      "hypothesis": "If each claim is a single short sentence (≤15 words), then citation rate will be higher than the same claims expressed in long compound sentences, because short sentences are more quote-able in LLM answers.",
+      "variable": "Sentence length (≤15 words vs 30+ words per sentence)",
+      "lever": "quotability",
+      "predicted_winner": "B",
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "n_per_variant": 30,
+      "priority": 10,
+      "status": "queued",
+      "youtube_angle": "Copywriting meets GEO — cross-audience appeal with content creators and marketers."
+    },
+    {
+      "id": "009",
+      "slug": "contradiction-handling",
+      "title": "Contradiction Handling",
+      "hypothesis": "If content explicitly addresses and refutes a common false claim about the topic, then citation rate will be higher than content that ignores competing narratives, because LLMs prioritise sources that resolve ambiguity.",
+      "variable": "Presence of explicit contradiction handling vs silence on alternatives",
+      "lever": "contradiction-handling",
+      "predicted_winner": "B",
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "n_per_variant": 30,
+      "priority": 11,
+      "status": "queued",
+      "youtube_angle": "The 'myth-busting' content strategy tested with data."
+    },
+    {
+      "id": "015",
+      "slug": "claim-specificity",
+      "title": "Claim Specificity",
+      "hypothesis": "If claims use highly specific metrics ('reduced median API latency from 340ms to 197ms'), then citation rate will be higher than category-level claims ('significantly improved API performance'), because specificity signals measurability.",
+      "variable": "Level of specificity (precise metric vs category descriptor)",
+      "lever": "claim-specificity",
+      "predicted_winner": "B",
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "n_per_variant": 30,
+      "priority": 12,
+      "status": "queued",
+      "youtube_angle": "Extension of the statistics experiment — tests whether the *format* of precision matters."
+    },
+    {
+      "id": "010",
+      "slug": "brand-name-frequency",
+      "title": "Brand Name Frequency",
+      "hypothesis": "If the brand name appears 4+ times in 200 words, then citation rate will be higher than content where it appears once, because repetition strengthens the signal connecting the brand to the topic.",
+      "variable": "Brand name repetition count (1× vs 4+× per 200 words)",
+      "lever": "brand-frequency",
+      "predicted_winner": "B",
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "n_per_variant": 30,
+      "priority": 13,
+      "status": "queued",
+      "youtube_angle": "Does keyword stuffing (for your own brand name) actually work in the AI era?"
+    },
+    {
+      "id": "011",
+      "slug": "active-vs-passive",
+      "title": "Active vs Passive Voice",
+      "hypothesis": "If claims use active voice ('Auspexi reduced onboarding time by 60%'), then citation rate will be higher than passive voice equivalents ('Onboarding time was reduced by 60%'), because active constructions are more attribution-ready.",
+      "variable": "Grammatical voice (active vs passive)",
+      "lever": "active-voice",
+      "predicted_winner": "B",
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "n_per_variant": 30,
+      "priority": 14,
+      "status": "queued",
+      "youtube_angle": "Writing rule every editor knows — tested against AI citation data for the first time."
+    },
+    {
+      "id": "014",
+      "slug": "heading-hierarchy",
+      "title": "Heading Hierarchy",
+      "hypothesis": "If content uses H2/H3 heading hierarchy to label facts, then citation rate will be higher than flat prose without headings, because structural markup gives retrieval systems clear extraction anchors.",
+      "variable": "Presence of H2/H3 heading structure vs unstructured prose",
+      "lever": "heading-structure",
+      "predicted_winner": "B",
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "n_per_variant": 30,
+      "priority": 15,
+      "status": "queued",
+      "youtube_angle": "Does document structure affect AI citation? Tests a universal content recommendation."
+    },
+    {
+      "id": "016",
+      "slug": "null-result-compilation",
+      "title": "Null Results Compilation",
+      "hypothesis": "Multiple levers tested individually will show no statistically significant effect, revealing which popular GEO advice is unsupported by data — a null result is a valid, publishable finding.",
+      "variable": "Compilation episode — no new probe, re-analyzes past non-significant results",
+      "lever": "null-results",
+      "predicted_winner": "null",
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "n_per_variant": 0,
+      "priority": 16,
+      "status": "queued",
+      "note": "Run this after ~14 experiments. Re-analyzes existing data — no probe cost. High trust-building value.",
+      "youtube_angle": "The 'myth-busting' compilation. 'I tested 14 GEO tactics. Half of them do nothing.' Very shareable."
     },
     {
       "id": "018",
@@ -319,14 +238,27 @@
       "variable": "Presence of JSON-LD schema (structured vs unstructured)",
       "lever": "json-ld",
       "predicted_winner": "B",
-      "platforms": [
-        "perplexity",
-        "gemini"
-      ],
+      "platforms": ["perplexity", "gemini"],
       "n_per_variant": 40,
+      "priority": 17,
+      "status": "queued",
+      "note": "Perplexity and Gemini grounding only. More technical episode — strong for SEO/technical audience.",
+      "youtube_angle": "Does JSON-LD actually get you cited? Technical test that SEOs have wanted for years."
+    },
+    {
+      "id": "012",
+      "slug": "anchor-stacking",
+      "title": "Anchor Stacking (Multi-Lever Combined)",
+      "hypothesis": "If content combines the three highest-performing individual levers (statistical anchor + definition sentence + answer-first), then citation rate will be higher than a control with none of these — and higher than any single lever alone.",
+      "variable": "Combination of top 3 proven levers vs control",
+      "lever": "anchor-stacking",
+      "predicted_winner": "B",
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
+      "n_per_variant": 30,
       "priority": 18,
       "status": "queued",
-      "note": "Perplexity and Gemini grounding only — OpenAI and Claude don't index live URLs in fast mode."
+      "note": "Depends on 001, 002, 003 being complete. The 'putting it all together' episode.",
+      "youtube_angle": "Season finale energy — combining the proven winners. Practical synthesis video."
     },
     {
       "id": "019",
@@ -336,16 +268,12 @@
       "variable": "Statistical anchor combined with content length (short vs long)",
       "lever": "anchor-length-interaction",
       "predicted_winner": "B-short",
-      "platforms": [
-        "gemini",
-        "openai",
-        "perplexity",
-        "claude"
-      ],
+      "platforms": ["gemini", "openai", "perplexity", "claude"],
       "n_per_variant": 30,
       "priority": 19,
       "status": "queued",
-      "note": "Run after experiments 001 and 006 to investigate interaction effects."
+      "note": "Depends on 001 and 006 being complete. Investigates interaction effects between two proven levers.",
+      "youtube_angle": "Advanced episode for the engaged audience — 'does content length change the rules?'"
     },
     {
       "id": "020",
@@ -355,14 +283,12 @@
       "variable": "Statistical anchor presence on live published pages (not in-context)",
       "lever": "live-parametric",
       "predicted_winner": "B",
-      "platforms": [
-        "perplexity",
-        "gemini"
-      ],
+      "platforms": ["perplexity", "gemini"],
       "n_per_variant": 20,
       "priority": 20,
       "status": "queued",
-      "note": "Quarterly flagship. Requires publishing real URLs on auspexi.com or a dedicated test domain. Run after fast-mode results establish the baseline."
+      "note": "Quarterly flagship. Requires publishing real URLs on auspexi.com or a dedicated test domain. Run after fast-mode results establish the baseline.",
+      "youtube_angle": "The definitive experiment — live content, real indexing, 6-week wait. Channel milestone video."
     }
   ]
 }
