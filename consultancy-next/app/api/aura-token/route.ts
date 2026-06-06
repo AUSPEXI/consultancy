@@ -21,7 +21,8 @@ export async function GET() {
     });
     return NextResponse.json({ token: token.name });
   } catch (err: any) {
-    console.error('[aura-token] ephemeral token failed, falling back to key:', err?.message);
-    return NextResponse.json({ key: apiKey });
+    console.error('[aura-token] ephemeral token failed:', err?.message);
+    // Never fall back to exposing the raw key — return 503 so the client can show an error
+    return NextResponse.json({ error: 'Voice agent temporarily unavailable' }, { status: 503 });
   }
 }
