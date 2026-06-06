@@ -2,6 +2,11 @@
   command = "npm install && npm run build"
   publish = "consultancy-next/.next"
 
+[functions]
+  # Use the Next.js app's own (empty) functions dir so Netlify does NOT bundle
+  # the legacy Vite/Express server at repo-root netlify/functions/api.ts.
+  directory = "consultancy-next/netlify/functions"
+
 [build.environment]
   NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
