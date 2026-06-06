@@ -12,6 +12,9 @@ on:
         required: false
         default: ''
 
+permissions:
+  contents: write
+
 jobs:
   run-lab:
     runs-on: ubuntu-latest
@@ -21,7 +24,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GEO_LAB_PAT }}
           fetch-depth: 1
 
       - name: Set up Node.js
