@@ -1,0 +1,70 @@
+name: GEO Lab Automation
+
+on:
+  schedule:
+    # 09:00 UTC every day — orchestrator decides what to do based on day + state
+    - cron: '0 9 * * *'
+  # Manual trigger: choose phase override
+  workflow_dispatch:
+    inputs:
+      force_phase:
+        description: 'Force a specific phase (design / probe / analyze) — leave blank for auto'
+        required: false
+        default: ''
+
+jobs:
+  run-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GEO_LAB_PAT }}
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install geo-lab dependencies
+        working-directory: geo-lab
+        run: npm install
+
+      - name: Run GEO Lab Orchestrator
+        working-directory: geo-lab
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
+          REPORT_EMAIL: ${{ secrets.REPORT_EMAIL }}
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.force_phase }}" ]; then
+            ARGS="--force-phase ${{ github.event.inputs.force_phase }}"
+          fi
+          node scripts/orchestrate.mjs $ARGS
+
+      - name: Commit results back to repo
+        run: |
+          git config user.name "GEO Lab Bot"
+          git config user.email "geo-lab@auspexi.com"
+          git add geo-lab/experiments/ geo-lab/lab-state.json
+          # Only commit if there are staged changes
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            PHASE=$(node -e "
+              const s=require('./geo-lab/lab-state.json');
+              const a=s.active_experiment;
+              if (!a) console.log('complete');
+              else console.log('running');
+            " 2>/dev/null || echo "update")
+            git commit -m "geo-lab: $PHASE — $(date -u '+%Y-%m-%d')"
+            git push origin ${{ github.ref_name }}
+          fi

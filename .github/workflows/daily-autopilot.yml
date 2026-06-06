@@ -4,7 +4,6 @@ on:
   schedule:
     # Runs at 06:00 UTC every day
     - cron: '0 6 * * *'
-  # Also allows manual trigger from GitHub Actions UI
   workflow_dispatch:
 
 jobs:
@@ -13,6 +12,21 @@ jobs:
     timeout-minutes: 30
 
     steps:
+      - name: Validate required secrets
+        run: |
+          missing=()
+          [ -z "${{ secrets.SITE_URL }}" ] && missing+=("SITE_URL")
+          [ -z "${{ secrets.CRON_SECRET }}" ] && missing+=("CRON_SECRET")
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "❌ Missing GitHub Secrets: ${missing[*]}"
+            echo ""
+            echo "Fix: Go to repo Settings → Secrets and variables → Actions → New repository secret"
+            echo "  SITE_URL     = your deployed Netlify URL, e.g. https://auspexi.com"
+            echo "  CRON_SECRET  = the value of CRON_SECRET in your Netlify environment variables"
+            exit 1
+          fi
+          echo "✓ Secrets present"
+
       - name: Trigger daily autopilot pipeline
         run: |
           echo "Triggering daily GEO autopilot at $(date -u)"
@@ -21,6 +35,7 @@ jobs:
             -X POST "${{ secrets.SITE_URL }}/api/cron/daily-autopilot" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json" \
+            --connect-timeout 15 \
             --max-time 1800)
 
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
@@ -29,9 +44,30 @@ jobs:
           echo "HTTP status: $HTTP_CODE"
           echo "Response: $BODY"
 
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "Autopilot failed with status $HTTP_CODE"
-            exit 1
-          fi
-
-          echo "Autopilot completed successfully"
+          case "$HTTP_CODE" in
+            200)
+              echo "✓ Autopilot completed successfully"
+              ;;
+            000)
+              echo "❌ Could not reach ${{ secrets.SITE_URL }} — check SITE_URL secret and that your Netlify site is deployed"
+              exit 1
+              ;;
+            401)
+              echo "❌ Unauthorized (401) — CRON_SECRET in GitHub does not match CRON_SECRET in Netlify env vars"
+              exit 1
+              ;;
+            404)
+              echo "❌ Not found (404) — /api/cron/daily-autopilot route does not exist at ${{ secrets.SITE_URL }}"
+              exit 1
+              ;;
+            500)
+              echo "❌ Server error (500) — check Netlify function logs for the root cause"
+              echo "Response body: $BODY"
+              exit 1
+              ;;
+            *)
+              echo "❌ Unexpected HTTP status $HTTP_CODE"
+              echo "Response body: $BODY"
+              exit 1
+              ;;
+          esac

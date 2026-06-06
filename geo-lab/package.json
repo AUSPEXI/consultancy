@@ -1,0 +1,19 @@
+{
+  "name": "geo-lab",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Automated GEO experiment lab — runs A/B citation probes and produces YouTube video packages.",
+  "scripts": {
+    "orchestrate": "node scripts/orchestrate.mjs",
+    "probe": "node scripts/probe.mjs",
+    "analyze": "node scripts/analyze.mjs",
+    "video": "node scripts/generate-video-package.mjs",
+    "report": "node scripts/send-report.mjs",
+    "dry-run": "node scripts/orchestrate.mjs --dry-run"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "nodemailer": "^6.9.14"
+  }
+}
