@@ -101,8 +101,12 @@ export async function GET(req: NextRequest) {
     // TEO axis embeddings — static, cache in Firestore
     let axisEmbeddings: number[][];
     let axisEmbeddingsWereNew = false;
+    // Axis embeddings must live in the SAME space as the fact embeddings they're
+    // projected against, so key the cache by the active embedding space.
+    const activeSpace = embeddingService.getActiveSpace('auto');
+    const spaceSlug = activeSpace.replace(/[^a-z0-9]/gi, '_');
     if (dbAdmin) {
-      const axisCacheRef = dbAdmin.collection('_embeddings_cache').doc('teo_axes_v1');
+      const axisCacheRef = dbAdmin.collection('_embeddings_cache').doc(`teo_axes_${spaceSlug}`);
       const axisCacheDoc = await axisCacheRef.get().catch(() => null);
       const cached = axisCacheDoc?.data()?.embeddings as number[][] | undefined;
       if (cached?.length === 3) {
@@ -110,7 +114,7 @@ export async function GET(req: NextRequest) {
       } else {
         axisEmbeddings = await embeddingService.generateEmbeddings(SEMANTIC_AXES);
         axisEmbeddingsWereNew = true;
-        axisCacheRef.set({ embeddings: axisEmbeddings, cachedAt: new Date().toISOString() }).catch(() => {});
+        axisCacheRef.set({ embeddings: axisEmbeddings, space: activeSpace, cachedAt: new Date().toISOString() }).catch(() => {});
       }
     } else {
       axisEmbeddings = await embeddingService.generateEmbeddings(SEMANTIC_AXES);
@@ -133,7 +137,7 @@ export async function GET(req: NextRequest) {
         if (dbAdmin) {
           const batch = dbAdmin.batch();
           needsEmbedding.forEach((f, i) => {
-            batch.update(dbAdmin!.collection(f.collection).doc(f.id), { embedding: freshEmbeddings[i] });
+            batch.update(dbAdmin!.collection(f.collection).doc(f.id), { embedding: freshEmbeddings[i], embeddingSpace: activeSpace });
           });
           batch.commit().catch(() => {});
         }

@@ -148,7 +148,10 @@ export default function ContentScorerPage() {
           category: contentType,
           createdAt: dateStr,
         };
-        if (fact.embedding?.length > 0) payload.embedding = fact.embedding;
+        if (fact.embedding?.length > 0) {
+          payload.embedding = fact.embedding;
+          if (fact.embeddingSpace) payload.embeddingSpace = fact.embeddingSpace;
+        }
         await addDoc(collection(db, 'facts'), payload);
       }
       await logAuditAction(user.uid, 'Extracted facts to Vault', { count: facts.length });

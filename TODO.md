@@ -59,7 +59,12 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
 ## Investigations
 - ☐ I1 Simulator original intent (git history) → informs S4.2
 - ☐ I2 Shadow Link original intent → informs S4.3
-- ☐ I3 1,200 local synonyms / 768-D embedding mechanism → informs S1.2
+- ☑ I3 Local synonym embedder BUILT — src/lib/local-synonyms.ts (synonym groups,
+       canonicalize) + src/lib/local-embeddings.ts (synonym-canonicalized feature
+       hashing, zero API cost). Wired into EmbeddingService as 'local'/'auto' mode;
+       facts now always get a vector. Verified: synonym-only sentences score 0.21
+       vs 0.00 for unrelated. Space-tagged (embeddingSpace) so local/API vectors
+       never cross-compared. TODO: grow dictionary toward 1,200+ word groups.
 - ☐ I4 Citacious knowledge-graph / personality file location → informs S3.4
 
 ## Lab tasks

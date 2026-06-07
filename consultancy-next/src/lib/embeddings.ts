@@ -1,10 +1,13 @@
 import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
+import { localEmbeddingService, LOCAL_EMBEDDING_SPACE } from './local-embeddings';
 
 const getGenAI = () => {
   const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
   return new GoogleGenAI({ apiKey });
 };
+
+export type EmbeddingMode = 'auto' | 'local' | 'api';
 
 export interface VectorPoint {
   id: string;
@@ -15,19 +18,54 @@ export interface VectorPoint {
 
 export class EmbeddingService {
   // Returns which engine is active — used for metadata/cost logging
-  getActiveEngine(): { name: string; model: string; dimensions: number } {
+  getActiveEngine(mode: EmbeddingMode = 'auto'): { name: string; model: string; dimensions: number } {
+    if (mode === 'local') {
+      return localEmbeddingService.getActiveEngine();
+    }
     if (process.env.OPENAI_API_KEY) {
       return { name: 'openai', model: 'text-embedding-3-small', dimensions: 1536 };
     }
-    return { name: 'gemini', model: 'text-embedding-004', dimensions: 768 };
+    if (process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY) {
+      return { name: 'gemini', model: 'text-embedding-004', dimensions: 768 };
+    }
+    // No API key configured → zero-cost local embedder
+    return localEmbeddingService.getActiveEngine();
   }
 
-  async generateEmbeddings(input: string | string[]): Promise<number[][]> {
+  /**
+   * The embedding "space" identifier for the vectors that generateEmbeddings
+   * would produce under the given mode. Store this alongside vectors so they're
+   * never cosine-compared across incompatible spaces.
+   */
+  getActiveSpace(mode: EmbeddingMode = 'auto'): string {
+    const engine = this.getActiveEngine(mode);
+    return engine.model;
+  }
+
+  /**
+   * Generate embeddings.
+   *  - mode 'local'  → always use the zero-cost synonym embedder
+   *  - mode 'api'    → always use the configured API (Gemini/OpenAI)
+   *  - mode 'auto'   → use API if a key exists, else fall back to local (free)
+   */
+  async generateEmbeddings(input: string | string[], mode: EmbeddingMode = 'auto'): Promise<number[][]> {
     const inputs = Array.isArray(input) ? input : [input];
     const cleanInputs = inputs.map(text => text.replace(/\n/g, ' ').trim()).filter(Boolean);
 
-    // OpenAI text-embedding-3-small: 1536 dims, $0.02/1M tokens — preferred
+    if (mode === 'local') {
+      return localEmbeddingService.embedMany(cleanInputs);
+    }
+
     const openaiKey = process.env.OPENAI_API_KEY;
+    const geminiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+
+    // No API key available — in auto mode this is the zero-cost path
+    if (!openaiKey && !geminiKey) {
+      if (mode === 'api') throw new Error('No embedding API key configured');
+      return localEmbeddingService.embedMany(cleanInputs);
+    }
+
+    // OpenAI text-embedding-3-small: 1536 dims, $0.02/1M tokens — preferred
     if (openaiKey) {
       const client = new OpenAI({ apiKey: openaiKey });
       const response = await client.embeddings.create({

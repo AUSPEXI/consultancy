@@ -36,21 +36,25 @@ export async function POST(request: Request) {
     }
 
     // Generate embeddings for all facts so the UMAP/map analytics can use them.
-    // Fire-and-forget — a failed embed never blocks the fact extraction response.
+    // In 'auto' mode this uses the API when a key exists, else the zero-cost local
+    // synonym embedder — so facts ALWAYS get a vector. A failed embed is non-fatal.
     let embeddings: (number[] | null)[] = facts.map(() => null);
+    let embeddingSpace = embeddingService.getActiveSpace('auto');
     try {
-      const vecs = await embeddingService.generateEmbeddings(facts);
+      const vecs = await embeddingService.generateEmbeddings(facts, 'auto');
       embeddings = vecs;
     } catch (embedErr) {
       console.warn('[extract-facts] embedding generation failed (non-fatal):', embedErr);
+      embeddingSpace = '';
     }
 
     const factsWithEmbeddings = facts.map((statement, i) => ({
       statement,
       embedding: embeddings[i] && (embeddings[i] as number[]).length > 0 ? embeddings[i] : null,
+      embeddingSpace: embeddings[i] && (embeddings[i] as number[]).length > 0 ? embeddingSpace : null,
     }));
 
-    return NextResponse.json({ success: true, facts: factsWithEmbeddings });
+    return NextResponse.json({ success: true, facts: factsWithEmbeddings, embeddingSpace });
   } catch (error: any) {
     console.error('Extract facts endpoint error:', error);
     return NextResponse.json({ error: 'Failed to extract facts' }, { status: 500 });
