@@ -1,22 +1,3 @@
-[build]
-  command = "npm run build"
-  publish = "dist"
-
-[functions]
-  node_bundler = "esbuild"
-  external_node_modules = ["vite"]
-
-[[redirects]]
-  from = "/sitemap.xml"
-  to = "/.netlify/functions/api/sitemap.xml"
-  status = 200
-
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/api/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# Legacy Vite app — this root netlify.toml is intentionally inert.
+# The live site is built from consultancy-next/ (base = consultancy-next set in Netlify UI).
+# Do not add redirects here; they would conflict with the Next.js app and break SEO.

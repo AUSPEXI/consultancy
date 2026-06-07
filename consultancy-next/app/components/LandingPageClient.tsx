@@ -231,43 +231,44 @@ export function LandingPageClient() {
     },
   ];
 
+  // Placeholder stubs — replace with real customer testimonials when available
   const testimonials = [
     {
-      text: "Auspexi completely changed our acquisition strategy. We stopped fighting for clicks and started optimizing for citations. Our inbound leads are up 400%.",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
-      name: "Sarah Jenkins",
-      role: "CMO, TechFlow",
+      text: "Your testimonial will appear here. Real words from a real customer about how Auspexi changed their GEO strategy.",
+      image: "/placeholder-avatar.svg",
+      name: "Your Name",
+      role: "Your Role, Your Company",
     },
     {
-      text: "The Content Scorer is incredible. We found exactly why our engineering blog wasn't being cited by ChatGPT, fixed our semantic structure, and saw an immediate jump in brand recommendations.",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-      name: "Marcus Chen",
-      role: "VP Growth, DataSync",
+      text: "Your testimonial will appear here. Real words from a real customer about how Auspexi changed their GEO strategy.",
+      image: "/placeholder-avatar.svg",
+      name: "Your Name",
+      role: "Your Role, Your Company",
     },
     {
-      text: "Traditional SEO is dying. Auspexi is the only platform we trust to ensure our brand survives the transition to Generative Engines.",
-      image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face",
-      name: "David Wright",
-      role: "Founder, Elevate Digital",
+      text: "Your testimonial will appear here. Real words from a real customer about how Auspexi changed their GEO strategy.",
+      image: "/placeholder-avatar.svg",
+      name: "Your Name",
+      role: "Your Role, Your Company",
     },
     {
-      text: "The Fact-Vault alone is worth the subscription. It automatically finds the highest-entropy data points in our whitepapers and turns them into cite-magnets.",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-      name: "Elena Rodriguez",
-      role: "Content Director, AI First",
+      text: "Your testimonial will appear here. Real words from a real customer about how Auspexi changed their GEO strategy.",
+      image: "/placeholder-avatar.svg",
+      name: "Your Name",
+      role: "Your Role, Your Company",
     },
     {
-      text: "We used to spend $50k/mo on paid search. Now we invest a fraction of that into GEO with Auspexi and get higher quality, intent-driven traffic.",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-      name: "James Wilson",
-      role: "CEO, MarketScale",
+      text: "Your testimonial will appear here. Real words from a real customer about how Auspexi changed their GEO strategy.",
+      image: "/placeholder-avatar.svg",
+      name: "Your Name",
+      role: "Your Role, Your Company",
     },
     {
-      text: "Auspexi's dashboard makes it so easy to explain the value of GEO to our executive team. The Share of Voice metrics are crystal clear.",
-      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
-      name: "Anita Patel",
-      role: "Head of SEO, GlobalRetail",
-    }
+      text: "Your testimonial will appear here. Real words from a real customer about how Auspexi changed their GEO strategy.",
+      image: "/placeholder-avatar.svg",
+      name: "Your Name",
+      role: "Your Role, Your Company",
+    },
   ];
 
   return (
@@ -779,7 +780,7 @@ export function LandingPageClient() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button onClick={() => handleOpenModal('trial')} size="lg" className="w-full sm:w-auto bg-white hover:bg-zinc-200 text-black text-lg px-8 h-14 rounded-xl shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
-              Start Your Free Trial
+              Get Your Free Report
             </Button>
             <Button onClick={() => handleOpenModal('demo')} size="lg" variant="outline" className="w-full sm:w-auto text-zinc-300 hover:text-white hover:bg-zinc-800 text-lg px-8 h-14 rounded-xl bg-zinc-900/50 backdrop-blur-sm shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
               Book a Demo

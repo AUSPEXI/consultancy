@@ -133,7 +133,7 @@ export default async function BlogPostPage(
                 Start extracting high-entropy facts and tracking your Share of Voice today.
               </p>
               <Link href="/" className="inline-flex items-center justify-center bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
-                Start Your Free Trial
+                Get Your Free Report
               </Link>
             </div>
           </div>

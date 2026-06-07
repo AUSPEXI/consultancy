@@ -255,7 +255,7 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          no cron needed.
 
 ## Sprint 8 — Marketing Honesty + SEO (read-only investigations, parallel track)
-- ⧖ S8.1 Frontend honesty check — IN PROGRESS.
+- ☑ S8.1 Frontend honesty check — DONE.
        FIXED (committed):
        • Homepage jsonLd/metadata highPrice '4999' → '1899' (matched real top tier).
        • entity-hub + schema-deploy gate copy "requires Premium tier" → "Pro" (Premium
@@ -277,7 +277,9 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
           to match reality, or build the features.
        4. investors/page.tsx uses "Enterprise"/"Premium" tier language — left as-is
           (forward-looking financial narrative, not a product feature promise).
-- ⧖ S8.2 SEO investigation — APP LAYER IS CLEAN; problem is the DEPLOY layer.
+- ☑ S8.2 SEO investigation — FIXED. Root netlify.toml neutralised (no longer hijacks
+         /sitemap.xml or rewrites /* → index.html). After redeploy verify
+         https://auspexi.com/sitemap.xml returns 48 URLs, then resubmit in GSC.
        Verified GOOD (no change needed):
        • app/sitemap.ts generates 48 URLs (10 static + 38 blog) — healthy.
        • app/robots.ts allows all marketing routes, disallows only /dashboard//api//og-
