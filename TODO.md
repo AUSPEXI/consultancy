@@ -277,10 +277,32 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
           to match reality, or build the features.
        4. investors/page.tsx uses "Enterprise"/"Premium" tier language — left as-is
           (forward-looking financial narrative, not a product feature promise).
-- ☐ S8.2 SEO investigation — 17 indexed vs 4+ in sitemap. Check next-sitemap config,
-         robots.txt, meta robots/noindex on marketing pages, generateMetadata coverage,
-         Netlify X-Robots-Tag headers (staging noindex carried to prod), GSC coverage.
-         Most likely: stray noindex header or over-broad robots.txt.
+- ⧖ S8.2 SEO investigation — APP LAYER IS CLEAN; problem is the DEPLOY layer.
+       Verified GOOD (no change needed):
+       • app/sitemap.ts generates 48 URLs (10 static + 38 blog) — healthy.
+       • app/robots.ts allows all marketing routes, disallows only /dashboard//api//og-
+         preview/, explicitly allows GPTBot/ClaudeBot/PerplexityBot/Googlebot/Google-Ext.
+       • NO noindex anywhere (no robots:{index:false}, no X-Robots-Tag noindex).
+       • next.config.js clean — sensible 301s for legacy AethergenAI paths, no SEO blocks.
+       • blog/[slug] HAS generateStaticParams + generateMetadata → SSG with per-post meta
+         (so blog pages are pre-rendered with real content + titles, not empty SPA shells).
+       • No stale public/sitemap.xml, _redirects, or _headers overriding the dynamic ones.
+       PRIME SUSPECT — conflicting root netlify.toml (repo-root, legacy Vite config):
+         publish="dist"; redirects /sitemap.xml → /.netlify/functions/api/sitemap.xml
+         (a LEGACY Express function that likely serves an OLD AethergenAI sitemap with only
+         a handful of URLs — this precisely explains "only ~4 picked up by sitemap"); and a
+         catch-all /* → /index.html 200 (SPA shell for every route). The correct Next.js
+         config lives at consultancy-next/netlify.toml (@netlify/plugin-nextjs).
+       RECOMMENDED FIX (needs deploy-config confirmation before I touch it — outward-facing):
+         1. In the Netlify UI, confirm the site's BASE DIRECTORY = consultancy-next so it
+            reads the correct netlify.toml (not the legacy repo-root one).
+         2. Once confirmed, neutralise/delete the repo-root netlify.toml + the leftover
+            root Vite app (index.html, vite.config.ts, root src/) so nothing can hijack
+            /sitemap.xml or rewrite /* → index.html.
+         3. After redeploy, fetch https://auspexi.com/sitemap.xml — confirm it returns all
+            48 Next URLs, then resubmit in Google Search Console.
+       NOTE: external WebFetch of the live sitemap/robots returned 403 (bot protection on
+       the host) — couldn't auto-verify which sitemap is live; the user/GSC can confirm.
 
 ---
 
