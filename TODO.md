@@ -149,7 +149,20 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
 - ☐ S5.4 Mobile responsive audit — audit all pages at 375px. Sidebar → hamburger,
          Overview dials stack, Cite-Probe chart scrollable, voice panel no overflow.
          Goal: usable on mobile, not pixel-perfect.
-- ☐ S5.5 Homepage marketing copy — the site currently feels clunky: everything is in
+- ☑ S5.5 Homepage marketing copy ADDED. New ValueSection component renders three
+         plain-language, value-first prose bands woven BETWEEN the existing feature boxes
+         (boxes untouched — they still feed LLM crawlers structured facts):
+         • Band A (after video, before Arsenal) "The quiet shift" — loss aversion +
+           first-mover urgency: AI answers about your industry without you.
+         • Band B (after Platform Features, before testimonials) "In plain English" —
+           removes jargon overwhelm, before/after proof framing of how it works.
+         • Band C (before pricing) "Why it's worth it" — anchors price against ad spend,
+           trust-transfer, compounding, competitor loss-aversion close.
+         ~5th-grade readability, short sentences, subtle psychological levers. Fade-in on
+         scroll, matches zinc/pink aesthetic.
+         NOTE for S8.1: homepage jsonLd/metadata still says highPrice '4999' — stale, real
+         top tier is $1,899/mo. Flag to fix in the marketing-honesty pass.
+- (orig spec) Homepage marketing copy — the site currently feels clunky: everything is in
          neat boxes (great for LLM-structured factual ingestion, weak for human visitors).
          Feature descriptions are accurate but read "genius-robot" — meaningless to a
          first-time visitor who doesn't yet understand GEO or why Auspexi is worth a

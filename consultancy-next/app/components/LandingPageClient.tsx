@@ -29,6 +29,44 @@ import { SplineScene } from '@/components/ui/splite';
 // Memoized feature card to prevent re-renders during interactions
 const MemoizedBentoCard = React.memo(BentoCard);
 
+// Plain-language value band — the human counterweight to the feature boxes.
+// The boxes feed AI crawlers structured facts; these sections speak to the
+// person deciding whether to subscribe. Kept deliberately simple and warm.
+function ValueSection({
+  eyebrow,
+  heading,
+  children,
+  tone = 'dark',
+}: {
+  eyebrow: string;
+  heading: string;
+  children: React.ReactNode;
+  tone?: 'dark' | 'muted';
+}) {
+  return (
+    <section className={`py-20 lg:py-28 ${tone === 'muted' ? 'bg-zinc-900/30 border-y border-zinc-900' : 'bg-zinc-950'}`}>
+      <div className="max-w-3xl mx-auto px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        >
+          <span className="inline-block text-pink-400 text-sm font-semibold uppercase tracking-widest mb-4">
+            {eyebrow}
+          </span>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading tracking-tight mb-6 leading-[1.15]">
+            {heading}
+          </h2>
+          <div className="space-y-5 text-lg md:text-xl text-zinc-300 leading-relaxed">
+            {children}
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
 function VideoPlayer() {
   const [playing, setPlaying] = useState(false);
   return (
@@ -364,6 +402,29 @@ export function LandingPageClient() {
         </div>
       </section>
 
+      {/* Value band — the human "why this matters to you" before the feature boxes */}
+      <ValueSection
+        eyebrow="The quiet shift"
+        heading="Right now, AI is answering questions about your industry — without you in the room."
+        tone="muted"
+      >
+        <p>
+          Think about the last time you looked something up. Now picture your customers skipping
+          the search box completely. They just ask ChatGPT, Gemini, or Claude — and they trust
+          whatever answer comes back.
+        </p>
+        <p>
+          Here&apos;s the part that should keep you up at night: the AI only names a handful of brands.
+          If yours isn&apos;t one of them, you don&apos;t get a second look. You&apos;re not on page two.
+          You&apos;re simply not in the conversation.
+        </p>
+        <p>
+          The good news is that almost no one has worked this out yet. The brands that move first
+          will own the answer for years. Auspexi exists to make sure the name the AI says out
+          loud is <span className="text-white font-semibold">yours</span>.
+        </p>
+      </ValueSection>
+
       {/* Bento Grid Features */}
       <section id="features" className="py-24 relative bg-zinc-950">
           <div className="max-w-7xl mx-auto px-6">
@@ -483,6 +544,30 @@ export function LandingPageClient() {
         </div>
       </section>
 
+      {/* Value band — plain-English "how it works", in human terms */}
+      <ValueSection
+        eyebrow="In plain English"
+        heading="We teach AI to trust your brand. Then we show you it worked."
+      >
+        <p>
+          You don&apos;t need to understand embeddings, schema, or vectors. That&apos;s our job. Here&apos;s
+          all you really need to know.
+        </p>
+        <p>
+          First, we check what the AI says about you today. That&apos;s your starting score. Most
+          brands are quietly shocked by how low it is.
+        </p>
+        <p>
+          Then we give the AI clear, true facts about your business — written the way AI likes to
+          read them — and we put those facts where the AI goes looking.
+        </p>
+        <p>
+          A few weeks later, we check again. You watch your score climb, and you see the AI naming
+          your brand in black and white. No guesswork. No vanity numbers. Just proof that more
+          people are hearing about you.
+        </p>
+      </ValueSection>
+
       {/* Testimonials */}
       <section id="testimonials" className="py-24 bg-zinc-900/30 border-y border-zinc-900 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
@@ -500,6 +585,29 @@ export function LandingPageClient() {
           </div>
         </div>
       </section>
+
+      {/* Value band — reframe the price before they see the numbers */}
+      <ValueSection
+        eyebrow="Why it's worth it"
+        heading="One AI answer can be worth more than a year of ads."
+      >
+        <p>
+          When AI recommends your brand, it doesn&apos;t feel like an ad. It feels like advice. People
+          trust advice. They act on it.
+        </p>
+        <p>
+          And unlike an ad, it doesn&apos;t switch off the moment you stop paying. The facts you build
+          with Auspexi keep working for you — in answer after answer, day after day.
+        </p>
+        <p>
+          Most of our customers were already spending far more on clicks that disappear the second
+          the budget runs out. This costs less, and it builds on itself over time.
+        </p>
+        <p className="text-white font-semibold">
+          So the real question isn&apos;t whether you can afford Auspexi. It&apos;s whether you can afford
+          to let a competitor become the answer instead.
+        </p>
+      </ValueSection>
 
       {/* Pricing */}
       <section id="pricing" className="py-24 bg-zinc-950">
