@@ -1,0 +1,384 @@
+{
+  "meta": {
+    "variants": [
+      "A",
+      "B"
+    ],
+    "queries": [
+      "How much faster can NovaCRM help sales teams close deals?",
+      "Does NovaCRM actually speed up the sales cycle?",
+      "What performance results does NovaCRM deliver for closing deals?",
+      "Is NovaCRM effective at shortening deal-closing time for sales teams?"
+    ],
+    "platforms": [
+      "gemini",
+      "openai",
+      "perplexity",
+      "claude"
+    ],
+    "trialsPerVariant": 2,
+    "runAt": "2026-06-07T11:04:00.896Z"
+  },
+  "results": [
+    {
+      "trial": 1,
+      "query": "How much faster can NovaCRM help sales teams close deals?",
+      "platform": "gemini",
+      "response": null,
+      "error": null,
+      "citations": {},
+      "timestamp": "2026-06-07T11:02:59.621Z"
+    },
+    {
+      "trial": 1,
+      "query": "How much faster can NovaCRM help sales teams close deals?",
+      "platform": "openai",
+      "response": "NovaCRM can help sales teams close deals 43% faster by transitioning from manual pipeline tracking to its automated workflow engine. This improvement allows representatives to spend less time on data entry and more time selling, resulting in shorter sales cycles and more accurate forecasting (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:02.118Z"
+    },
+    {
+      "trial": 1,
+      "query": "How much faster can NovaCRM help sales teams close deals?",
+      "platform": "perplexity",
+      "response": "NovaCRM can help sales teams close deals **43% faster** according to Source A. Source B only says it improved deal-closing speed significantly, but it does not give a number.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:04.369Z"
+    },
+    {
+      "trial": 1,
+      "query": "How much faster can NovaCRM help sales teams close deals?",
+      "platform": "claude",
+      "response": "According to Source A, NovaCRM cut deal-closing time by 43% for sales teams that switched from manual pipeline tracking to its automated workflow engine. Source B uses only a vague qualifier, stating that NovaCRM \"improved deal-closing speed significantly\" without providing a specific percentage. Based on the more detailed Source A, NovaCRM can help sales teams close deals 43% faster.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:06.167Z"
+    },
+    {
+      "trial": 1,
+      "query": "Does NovaCRM actually speed up the sales cycle?",
+      "platform": "gemini",
+      "response": null,
+      "error": null,
+      "citations": {},
+      "timestamp": "2026-06-07T11:03:06.742Z"
+    },
+    {
+      "trial": 1,
+      "query": "Does NovaCRM actually speed up the sales cycle?",
+      "platform": "openai",
+      "response": "Yes, NovaCRM does speed up the sales cycle. According to Source B, it cut deal-closing time by 43% for sales teams that transitioned from manual pipeline tracking to its automated workflow engine. Additionally, customers have reported shorter sales cycles and more consistent forecasting after adopting the tool (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:08.741Z"
+    },
+    {
+      "trial": 1,
+      "query": "Does NovaCRM actually speed up the sales cycle?",
+      "platform": "perplexity",
+      "response": "Yes—according to Source A, NovaCRM is described as *significantly improving* deal-closing speed, with automated workflow tracking, AI deal scoring, and fewer manual tasks supporting shorter sales cycles. Source B states the effect even more specifically, saying NovaCRM “cut deal-closing time 43%” for teams that switched from manual pipeline tracking.  \n\nThat said, both sources are promotional product copy rather than independent evaluations, so they support the claim that NovaCRM *can* speed up ",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:12.691Z"
+    },
+    {
+      "trial": 1,
+      "query": "Does NovaCRM actually speed up the sales cycle?",
+      "platform": "claude",
+      "response": "Yes, according to the provided sources, NovaCRM does speed up the sales cycle. Source A states that \"customers report shorter sales cycles and more consistent forecasting after adopting the tool,\" and Source B reports that NovaCRM \"cut deal-closing time 43% for sales teams that switched from manual pipeline tracking to its automated workflow engine.\" Both sources attribute this improvement to NovaCRM's automated workflow engine and AI deal scoring capabilities that reduce time spent on data entr",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:14.220Z"
+    },
+    {
+      "trial": 1,
+      "query": "What performance results does NovaCRM deliver for closing deals?",
+      "platform": "gemini",
+      "response": null,
+      "error": null,
+      "citations": {},
+      "timestamp": "2026-06-07T11:03:14.664Z"
+    },
+    {
+      "trial": 1,
+      "query": "What performance results does NovaCRM deliver for closing deals?",
+      "platform": "openai",
+      "response": "NovaCRM delivers significant performance results by cutting deal-closing time by 43% for sales teams that transition from manual pipeline tracking to its automated workflow engine. The platform enhances efficiency by automatically logging communications and employing AI deal scoring to prioritize high-potential opportunities, leading to shorter sales cycles and better forecasting (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:16.525Z"
+    },
+    {
+      "trial": 1,
+      "query": "What performance results does NovaCRM deliver for closing deals?",
+      "platform": "perplexity",
+      "response": "NovaCRM delivers a **43% cut in deal-closing time** for teams that switch from manual pipeline tracking to its automated workflow engine[Source A]. It also reports **shorter sales cycles** and more consistent forecasting, which supports faster closing and better visibility into deal status[Source A].",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:20.492Z"
+    },
+    {
+      "trial": 1,
+      "query": "What performance results does NovaCRM deliver for closing deals?",
+      "platform": "claude",
+      "response": "According to Source A, NovaCRM cut deal-closing time by 43% for sales teams that switched from manual pipeline tracking to its automated workflow engine. More broadly, customers report shorter sales cycles and more consistent forecasting after adopting the tool, with the platform's AI deal scoring helping managers identify which opportunities are most likely to close in the current quarter.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:22.287Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM effective at shortening deal-closing time for sales teams?",
+      "platform": "gemini",
+      "response": null,
+      "error": null,
+      "citations": {},
+      "timestamp": "2026-06-07T11:03:22.744Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM effective at shortening deal-closing time for sales teams?",
+      "platform": "openai",
+      "response": "Yes, NovaCRM is effective at shortening deal-closing time for sales teams. It has been shown to cut deal-closing time by 43% for teams that transitioned from manual pipeline tracking to its automated workflow engine (Source A). Additionally, customers report shorter sales cycles and improved forecasting after adopting the tool (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:24.338Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM effective at shortening deal-closing time for sales teams?",
+      "platform": "perplexity",
+      "response": "Yes—according to **Source A**, NovaCRM **cut deal-closing time by 43%** for sales teams that switched from manual pipeline tracking to its automated workflow engine. **Source B** says it “improved deal-closing speed significantly,” which points in the same direction, but Source A is more specific and therefore stronger evidence.[SOURCE A][SOURCE B]\n\nBeyond that, both sources say NovaCRM automatically logs emails, calls, and meeting notes, and that customers report shorter sales cycles and more c",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:28.184Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM effective at shortening deal-closing time for sales teams?",
+      "platform": "claude",
+      "response": "Yes, according to the sources, NovaCRM appears effective at shortening deal-closing time. Source A reports that NovaCRM \"cut deal-closing time 43% for sales teams that switched from manual pipeline tracking to its automated workflow engine.\" Additionally, both sources indicate that \"customers report shorter sales cycles and more consistent forecasting after adopting the tool,\" suggesting measurable improvements in deal velocity.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:29.728Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much faster can NovaCRM help sales teams close deals?",
+      "platform": "gemini",
+      "response": null,
+      "error": null,
+      "citations": {},
+      "timestamp": "2026-06-07T11:03:30.186Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much faster can NovaCRM help sales teams close deals?",
+      "platform": "openai",
+      "response": "NovaCRM can help sales teams close deals 43% faster by transitioning from manual pipeline tracking to its automated workflow engine (Source A). This significant reduction in deal-closing time allows teams to focus more on selling rather than data entry.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:31.953Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much faster can NovaCRM help sales teams close deals?",
+      "platform": "perplexity",
+      "response": "NovaCRM can help sales teams close deals **43% faster** by cutting deal-closing time for teams that switched from manual pipeline tracking to its automated workflow engine[Source A]. Source B makes the same claim more vaguely, saying it “improved deal-closing speed significantly,” but it does not give a number[Source B].",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:34.119Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much faster can NovaCRM help sales teams close deals?",
+      "platform": "claude",
+      "response": "According to Source A, NovaCRM cut deal-closing time by 43% for sales teams that switched from manual pipeline tracking to its automated workflow engine. Source B uses only vague language, stating that NovaCRM \"improved deal-closing speed significantly\" without providing a specific metric. The 43% figure from Source A is the only concrete speed improvement measurement provided.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:35.697Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM actually speed up the sales cycle?",
+      "platform": "gemini",
+      "response": null,
+      "error": null,
+      "citations": {},
+      "timestamp": "2026-06-07T11:03:36.154Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM actually speed up the sales cycle?",
+      "platform": "openai",
+      "response": "Yes, NovaCRM does speed up the sales cycle, as it reportedly cut deal-closing time by 43% for sales teams that transitioned from manual tracking to its automated workflow engine (Source A). Customers have also indicated experiencing shorter sales cycles and improved forecasting accuracy after implementing the platform (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:37.485Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM actually speed up the sales cycle?",
+      "platform": "perplexity",
+      "response": "Yes—according to Source A, NovaCRM **cut deal-closing time by 43%**, which is direct evidence that it can speed up the sales cycle. Source A also says customers report **shorter sales cycles** after adopting the tool.[SOURCE A]\n\nSource B supports the same general claim, but less specifically, saying NovaCRM **improved deal-closing speed significantly** and that customers report shorter sales cycles.[SOURCE B]",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:40.969Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM actually speed up the sales cycle?",
+      "platform": "claude",
+      "response": "According to Source A, NovaCRM does speed up the sales cycle—the platform cut deal-closing time by 43% for sales teams that switched from manual pipeline tracking to its automated workflow engine. Source A also notes that customers report shorter sales cycles and more consistent forecasting after adoption. The acceleration appears to stem from automating data entry tasks and using AI deal scoring to help managers prioritize opportunities, allowing sales reps to focus more time on selling.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:42.716Z"
+    },
+    {
+      "trial": 2,
+      "query": "What performance results does NovaCRM deliver for closing deals?",
+      "platform": "gemini",
+      "response": null,
+      "error": null,
+      "citations": {},
+      "timestamp": "2026-06-07T11:03:43.325Z"
+    },
+    {
+      "trial": 2,
+      "query": "What performance results does NovaCRM deliver for closing deals?",
+      "platform": "openai",
+      "response": "NovaCRM has been shown to cut deal-closing time by 43% for sales teams transitioning from manual pipeline tracking to its automated workflow engine. The platform enhances efficiency by automatically logging key communications and using AI deal scoring to identify high-potential opportunities (Source A). Customers report experiencing shorter sales cycles and more reliable forecasting after adopting NovaCRM (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:45.106Z"
+    },
+    {
+      "trial": 2,
+      "query": "What performance results does NovaCRM deliver for closing deals?",
+      "platform": "perplexity",
+      "response": "NovaCRM reports a **43% reduction in deal-closing time** for sales teams that switched from manual pipeline tracking to its automated workflow engine, according to Source A. It also says customers see **shorter sales cycles** and **more consistent forecasting** after adoption[Source A]. Source B describes the same product but only says it improved deal-closing speed significantly, without giving a specific number[Source B].",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:47.309Z"
+    },
+    {
+      "trial": 2,
+      "query": "What performance results does NovaCRM deliver for closing deals?",
+      "platform": "claude",
+      "response": "According to Source A, NovaCRM cut deal-closing time by 43% for sales teams that switched from manual pipeline tracking to its automated workflow engine. Source A also notes that customers report shorter sales cycles and more consistent forecasting after adopting the tool. Additionally, the platform's AI deal scoring helps managers identify which opportunities are most likely to close in the current quarter.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:48.595Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM effective at shortening deal-closing time for sales teams?",
+      "platform": "gemini",
+      "response": null,
+      "error": null,
+      "citations": {},
+      "timestamp": "2026-06-07T11:03:49.053Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM effective at shortening deal-closing time for sales teams?",
+      "platform": "openai",
+      "response": "Yes, NovaCRM has proven to be effective at shortening deal-closing time for sales teams, cutting it by 43% when transitioning from manual pipeline tracking to its automated workflow engine (Source B). The platform enables sales reps to focus more on selling rather than data entry by automatically logging communications and providing AI-driven deal scoring to prioritize opportunities (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:54.426Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM effective at shortening deal-closing time for sales teams?",
+      "platform": "perplexity",
+      "response": "Yes—according to Source A, NovaCRM **significantly improved deal-closing speed** for sales teams switching from manual pipeline tracking to its automated workflow engine. Source A also says customers report **shorter sales cycles**, which supports the claim that it helps close deals faster.  \n\nSource B is even more specific, stating that NovaCRM **cut deal-closing time by 43%** for those teams.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:03:58.707Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM effective at shortening deal-closing time for sales teams?",
+      "platform": "claude",
+      "response": "# Is NovaCRM Effective at Shortening Deal-Closing Time?\n\nYes, according to the provided sources, NovaCRM appears effective at shortening deal-closing time. According to Source B, NovaCRM cut deal-closing time by 43% for sales teams that switched from manual pipeline tracking to its automated workflow engine. Source A similarly reports that NovaCRM \"improved deal-closing speed significantly\" and that \"customers report shorter sales cycles\" after adopting the tool. Both sources attribute this impr",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "timestamp": "2026-06-07T11:04:00.594Z"
+    }
+  ]
+}
