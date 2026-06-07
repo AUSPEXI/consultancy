@@ -106,7 +106,24 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
 - ☐ S5.3–S5.4 (TBD)
 
 ## Sprint 6 — GEO Lab Feedback Loop
-- ☐ S6.1 Feed lab experiment findings back into dashboard content recommendations
+- ☑ S6.1 Closed the GEO Lab → dashboard loop. Lab experiments now feed live content
+         recommendations into the Content Scorer.
+         • analyze.mjs additionally emits machine-readable finding.json (aggregate
+           rates, significant comparisons, verdict, bestVariant, topEffect).
+         • New geo-lab/scripts/publish-finding.mjs: reads finding.json + backlog
+           entry, maps the lever to authored guidance (LEVER_GUIDANCE, 17 levers),
+           attaches the empirical result, POSTs to the dashboard. Non-fatal if env
+           unset. Wired into orchestrate.mjs analyze phase + `npm run publish`.
+         • New dashboard route /api/geo-findings: POST (Bearer GEO_FINDINGS_SECRET)
+           upserts by lever into Firestore geo_findings; GET (requireAuth) returns
+           active (significant) findings sorted by effect, + null-result count.
+         • Content Scorer page shows "Lab-Validated GEO Levers" panel with headline,
+           recommendation, effect (pp + platform), p-value, n. Only significant
+           findings surface as advice; nulls stored for transparency.
+         • geo-lab.yml passes DASHBOARD_URL + GEO_FINDINGS_SECRET; documented in
+           START_PROMPT.md. Citacious config → v6.
+         ⚠ Deploy: set GEO_FINDINGS_SECRET in BOTH Netlify (dashboard) and GitHub
+           secrets (lab), plus DASHBOARD_URL in GitHub secrets.
 - ☐ S6.2–S6.5 (TBD)
 
 ## Sprint 7 — Competitive Validation

@@ -69,6 +69,23 @@ Then in DESIGN.md you can specify `probe_mode: auspexi` and the probe runner
 will call your `/api/cite-probe` endpoint instead of calling the LLMs directly.
 This lets experiments use the same logic that runs in production.
 
+## Optional: publish findings to the dashboard
+
+When an experiment completes, the orchestrator's analyze phase can push the
+verdict into the Auspexi dashboard's content-recommendation loop (it appears as
+a "Lab-Validated GEO Lever" on the Content Scorer). Set:
+
+```
+DASHBOARD_URL=https://auspexi.com         # the consultancy-next deployment
+GEO_FINDINGS_SECRET=<shared secret>       # must match the dashboard's env var
+```
+
+Both are optional — if unset, `publish-finding.mjs` logs and skips without
+failing the pipeline. Only statistically significant findings become active
+recommendations; null results are stored for transparency but not surfaced as
+advice. The same `GEO_FINDINGS_SECRET` must be set in the dashboard's Netlify
+env vars for the POST to be authorised.
+
 ## Suggested first experiments (pick one to start)
 
 1. **Statistical anchors** — Does one specific number in the first sentence

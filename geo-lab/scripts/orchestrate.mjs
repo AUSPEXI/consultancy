@@ -291,6 +291,14 @@ async function analyzePhase(state, backlog) {
   log('Sending report email...');
   await runScript(path.join(__dir, 'send-report.mjs'), [experimentDir]);
 
+  // Publish the finding into the dashboard recommendation loop (non-fatal)
+  log('Publishing finding to dashboard...');
+  try {
+    await runScript(path.join(__dir, 'publish-finding.mjs'), [experimentDir]);
+  } catch (err) {
+    log(`Publish step failed (non-fatal): ${err.message}`);
+  }
+
   // Mark experiment complete
   const expEntry = backlog.experiments.find(e => e.id === exp.id);
   if (expEntry) {

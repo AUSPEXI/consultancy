@@ -6,7 +6,7 @@
  * audit logs and conversation history reflect which prompt version was in use.
  */
 
-export const CITACIOUS_CONFIG_VERSION = '2026-06-07-v5';
+export const CITACIOUS_CONFIG_VERSION = '2026-06-07-v6';
 
 export type ToolStatus = 'active' | 'beta' | 'deprecated';
 
@@ -84,9 +84,9 @@ export const DASHBOARD_TOOLS: DashboardTool[] = [
     id: 'content-scorer',
     name: 'Content Scorer',
     status: 'active',
-    purpose: "Analyst's Forge. Paste content to grade it on GEO readiness — entity density, fact entropy, schema coverage, and overall citation probability. Suggests specific edits before publishing.",
-    metrics: ['GEO score %', 'Entity density', 'Fact count extracted', 'Schema coverage'],
-    actions: ['Score content', 'Extract facts to Fact Vault', 'Get edit suggestions'],
+    purpose: "Analyst's Forge. Paste content to grade it on GEO readiness — entity density, fact entropy, schema coverage, and overall citation probability. Suggests specific edits before publishing, and surfaces Lab-Validated GEO Levers — content tactics proven to lift citation rate by real A/B experiments in the Auspexi GEO Lab, with effect sizes and p-values.",
+    metrics: ['GEO score %', 'Entity density', 'Fact count extracted', 'Schema coverage', 'Lab-validated levers (live from GEO Lab)'],
+    actions: ['Score content', 'Extract facts to Fact Vault', 'Get edit suggestions', 'Apply lab-validated GEO levers'],
     flavor: "Analyst's Forge",
   },
   {

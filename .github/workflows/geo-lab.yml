@@ -45,6 +45,10 @@ jobs:
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
           REPORT_EMAIL: ${{ secrets.REPORT_EMAIL }}
+          # Closes the lab → dashboard recommendation loop (publish-finding.mjs).
+          # Both are optional: if unset, the publish step is skipped non-fatally.
+          DASHBOARD_URL: ${{ secrets.DASHBOARD_URL }}
+          GEO_FINDINGS_SECRET: ${{ secrets.GEO_FINDINGS_SECRET }}
         run: |
           ARGS=""
           if [ -n "${{ github.event.inputs.force_phase }}" ]; then

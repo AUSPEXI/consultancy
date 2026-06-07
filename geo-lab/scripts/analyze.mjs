@@ -161,7 +161,49 @@ if (allSignificant.length > 1) {
   report += `- **Multiple comparisons**: ${allSignificant.length} simultaneous tests inflate the false-positive rate. Treat findings as exploratory unless pre-registered.\n`;
 }
 
+// ── Machine-readable finding ─────────────────────────────────────────────────
+// Consumed by publish-finding.mjs to push results into the dashboard's
+// content-recommendation loop. Keep this in sync with the prose report above.
+const aggregate = {};
+let bestVariant = null;
+let bestRate = -1;
+for (const v of variants) {
+  const rate = agg[v].total > 0 ? agg[v].cited / agg[v].total : 0;
+  aggregate[v] = { cited: agg[v].cited, total: agg[v].total, rate: +(rate * 100).toFixed(1) };
+  if (allSignificant.length > 0 && rate > bestRate) {
+    bestRate = rate;
+    bestVariant = v;
+  }
+}
+
+// Largest significant effect (absolute pp) — the headline a recommendation leans on.
+const topEffect = allSignificant
+  .map(s => ({ ...s, absDiff: Math.abs(parseFloat(s.diff)) }))
+  .sort((a, b) => b.absDiff - a.absDiff)[0] || null;
+
+const findingJson = {
+  runAt: meta.runAt,
+  variants,
+  platforms,
+  trialsPerVariant: meta.trialsPerVariant,
+  hypothesis,
+  aggregate,
+  significant: allSignificant.map(s => ({
+    platform: s.platform,
+    control: s.control,
+    treatment: s.treatment,
+    diffPp: parseFloat(s.diff),
+    pValue: s.pValue,
+  })),
+  verdict: allSignificant.length > 0 ? 'significant' : 'null',
+  bestVariant,
+  topEffect: topEffect
+    ? { platform: topEffect.platform, treatment: topEffect.treatment, diffPp: parseFloat(topEffect.diff), pValue: topEffect.pValue }
+    : null,
+};
+
 // ── Save ─────────────────────────────────────────────────────────────────────
 await fs.writeFile(path.join(experimentDir, 'FINDING.md'), report);
-console.log(`\nFINDING.md written to ${experimentDir}/`);
+await fs.writeFile(path.join(experimentDir, 'finding.json'), JSON.stringify(findingJson, null, 2) + '\n');
+console.log(`\nFINDING.md + finding.json written to ${experimentDir}/`);
 console.log('\nNext: node scripts/video-script.mjs ' + experimentDir);

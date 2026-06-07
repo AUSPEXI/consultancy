@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { PenTool, Loader2, CheckCircle2, AlertTriangle, ArrowRight, LayoutTemplate, FileText, BookOpen, Database, Megaphone, Code2, Download } from 'lucide-react';
+import { PenTool, Loader2, CheckCircle2, AlertTriangle, ArrowRight, LayoutTemplate, FileText, BookOpen, Database, Megaphone, Code2, Download, FlaskConical } from 'lucide-react';
 import { WorkflowProgress, markStepComplete } from '@/components/dashboard/WorkflowProgress';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
@@ -39,11 +39,28 @@ export default function ContentScorerPage() {
   const [isSavingFacts, setIsSavingFacts] = useState(false);
   const [factsSaved, setFactsSaved] = useState(false);
   const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [labLevers, setLabLevers] = useState<any[]>([]);
 
   const showToast = (text: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToast({ text, type });
     setTimeout(() => setToast(null), 4000);
   };
+
+  // Pull the GEO Lab's validated content levers so the recommendations shown
+  // here are grounded in the lab's real A/B citation experiments, not guesswork.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await authFetch('/api/geo-findings');
+        const data = await res.json();
+        if (!cancelled && data.success) setLabLevers(data.recommendations || []);
+      } catch {
+        /* non-blocking — the panel simply stays hidden if the loop has no data yet */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => { localStorage.setItem('contentScorer_content', content); }, [content]);
   useEffect(() => { localStorage.setItem('contentScorer_contentType', contentType); }, [contentType]);
@@ -248,6 +265,38 @@ export default function ContentScorerPage() {
           <button onClick={handleAnalyze} disabled={isAnalyzing || !content.trim()} className="w-full py-3 bg-pink-600 hover:bg-pink-700 text-white rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
             {isAnalyzing ? <><Loader2 className="w-4 h-4 animate-spin" /> Analyzing Intent &amp; Readability...</> : <><PenTool className="w-4 h-4" /> Analyze Content</>}
           </button>
+
+          {labLevers.length > 0 && (
+            <div className="bg-zinc-900/50 border border-indigo-500/20 rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <FlaskConical className="w-4 h-4 text-indigo-400" />
+                <h3 className="text-sm font-semibold text-white">Lab-Validated GEO Levers</h3>
+              </div>
+              <p className="text-xs text-zinc-500 mb-3">
+                Apply these while drafting — each is backed by a real A/B citation experiment in the Auspexi GEO Lab.
+              </p>
+              <div className="space-y-2">
+                {labLevers.map((lev) => (
+                  <div key={lev.lever} className="bg-zinc-950 border border-zinc-800 rounded-lg p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="text-sm font-medium text-indigo-300">{lev.headline}</p>
+                      {lev.topEffect && (
+                        <span className="shrink-0 text-[10px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-full whitespace-nowrap">
+                          {lev.topEffect.diffPp > 0 ? '+' : ''}{lev.topEffect.diffPp}pp · {lev.topEffect.platform}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-zinc-400 mt-1 leading-relaxed">{lev.recommendation}</p>
+                    {lev.topEffect && (
+                      <p className="text-[10px] text-zinc-600 mt-1.5">
+                        p={lev.topEffect.pValue}{lev.trialsPerVariant ? ` · n=${lev.trialsPerVariant}/variant` : ''}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {result && (
