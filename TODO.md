@@ -57,7 +57,14 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          imported by both Copilot.tsx (voice) and copilot-chat/route.ts (text).
          CITACIOUS_CONFIG_VERSION string for audit trail. Sprint discipline: bump version +
          update DASHBOARD_TOOLS at end of any sprint that changes dashboard features.
-- ☐ S3.6–S3.9 (TBD from voice audit)
+- ☐ S3.6 Voice session analytics — log session starts, duration, voice-triggered tool
+         navigations to copilot_sessions. Citacious can reference usage. No external cost.
+- ☐ S3.7 Aura onboarding flow — if settings.brand empty, Aura proactively asks for brand
+         name + domain on first session, then navigates to Settings (Aura-persona quest).
+- ☐ S3.8 Voice interrupt / barge-in — detect new speech while audioPlaying, cancel current
+         playback, process new utterance. Fixes top voice-UX frustration.
+- ☐ S3.9 Citacious in-session memory — rolling 10-turn history injected into system
+         instruction so it can reference earlier turns. Session-only, no Firestore.
 
 ## Sprint 4 — Satellite Tools
 - ☑ S4.1 Brand Monitor now uses REAL data. Replaced the fully-fabricated route
@@ -92,7 +99,19 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          tracking id, persists every link to shadow_links (+ audit_logs), and adds a GET
          history endpoint. Overview page uses authFetch and no longer fabricates an
          untracked link on failure (it surfaces the error). Citacious config → v4.
-- ☐ S4.4–S4.8 (TBD)
+- ☐ S4.4 GEO Pulse real data — audit sovMetrics source; if missing/fabricated, show
+         explicit "no data — run Citation Probe" state instead of fake trend lines.
+         (Trust fix, same class as S0.1/S0.2.)  [PRIORITY: trust-first]
+- ☐ S4.5 Competitor Radar real data — audit decay scores; if fabricated, compute real
+         decay = days since last competitor content update (Exa on their domain) weighted
+         by their probe-derived citation rate. No probe data → "run Citation Probe first".
+         [PRIORITY: trust-first]
+- ☐ S4.6 Autopilot real implementation — audit whether the probe→generate→publish→re-probe
+         loop actually runs or is a stub. If stub, implement real loop; gate Business tier.
+- ☐ S4.7 Agent webhook delivery confirmation — log webhook HTTP status + response snippet,
+         retry on 4xx/5xx (×3), surface per-article delivery status. Store on articles doc.
+- ☐ S4.8 Entity Hub Wikidata export — implement QuickStatements (tab-delimited batch)
+         export from the entity profile. Copy-to-clipboard. Pure formatting, no API call.
 
 ## Sprint 5 — UI/UX & Pricing
 - ☑ S5.1 Consolidate tier enum to 3 real tiers (Starter $149 / Pro $499 / Business $1,899).
@@ -113,7 +132,17 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          utility, not a Pro "advanced" tool. Citacious quest-path updated to 8-step
          flow (0-config → 1-measure → 2-vault → 3-generate → 4-score → 5-schema
          → 6-deploy → 7-probe → 8-defend). Config → v5.
-- ☐ S5.3–S5.4 (TBD)
+- ☐ S5.3 Onboarding checklist — dismissable 5-step checklist (persisted to users doc)
+         matching THE QUEST: Configure → First probe → Add 10 facts → Score article →
+         Deploy schema. Steps auto-check on completion. Replaces static S0.1 setup prompt
+         with something actionable.  [PRIORITY: trust-first]
+- ☐ S5.4 Mobile responsive audit — audit all pages at 375px. Sidebar → hamburger,
+         Overview dials stack, Cite-Probe chart scrollable, voice panel no overflow.
+         Goal: usable on mobile, not pixel-perfect.
+- ☐ S5.5 Homepage marketing copy — add human-language, value-focused prose sections
+         between the feature boxes. 5th-grade readability, subtle psychological levers
+         (loss aversion, social proof, future-pacing). Boxes stay (LLM-structured facts);
+         prose balances aesthetic + conversion for first-time human visitors.
 
 ## Sprint 6 — GEO Lab Feedback Loop
 - ☑ S6.1 Closed the GEO Lab → dashboard loop. Lab experiments now feed live content
@@ -134,10 +163,34 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
            START_PROMPT.md. Citacious config → v6.
          ⚠ Deploy: set GEO_FINDINGS_SECRET in BOTH Netlify (dashboard) and GitHub
            secrets (lab), plus DASHBOARD_URL in GitHub secrets.
-- ☐ S6.2–S6.5 (TBD)
+- ☐ S6.2 Lab results history page — dedicated /dashboard/geo-lab (read-only, Pro+)
+         showing all findings: significant w/ effect sizes, null counts, run timeline.
+         Uses existing GET /api/geo-findings. Add geo-lab to Citacious manifest.
+- ☐ S6.3 User-triggered experiment requests — "Request an experiment" button writes a
+         hypothesis to lab_requests; weekly orchestrator pulls top-voted into backlog.json.
+- ☐ S6.4 Lab findings digest email — on significant publish, POST to Netlify fn that emails
+         a one-line digest to sales@auspexi.com (+ opt-in users). Non-fatal.
+- ☐ S6.5 Embed lab findings into Agent generation — inject top 3 active significant levers
+         as explicit instructions into the article-generation prompt. Structural adoption.
 
 ## Sprint 7 — Competitive Validation
-- ☐ S7.1–S7.2 (TBD)
+- ☐ S7.1 Competitor citation comparison — "Competitor Probe" mode runs the same query set
+         for the user's brand AND a competitor domain; two citation-rate columns, per-query
+         winner. Stored in citation_tests with mode:'competitor' + competitorDomain.
+- ☐ S7.2 Industry citation benchmarks — aggregate anonymised rates (no PII, industry
+         category only) into benchmark bands on the Cite-Probe chart. Opt-in toggle in
+         Settings; weekly aggregation job/cloud function.
+
+## Sprint 8 — Marketing Honesty + SEO (read-only investigations, parallel track)
+- ☐ S8.1 Frontend honesty check — audit homepage hero/what-we-do/feature grid, Auspexi
+         Arsenal, pricing cards (Starter $149 / Pro $499 / Business $1,899 + feature lists
+         vs real gates), blog posts referencing changed features (Simulator/Brand Monitor/
+         Shadow Link), and stale beta/coming-soon labels. Ground truth = DASHBOARD_TOOLS +
+         tiers.ts.
+- ☐ S8.2 SEO investigation — 17 indexed vs 4+ in sitemap. Check next-sitemap config,
+         robots.txt, meta robots/noindex on marketing pages, generateMetadata coverage,
+         Netlify X-Robots-Tag headers (staging noindex carried to prod), GSC coverage.
+         Most likely: stray noindex header or over-broad robots.txt.
 
 ---
 
