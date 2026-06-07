@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { GoogleGenAI, Type, Modality } from '@google/genai';
 import { Bot, X, Send, Maximize2, Minimize2, Sparkles, Mic, MicOff, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { collection, getDocs, getDoc, doc, query, orderBy, limit, where } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc, query, orderBy, limit, where, addDoc } from 'firebase/firestore';
 import { db, auth } from '@/firebase';
 import { CITACIOUS_GEO_KNOWLEDGE } from '@/data/faqData';
 import { authFetch } from '@/lib/auth-fetch';
@@ -137,6 +137,11 @@ export function Copilot({ setActiveTab }: CopilotProps) {
   const isManualDisconnectRef = useRef(false);
   const reconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
   const toggleVoiceRef = useRef<(() => Promise<void>) | null>(null);
+  // S3.9: rolling voice turn history — injected into systemInstruction for in-session memory
+  const voiceTurnsRef = useRef<{ role: 'user' | 'citacious'; text: string }[]>([]);
+  // S3.6: session start time for duration logging
+  const voiceSessionStartRef = useRef<number | null>(null);
+  const voiceNavCountRef = useRef<number>(0);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -412,7 +417,11 @@ MATHEMATICAL DEFINITIONS:
 GEO KNOWLEDGE BASE (use this to answer any user questions about GEO concepts, strategy, or Auspexi features accurately):
 ${CITACIOUS_GEO_KNOWLEDGE}
 
-${knowledgeContext}`;
+${knowledgeContext}
+
+${voiceTurnsRef.current.length > 0
+  ? `CURRENT VOICE SESSION — RECENT TURNS (use this to maintain conversational continuity; do NOT repeat what was already said unless asked):\n${voiceTurnsRef.current.slice(-10).map(t => `${t.role === 'user' ? 'USER' : 'CITACIOUS'}: ${t.text}`).join('\n')}`
+  : ''}`;
 
   const disconnectVoice = () => {
     if (reconnectTimerRef.current) { clearTimeout(reconnectTimerRef.current); reconnectTimerRef.current = null; }
@@ -420,6 +429,22 @@ ${knowledgeContext}`;
       sessionRef.current.close();
       sessionRef.current = null;
     }
+    // S3.6: log session end with duration + nav count
+    const currentUser = auth?.currentUser;
+    if (currentUser && db && voiceSessionStartRef.current) {
+      const durationSeconds = Math.round((Date.now() - voiceSessionStartRef.current) / 1000);
+      addDoc(collection(db, 'copilot_sessions'), {
+        userId: currentUser.uid,
+        agent: 'citacious',
+        event: 'end',
+        durationSeconds,
+        navigationCount: voiceNavCountRef.current,
+        turnCount: voiceTurnsRef.current.length,
+        endedAt: new Date().toISOString(),
+      }).catch(() => {});
+      voiceSessionStartRef.current = null;
+    }
+    voiceTurnsRef.current = []; // clear history on disconnect (S3.9 — session-only)
     if (scriptProcessorRef.current) {
       scriptProcessorRef.current.disconnect();
       scriptProcessorRef.current = null;
@@ -508,6 +533,19 @@ ${knowledgeContext}`;
         },
         callbacks: {
           onopen: async () => {
+            // S3.6: log session start
+            voiceSessionStartRef.current = Date.now();
+            voiceNavCountRef.current = 0;
+            voiceTurnsRef.current = []; // fresh history per session (S3.9)
+            const currentUser = auth?.currentUser;
+            if (currentUser && db) {
+              addDoc(collection(db, 'copilot_sessions'), {
+                userId: currentUser.uid,
+                agent: 'citacious',
+                event: 'start',
+                startedAt: new Date().toISOString(),
+              }).catch(() => {});
+            }
             try {
               const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
               audioContextRef.current = audioCtx;
@@ -578,6 +616,7 @@ registerProcessor('pcm-capture', PCMCaptureProcessor);
               if (functionCalls && functionCalls.length > 0) {
                 const call = functionCalls[0];
                 if (call.name === "navigateToTab") {
+                  voiceNavCountRef.current += 1; // S3.6: track navigations per session
                   const tabId = (call.args as any).tabId;
                   router.push(`/dashboard/${tabId}`);
                   setActiveTab?.(tabId);
@@ -613,11 +652,15 @@ registerProcessor('pcm-capture', PCMCaptureProcessor);
 
             const inputTranscription = message.serverContent?.inputTranscription?.text;
             if (inputTranscription) {
+              // S3.9: accumulate user turns for in-session memory
+              const last = voiceTurnsRef.current[voiceTurnsRef.current.length - 1];
+              if (last?.role === 'user') last.text += ' ' + inputTranscription;
+              else voiceTurnsRef.current.push({ role: 'user', text: inputTranscription });
               setMessages(prev => {
-                const last = prev[prev.length - 1];
-                if (last && last.role === 'user') {
+                const lastMsg = prev[prev.length - 1];
+                if (lastMsg && lastMsg.role === 'user') {
                   const newMessages = [...prev];
-                  newMessages[newMessages.length - 1] = { ...last, content: last.content + " " + inputTranscription };
+                  newMessages[newMessages.length - 1] = { ...lastMsg, content: lastMsg.content + " " + inputTranscription };
                   return newMessages;
                 } else {
                   return [...prev, { role: 'user', content: inputTranscription }];
@@ -627,11 +670,15 @@ registerProcessor('pcm-capture', PCMCaptureProcessor);
 
             const outputTranscription = message.serverContent?.outputTranscription?.text;
             if (outputTranscription) {
+              // S3.9: accumulate Citacious turns
+              const last = voiceTurnsRef.current[voiceTurnsRef.current.length - 1];
+              if (last?.role === 'citacious') last.text += ' ' + outputTranscription;
+              else voiceTurnsRef.current.push({ role: 'citacious', text: outputTranscription });
               setMessages(prev => {
-                const last = prev[prev.length - 1];
-                if (last && last.role === 'model') {
+                const lastMsg = prev[prev.length - 1];
+                if (lastMsg && lastMsg.role === 'model') {
                   const newMessages = [...prev];
-                  newMessages[newMessages.length - 1] = { ...last, content: last.content + " " + outputTranscription };
+                  newMessages[newMessages.length - 1] = { ...lastMsg, content: lastMsg.content + " " + outputTranscription };
                   return newMessages;
                 } else {
                   return [...prev, { role: 'model', content: outputTranscription }];

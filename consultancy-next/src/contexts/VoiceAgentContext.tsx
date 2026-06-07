@@ -76,6 +76,8 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
   const isManualDisconnectRef = useRef(false);
   const reconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
   const connectRef = useRef<(() => Promise<void>) | null>(null);
+  // S3.6: session timing
+  const auraSessionStartRef = useRef<number | null>(null);
 
   const stopAllSources = () => {
     activeSourcesRef.current.forEach(source => {
@@ -194,9 +196,11 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
       if (!credential) throw new Error('Voice credential not configured on server');
       const ai = new GoogleGenAI({ apiKey: credential, httpOptions: { apiVersion: 'v1alpha' } });
 
+      // S3.7: Aura onboarding — detect first-visit / unconfigured state and proactively guide
+      const isUnconfigured = !userData?.brand;
       const visitorContext = userData?.brand
         ? `\n\nVISITOR CONTEXT: You are speaking with someone from "${userData.brand}"${userData.domain ? ` (${userData.domain})` : ''}. They are already an Auspexi customer. Welcome them warmly and offer to guide them to their dashboard.`
-        : '';
+        : `\n\nVISITOR CONTEXT: This visitor has not yet set up their brand. As soon as you greet them, ask: "Before I can show you what Auspexi can do for your brand specifically, can you tell me your company name and website?" Once they share their company name, warmly acknowledge it and use navigateToPage("dashboard") so they can set up. If they are not ready to share, just answer their questions about GEO.`;
 
       const systemInstruction = `You are Aura — Auspexi's voice brand guide on the public website. You are warm, knowledgeable, and concise.
 
@@ -284,8 +288,19 @@ ${visitorContext}`;
               const source = audioCtx.createMediaStreamSource(stream);
               const processor = audioCtx.createScriptProcessor(4096, 1, 1);
               processor.onaudioprocess = (e) => {
-                if (isOutputtingRef.current || activeSourcesRef.current.length > 0) return;
                 const inputData = e.inputBuffer.getChannelData(0);
+                // S3.8 barge-in: if Aura is speaking and user produces sound above a threshold,
+                // cancel current playback so their new utterance is processed immediately.
+                if (activeSourcesRef.current.length > 0) {
+                  const rms = Math.sqrt(inputData.reduce((s, v) => s + v * v, 0) / inputData.length);
+                  if (rms > 0.02) {
+                    activeSourcesRef.current.forEach(s => { try { s.stop(); } catch (_) {} });
+                    activeSourcesRef.current = [];
+                    isOutputtingRef.current = false;
+                    nextPlayTimeRef.current = audioCtx.currentTime;
+                  }
+                }
+                if (isOutputtingRef.current || activeSourcesRef.current.length > 0) return;
                 const int16Data = float32ToInt16(inputData);
                 const base64 = int16ToBase64(int16Data);
                 sessionPromise.then((session) => {
@@ -302,6 +317,17 @@ ${visitorContext}`;
               scriptProcessorRef.current = processor;
               setIsConnected(true);
               setIsConnecting(false);
+              // S3.6: log Aura session start
+              auraSessionStartRef.current = Date.now();
+              const currentUser = auth?.currentUser;
+              if (currentUser && db) {
+                addDoc(collection(db, 'copilot_sessions'), {
+                  userId: currentUser.uid,
+                  agent: 'aura',
+                  event: 'start',
+                  startedAt: new Date().toISOString(),
+                }).catch(() => {});
+              }
             } catch (err: any) {
               console.error("Microphone access error:", err);
               setError("Microphone access denied or unavailable. Please check your permissions.");
@@ -427,6 +453,19 @@ ${visitorContext}`;
     if (transcriptRef.current.length > 0) {
       processTranscriptAndExtractKnowledge([...transcriptRef.current]);
       transcriptRef.current = [];
+    }
+    // S3.6: log Aura session end with duration
+    const currentUser = auth?.currentUser;
+    if (currentUser && db && auraSessionStartRef.current) {
+      const durationSeconds = Math.round((Date.now() - auraSessionStartRef.current) / 1000);
+      addDoc(collection(db, 'copilot_sessions'), {
+        userId: currentUser.uid,
+        agent: 'aura',
+        event: 'end',
+        durationSeconds,
+        endedAt: new Date().toISOString(),
+      }).catch(() => {});
+      auraSessionStartRef.current = null;
     }
     if (sessionRef.current) { sessionRef.current.close(); sessionRef.current = null; }
     if (scriptProcessorRef.current) { scriptProcessorRef.current.disconnect(); scriptProcessorRef.current = null; }

@@ -57,14 +57,22 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          imported by both Copilot.tsx (voice) and copilot-chat/route.ts (text).
          CITACIOUS_CONFIG_VERSION string for audit trail. Sprint discipline: bump version +
          update DASHBOARD_TOOLS at end of any sprint that changes dashboard features.
-- ☐ S3.6 Voice session analytics — log session starts, duration, voice-triggered tool
-         navigations to copilot_sessions. Citacious can reference usage. No external cost.
-- ☐ S3.7 Aura onboarding flow — if settings.brand empty, Aura proactively asks for brand
-         name + domain on first session, then navigates to Settings (Aura-persona quest).
-- ☐ S3.8 Voice interrupt / barge-in — detect new speech while audioPlaying, cancel current
-         playback, process new utterance. Fixes top voice-UX frustration.
-- ☐ S3.9 Citacious in-session memory — rolling 10-turn history injected into system
-         instruction so it can reference earlier turns. Session-only, no Firestore.
+- ☑ S3.6 Voice session analytics. Both Aura (VoiceAgentContext) and Citacious (Copilot)
+         now log START and END events to copilot_sessions collection: userId, agent, event,
+         startedAt/endedAt, durationSeconds. Citacious also logs navigationCount (voice-
+         triggered navigateToTab calls) and turnCount per session. No external cost.
+- ☑ S3.7 Aura onboarding flow. When visitor has no brand configured, the Aura system
+         instruction includes a VISITOR CONTEXT block instructing Aura to open with
+         "can you tell me your company name and website?" and navigate to dashboard once
+         they share. Configured visitors get a warm returning-customer welcome instead.
+- ☑ S3.8 Voice barge-in implemented in VoiceAgentContext. The audio processor now
+         computes RMS of each input frame; if Aura is speaking (activeSourcesRef > 0) and
+         RMS > 0.02, all active audio sources are stopped immediately and isOutputtingRef
+         is reset so the user's new utterance is sent without waiting for playback to end.
+- ☑ S3.9 Citacious in-session turn memory. voiceTurnsRef accumulates user + Citacious
+         turns from input/output transcriptions during the session. Last 10 turns are
+         injected into systemInstruction as "CURRENT VOICE SESSION — RECENT TURNS" so
+         Citacious can reference earlier parts of the conversation. Cleared on disconnect.
 
 ## Sprint 4 — Satellite Tools
 - ☑ S4.1 Brand Monitor now uses REAL data. Replaced the fully-fabricated route
