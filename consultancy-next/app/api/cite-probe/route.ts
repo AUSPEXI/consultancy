@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
 import { dbAdmin } from '@/lib/firebase-admin';
+import { computeAttribution } from '@/lib/attribution';
 
 // Build 7 brand-and-keyword-specific queries so the probe is relevant to the actual client
 function buildQueries(brand: string, _domain: string, keywords: string[]): string[] {
@@ -329,12 +330,31 @@ export async function POST(request: Request) {
     const misinformationCount = queryResults.filter(r => r.cited && !r.accurate).length;
     const activePlatforms = activeRates.length;
 
+    // Closed-loop attribution: correlate this run against the previous one and the
+    // facts/articles added in between. Computed BEFORE persisting so the "previous
+    // run" lookup doesn't see the run we're about to write. Non-fatal.
+    let attribution = null;
+    if (dbAdmin && userId !== 'anonymous') {
+      try {
+        attribution = await computeAttribution(
+          dbAdmin,
+          userId,
+          queryResults.map(r => ({ query: r.query, cited: r.cited })),
+          citationRate,
+          timestamp,
+        );
+      } catch (attrErr) {
+        console.warn('[cite-probe] attribution failed (non-fatal):', attrErr);
+      }
+    }
+
     const probeResult = {
       brand, domain, userId, timestamp,
       citationRate, citedCount, misinformationCount,
       totalQueries: testQueries.length,
       activePlatforms, platformRates,
       results: queryResults,
+      attribution,
     };
 
     if (dbAdmin && userId !== 'anonymous') {

@@ -18,7 +18,17 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
 - ☑ S1.1 Persist + reload citation history (`GET /api/cite-probe`) → trend chart on Cite-Probe page
 - ☑ S1.2 Fact embedding logging — extract-facts generates+returns embeddings;
          content-scorer write path stores embedding field; Fact interface updated
-- ☐ S1.3 Link probe runs to facts/articles (closed-loop attribution) — deferred to S6
+- ☑ S1.3 Closed-loop attribution. New src/lib/attribution.ts correlates each probe
+         run against the user's PREVIOUS run and the facts/articles created in the
+         window between them. Computes newly-won queries (cited now, not before),
+         lost queries, and ranks facts/articles by keyword overlap with the newly-won
+         queries. Pure timestamp-windowing + keyword overlap — no model calls, no
+         fabrication. Wired into /api/cite-probe POST (computed before persisting so
+         the previous-run lookup is clean; stored on the citation_test doc + returned).
+         Cite-Probe page shows a "Since Your Last Probe" panel: delta pp badge,
+         newly-cited query chips, likely-contributing facts/articles with the queries
+         they match. Framed explicitly as CORRELATION not proof, with the 2–6 week
+         GEO-propagation caveat. Citacious config → v7.
 - ☑ S1.4 Build A-SOV trend from real citation_tests history (Overview chart no longer
          fabricates a 12→45 ramp; demo data clearly badged for zero-data users)
 - ☑ S1.5 GET /api/export-training-set?userId=&format=jsonl|csv

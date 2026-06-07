@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Zap, Loader2, CheckCircle2, XCircle, TrendingUp, Target, RefreshCw, AlertTriangle, ShieldCheck, Plus, X, BookOpen, Layers } from 'lucide-react';
+import { Zap, Loader2, CheckCircle2, XCircle, TrendingUp, Target, RefreshCw, AlertTriangle, ShieldCheck, Plus, X, BookOpen, Layers, GitBranch, Database, FileText } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { checkTierAccess } from '@/constants/tiers';
@@ -49,6 +49,29 @@ interface ProbeRun {
   };
   results: ProbeResult[];
   timestamp: string;
+  attribution?: Attribution | null;
+}
+
+interface ContributingItem {
+  id: string;
+  label: string;
+  matchedQueries: string[];
+  overlap: number;
+}
+
+interface Attribution {
+  hasPrevious: boolean;
+  prevTimestamp: string | null;
+  prevRate: number | null;
+  newRate: number;
+  deltaPp: number | null;
+  newlyWonQueries: string[];
+  lostQueries: string[];
+  factsAddedInWindow: number;
+  articlesAddedInWindow: number;
+  contributingFacts: ContributingItem[];
+  contributingArticles: ContributingItem[];
+  note: string;
 }
 
 const PLATFORM_META = {
@@ -457,6 +480,88 @@ export default function CiteProbePage() {
                   );
                 })}
               </div>
+            </div>
+          )}
+
+          {/* Closed-loop attribution — what changed since the last probe */}
+          {probeData.attribution?.hasPrevious && (
+            <div className="bg-zinc-900/50 border border-indigo-500/20 rounded-xl p-6">
+              <div className="flex items-center gap-2 mb-1">
+                <GitBranch className="w-4 h-4 text-indigo-400" />
+                <h3 className="text-sm font-semibold text-white">Since Your Last Probe</h3>
+                {typeof probeData.attribution.deltaPp === 'number' && (
+                  <span className={`ml-1 text-[11px] font-bold px-2 py-0.5 rounded-full border ${
+                    probeData.attribution.deltaPp > 0
+                      ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20'
+                      : probeData.attribution.deltaPp < 0
+                      ? 'text-red-400 bg-red-400/10 border-red-400/20'
+                      : 'text-zinc-400 bg-zinc-400/10 border-zinc-700'
+                  }`}>
+                    {probeData.attribution.deltaPp > 0 ? '+' : ''}{probeData.attribution.deltaPp}pp
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-zinc-400 leading-relaxed mb-4">{probeData.attribution.note}</p>
+
+              {probeData.attribution.newlyWonQueries.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider mb-2">
+                    Newly cited queries
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {probeData.attribution.newlyWonQueries.map((q, i) => (
+                      <span key={i} className="text-xs text-emerald-300 bg-emerald-400/10 border border-emerald-400/20 rounded-lg px-2.5 py-1">
+                        {q}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(probeData.attribution.contributingFacts.length > 0 || probeData.attribution.contributingArticles.length > 0) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {probeData.attribution.contributingFacts.length > 0 && (
+                    <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Database className="w-3.5 h-3.5 text-blue-400" />
+                        <p className="text-xs font-semibold text-white">Likely-contributing facts</p>
+                      </div>
+                      <ul className="space-y-2">
+                        {probeData.attribution.contributingFacts.map((f) => (
+                          <li key={f.id} className="text-xs text-zinc-400 leading-relaxed">
+                            <span className="text-zinc-300">{f.label}</span>
+                            <span className="block text-[10px] text-zinc-600 mt-0.5">
+                              matches: {f.matchedQueries.join('; ')}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {probeData.attribution.contributingArticles.length > 0 && (
+                    <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <FileText className="w-3.5 h-3.5 text-pink-400" />
+                        <p className="text-xs font-semibold text-white">Likely-contributing articles</p>
+                      </div>
+                      <ul className="space-y-2">
+                        {probeData.attribution.contributingArticles.map((a) => (
+                          <li key={a.id} className="text-xs text-zinc-400 leading-relaxed">
+                            <span className="text-zinc-300">{a.label}</span>
+                            <span className="block text-[10px] text-zinc-600 mt-0.5">
+                              matches: {a.matchedQueries.join('; ')}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <p className="text-[10px] text-zinc-600 mt-4">
+                Correlation, not proof — these items were published in the window where these queries changed and overlap their wording. GEO effects typically take 2–6 weeks to surface.
+              </p>
             </div>
           )}
 

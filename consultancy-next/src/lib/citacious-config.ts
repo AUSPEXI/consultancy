@@ -6,7 +6,7 @@
  * audit logs and conversation history reflect which prompt version was in use.
  */
 
-export const CITACIOUS_CONFIG_VERSION = '2026-06-07-v6';
+export const CITACIOUS_CONFIG_VERSION = '2026-06-07-v7';
 
 export type ToolStatus = 'active' | 'beta' | 'deprecated';
 
@@ -49,8 +49,8 @@ export const DASHBOARD_TOOLS: DashboardTool[] = [
     name: 'Citation Probe',
     status: 'active',
     purpose: 'THE PRIMARY MEASUREMENT TOOL. Sends live questions through the Auspexi Citation Engine across ChatGPT, Gemini, Claude, and Perplexity, checks if the brand is cited in each answer, and tracks citation rate over time.',
-    metrics: ['Citation rate %', 'Per-platform citation rates (Gemini/ChatGPT/Perplexity/Claude)', 'Cited queries', 'Missed queries'],
-    actions: ['Run probe', 'View citation history chart', 'Export training set (JSONL/CSV)', 'Identify content gaps from missed queries'],
+    metrics: ['Citation rate %', 'Per-platform citation rates (Gemini/ChatGPT/Perplexity/Claude)', 'Cited queries', 'Missed queries', 'Since-last-probe attribution (newly-won queries + likely-contributing facts/articles)'],
+    actions: ['Run probe', 'View citation history chart', 'Export training set (JSONL/CSV)', 'Identify content gaps from missed queries', 'See which facts/articles correlate with newly-cited queries'],
     flavor: 'Citation Engine',
   },
   {
