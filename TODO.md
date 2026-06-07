@@ -147,4 +147,9 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
 - ☑ I4 RESOLVED: no separate files; personality in faqData.ts + inline prompts (see S3.4)
 
 ## Lab tasks
-- ☐ L1 Switch GEO Lab orchestrator design/video phases to claude-opus-4-8
+- ☑ L1 GEO Lab design + video phases already on claude-opus-4-8 (orchestrate.mjs:66,
+       generate-video-package.mjs:38). Probe stays on claude-haiku-4-5 (high volume).
+       Verified production dashboard uses ONLY cheap models (gemini-2.5-flash ×27,
+       gpt-4o-mini ×6, sonar ×5, claude-haiku ×4) — zero Opus in any per-user path.
+       Opus is confined to the weekly low-volume lab judgment tasks by design;
+       deliberately NOT pushed further into production to keep costs low.
