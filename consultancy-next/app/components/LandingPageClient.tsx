@@ -7,7 +7,6 @@ import { GlowingEffect } from '@/components/ui/glowing-effect';
 import { PricingCard } from '@/components/ui/dark-gradient-pricing';
 import { Footerdemo } from '@/components/ui/footer-section';
 import { ImageZoom } from '@/components/ui/image-zoom';
-import { TestimonialsColumn } from '@/components/ui/testimonials-columns-1';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { BlogHero } from '@/components/BlogHero';
 import { ArrowRight, Bot, Target, Zap, Search, BarChart3, ShieldAlert, CheckCircle2, Database, Mic, Brain, Blocks, Activity, Hash, Check, RefreshCw, Building2, Layers, Globe } from 'lucide-react';
@@ -228,46 +227,6 @@ export function LandingPageClient() {
       description: "One JS snippet on your website. Your structured data stays permanently in sync with your Fact-Vault — no developer needed after day one. GPTBot, ClaudeBot, and Google-Extended read fresh JSON-LD on every crawl.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-yellow-500/50 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5",
-    },
-  ];
-
-  // Placeholder stubs — replace with real customer testimonials when available
-  const testimonials = [
-    {
-      text: "Your testimonial will appear here. Real words from a real customer about how Auspexi changed their GEO strategy.",
-      image: "/placeholder-avatar.svg",
-      name: "Your Name",
-      role: "Your Role, Your Company",
-    },
-    {
-      text: "Your testimonial will appear here. Real words from a real customer about how Auspexi changed their GEO strategy.",
-      image: "/placeholder-avatar.svg",
-      name: "Your Name",
-      role: "Your Role, Your Company",
-    },
-    {
-      text: "Your testimonial will appear here. Real words from a real customer about how Auspexi changed their GEO strategy.",
-      image: "/placeholder-avatar.svg",
-      name: "Your Name",
-      role: "Your Role, Your Company",
-    },
-    {
-      text: "Your testimonial will appear here. Real words from a real customer about how Auspexi changed their GEO strategy.",
-      image: "/placeholder-avatar.svg",
-      name: "Your Name",
-      role: "Your Role, Your Company",
-    },
-    {
-      text: "Your testimonial will appear here. Real words from a real customer about how Auspexi changed their GEO strategy.",
-      image: "/placeholder-avatar.svg",
-      name: "Your Name",
-      role: "Your Role, Your Company",
-    },
-    {
-      text: "Your testimonial will appear here. Real words from a real customer about how Auspexi changed their GEO strategy.",
-      image: "/placeholder-avatar.svg",
-      name: "Your Name",
-      role: "Your Role, Your Company",
     },
   ];
 
@@ -568,24 +527,6 @@ export function LandingPageClient() {
           people are hearing about you.
         </p>
       </ValueSection>
-
-      {/* Testimonials */}
-      <section id="testimonials" className="py-24 bg-zinc-900/30 border-y border-zinc-900 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">Trusted by Pioneers</h2>
-            <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
-              See how forward-thinking brands are using Auspexi to dominate the new era of search.
-            </p>
-          </div>
-
-          <div className="flex justify-center gap-6 [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)] h-[600px]">
-            <TestimonialsColumn testimonials={testimonials.slice(0, 2)} duration={15} />
-            <TestimonialsColumn testimonials={testimonials.slice(2, 4)} className="hidden md:block" duration={19} />
-            <TestimonialsColumn testimonials={testimonials.slice(4, 6)} className="hidden lg:block" duration={17} />
-          </div>
-        </div>
-      </section>
 
       {/* Value band — reframe the price before they see the numbers */}
       <ValueSection

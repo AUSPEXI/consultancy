@@ -75,7 +75,6 @@ export function Footerdemo() {
               <Link href="/#pricing" className="block transition-colors hover:text-white">Pricing</Link>
               <a href="/#strategy" className="block transition-colors hover:text-white">GEO Strategy</a>
               <Link href="/voice-agents" className="block transition-colors hover:text-white">Voice Agents</Link>
-              <Link href="/#testimonials" className="block transition-colors hover:text-white">Case Studies</Link>
             </nav>
           </div>
 
