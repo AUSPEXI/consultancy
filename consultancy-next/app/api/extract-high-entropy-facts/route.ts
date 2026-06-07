@@ -42,12 +42,21 @@ Return ONLY valid JSON:
       facts = [];
     }
 
-    // Embed all fact statements in one batch call — stored on fact docs for UMAP
+    // High-priority call: generate API + local synonym embeddings in parallel.
+    // The alignment score tells you how well the local dictionary covers this text.
     if (facts.length > 0) {
       try {
         const statements = facts.map((f: any) => f.statement || '').filter(Boolean);
-        const embeddings = await embeddingService.generateEmbeddings(statements);
-        facts = facts.map((f: any, i: number) => ({ ...f, embedding: embeddings[i] ?? [] }));
+        const { apiEmbeddings, localEmbeddings, alignmentScores, apiSpace, localSpace } =
+          await embeddingService.generateWithLocal(statements);
+        facts = facts.map((f: any, i: number) => ({
+          ...f,
+          embedding: apiEmbeddings[i] ?? [],
+          embeddingSpace: apiSpace,
+          localEmbedding: localEmbeddings[i] ?? [],
+          localEmbeddingSpace: localSpace,
+          embeddingAlignmentScore: alignmentScores[i] ?? null,
+        }));
       } catch (embErr) {
         console.warn('[extract-high-entropy-facts] embedding failed, returning without vectors:', embErr);
       }

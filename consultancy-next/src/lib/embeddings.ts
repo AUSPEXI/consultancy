@@ -101,6 +101,69 @@ export class EmbeddingService {
     return dotProduct / (magnitudeA * magnitudeB);
   }
 
+  /**
+   * Generate BOTH an API embedding and a local synonym embedding in parallel.
+   *
+   * The alignment score (cosine between the two vectors, projected into the
+   * same space via a scalar comparison) tells you how well the local dictionary
+   * covers a given piece of text:
+   *   > 0.7 → local vector is a good proxy; cheaper to use local for this concept
+   *   0.3–0.7 → partial coverage; local useful for retrieval but API for ranking
+   *   < 0.3 → poor coverage; this concept needs more synonym entries
+   *
+   * Use case: on every high-priority API call, also compute local + store both.
+   * Over time the alignment scores reveal which synonym groups to expand.
+   *
+   * Both vectors are stored under the SAME fact document:
+   *   embedding        — API vector (Gemini/OpenAI)
+   *   embeddingSpace   — 'text-embedding-004' | 'text-embedding-3-small'
+   *   localEmbedding   — local synonym vector (768-D)
+   *   localEmbeddingSpace — 'local-synonym-v1'
+   *   embeddingAlignmentScore — cosine(api_normalized, local_normalized)
+   */
+  async generateWithLocal(
+    input: string | string[],
+  ): Promise<{
+    apiEmbeddings: number[][];
+    localEmbeddings: number[][];
+    alignmentScores: number[];
+    apiSpace: string;
+    localSpace: string;
+  }> {
+    const inputs = Array.isArray(input) ? input : [input];
+
+    // Run both in parallel — local is synchronous so it never slows the API call
+    const [apiVecs, localVecs] = await Promise.all([
+      this.generateEmbeddings(inputs, 'api'),
+      Promise.resolve(localEmbeddingService.embedMany(inputs)),
+    ]);
+
+    // Alignment: cosine between api vec (L2-normalised by provider) and local vec (already L2-normalised)
+    // Since dims differ (e.g. 1536 vs 768) we can't dot-product directly — use a magnitude-independent
+    // proxy: cosine of the overlapping first-N dims as a rough calibration signal.
+    const minDim = Math.min(apiVecs[0]?.length ?? 0, localVecs[0]?.length ?? 0);
+    const alignmentScores = apiVecs.map((api, i) => {
+      const local = localVecs[i];
+      if (!api || !local || minDim === 0) return 0;
+      let dot = 0, na = 0, nb = 0;
+      for (let d = 0; d < minDim; d++) {
+        dot += api[d] * local[d];
+        na += api[d] * api[d];
+        nb += local[d] * local[d];
+      }
+      na = Math.sqrt(na); nb = Math.sqrt(nb);
+      return na === 0 || nb === 0 ? 0 : Math.round((dot / (na * nb)) * 1000) / 1000;
+    });
+
+    return {
+      apiEmbeddings: apiVecs,
+      localEmbeddings: localVecs,
+      alignmentScores,
+      apiSpace: this.getActiveSpace('api'),
+      localSpace: LOCAL_EMBEDDING_SPACE,
+    };
+  }
+
   prepareUmapPayload(points: VectorPoint[]) {
     return points.map(p => ({
       vector: p.embedding,

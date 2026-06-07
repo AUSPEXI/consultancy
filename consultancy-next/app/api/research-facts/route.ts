@@ -55,12 +55,21 @@ export async function POST(request: Request) {
 
     let facts: any[] = result.data || [];
 
-    // Embed all fact statements in one batch call — stored on fact docs for UMAP
+    // High-priority API call: embed all facts AND compute local synonym vectors in
+    // parallel. Storing both gives alignment scores that reveal dictionary gaps.
     if (facts.length > 0) {
       try {
         const statements = facts.map((f: any) => f.statement || '').filter(Boolean);
-        const embeddings = await embeddingService.generateEmbeddings(statements);
-        facts = facts.map((f: any, i: number) => ({ ...f, embedding: embeddings[i] ?? [] }));
+        const { apiEmbeddings, localEmbeddings, alignmentScores, apiSpace, localSpace } =
+          await embeddingService.generateWithLocal(statements);
+        facts = facts.map((f: any, i: number) => ({
+          ...f,
+          embedding: apiEmbeddings[i] ?? [],
+          embeddingSpace: apiSpace,
+          localEmbedding: localEmbeddings[i] ?? [],
+          localEmbeddingSpace: localSpace,
+          embeddingAlignmentScore: alignmentScores[i] ?? null,
+        }));
       } catch (embErr) {
         console.warn('[research-facts] embedding failed, returning without vectors:', embErr);
       }

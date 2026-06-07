@@ -128,7 +128,15 @@ export default function FactVault() {
             category: 'Extracted',
             createdAt: new Date().toISOString().split('T')[0],
           };
-          if (fact.embedding?.length > 0) payload.embedding = fact.embedding;
+          if (fact.embedding?.length > 0) {
+            payload.embedding = fact.embedding;
+            if (fact.embeddingSpace) payload.embeddingSpace = fact.embeddingSpace;
+          }
+          if (fact.localEmbedding?.length > 0) {
+            payload.localEmbedding = fact.localEmbedding;
+            payload.localEmbeddingSpace = fact.localEmbeddingSpace ?? 'local-synonym-v1';
+          }
+          if (fact.embeddingAlignmentScore != null) payload.embeddingAlignmentScore = fact.embeddingAlignmentScore;
           await addDoc(collection(db, 'facts'), payload);
           newFactsPayloads.push(payload);
         }
@@ -188,7 +196,15 @@ export default function FactVault() {
             category: 'Auto-Researched',
             createdAt: new Date().toISOString().split('T')[0],
           };
-          if (fact.embedding?.length > 0) payload.embedding = fact.embedding;
+          if (fact.embedding?.length > 0) {
+            payload.embedding = fact.embedding;
+            if (fact.embeddingSpace) payload.embeddingSpace = fact.embeddingSpace;
+          }
+          if (fact.localEmbedding?.length > 0) {
+            payload.localEmbedding = fact.localEmbedding;
+            payload.localEmbeddingSpace = fact.localEmbeddingSpace ?? 'local-synonym-v1';
+          }
+          if (fact.embeddingAlignmentScore != null) payload.embeddingAlignmentScore = fact.embeddingAlignmentScore;
           await addDoc(collection(db, 'facts'), payload);
           newFactsPayloads.push(payload);
         }
