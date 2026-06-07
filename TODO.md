@@ -213,15 +213,22 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
            START_PROMPT.md. Citacious config → v6.
          ⚠ Deploy: set GEO_FINDINGS_SECRET in BOTH Netlify (dashboard) and GitHub
            secrets (lab), plus DASHBOARD_URL in GitHub secrets.
-- ☐ S6.2 Lab results history page — dedicated /dashboard/geo-lab (read-only, Pro+)
-         showing all findings: significant w/ effect sizes, null counts, run timeline.
-         Uses existing GET /api/geo-findings. Add geo-lab to Citacious manifest.
-- ☐ S6.3 User-triggered experiment requests — "Request an experiment" button writes a
-         hypothesis to lab_requests; weekly orchestrator pulls top-voted into backlog.json.
-- ☐ S6.4 Lab findings digest email — on significant publish, POST to Netlify fn that emails
-         a one-line digest to sales@auspexi.com (+ opt-in users). Non-fatal.
-- ☐ S6.5 Embed lab findings into Agent generation — inject top 3 active significant levers
-         as explicit instructions into the article-generation prompt. Structural adoption.
+- ☑ S6.2 Lab results history page BUILT. New /dashboard/geo-lab (Pro+) reads GET
+         /api/geo-findings: collapsible FindingCard per active lever with effect badge
+         (±pp · platform), p-value chip, trials/platforms/age detail on expand; active
+         vs null-result counts in header. Added geo-lab to Citacious manifest (config v8)
+         and Sidebar under new RESEARCH group with FlaskConical icon.
+- ☑ S6.3 User-triggered experiment requests BUILT. RequestForm on the geo-lab page writes
+         { userId, hypothesis, submittedAt, status:'pending' } to lab_requests. (Weekly
+         orchestrator pull into backlog.json is the lab-side follow-up.)
+- ☑ S6.4 Lab findings digest email BUILT in publish-finding.mjs. On a SIGNIFICANT finding,
+         sends a one-line digest (headline + effect + lever + recommendation) to REPORT_EMAIL
+         (defaults to sales@auspexi.com via EMAIL_USER) using the same Gmail transport as
+         send-report.mjs. Fires even when dashboard publish env is unset. Fully non-fatal.
+- ☑ S6.5 Lab findings embedded into Agent generation. /api/agent/synthesize now fetches the
+         top 3 active significant geo_findings (by effect size) and injects them as a
+         "LAB-VALIDATED GEO TACTICS — apply ALL of these" block in the synthesis prompt.
+         Non-fatal: falls back to the standard prompt if findings are unavailable.
 
 ## Sprint 7 — Competitive Validation
 - ☐ S7.1 Competitor citation comparison — "Competitor Probe" mode runs the same query set

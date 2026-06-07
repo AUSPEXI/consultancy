@@ -22,6 +22,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
+import nodemailer from 'nodemailer';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '..');
@@ -105,12 +106,42 @@ const payload = {
   active: !isNull,
 };
 
+// S6.4: one-line digest email when a SIGNIFICANT finding is published.
+// Reuses the same Gmail transport as send-report.mjs. Non-fatal by design.
+async function sendDigestEmail() {
+  if (isNull) return; // only significant findings warrant a digest
+  const user = process.env.EMAIL_USER;
+  const pass = process.env.EMAIL_APP_PASSWORD;
+  const toEmail = process.env.REPORT_EMAIL || user;
+  if (!user || !pass) {
+    console.log('EMAIL_USER / EMAIL_APP_PASSWORD not set — skipping digest email (non-fatal).');
+    return;
+  }
+  const eff = finding.topEffect;
+  const effLine = eff
+    ? `${eff.diffPp > 0 ? '+' : ''}${eff.diffPp.toFixed(1)}pp on ${eff.platform} (p=${eff.pValue.toFixed(3)})`
+    : 'significant effect detected';
+  try {
+    const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user, pass } });
+    await transporter.sendMail({
+      from: `"GEO Lab" <${user}>`,
+      to: toEmail,
+      subject: `New GEO Lab result: ${headline}`,
+      text: `New significant GEO Lab finding.\n\n${headline}\nEffect: ${effLine}\nLever: ${lever}\n\nRecommendation: ${recommendation}\n\nSee the dashboard GEO Lab page for full details.`,
+    });
+    console.log(`Digest email sent to ${toEmail}.`);
+  } catch (err) {
+    console.error('Digest email error (non-fatal):', err.message);
+  }
+}
+
 const dashboardUrl = process.env.DASHBOARD_URL;
 const secret = process.env.GEO_FINDINGS_SECRET;
 
 if (!dashboardUrl || !secret) {
   console.log('DASHBOARD_URL / GEO_FINDINGS_SECRET not set — skipping dashboard publish (non-fatal).');
   console.log('Would have published:', JSON.stringify({ lever, verdict: finding.verdict, headline }, null, 2));
+  await sendDigestEmail(); // digest can still go out even without the dashboard
   process.exit(0);
 }
 
@@ -126,10 +157,12 @@ try {
   const text = await res.text();
   if (!res.ok) {
     console.error(`Publish failed (${res.status}): ${text}`);
+    await sendDigestEmail();
     process.exit(0); // non-fatal — don't break the pipeline
   }
   console.log(`Published finding for lever "${lever}" (${finding.verdict}) → dashboard.`);
 } catch (err) {
   console.error('Publish error (non-fatal):', err.message);
-  process.exit(0);
 }
+
+await sendDigestEmail();

@@ -6,7 +6,7 @@
  * audit logs and conversation history reflect which prompt version was in use.
  */
 
-export const CITACIOUS_CONFIG_VERSION = '2026-06-07-v7';
+export const CITACIOUS_CONFIG_VERSION = '2026-06-07-v8';
 
 export type ToolStatus = 'active' | 'beta' | 'deprecated';
 
@@ -160,6 +160,15 @@ export const DASHBOARD_TOOLS: DashboardTool[] = [
     metrics: ['Deployed schema types', 'Fact coverage in schema'],
     actions: ['Copy deploy snippet', 'Preview schema output', 'Validate schema'],
     flavor: 'Schema Deploy',
+  },
+  {
+    id: 'geo-lab',
+    name: 'GEO Lab Results',
+    status: 'active',
+    purpose: 'Live findings from the Auspexi GEO Lab — real A/B experiments measuring which content tactics (statistical anchors, entity density, inverted pyramid, etc.) lift AI citation rate. Only statistically significant findings surface as recommendations, sorted by effect size.',
+    metrics: ['Active findings count', 'Effect size (pp)', 'p-value', 'Null result count'],
+    actions: ['Browse lab findings', 'Expand a finding for full recommendation', 'Apply lever to content via Content Scorer'],
+    flavor: 'Experimental Evidence Vault',
   },
   {
     id: 'autopilot',

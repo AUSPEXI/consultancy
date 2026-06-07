@@ -1,6 +1,6 @@
 'use client'
 
-import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert, Zap, RefreshCw, Building2, Layers3, Target, CheckCircle2 } from 'lucide-react';
+import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert, Zap, RefreshCw, Building2, Layers3, Target, CheckCircle2, FlaskConical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -79,6 +79,12 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       label: 'ENTITY & SCHEMA',
       items: [
         { id: 'entity-hub', label: 'Entity Hub', icon: Building2, requiredTier: 'Pro' as UserTier, path: '/dashboard/entity-hub' },
+      ],
+    },
+    {
+      label: 'RESEARCH',
+      items: [
+        { id: 'geo-lab', label: 'GEO Lab Results', icon: FlaskConical, requiredTier: 'Pro' as UserTier, path: '/dashboard/geo-lab' },
       ],
     },
   ];

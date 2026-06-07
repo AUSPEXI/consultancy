@@ -1,11 +1,29 @@
 import { NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
+import { dbAdmin } from '@/lib/firebase-admin';
 
 export async function POST(request: Request) {
   try {
     const { topic, facts, brandName, userId = 'anonymous', negativeStatements = [] } = await request.json();
     if (!topic?.trim() || !facts?.trim()) {
       return NextResponse.json({ error: 'topic and facts are required' }, { status: 400 });
+    }
+
+    // S6.5: fetch top 3 active GEO Lab findings to inject as structural instructions.
+    // Non-fatal — falls back to the standard prompt if findings are unavailable.
+    let labLeverSection = '';
+    if (dbAdmin) {
+      try {
+        const snap = await dbAdmin.collection('geo_findings').get();
+        const activeFindings = snap.docs
+          .map(d => d.data() as { active?: boolean; headline?: string; recommendation?: string; topEffect?: { diffPp: number } })
+          .filter(f => f.active && f.recommendation)
+          .sort((a, b) => Math.abs(b.topEffect?.diffPp || 0) - Math.abs(a.topEffect?.diffPp || 0))
+          .slice(0, 3);
+        if (activeFindings.length > 0) {
+          labLeverSection = `\n\nLAB-VALIDATED GEO TACTICS (apply ALL of these — each is empirically proven to lift citation rate in real A/B experiments):\n${activeFindings.map((f, i) => `${i + 1}. ${f.headline}: ${f.recommendation}`).join('\n')}`;
+        }
+      } catch { /* non-fatal */ }
     }
 
     const brandInstruction = brandName
@@ -19,7 +37,7 @@ export async function POST(request: Request) {
     const prompt = `You are a Synthesis Agent specializing in Generative Engine Optimization (GEO) content. Your articles are written to be cited by AI engines like ChatGPT, Perplexity, Claude, and Gemini.
 
 Topic: "${topic}"
-${brandInstruction}${correctionInstruction}
+${brandInstruction}${correctionInstruction}${labLeverSection}
 
 Verified Facts (ground truth — do not hallucinate beyond these):
 """
