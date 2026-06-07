@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
 import { dbAdmin } from '@/lib/firebase-admin';
+import { requireAuth } from '@/lib/api-auth';
 
 // ── Gemini probe (existing logic, kept intact) ──────────────────────────────
 async function probeQuery(query: string, apiKey: string, openaiKey: string): Promise<string> {
@@ -141,8 +142,11 @@ function computeSov(cited: boolean[]): number {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
   try {
-    const { keyword, userId = 'anonymous', brand: brandParam = '', domain: domainParam = '' } = await request.json();
+    const { keyword, brand: brandParam = '', domain: domainParam = '' } = await request.json();
     if (!keyword?.trim()) {
       return NextResponse.json({ error: 'keyword is required' }, { status: 400 });
     }

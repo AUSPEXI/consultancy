@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
 import { embeddingService } from '@/lib/embeddings';
 import { dbAdmin } from '@/lib/firebase-admin';
+import { requireAuth } from '@/lib/api-auth';
 
 export interface PermutationResult {
   query: string;
@@ -13,8 +14,11 @@ export interface PermutationResult {
 // Generates ~60 query permutations per keyword across 7 format types x ~8–9 variants each.
 // For N keywords this produces N * ~60 vectors → stored in fact_permutations for model training.
 export async function POST(request: Request) {
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
   try {
-    const { keyword, brand = '', userId = 'anonymous' } = await request.json();
+    const { keyword, brand = '' } = await request.json();
     if (!keyword?.trim()) return NextResponse.json({ error: 'keyword is required' }, { status: 400 });
 
     const kw = keyword.trim();

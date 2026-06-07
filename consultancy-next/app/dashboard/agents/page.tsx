@@ -11,6 +11,7 @@ import { db } from '@/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { checkTierAccess } from '@/constants/tiers';
 import { logAuditAction } from '@/lib/audit';
+import { authFetch } from '@/lib/auth-fetch';
 
 type AgentStatus = 'idle' | 'running' | 'completed' | 'error';
 type BulkStatus = 'pending' | 'running' | 'done' | 'error';
@@ -171,13 +172,13 @@ export default function AgentsPage() {
       }
 
       setCrawlerStatus('running');
-      const crawlRes = await fetch('/api/agent/crawl', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: effectiveTopic }) });
+      const crawlRes = await authFetch('/api/agent/crawl', { method: 'POST', body: JSON.stringify({ topic: effectiveTopic }) });
       const crawlData = await crawlRes.json();
       if (!crawlData.success) throw new Error(crawlData.error);
       setCrawlerStatus('completed');
 
       setExtractionStatus('running');
-      const extractRes = await fetch('/api/agent/extract', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: effectiveTopic, crawlerData: crawlData.result, vaultContext }) });
+      const extractRes = await authFetch('/api/agent/extract', { method: 'POST', body: JSON.stringify({ topic: effectiveTopic, crawlerData: crawlData.result, vaultContext }) });
       const extractData = await extractRes.json();
       if (!extractData.success) throw new Error(extractData.error);
       const facts = extractData.result || 'No facts extracted.';
@@ -187,7 +188,7 @@ export default function AgentsPage() {
       await new Promise(res => setTimeout(res, 5000));
 
       setSchemaStatus('running');
-      const schemaRes = await fetch('/api/agent/schema', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ facts }) });
+      const schemaRes = await authFetch('/api/agent/schema', { method: 'POST', body: JSON.stringify({ facts }) });
       const schemaData = await schemaRes.json();
       if (!schemaData.success) throw new Error(schemaData.error);
       const schema = schemaData.result || '{}';
@@ -198,7 +199,7 @@ export default function AgentsPage() {
 
       setSynthesisStatus('running');
       const allCorrections = [...(userData?.negativeStatements || []), ...correctionSnippets].filter(Boolean);
-      const synthRes = await fetch('/api/agent/synthesize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: effectiveTopic, facts, brandName: userData?.brand || '', negativeStatements: allCorrections }) });
+      const synthRes = await authFetch('/api/agent/synthesize', { method: 'POST', body: JSON.stringify({ topic: effectiveTopic, facts, brandName: userData?.brand || '', negativeStatements: allCorrections }) });
       const synthData = await synthRes.json();
       if (!synthData.success) throw new Error(synthData.error);
       const article = synthData.result || 'Failed to generate article.';
@@ -233,10 +234,9 @@ export default function AgentsPage() {
     setPermError(null);
     setPermResult(null);
     try {
-      const res = await fetch('/api/permutations', {
+      const res = await authFetch('/api/permutations', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ keyword: permKeyword.trim(), brand: userData?.brand || '', userId: user.uid }),
+        body: JSON.stringify({ keyword: permKeyword.trim(), brand: userData?.brand || '' }),
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.error || 'Permutation generation failed');

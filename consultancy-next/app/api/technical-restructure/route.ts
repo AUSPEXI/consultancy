@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
   try {
-    const { text, userId = 'anonymous' } = await request.json();
+    const { text } = await request.json();
     if (!text?.trim()) {
       return NextResponse.json({ error: 'text is required' }, { status: 400 });
     }

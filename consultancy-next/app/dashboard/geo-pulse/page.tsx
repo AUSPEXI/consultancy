@@ -4,6 +4,7 @@ import { Activity, Loader2, Target, BarChart3, TrendingUp, Cpu, Network, Chevron
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { checkTierAccess } from '@/constants/tiers';
+import { authFetch } from '@/lib/auth-fetch';
 
 export default function GeoPulsePage() {
   const { tier, role, userData } = useAuth();
@@ -45,9 +46,8 @@ export default function GeoPulsePage() {
   ];
 
   const fetchKeyword = async (kw: string) => {
-    const res = await fetch('/api/geo-pulse', {
+    const res = await authFetch('/api/geo-pulse', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ keyword: kw }),
     });
     const json = await res.json();

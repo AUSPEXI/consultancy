@@ -175,9 +175,8 @@ export default function FactVault() {
 
     setIsResearching(true);
     try {
-      const res = await fetch('/api/research-facts', {
+      const res = await authFetch('/api/research-facts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ industry })
       });
       const data = await res.json();

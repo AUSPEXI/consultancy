@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 import { getExa } from '@/lib/exa';
 import { dbAdmin } from '@/lib/firebase-admin';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
   try {
-    const { topic, userId = 'anonymous' } = await request.json();
+    const { topic } = await request.json();
     if (!topic?.trim()) {
       return NextResponse.json({ error: 'topic is required' }, { status: 400 });
     }

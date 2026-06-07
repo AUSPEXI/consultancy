@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
 import { embeddingService } from '@/lib/embeddings';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
   try {
-    const { content, contentType, userId = 'anonymous' } = await request.json();
+    const { content, contentType } = await request.json();
     if (!content) {
       return NextResponse.json({ error: 'Missing content or userId' }, { status: 400 });
     }

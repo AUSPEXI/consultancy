@@ -3,10 +3,14 @@ import { getExa } from '@/lib/exa';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
 import { FactExtractionSchema } from '@/lib/output-validation';
 import { embeddingService } from '@/lib/embeddings';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
   try {
-    const { industry, userId = 'anonymous' } = await request.json();
+    const { industry } = await request.json();
     if (!industry) {
       return NextResponse.json({ error: 'Missing industry' }, { status: 400 });
     }

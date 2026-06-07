@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
 import { dbAdmin } from '@/lib/firebase-admin';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
   try {
-    const { topic, facts, brandName, userId = 'anonymous', negativeStatements = [] } = await request.json();
+    const { topic, facts, brandName, negativeStatements = [] } = await request.json();
     if (!topic?.trim() || !facts?.trim()) {
       return NextResponse.json({ error: 'topic and facts are required' }, { status: 400 });
     }

@@ -143,10 +143,9 @@ export default function ContentScorerPage() {
     if (!user || !result || !content.trim()) return;
     setIsSavingFacts(true);
     try {
-      const response = await fetch('/api/extract-facts', {
+      const response = await authFetch('/api/extract-facts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content, contentType, userId: user.uid })
+        body: JSON.stringify({ content, contentType })
       });
       const data = await response.json();
       if (!data.success) throw new Error(data.error);

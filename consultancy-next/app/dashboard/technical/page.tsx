@@ -9,6 +9,7 @@ import { logAuditAction } from '@/lib/audit';
 import { db } from '@/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { checkTierAccess } from '@/constants/tiers';
+import { authFetch } from '@/lib/auth-fetch';
 
 export default function TechnicalPage() {
   const { tier, role, user } = useAuth();
@@ -87,10 +88,8 @@ export default function TechnicalPage() {
 
     setIsProcessing(true);
     try {
-      const dbUrl = typeof window !== 'undefined' ? '' : 'http://localhost:3000';
-      const searchRes = await fetch(`${dbUrl}/api/technical-restructure`, {
+      const searchRes = await authFetch('/api/technical-restructure', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: inputText })
       });
       const data = await searchRes.json();
@@ -120,10 +119,8 @@ export default function TechnicalPage() {
 
     setIsGeneratingSchema(true);
     try {
-      const dbUrl = typeof window !== 'undefined' ? '' : 'http://localhost:3000';
-      const searchRes = await fetch(`${dbUrl}/api/technical-schema`, {
+      const searchRes = await authFetch('/api/technical-schema', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ factText })
       });
       const data = await searchRes.json();
