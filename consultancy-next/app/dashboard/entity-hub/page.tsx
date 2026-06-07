@@ -133,7 +133,7 @@ export default function EntityHubPage() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <Building2 className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-          <p className="text-zinc-400 font-medium">Entity Hub requires Premium tier</p>
+          <p className="text-zinc-400 font-medium">Entity Hub requires Pro tier</p>
         </div>
       </div>
     );

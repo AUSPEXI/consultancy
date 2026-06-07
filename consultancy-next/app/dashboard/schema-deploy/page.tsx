@@ -65,7 +65,7 @@ add_action('wp_head', function() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <Layers className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-          <p className="text-zinc-400 font-medium">Schema Deploy requires Premium tier</p>
+          <p className="text-zinc-400 font-medium">Schema Deploy requires Pro tier</p>
           <p className="text-zinc-600 text-sm mt-1">Upgrade your plan to access dynamic structured data deployment.</p>
         </div>
       </div>

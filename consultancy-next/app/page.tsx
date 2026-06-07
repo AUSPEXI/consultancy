@@ -33,7 +33,7 @@ const jsonLd = {
       description: 'Generative Engine Optimization (GEO) platform tracking brand AI Share of Voice across ChatGPT, Gemini, Claude and Perplexity.',
       url: 'https://auspexi.com',
       image: 'https://auspexi.com/geo-infographic.png',
-      offers: { '@type': 'AggregateOffer', priceCurrency: 'USD', lowPrice: '149', highPrice: '4999' },
+      offers: { '@type': 'AggregateOffer', priceCurrency: 'USD', lowPrice: '149', highPrice: '1899' },
     },
     {
       '@type': 'Organization',

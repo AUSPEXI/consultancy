@@ -255,11 +255,28 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          no cron needed.
 
 ## Sprint 8 — Marketing Honesty + SEO (read-only investigations, parallel track)
-- ☐ S8.1 Frontend honesty check — audit homepage hero/what-we-do/feature grid, Auspexi
-         Arsenal, pricing cards (Starter $149 / Pro $499 / Business $1,899 + feature lists
-         vs real gates), blog posts referencing changed features (Simulator/Brand Monitor/
-         Shadow Link), and stale beta/coming-soon labels. Ground truth = DASHBOARD_TOOLS +
-         tiers.ts.
+- ⧖ S8.1 Frontend honesty check — IN PROGRESS.
+       FIXED (committed):
+       • Homepage jsonLd/metadata highPrice '4999' → '1899' (matched real top tier).
+       • entity-hub + schema-deploy gate copy "requires Premium tier" → "Pro" (Premium
+         is a legacy tier name; canonical gate is Pro).
+       VERIFIED ACCURATE: homepage feature grid (Arsenal) + Platform Features all map to
+       real DASHBOARD_TOOLS; pricing cards match tiers.ts (Starter $149 / Pro $499 /
+       Business $1,899) and feature gates.
+       FLAGGED FOR USER DECISION (not changed — these are judgment calls):
+       1. "Start Your Free Trial" CTA (LandingPageClient + blog/[slug]) — NO free-trial
+          logic exists anywhere; billing is month-to-month from day one ("cancel after
+          first month"). The CTA promises a trial that doesn't exist. Options: implement a
+          real trial, or reword to the actual free offer ("Get Your Free GEO Report").
+       2. Testimonials block (6 named people/companies + metrics like "+400% leads",
+          "$50k/mo paid search") appear fabricated. Legal/honesty risk if not real.
+       3. Blog overstatements vs built features: "Omnichannel Amplifier" claims auto-gen
+          across LinkedIn/Reddit/Twitter/TikTok (built: Reddit + LinkedIn seed only);
+          voice "route lead into HubSpot/Salesforce via API" (built: email call-log only);
+          "Edge Schema Generator at CDN level" (built: client JS snippet). Decide: reword
+          to match reality, or build the features.
+       4. investors/page.tsx uses "Enterprise"/"Premium" tier language — left as-is
+          (forward-looking financial narrative, not a product feature promise).
 - ☐ S8.2 SEO investigation — 17 indexed vs 4+ in sitemap. Check next-sitemap config,
          robots.txt, meta robots/noindex on marketing pages, generateMetadata coverage,
          Netlify X-Robots-Tag headers (staging noindex carried to prod), GSC coverage.
