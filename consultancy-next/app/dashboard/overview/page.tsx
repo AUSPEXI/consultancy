@@ -145,6 +145,17 @@ export default function OverviewPage() {
     return () => unsubscribe();
   }, [user, tier]);
 
+  // Real citation history — used to build the A-SOV trend chart from actual probe
+  // runs when sovMetrics is empty (i.e. user runs Cite-Probe but not the daily audit)
+  const [citationHistory, setCitationHistory] = useState<any[]>([]);
+  useEffect(() => {
+    if (!user?.uid) return;
+    fetch(`/api/cite-probe?userId=${encodeURIComponent(user.uid)}&limit=14`)
+      .then(r => r.json())
+      .then(j => { if (j.success && Array.isArray(j.history)) setCitationHistory(j.history); })
+      .catch(() => {});
+  }, [user?.uid]);
+
   if (role !== 'admin' && !checkTierAccess(tier, 'Basic')) {
     return (
       <div className="space-y-6">
@@ -248,7 +259,26 @@ export default function OverviewPage() {
 
   const handleCopy = () => { navigator.clipboard.writeText(generatedShadowLink); setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
-  const displayData = metrics.length > 0 ? metrics : [
+  // Real trend built from accumulated Cite-Probe runs (aSov = citationRate). Only
+  // platform/aSov values are real; competitor/traffic fields stay 0 (no fabrication).
+  const realTrend = citationHistory.map((h: any) => {
+    const pr = h.platformRates || {};
+    return {
+      shortDate: h.timestamp ? new Date(h.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '',
+      aSov: Math.round(h.citationRate ?? 0),
+      err: 0, compGap: 0, compA: 0, compB: 0, aiTraffic: 0,
+      platforms: {
+        chatgpt: pr.chatgpt ?? 0,
+        claude: pr.claude ?? 0,
+        gemini: pr.gemini ?? 0,
+        perplexity: pr.perplexity ?? 0,
+      },
+      isReal: true,
+    };
+  });
+
+  // Synthetic demo ramp — only shown when the user has NO real data at all
+  const demoTrend = [
     { shortDate: 'Mon', aSov: 12, err: 20, compGap: -33, compA: 45, compB: 30, aiTraffic: 120, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } },
     { shortDate: 'Tue', aSov: 18, err: 35, compGap: -24, compA: 42, compB: 28, aiTraffic: 132, platforms: { chatgpt: 25, claude: 20, gemini: 30, perplexity: 15 } },
     { shortDate: 'Wed', aSov: 25, err: 45, compGap: -13, compA: 38, compB: 25, aiTraffic: 250, platforms: { chatgpt: 35, claude: 30, gemini: 40, perplexity: 20 } },
@@ -256,8 +286,15 @@ export default function OverviewPage() {
     { shortDate: 'Fri', aSov: 45, err: 80, compGap: 15, compA: 30, compB: 18, aiTraffic: 310, platforms: { chatgpt: 60, claude: 55, gemini: 70, perplexity: 35 } },
   ];
 
-  const latest = metrics.length > 0 ? metrics[metrics.length - 1] : { id: 'placeholder', aSov: 12, err: 20, compGap: -33, compA: 45, compB: 30, aiTraffic: 120, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } };
-  const previous = metrics.length > 1 ? metrics[metrics.length - 2] : latest;
+  const displayData = metrics.length > 0 ? metrics : realTrend.length > 0 ? realTrend : demoTrend;
+  const trendIsReal = metrics.length > 0 || realTrend.length > 0;
+
+  const latest = metrics.length > 0 ? metrics[metrics.length - 1]
+    : realTrend.length > 0 ? realTrend[realTrend.length - 1]
+    : { id: 'placeholder', aSov: 12, err: 20, compGap: -33, compA: 45, compB: 30, aiTraffic: 120, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } };
+  const previous = metrics.length > 1 ? metrics[metrics.length - 2]
+    : realTrend.length > 1 ? realTrend[realTrend.length - 2]
+    : latest;
   const safeLatest = { aSov: latest.aSov ?? 0, err: latest.err ?? 0, compGap: latest.compGap ?? 0, aiTraffic: Math.min(latest.aiTraffic ?? 0, 9999), compA: latest.compA ?? 0, platforms: latest.platforms || {}, radar: latest.radar || [], sentiment: latest.sentiment || [], topUrls: latest.topUrls || [] };
   const safePrevious = { aSov: previous.aSov ?? 0, err: previous.err ?? 0, compGap: previous.compGap ?? 0, aiTraffic: Math.min(previous.aiTraffic ?? 0, 9999), compA: previous.compA ?? 0 };
   const asovTrend = Math.round(safeLatest.aSov - safePrevious.aSov);
@@ -446,7 +483,15 @@ export default function OverviewPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-          <div className="mb-6"><h3 className="text-base font-semibold text-white">Absolute Share of Voice (A-SOV)</h3><p className="text-xs text-zinc-400 mt-1">Your exact response dominance across all LLM matrices.</p></div>
+          <div className="mb-6 flex items-start justify-between gap-3">
+            <div>
+              <h3 className="text-base font-semibold text-white">Absolute Share of Voice (A-SOV)</h3>
+              <p className="text-xs text-zinc-400 mt-1">Your exact response dominance across all LLM matrices.</p>
+            </div>
+            <span className={`shrink-0 text-[9px] font-mono px-2 py-1 rounded-full border ${trendIsReal ? 'text-emerald-500 border-emerald-500/30 bg-emerald-500/10' : 'text-zinc-500 border-zinc-700 bg-zinc-900'}`}>
+              {trendIsReal ? '● LIVE DATA' : '◌ DEMO — run Citation Probe'}
+            </span>
+          </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height={300} minWidth={0}>
               <AreaChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>

@@ -18,11 +18,12 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
 - ☑ S1.1 Persist + reload citation history (`GET /api/cite-probe`) → trend chart on Cite-Probe page
 - ☐ S1.2 Fact embedding logging — store 768/1536-D vectors with each fact in `facts`
 - ☐ S1.3 Link probe runs to the facts/articles that target them (closed-loop attribution)
-- ☐ S1.4 Aggregate `citation_tests` into per-user `sovMetrics` from REAL data (replaces removed sim)
+- ☑ S1.4 Build A-SOV trend from real citation_tests history (Overview chart no longer
+         fabricates a 12→45 ramp; demo data clearly badged for zero-data users)
 - ☐ S1.5 Export training set: (content variant, query, platform, cited bool, embedding)
 
 ## Sprint 2 — Make Value Visible
-- ☐ S2.1 Overview: drive A-SOV / dials from real citation_tests aggregates
+- ☑ S2.1 Overview A-SOV trend + dials driven by real citation data; LIVE/DEMO badge
 - ☐ S2.2 Per-platform citation trend on Cite-Probe (currently overall only)
 
 ## Sprint 3 — Voice Agents (Aura + Citacious)
