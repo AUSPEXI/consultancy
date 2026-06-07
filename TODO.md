@@ -30,10 +30,16 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
 - ☑ S2.2 Per-platform citation trend sparklines on Cite-Probe history chart
 
 ## Sprint 3 — Voice Agents (Aura + Citacious)
-- ☐ S3.1 Fix Aura audio context resume on user gesture
-- ☐ S3.2 Citacious stale-context bug (knowledge graph not refreshing)
-- ☐ S3.3 JSON-LD naming consistency
-- ☐ S3.4 Locate + version Citacious knowledge-graph / personality files (see I4)
+- ☑ S3.1 Aura audio context resume — resume() on creation + before each playAudio
+         (mirrors working Citacious pattern; fixes silent playback on Safari/iOS)
+- ☑ S3.2 Citacious stale-context — fetchKnowledge re-runs on panel open, every 90s
+         while open, and right before each voice session connect
+- ☑ S3.3 JSON-LD naming — voice-agents schema named the public agent "Citacious"
+         while the page renders Aura; corrected to "Aura by Auspexi" + provider org
+- ☑ I4/S3.4 Located: NO separate config files. Aura/Citacious personality lives in
+         faqData.ts (AURA_FAQ_KNOWLEDGE, CITACIOUS_GEO_KNOWLEDGE) + inline
+         systemInstruction (VoiceAgentContext.tsx, Copilot.tsx). Future: centralize
+         into versioned config (optional refactor, not blocking).
 - ☐ S3.5–S3.9 (TBD from voice audit)
 
 ## Sprint 4 — Satellite Tools
@@ -64,7 +70,7 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
        stores embedding + localEmbedding + embeddingAlignmentScore on every fact.
        Alignment score reveals dictionary gaps (< 0.3 = needs more synonyms).
        All high-priority write paths updated. Verified: 0.21 vs 0.00 unrelated.
-- ☐ I4 Citacious knowledge-graph / personality file location → informs S3.4
+- ☑ I4 RESOLVED: no separate files; personality in faqData.ts + inline prompts (see S3.4)
 
 ## Lab tasks
 - ☐ L1 Switch GEO Lab orchestrator design/video phases to claude-opus-4-8

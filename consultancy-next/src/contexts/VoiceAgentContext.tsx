@@ -121,6 +121,9 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
   const playAudio = (base64: string) => {
     const audioCtx = audioContextRef.current;
     if (!audioCtx) return;
+    // Browsers may suspend the context (autoplay policy / tab backgrounding).
+    // Resume before scheduling or playback fails silently. Mirrors Citacious.
+    if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
     const int16Data = base64ToInt16Array(base64);
     const float32Data = int16ToFloat32(int16Data);
     const buffer = audioCtx.createBuffer(1, float32Data.length, 24000);
@@ -270,6 +273,9 @@ ${visitorContext}`;
             try {
               const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
               audioContextRef.current = audioCtx;
+              // Resume immediately — connect() runs from a user gesture, but the
+              // context can still be created 'suspended' on some browsers (Safari/iOS).
+              if (audioCtx.state === 'suspended') await audioCtx.resume().catch(() => {});
               nextPlayTimeRef.current = audioCtx.currentTime;
               const stream = await navigator.mediaDevices.getUserMedia({
                 audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true }

@@ -9,12 +9,14 @@ import { Sparkles, Mic, Zap, Brain, MessageSquare, Shield } from 'lucide-react';
 const voiceJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'Citacious by Auspexi',
+  name: 'Aura by Auspexi',
+  alternateName: 'Auspexi Voice Agent',
   applicationCategory: 'BusinessApplication',
-  description: 'Real-time AI voice assistant for Generative Engine Optimization strategy, powered by Gemini Live.',
+  description: 'Aura is a real-time AI voice assistant for Generative Engine Optimization, powered by Gemini Live. Ask about GEO strategy and navigate Auspexi hands-free.',
   url: 'https://auspexi.com/voice-agents',
   operatingSystem: 'Web',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  provider: { '@type': 'Organization', name: 'Auspexi' },
 };
 
 const features = [

@@ -173,6 +173,10 @@ export function Copilot({ setActiveTab }: CopilotProps) {
     return () => unsubscribe();
   }, []);
 
+  // Hoisted so it can be re-run on demand (e.g. before a voice session) to avoid
+  // stale context — Citacious previously only loaded knowledge once per auth change.
+  const fetchKnowledgeRef = useRef<() => Promise<void>>(async () => {});
+
   useEffect(() => {
     const fetchKnowledge = async () => {
       try {
@@ -295,6 +299,8 @@ export function Copilot({ setActiveTab }: CopilotProps) {
       }
     };
 
+    fetchKnowledgeRef.current = fetchKnowledge;
+
     if (!auth) return;
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) fetchKnowledge();
@@ -302,6 +308,15 @@ export function Copilot({ setActiveTab }: CopilotProps) {
 
     return () => unsubscribe();
   }, []);
+
+  // Keep context fresh: re-fetch when the panel opens and every 90s while open,
+  // so edits made elsewhere (e.g. adding facts in another tab) aren't ignored.
+  useEffect(() => {
+    if (!isOpen) return;
+    fetchKnowledgeRef.current();
+    const interval = setInterval(() => fetchKnowledgeRef.current(), 90_000);
+    return () => clearInterval(interval);
+  }, [isOpen]);
 
   const stopAllSources = () => {
     activeSourcesRef.current.forEach(source => {
@@ -461,6 +476,9 @@ ${knowledgeContext}`;
 
     try {
       setIsConnectingVoice(true);
+      // Pull the latest knowledge before opening the voice session so Citacious
+      // never speaks from stale context (state settles before the session opens).
+      await fetchKnowledgeRef.current();
       const ai = await fetchLiveClient();
 
       const sessionPromise = ai.live.connect({
