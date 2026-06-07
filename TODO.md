@@ -62,7 +62,17 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          + LinkedIn post with hashtags) from LLM grounded in actual thread context.
          Copy-to-clipboard workflow; seed history logged to Firestore seed_history.
          Non-Business users see upgrade callout. Citacious config bumped to v2.
-- ☐ S4.2 Simulator recovery/rebuild (see I1)
+- ☑ S4.2 Simulator rebuilt with REAL multi-engine queries. The old route asked ONE
+         model to fabricate four engine answers and "decide randomly" whether each
+         mentioned the brand — pure invention. New `src/lib/engine-query.ts` fires the
+         user's query at every live engine we hold a key for (ChatGPT/Claude/Gemini/
+         Perplexity via the same probes as cite-probe) and deterministically detects
+         genuine brand mentions (substring + negative-context guard). SOV = mentions /
+         LIVE engines; unconfigured engines are skipped & excluded from the denominator
+         (shown as "Not Configured"), errored engines shown honestly. Route now requires
+         auth + logs blended cost to cost_audit. Page uses authFetch, shows real
+         per-engine response text. Citacious config → v3. (I1: git history held no
+         original design — only one unrelated commit touched the route.)
 - ☐ S4.3 Shadow Link intent + rebuild (see I2)
 - ☐ S4.4–S4.8 (TBD)
 
@@ -90,7 +100,9 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
 ---
 
 ## Investigations
-- ☐ I1 Simulator original intent (git history) → informs S4.2
+- ☑ I1 Simulator original intent: git history held nothing — only one unrelated commit
+       (voice model revert) ever touched the route. No lost design to recover; rebuilt
+       from first principles as a real multi-engine SOV probe (see S4.2).
 - ☐ I2 Shadow Link original intent → informs S4.3
 - ☑ I3 Local synonym embedder BUILT + EXPANDED: 341 groups, 2,162 word entries.
        generateWithLocal() runs API + local in parallel on high-priority calls;

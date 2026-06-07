@@ -1,49 +1,76 @@
 import { NextResponse } from 'next/server';
-import { llmOrchestrator } from '@/lib/llm-orchestrator';
-import { SimulatorSchema } from '@/lib/output-validation';
+import { requireAuth } from '@/lib/api-auth';
+import { dbAdmin } from '@/lib/firebase-admin';
+import { queryAllEngines, type EngineId } from '@/lib/engine-query';
+
+// Real multi-engine Share-of-Voice probe.
+//
+// Instead of asking one model to fabricate what four engines "would" say
+// (and randomly decide whether the brand is mentioned), this fires the user's
+// real query at every live engine we hold an API key for, then deterministically
+// detects whether each engine genuinely named the brand. SOV is the share of
+// LIVE engines that mentioned it — engines without a configured key are skipped
+// and excluded from the denominator, never faked.
+
+const ENGINE_IDS: EngineId[] = ['chatgpt', 'claude', 'gemini', 'perplexity'];
 
 export async function POST(request: Request) {
+  const authResult = await requireAuth(request);
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
+
   try {
-    const { query, brand, userId = 'anonymous' } = await request.json();
-    if (!query || !brand) {
+    const { query, brand } = await request.json();
+    if (!query?.trim() || !brand?.trim()) {
       return NextResponse.json({ error: 'Missing query or brand' }, { status: 400 });
     }
 
-    const prompt = `
-      You are an advanced AI simulation engine.
-      Simulate how 4 different AI engines (ChatGPT, Claude, Gemini, Perplexity) would answer the following high-intent query: "${query}".
-      The brand we are tracking is: "${brand}".
-      
-      For each engine, write a realistic 2-3 sentence response to the query. 
-      Decide randomly if the engine should mention the brand or a competitor. 
-      
-      Return a JSON object with:
-      - chatgpt: { response: string, mentionedBrand: boolean }
-      - claude: { response: string, mentionedBrand: boolean }
-      - gemini: { response: string, mentionedBrand: boolean }
-      - perplexity: { response: string, mentionedBrand: boolean }
-      - sovScore: number (0 to 100, based on how many mentioned the brand)
-    `;
+    const engines = await queryAllEngines(query.trim(), brand.trim());
 
-    const result = await llmOrchestrator.executeCall<any>({
-      userId,
-      provider: 'gemini',
-      model: 'gemini-2.5-flash',
-      prompt,
-      schema: SimulatorSchema,
-      feature: 'simulator',
-    });
+    const active = ENGINE_IDS.filter((id) => !engines[id].skipped);
+    const mentions = active.filter((id) => engines[id].mentionedBrand);
+    const sovScore = active.length > 0
+      ? Math.round((mentions.length / active.length) * 100)
+      : 0;
 
-    if (!result.success) {
+    if (active.length === 0) {
       return NextResponse.json(
-        { error: result.error, validationErrors: result.validationErrors },
-        { status: 500 }
+        { success: false, error: 'No AI engines are configured. Set at least one provider API key.' },
+        { status: 503 },
       );
     }
 
-    return NextResponse.json({ success: true, result: result.data });
+    const result = {
+      ...engines,
+      sovScore,
+      activeEngines: active.length,
+      mentionCount: mentions.length,
+      liveEngines: active,
+    };
+
+    // Cost: ~600 output tokens per active engine. Rough blended estimate.
+    if (dbAdmin && userId) {
+      const perEngine: Record<string, number> = {
+        gemini: (600 / 1_000_000) * 0.40,
+        chatgpt: (800 / 1_000_000) * 0.60,
+        perplexity: 0.005,
+        claude: (800 / 1_000_000) * 4.0,
+      };
+      const cost = active.reduce((sum, id) => sum + (perEngine[id] || 0), 0);
+      dbAdmin.collection('cost_audit').add({
+        userId,
+        feature: 'simulator',
+        provider: 'multi-engine',
+        engines: active,
+        estimatedCostUsd: cost,
+        totalCostUsd: cost,
+        timestamp: new Date().toISOString(),
+      }).catch(() => {});
+    }
+
+    return NextResponse.json({ success: true, result });
   } catch (error: any) {
     console.error('Simulation endpoint error:', error);
-    return NextResponse.json({ error: 'Failed to run simulation' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Failed to run simulation' }, { status: 500 });
   }
 }

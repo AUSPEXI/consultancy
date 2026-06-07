@@ -7,6 +7,7 @@ import { checkTierAccess } from '@/constants/tiers';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
 import { logSimulatorResult } from '@/lib/metrics';
+import { authFetch } from '@/lib/auth-fetch';
 
 export default function SimulatorPage() {
   const { tier, role, user } = useAuth();
@@ -26,7 +27,7 @@ export default function SimulatorPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold font-heading mb-2">Multi-Engine SOV Simulator</h1>
-          <p className="text-zinc-400">Simulate how different LLMs respond to high-intent queries and track your Share of Voice.</p>
+          <p className="text-zinc-400">Query live AI engines with high-intent prompts and track your real Share of Voice.</p>
         </div>
         <UpgradePrompt title="Simulator Locked" description="Upgrade to the Pro tier to access the Multi-Engine SOV Simulator and see exactly how leading AI engines view your brand." requiredTier="Pro" />
       </div>
@@ -38,9 +39,8 @@ export default function SimulatorPage() {
     setIsSimulating(true);
     setResults(null);
     try {
-      const res = await fetch('/api/simulate', {
+      const res = await authFetch('/api/simulate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query, brand })
       });
       const data = await res.json();
@@ -59,18 +59,44 @@ export default function SimulatorPage() {
     }
   };
 
-  const EngineCard = ({ name, data }: { name: string; data: any }) => (
-    <div className={`bg-zinc-900 border ${data.mentionedBrand ? 'border-emerald-500/50' : 'border-zinc-800'} rounded-xl p-5 relative overflow-hidden`}>
-      {data.mentionedBrand && (
-        <div className="absolute top-0 right-0 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-bl-lg">Brand Cited</div>
-      )}
-      <div className="flex items-center gap-2 mb-3">
-        <Bot className={`w-5 h-5 ${data.mentionedBrand ? 'text-emerald-400' : 'text-zinc-500'}`} />
-        <h3 className="font-semibold text-white">{name}</h3>
+  const EngineCard = ({ name, data }: { name: string; data: any }) => {
+    if (!data || data.skipped) {
+      return (
+        <div className="bg-zinc-900/50 border border-dashed border-zinc-800 rounded-xl p-5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 bg-zinc-700/30 text-zinc-500 text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-bl-lg">Not Configured</div>
+          <div className="flex items-center gap-2 mb-3">
+            <Bot className="w-5 h-5 text-zinc-600" />
+            <h3 className="font-semibold text-zinc-500">{name}</h3>
+          </div>
+          <p className="text-sm text-zinc-600 leading-relaxed italic">No API key set for this engine — excluded from the SOV score.</p>
+        </div>
+      );
+    }
+    if (data.error) {
+      return (
+        <div className="bg-zinc-900 border border-amber-800/40 rounded-xl p-5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 bg-amber-500/20 text-amber-400 text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-bl-lg">Error</div>
+          <div className="flex items-center gap-2 mb-3">
+            <Bot className="w-5 h-5 text-amber-500" />
+            <h3 className="font-semibold text-white">{name}</h3>
+          </div>
+          <p className="text-sm text-amber-400/70 leading-relaxed">This engine failed to respond. It is excluded from the SOV score.</p>
+        </div>
+      );
+    }
+    return (
+      <div className={`bg-zinc-900 border ${data.mentionedBrand ? 'border-emerald-500/50' : 'border-zinc-800'} rounded-xl p-5 relative overflow-hidden`}>
+        {data.mentionedBrand && (
+          <div className="absolute top-0 right-0 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-bl-lg">Brand Cited</div>
+        )}
+        <div className="flex items-center gap-2 mb-3">
+          <Bot className={`w-5 h-5 ${data.mentionedBrand ? 'text-emerald-400' : 'text-zinc-500'}`} />
+          <h3 className="font-semibold text-white">{name}</h3>
+        </div>
+        <p className="text-sm text-zinc-400 leading-relaxed whitespace-pre-wrap">{data.response}</p>
       </div>
-      <p className="text-sm text-zinc-400 leading-relaxed">{data.response}</p>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -84,7 +110,7 @@ export default function SimulatorPage() {
           <MonitorPlay className="w-8 h-8 text-pink-500" />
           Multi-Engine SOV Simulator
         </h1>
-        <p className="text-zinc-400">Test high-intent queries across engines to see if your brand is recommended.</p>
+        <p className="text-zinc-400">Fire a high-intent query at every live AI engine and see which ones actually cite your brand.</p>
       </div>
 
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
@@ -99,7 +125,7 @@ export default function SimulatorPage() {
           </div>
         </div>
         <button onClick={handleSimulate} disabled={isSimulating || !query.trim() || !brand.trim()} className="w-full py-3 bg-pink-600 hover:bg-pink-700 text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-          {isSimulating ? <><Loader2 className="w-5 h-5 animate-spin" /> Running Simulation...</> : <><Sparkles className="w-5 h-5" /> Simulate Engines</>}
+          {isSimulating ? <><Loader2 className="w-5 h-5 animate-spin" /> Querying Live Engines...</> : <><Sparkles className="w-5 h-5" /> Query Live Engines</>}
         </button>
       </div>
 
@@ -107,8 +133,10 @@ export default function SimulatorPage() {
         <div className="space-y-6">
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-white">Simulated AI Share of Voice (SOV)</h3>
-              <p className="text-sm text-zinc-400">Percentage of engines that cited your brand for this query.</p>
+              <h3 className="text-lg font-semibold text-white">Live AI Share of Voice (SOV)</h3>
+              <p className="text-sm text-zinc-400">
+                {results.mentionCount} of {results.activeEngines} live engine{results.activeEngines === 1 ? '' : 's'} cited your brand for this query.
+              </p>
             </div>
             <div className="text-4xl font-bold text-pink-400">{results.sovScore}%</div>
           </div>

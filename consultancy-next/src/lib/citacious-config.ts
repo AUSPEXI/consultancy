@@ -6,7 +6,7 @@
  * audit logs and conversation history reflect which prompt version was in use.
  */
 
-export const CITACIOUS_CONFIG_VERSION = '2026-06-07-v2';
+export const CITACIOUS_CONFIG_VERSION = '2026-06-07-v3';
 
 export type ToolStatus = 'active' | 'beta' | 'deprecated';
 
@@ -93,9 +93,9 @@ export const DASHBOARD_TOOLS: DashboardTool[] = [
     id: 'simulator',
     name: 'SOV Simulator',
     status: 'active',
-    purpose: 'Scrying Pool. Run prompt matrices through the Auspexi AI engine to simulate how the Latent Space Moat influences AI responses before committing to a content campaign.',
-    metrics: ['Simulated citation probability', 'Vault influence score'],
-    actions: ['Run simulation', 'Test content hypotheses', 'Preview AI response with vault context'],
+    purpose: 'Scrying Pool. Fire a single high-intent query at every live AI engine (ChatGPT, Claude, Gemini, Perplexity) and measure the real Share of Voice — which engines actually cite the brand. Engines without a configured key are skipped, never faked.',
+    metrics: ['Live Share of Voice %', 'Engines citing the brand', 'Per-engine response text'],
+    actions: ['Query live engines', 'Compare per-engine brand citations', 'Identify which engines ignore the brand'],
     flavor: 'Scrying Pool',
   },
   {
