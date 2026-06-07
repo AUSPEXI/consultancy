@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
+import { embeddingService } from '@/lib/embeddings';
 
 export async function POST(request: Request) {
   try {
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
     }
 
     const rawStr = result.rawOutput || '[]';
-    let facts = [];
+    let facts: string[] = [];
     try {
       let cleaned = rawStr.trim();
       if (cleaned.includes('```')) {
@@ -34,7 +35,22 @@ export async function POST(request: Request) {
       facts = [rawStr];
     }
 
-    return NextResponse.json({ success: true, facts });
+    // Generate embeddings for all facts so the UMAP/map analytics can use them.
+    // Fire-and-forget — a failed embed never blocks the fact extraction response.
+    let embeddings: (number[] | null)[] = facts.map(() => null);
+    try {
+      const vecs = await embeddingService.generateEmbeddings(facts);
+      embeddings = vecs;
+    } catch (embedErr) {
+      console.warn('[extract-facts] embedding generation failed (non-fatal):', embedErr);
+    }
+
+    const factsWithEmbeddings = facts.map((statement, i) => ({
+      statement,
+      embedding: embeddings[i] && (embeddings[i] as number[]).length > 0 ? embeddings[i] : null,
+    }));
+
+    return NextResponse.json({ success: true, facts: factsWithEmbeddings });
   } catch (error: any) {
     console.error('Extract facts endpoint error:', error);
     return NextResponse.json({ error: 'Failed to extract facts' }, { status: 500 });

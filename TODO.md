@@ -16,11 +16,14 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
 
 ## Sprint 1 — ML Data Backbone  ⧖
 - ☑ S1.1 Persist + reload citation history (`GET /api/cite-probe`) → trend chart on Cite-Probe page
-- ☐ S1.2 Fact embedding logging — store 768/1536-D vectors with each fact in `facts`
-- ☐ S1.3 Link probe runs to the facts/articles that target them (closed-loop attribution)
+- ☑ S1.2 Fact embedding logging — extract-facts generates+returns embeddings;
+         content-scorer write path stores embedding field; Fact interface updated
+- ☐ S1.3 Link probe runs to facts/articles (closed-loop attribution) — deferred to S6
 - ☑ S1.4 Build A-SOV trend from real citation_tests history (Overview chart no longer
          fabricates a 12→45 ramp; demo data clearly badged for zero-data users)
-- ☐ S1.5 Export training set: (content variant, query, platform, cited bool, embedding)
+- ☑ S1.5 GET /api/export-training-set?userId=&format=jsonl|csv
+         Exports (query, platform, cited, citation_rate, embedding) per probe run
+         Export JSONL button on Cite-Probe history chart
 
 ## Sprint 2 — Make Value Visible
 - ☑ S2.1 Overview A-SOV trend + dials driven by real citation data; LIVE/DEMO badge

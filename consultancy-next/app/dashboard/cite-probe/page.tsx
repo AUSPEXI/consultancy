@@ -630,7 +630,19 @@ export default function CiteProbePage() {
               <TrendingUp className="w-4 h-4 text-emerald-400" />
               <h3 className="text-sm font-semibold text-white">Citation Rate Over Time</h3>
             </div>
-            <span className="text-[10px] text-zinc-500">{persistentHistory.length} probe{persistentHistory.length !== 1 ? 's' : ''} on record</span>
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] text-zinc-500">{persistentHistory.length} probe{persistentHistory.length !== 1 ? 's' : ''} on record</span>
+              {user?.uid && (
+                <a
+                  href={`/api/export-training-set?userId=${encodeURIComponent(user.uid)}&format=jsonl`}
+                  download="training-set.jsonl"
+                  className="text-[10px] font-semibold text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-md px-2 py-1 transition-colors"
+                  title="Download all probe runs as JSONL for ML training"
+                >
+                  ↓ Export JSONL
+                </a>
+              )}
+            </div>
           </div>
           {(() => {
             const points = persistentHistory;

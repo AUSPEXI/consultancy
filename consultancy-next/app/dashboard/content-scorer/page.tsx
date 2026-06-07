@@ -136,14 +136,20 @@ export default function ContentScorerPage() {
       const facts = data.facts || [];
       const dateStr = new Date().toISOString().split('T')[0];
       for (const fact of facts) {
-        await addDoc(collection(db, 'facts'), {
+        // extract-facts now returns { statement, embedding } objects
+        const statement = typeof fact === 'string'
+          ? fact.substring(0, 1000)
+          : (fact.statement ?? JSON.stringify(fact)).substring(0, 1000);
+        const payload: Record<string, any> = {
           userId: user.uid,
-          statement: typeof fact === 'string' ? fact.substring(0, 1000) : JSON.stringify(fact).substring(0, 1000),
+          statement,
           entropyScore: Math.floor(Math.random() * 40) + 60,
           cliffhangerActive: false,
           category: contentType,
-          createdAt: dateStr
-        });
+          createdAt: dateStr,
+        };
+        if (fact.embedding?.length > 0) payload.embedding = fact.embedding;
+        await addDoc(collection(db, 'facts'), payload);
       }
       await logAuditAction(user.uid, 'Extracted facts to Vault', { count: facts.length });
       setFactsSaved(true);

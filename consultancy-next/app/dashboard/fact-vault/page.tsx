@@ -23,6 +23,7 @@ interface Fact {
   category: string;
   createdAt: string;
   status?: string;
+  embedding?: number[] | null;
 }
 
 export default function FactVault() {
