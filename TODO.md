@@ -140,10 +140,12 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          utility, not a Pro "advanced" tool. Citacious quest-path updated to 8-step
          flow (0-config → 1-measure → 2-vault → 3-generate → 4-score → 5-schema
          → 6-deploy → 7-probe → 8-defend). Config → v5.
-- ☐ S5.3 Onboarding checklist — dismissable 5-step checklist (persisted to users doc)
-         matching THE QUEST: Configure → First probe → Add 10 facts → Score article →
-         Deploy schema. Steps auto-check on completion. Replaces static S0.1 setup prompt
-         with something actionable.  [PRIORITY: trust-first]
+- ☑ S5.3 Onboarding checklist BUILT. New OnboardingChecklist component on Overview:
+         dismissable 5-step quest (Configure → First probe → Add 10 facts → Score article
+         → Deploy schema). Every step auto-checks from REAL data — brand from users doc,
+         hasProbed from citation history, fact count + article count via getCountFromServer,
+         schemaDeployed flag. Dismissal persists to users.onboardingDismissed; auto-hides
+         when all 5 complete. Progress bar + per-step deep links.
 - ☐ S5.4 Mobile responsive audit — audit all pages at 375px. Sidebar → hamburger,
          Overview dials stack, Cite-Probe chart scrollable, voice panel no overflow.
          Goal: usable on mobile, not pixel-perfect.

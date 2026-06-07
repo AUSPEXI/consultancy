@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Cell, ReferenceArea, PieChart, Pie } from 'recharts';
 import { TrendingUp, Users, Target, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, HelpCircle, Sparkles } from 'lucide-react';
 import { SyntheticDataPanel } from '@/components/dashboard/SyntheticDataPanel';
+import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
 import { authFetch } from '@/lib/auth-fetch';
@@ -381,6 +382,14 @@ export default function OverviewPage() {
           <span className="text-sm font-bold tracking-tight">{toastMessage.text}</span>
           <button onClick={() => setToastMessage(null)} className="ml-4 p-1 hover:bg-white/10 rounded-full transition-colors"><X className="w-4 h-4" /></button>
         </div>
+      )}
+
+      {user?.uid && (
+        <OnboardingChecklist
+          userId={user.uid}
+          brandConfigured={!!userData?.brand}
+          hasProbed={citationHistory.length > 0}
+        />
       )}
 
       <SemanticAnchorsModal isOpen={isEditingAnchors} onClose={() => setIsEditingAnchors(false)} userId={user?.uid || ''} brand={userData?.brand || ''} domain={userData?.domain || ''} keywords={userData?.keywords || []} initialAnchors={userAnchors} onSaved={refetchGeo} showToast={(text, type) => setToastMessage({ text, type })} />
