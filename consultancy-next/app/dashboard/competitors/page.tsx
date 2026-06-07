@@ -38,7 +38,7 @@ export default function Competitors() {
 
   useEffect(() => {
     if (!user) return;
-    if (role !== 'admin' && !checkTierAccess(tier, 'Medium')) return;
+    if (role !== 'admin' && !checkTierAccess(tier, 'Pro')) return;
 
     const q = query(
       collection(db, 'competitors'),
@@ -59,7 +59,7 @@ export default function Competitors() {
     return () => unsubscribe();
   }, [user, tier, role]);
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Medium')) {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Pro')) {
     return (
       <div className="space-y-6">
         <div>
@@ -68,8 +68,8 @@ export default function Competitors() {
         </div>
         <UpgradePrompt
           title="Competitor Tracking Locked"
-          description="Upgrade to the Medium tier to automatically monitor your competitors for signs of data decay in AI responses, alerting you to Trojan Horse opportunities."
-          requiredTier="Medium"
+          description="Upgrade to the Pro tier to automatically monitor your competitors for signs of data decay in AI responses, alerting you to Trojan Horse opportunities."
+          requiredTier="Pro"
         />
       </div>
     );

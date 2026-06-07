@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Database, Lock, Unlock, CheckCircle2, AlertCircle, Plus, X, Loader2, Megaphone, Sparkles, Search, Network, FileText, BarChart2 } from 'lucide-react';
 import { WorkflowProgress, markStepComplete } from '@/components/dashboard/WorkflowProgress';
 import { useAuth } from '@/contexts/AuthContext';
-import { checkTierAccess } from '@/constants/tiers';
+import { checkTierAccess, normalizeTier } from '@/constants/tiers';
 import { db } from '@/firebase';
 import { collection, addDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { GoogleGenAI, Type } from '@google/genai';
@@ -70,17 +70,17 @@ export default function FactVault() {
   }, [user]);
 
   const getFactLimit = () => {
-    if (!checkTierAccess(tier, 'Basic')) return 0;
-    if (tier === 'Basic') return 10;
-    if (tier === 'Medium') return 50;
-    if (tier === 'Premium') return 150;
-    return Infinity; // Pro, Business, Enterprise, PipelineOffer
+    const t = normalizeTier(tier);
+    if (t === 'Free') return 0;
+    if (t === 'Starter') return 50;   // $149 — pricing page advertises "1GB Fact-Vault"
+    if (t === 'Pro') return 500;      // $499 — "10GB Fact-Vault"
+    return Infinity;                  // Business ($1,899) — "50GB Fact-Vault"
   };
 
   const currentLimit = getFactLimit();
   const isAtLimit = facts.length >= currentLimit;
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Basic')) {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Starter')) {
     return (
       <div className="space-y-6">
         <div>
@@ -89,8 +89,8 @@ export default function FactVault() {
         </div>
         <UpgradePrompt
           title="Fact-Vault Locked"
-          description="Upgrade to the Basic tier to start extracting and storing high-entropy facts that AI models love to cite."
-          requiredTier="Basic"
+          description="Upgrade to the Starter tier to start extracting and storing high-entropy facts that AI models love to cite."
+          requiredTier="Starter"
         />
       </div>
     );

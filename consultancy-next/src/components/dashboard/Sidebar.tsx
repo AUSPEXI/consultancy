@@ -48,35 +48,35 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     {
       label: 'THE QUEST',
       items: [
-        { id: 'cite-probe',     label: 'Citation Probe',   icon: Zap,     requiredTier: 'Basic' as UserTier, path: '/dashboard/cite-probe',    step: '1', wfKey: 'step1' },
-        { id: 'fact-vault',     label: 'Fact Vault',       icon: Database,requiredTier: 'Basic' as UserTier, path: '/dashboard/fact-vault',    step: '2', wfKey: 'step2' },
-        { id: 'agents',         label: 'Content Pipeline', icon: Bot,     requiredTier: 'Basic' as UserTier, path: '/dashboard/agents',        step: '3', wfKey: 'step3' },
-        { id: 'content-scorer', label: 'Score & Refine',   icon: PenTool, requiredTier: 'Basic' as UserTier, path: '/dashboard/content-scorer',step: '4', wfKey: 'step4' },
-        { id: 'technical',      label: 'Schema & Deploy',  icon: Code,    requiredTier: 'Basic' as UserTier, path: '/dashboard/technical',     step: '5', wfKey: 'step5' },
+        { id: 'cite-probe',     label: 'Citation Probe',   icon: Zap,     requiredTier: 'Starter' as UserTier, path: '/dashboard/cite-probe',    step: '1', wfKey: 'step1' },
+        { id: 'fact-vault',     label: 'Fact Vault',       icon: Database,requiredTier: 'Starter' as UserTier, path: '/dashboard/fact-vault',    step: '2', wfKey: 'step2' },
+        { id: 'agents',         label: 'Content Pipeline', icon: Bot,     requiredTier: 'Pro' as UserTier, path: '/dashboard/agents',        step: '3', wfKey: 'step3' },
+        { id: 'content-scorer', label: 'Score & Refine',   icon: PenTool, requiredTier: 'Starter' as UserTier, path: '/dashboard/content-scorer',step: '4', wfKey: 'step4' },
+        { id: 'technical',      label: 'Schema & Deploy',  icon: Code,    requiredTier: 'Pro' as UserTier, path: '/dashboard/technical',     step: '5', wfKey: 'step5' },
       ],
     },
     {
       label: 'COMMAND CENTRE',
       items: [
-        { id: 'overview',       label: 'SOV Overview',         icon: LayoutDashboard, requiredTier: 'Basic'  as UserTier, path: '/dashboard/overview' },
-        { id: 'geo-pulse',      label: 'GEO Pulse',            icon: Activity,        requiredTier: 'Medium' as UserTier, path: '/dashboard/geo-pulse' },
-        { id: 'autopilot',      label: 'GEO Autopilot',        icon: RefreshCw,       requiredTier: 'Pro'    as UserTier, path: '/dashboard/autopilot' },
+        { id: 'overview',       label: 'SOV Overview',         icon: LayoutDashboard, requiredTier: 'Starter' as UserTier, path: '/dashboard/overview' },
+        { id: 'geo-pulse',      label: 'GEO Pulse',            icon: Activity,        requiredTier: 'Pro'     as UserTier, path: '/dashboard/geo-pulse' },
+        { id: 'autopilot',      label: 'GEO Autopilot',        icon: RefreshCw,       requiredTier: 'Pro'     as UserTier, path: '/dashboard/autopilot' },
       ],
     },
     {
       label: 'INTELLIGENCE',
       items: [
-        { id: 'competitors',    label: 'Competitor Radar',     icon: Radar,           requiredTier: 'Medium' as UserTier, path: '/dashboard/competitors' },
-        { id: 'brand-monitor',  label: 'Brand Monitor',        icon: Target,          requiredTier: 'Medium' as UserTier, path: '/dashboard/brand-monitor' },
-        { id: 'simulator',      label: 'SOV Simulator',        icon: MonitorPlay,     requiredTier: 'Medium' as UserTier, path: '/dashboard/simulator' },
+        { id: 'competitors',    label: 'Competitor Radar',     icon: Radar,           requiredTier: 'Pro' as UserTier, path: '/dashboard/competitors' },
+        { id: 'brand-monitor',  label: 'Brand Monitor',        icon: Target,          requiredTier: 'Pro' as UserTier, path: '/dashboard/brand-monitor' },
+        { id: 'simulator',      label: 'SOV Simulator',        icon: MonitorPlay,     requiredTier: 'Pro' as UserTier, path: '/dashboard/simulator' },
       ],
     },
     {
       label: 'ADVANCED',
       items: [
-        { id: 'entity-hub',     label: 'Entity Hub',           icon: Building2,       requiredTier: 'Premium' as UserTier, path: '/dashboard/entity-hub' },
-        { id: 'schema-deploy',  label: 'Schema Deploy',        icon: Layers,          requiredTier: 'Premium' as UserTier, path: '/dashboard/schema-deploy' },
-        { id: 'audit-logs',     label: 'Audit Logs',           icon: ShieldCheck,     requiredTier: 'Basic'   as UserTier, path: '/dashboard/audit-logs' },
+        { id: 'entity-hub',     label: 'Entity Hub',           icon: Building2,       requiredTier: 'Pro' as UserTier, path: '/dashboard/entity-hub' },
+        { id: 'schema-deploy',  label: 'Schema Deploy',        icon: Layers,          requiredTier: 'Pro' as UserTier, path: '/dashboard/schema-deploy' },
+        { id: 'audit-logs',     label: 'Audit Logs',           icon: ShieldCheck,     requiredTier: 'Starter' as UserTier, path: '/dashboard/audit-logs' },
       ],
     },
   ];

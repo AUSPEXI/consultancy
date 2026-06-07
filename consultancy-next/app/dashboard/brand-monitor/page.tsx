@@ -18,7 +18,7 @@ export default function BrandMonitorPage() {
     setTimeout(() => setToast(null), 4000);
   };
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Medium')) {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Pro')) {
     return (
       <div className="space-y-6">
         <div>
@@ -27,8 +27,8 @@ export default function BrandMonitorPage() {
         </div>
         <UpgradePrompt
           title="Brand Monitor Locked"
-          description="Upgrade to the Medium tier to access the Consensus Platform Monitor and detect negative sentiment before it trains the next LLM."
-          requiredTier="Medium"
+          description="Upgrade to the Pro tier to access the Consensus Platform Monitor and detect negative sentiment before it trains the next LLM."
+          requiredTier="Pro"
         />
       </div>
     );

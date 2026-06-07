@@ -165,14 +165,14 @@ export default function ContentScorerPage() {
     }
   };
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Basic')) {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Starter')) {
     return (
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold font-heading mb-2">Pre-Publish Content Scorer</h1>
           <p className="text-zinc-400">Analyze your content for &ldquo;Machine Readability&rdquo; before you publish.</p>
         </div>
-        <UpgradePrompt title="Content Scorer Locked" description="Upgrade to the Basic tier to access the Pre-Publish Content Scorer and ensure your content is optimized for LLM extraction." requiredTier="Basic" />
+        <UpgradePrompt title="Content Scorer Locked" description="Upgrade to the Starter tier to access the Pre-Publish Content Scorer and ensure your content is optimized for LLM extraction." requiredTier="Starter" />
       </div>
     );
   }

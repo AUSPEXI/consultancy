@@ -17,7 +17,7 @@ export default function SchemaDeployPage() {
   useEffect(() => { setOrigin(window.location.origin); }, []);
 
   const isAdmin = user?.email === 'hopiumcalculator@gmail.com';
-  const hasAccess = isAdmin || checkTierAccess(tier, 'Premium');
+  const hasAccess = isAdmin || checkTierAccess(tier, 'Pro');
 
   const publicSchemaUrl = user ? `${origin}/api/schema-public/${user.uid}` : '';
 

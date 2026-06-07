@@ -113,7 +113,7 @@ export default function OverviewPage() {
   }, [toastMessage]);
 
   useEffect(() => {
-    if (!user || !checkTierAccess(tier, 'Basic')) return;
+    if (!user || !checkTierAccess(tier, 'Starter')) return;
     const q = query(
       collection(db, 'sovMetrics'),
       where('userId', '==', user.uid),
@@ -132,7 +132,7 @@ export default function OverviewPage() {
 
   // Real citation data — actual LLM queries, not estimates
   useEffect(() => {
-    if (!user || !checkTierAccess(tier, 'Basic')) return;
+    if (!user || !checkTierAccess(tier, 'Starter')) return;
     const q = query(
       collection(db, 'citation_tests'),
       where('userId', '==', user.uid),
@@ -156,7 +156,7 @@ export default function OverviewPage() {
       .catch(() => {});
   }, [user?.uid]);
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Basic')) {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Starter')) {
     return (
       <div className="space-y-6">
         <div>
@@ -165,8 +165,8 @@ export default function OverviewPage() {
         </div>
         <UpgradePrompt
           title="Dashboard Locked"
-          description="Upgrade to the Basic tier to unlock the Overview Dashboard, track your AI Share of Voice, and generate Shadow Links."
-          requiredTier="Basic"
+          description="Upgrade to the Starter tier to unlock the Overview Dashboard, track your AI Share of Voice, and generate Shadow Links."
+          requiredTier="Starter"
         />
       </div>
     );

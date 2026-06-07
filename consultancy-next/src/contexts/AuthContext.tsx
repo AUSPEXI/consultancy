@@ -8,7 +8,10 @@ import { auth, db, googleProvider } from '@/firebase'
 export type { UserTier } from '@/constants/tiers'
 
 export interface UserData {
-  tier: 'Free' | 'Basic' | 'Medium' | 'Pro' | 'Business' | 'Enterprise' | 'Premium' | 'PipelineOffer'
+  // Canonical tiers are Free | Starter | Pro | Business. Legacy names
+  // (Basic/Medium/Premium/Enterprise/PipelineOffer) may still appear in older
+  // Firestore docs — normalizeTier() in @/constants/tiers maps them on read.
+  tier: string
   role: 'admin' | 'user'
   email?: string | null
   onboardingCompleted?: boolean

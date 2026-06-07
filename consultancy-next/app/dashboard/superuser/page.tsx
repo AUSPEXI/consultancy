@@ -301,10 +301,12 @@ export default function SuperuserPage() {
 
   // Tier management
   const [tierEmail, setTierEmail] = useState('');
-  const [selectedTier, setSelectedTier] = useState('Premium');
+  const [selectedTier, setSelectedTier] = useState('Pro');
   const [isUpdatingTier, setIsUpdatingTier] = useState(false);
 
-  const TIERS = ['Free', 'Basic', 'Medium', 'Pro', 'Business', 'Premium', 'Enterprise', 'PipelineOffer'];
+  // Canonical billable tiers (matches pricing page). Legacy names are still
+  // accepted on read via normalizeTier but should not be assignable here.
+  const TIERS = ['Free', 'Starter', 'Pro', 'Business'];
 
   const updateUserTier = async () => {
     if (!isSuperuser) { setStatus({ type: 'error', message: 'Tier management restricted to superuser account.' }); return; }

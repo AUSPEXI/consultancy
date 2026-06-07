@@ -8,14 +8,14 @@ function getStripe(): Stripe {
   return new Stripe(key);
 }
 
-// Tier mapping matches create-checkout-session amounts (in cents)
-function tierFromAmount(amountTotal: number | null, mode: string): string {
-  if (mode === 'subscription') return 'Premium'; // PipelineOffer subscription
+// Tier mapping matches create-checkout-session amounts (in cents).
+// Returns canonical tiers only (Starter / Pro / Business).
+function tierFromAmount(amountTotal: number | null): string {
   switch (amountTotal) {
-    case 14900: return 'Basic';      // $149
-    case 49900: return 'Premium';    // $499
-    case 99900: return 'Pro';        // $999
-    default:    return 'Basic';
+    case 14900:  return 'Starter';   // $149
+    case 49900:  return 'Pro';       // $499
+    case 189900: return 'Business';  // $1,899
+    default:     return 'Starter';
   }
 }
 
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
         const userQuery = await dbAdmin.collection('users').where('email', '==', email).limit(1).get();
         if (!userQuery.empty) {
           const userDoc = userQuery.docs[0];
-          const newTier = tierFromAmount(session.amount_total, session.mode || 'payment');
+          const newTier = tierFromAmount(session.amount_total);
           await userDoc.ref.update({ tier: newTier, updatedAt: new Date().toISOString() });
           console.log(`[stripe-webhook] Upgraded ${email} to ${newTier}`);
         } else {

@@ -2,6 +2,7 @@
 
 import { Bell, Search, Zap, Menu, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { normalizeTier, checkTierAccess } from '@/constants/tiers';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -37,9 +38,9 @@ export function Header({ onMenuClick }: HeaderProps) {
       <div className="flex items-center gap-3 md:gap-6">
         <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-pink-500/10 text-pink-400 text-xs font-medium border border-pink-500/20">
           <Shield className="w-3.5 h-3.5" />
-          {tier} Tier
+          {normalizeTier(tier)} Tier
         </div>
-        {tier === 'Premium' && (
+        {checkTierAccess(tier, 'Pro') && (
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20">
             <Zap className="w-3.5 h-3.5" />
             Edge Worker Active

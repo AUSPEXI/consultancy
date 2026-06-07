@@ -41,7 +41,7 @@ export default function EntityHubPage() {
   const [extraContext, setExtraContext] = useState('');
 
   const isAdmin = user?.email === 'hopiumcalculator@gmail.com';
-  const hasAccess = isAdmin || checkTierAccess(tier, 'Premium');
+  const hasAccess = isAdmin || checkTierAccess(tier, 'Pro');
 
   const copy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);

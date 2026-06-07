@@ -21,14 +21,14 @@ export default function SimulatorPage() {
     setTimeout(() => setToast(null), 4000);
   };
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Medium')) {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Pro')) {
     return (
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold font-heading mb-2">Multi-Engine SOV Simulator</h1>
           <p className="text-zinc-400">Simulate how different LLMs respond to high-intent queries and track your Share of Voice.</p>
         </div>
-        <UpgradePrompt title="Simulator Locked" description="Upgrade to the Medium tier to access the Multi-Engine SOV Simulator and see exactly how leading AI engines view your brand." requiredTier="Medium" />
+        <UpgradePrompt title="Simulator Locked" description="Upgrade to the Pro tier to access the Multi-Engine SOV Simulator and see exactly how leading AI engines view your brand." requiredTier="Pro" />
       </div>
     );
   }

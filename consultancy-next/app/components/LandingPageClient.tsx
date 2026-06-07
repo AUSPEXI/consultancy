@@ -522,82 +522,70 @@ export function LandingPageClient() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             <PricingCard
               tier="Starter"
               price={currency === 'USD' ? "$149/mo" : "£119/mo"}
               bestFor="For individuals & early-stage founders exploring AI visibility"
               CTA="Start Now"
-              onClick={() => handleCheckout('Basic')}
+              onClick={() => handleCheckout('Starter')}
               benefits={[
                 { text: "1 Brand, 5 Target Keywords", checked: true },
                 { text: "AI SOV Overview Dashboard", checked: true },
-                { text: "Fact-Vault (unlimited entries)", checked: true },
+                { text: "Citation Probe (real AI queries)", checked: true },
+                { text: "Fact-Vault (50 facts)", checked: true },
                 { text: "Content Scorer", checked: true },
                 { text: "Citacious AI Strategist", checked: true },
                 { text: "Audit Logs & Activity History", checked: true },
                 { text: "LLM Inference & Embedding Costs Inc.", checked: true },
-                { text: "Competitor Radar", checked: false },
-                { text: "Entity Intelligence Hub", checked: false },
-                { text: "Schema Deploy", checked: false },
-                { text: "GEO Autopilot Loop", checked: false },
-              ]}
-            />
-            <PricingCard
-              tier="Premium"
-              price={currency === 'USD' ? "$499/mo" : "£399/mo"}
-              bestFor="For growth teams ready to move from measurement to execution"
-              CTA="Start Premium"
-              onClick={() => handleCheckout('Premium')}
-              benefits={[
-                { text: "5 Brands, 50 Keywords", checked: true },
-                { text: "Competitor Radar (up to 6)", checked: true },
-                { text: "GEO Pulse Index (live citation scan)", checked: true },
-                { text: "SOV Simulator & Brand Monitor", checked: true },
-                { text: "Entity Intelligence Hub", checked: true },
-                { text: "Schema Deploy (live JSON-LD API)", checked: true },
-                { text: "Multi-Agent Crawler", checked: true },
-                { text: "768-D Latent Space Map", checked: true },
-                { text: "Citation Probe (real Gemini queries)", checked: true },
-                { text: "GEO Autopilot Loop", checked: false },
+                { text: "Competitor Radar & Brand Monitor", checked: false },
+                { text: "GEO Autopilot & Multi-Agent Crawler", checked: false },
+                { text: "Autonomous Social Seeding", checked: false },
               ]}
             />
             <PricingCard
               tier="Pro"
-              price={currency === 'USD' ? "$999/mo" : "£799/mo"}
-              bestFor="For brands serious about owning their AI citation narrative"
+              price={currency === 'USD' ? "$499/mo" : "£399/mo"}
+              bestFor="For growth teams ready to move from measurement to execution"
               CTA="Start Pro"
               onClick={() => handleCheckout('Pro')}
               benefits={[
-                { text: "10 Brands, 100 Keywords", checked: true },
-                { text: "Everything in Premium", checked: true },
-                { text: "GEO Autopilot Loop (unlimited runs)", checked: true },
-                { text: "Probe→Generate→Publish→Re-probe", checked: true },
-                { text: "CMS Webhook Auto-Publishing", checked: true },
+                { text: "5 Brands, 50 Keywords", checked: true },
+                { text: "Everything in Starter", checked: true },
+                { text: "Competitor Radar & Brand Monitor", checked: true },
+                { text: "GEO Pulse Index (live citation scan)", checked: true },
+                { text: "SOV Simulator", checked: true },
+                { text: "Entity Intelligence Hub", checked: true },
+                { text: "Schema Deploy (live JSON-LD API)", checked: true },
+                { text: "Multi-Agent Crawler", checked: true },
+                { text: "GEO Autopilot Loop", checked: true },
+                { text: "768-D Latent Space Map", checked: true },
+                { text: "Autonomous Social Seeding", checked: false },
+              ]}
+            />
+            <PricingCard
+              tier="Business"
+              price={currency === 'USD' ? "$1,899/mo" : "£1,499/mo"}
+              bestFor="For mid-market SaaS & high-growth brands scaling GEO"
+              CTA="Start Business"
+              onClick={() => handleCheckout('Business')}
+              benefits={[
+                { text: "25 Brands, 250 Keywords", checked: true },
+                { text: "Everything in Pro", checked: true },
+                { text: "Autonomous Social Seeding (Reddit & LinkedIn)", checked: true },
                 { text: "Full API Access for GEO Integrations", checked: true },
+                { text: "CMS Webhook Auto-Publishing", checked: true },
+                { text: "50GB Fact-Vault", checked: true },
                 { text: "White-Glove Implementation Support", checked: true },
                 { text: "Weekly Strategic Analyst Session", checked: true },
                 { text: "Multi-User Team Management", checked: true },
               ]}
             />
-            <PricingCard
-              tier="Enterprise"
-              price={currency === 'USD' ? "Custom" : "Custom"}
-              bestFor="For Fortune 500 market leaders & agencies"
-              CTA="Talk to Sales"
-              onClick={() => window.location.href = 'mailto:sales@auspexi.com'}
-              benefits={[
-                { text: "Unlimited Keywords & Competitors", checked: true },
-                { text: "Everything in Pro", checked: true },
-                { text: "Dedicated Account Manager", checked: true },
-                { text: "Custom Reporting & Dashboards", checked: true },
-                { text: "Whitelabel GEO Dashboard", checked: true },
-                { text: "SOC2 Compliance & SSO Integration", checked: true },
-                { text: "SLA Guaranteed Response Times", checked: true },
-                { text: "Custom Integration Support", checked: true },
-                { text: "24/7 Priority Support", checked: true },
-              ]}
-            />
+          </div>
+
+          <div className="mt-8 text-center text-sm text-zinc-500">
+            Need custom volumes, SSO, or a whitelabel dashboard?{' '}
+            <a href="mailto:sales@auspexi.com" className="text-pink-400 hover:text-pink-300 underline">Talk to sales</a>.
           </div>
 
           <div className="mt-12 text-center text-sm text-zinc-500 max-w-3xl mx-auto bg-zinc-900/30 rounded-xl p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">

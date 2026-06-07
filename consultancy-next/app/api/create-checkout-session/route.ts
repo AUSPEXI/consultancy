@@ -29,24 +29,25 @@ export async function POST(request: Request) {
 
     let unitAmount = 0;
     let productName = '';
-    let mode: 'subscription' | 'payment' = 'subscription';
+    const mode: 'subscription' | 'payment' = 'subscription';
 
-    if (tier === 'Basic') {
+    // Canonical tiers (matches pricing page + tiers.ts TIER_PRICES). Legacy
+    // names are normalized so historical checkout links keep working.
+    const normalized =
+      tier === 'Basic' ? 'Starter'
+      : (tier === 'Premium' || tier === 'PipelineOffer') ? 'Pro'
+      : tier === 'Enterprise' ? 'Business'
+      : tier;
+
+    if (normalized === 'Starter') {
       unitAmount = 14900; // $149.00
       productName = 'Auspexi Starter';
-    } else if (tier === 'Premium') {
+    } else if (normalized === 'Pro') {
       unitAmount = 49900; // $499.00
-      productName = 'Auspexi Premium';
-    } else if (tier === 'Pro') {
-      unitAmount = 99900; // $999.00
       productName = 'Auspexi Pro';
-    } else if (tier === 'Enterprise') {
-      unitAmount = 0;
-      productName = 'Auspexi Enterprise';
-    } else if (tier === 'PipelineOffer') {
-      unitAmount = 49900; // $499.00
-      productName = 'Auspexi Full Access (Pipeline Offer)';
-      mode = 'subscription';
+    } else if (normalized === 'Business') {
+      unitAmount = 189900; // $1,899.00
+      productName = 'Auspexi Business';
     } else {
       return NextResponse.json({ error: 'Invalid tier selected' }, { status: 400 });
     }

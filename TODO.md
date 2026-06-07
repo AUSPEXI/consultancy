@@ -56,7 +56,16 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
 - ☐ S4.4–S4.8 (TBD)
 
 ## Sprint 5 — UI/UX & Pricing
-- ☐ S5.1 Consolidate tier enum to 3 real tiers (Starter $149 / Pro $499 / Business $1,899)
+- ☑ S5.1 Consolidate tier enum to 3 real tiers (Starter $149 / Pro $499 / Business $1,899).
+         tiers.ts is now canonical: UserTier = Free|Starter|Pro|Business, TIER_PRICES,
+         normalizeTier() maps legacy names (Basic→Starter, Medium/Pro/Premium/PipelineOffer→Pro,
+         Enterprise→Business) so old Firestore docs + Stripe history keep working.
+         Feature gates remapped: Starter = overview/cite-probe/fact-vault/content-scorer/audit-logs;
+         Pro = +geo-pulse/competitors/brand-monitor/simulator/autopilot/agents/technical/
+         schema-deploy/entity-hub; Business = top tier (social seeding + API, advertised).
+         Fixed live landing page (was 4 cards w/ wrong $999 Pro) → 3 canonical cards.
+         Stripe webhook + create-checkout-session aligned to real prices incl. $1,899 Business.
+         Fact-Vault limits: Starter 50 / Pro 500 / Business ∞.
 - ☐ S5.2 Sidebar reorganisation
 - ☐ S5.3–S5.4 (TBD)
 

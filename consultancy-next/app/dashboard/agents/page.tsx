@@ -123,14 +123,14 @@ export default function AgentsPage() {
     }
   }, [showResults, finalArticle]);
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Premium')) {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Pro')) {
     return (
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold font-heading mb-2">Multi-Agent Orchestration</h1>
           <p className="text-zinc-400">Deploy specialized AI agents to crawl, extract, structure, and synthesize GEO-optimized content.</p>
         </div>
-        <UpgradePrompt title="Multi-Agent Orchestration Locked" description="Upgrade to the Premium tier to access the full Prompt-to-Conversion Pipeline and deploy specialized AI agents for automated content generation." requiredTier="Premium" />
+        <UpgradePrompt title="Multi-Agent Orchestration Locked" description="Upgrade to the Pro tier to access the full Prompt-to-Conversion Pipeline and deploy specialized AI agents for automated content generation." requiredTier="Pro" />
       </div>
     );
   }

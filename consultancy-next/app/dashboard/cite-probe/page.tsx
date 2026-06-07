@@ -139,7 +139,7 @@ export default function CiteProbePage() {
     await saveNegativeStatements(updated);
   };
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Pro')) {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Starter')) {
     return (
       <div className="space-y-6">
         <div>
@@ -148,8 +148,8 @@ export default function CiteProbePage() {
         </div>
         <UpgradePrompt
           title="Citation Probe Locked"
-          description="Upgrade to Pro or above to run live citation tests across AI engines and track your brand's citation rate over time."
-          requiredTier="Pro"
+          description="Upgrade to the Starter tier or above to run live citation tests across AI engines and track your brand's citation rate over time."
+          requiredTier="Starter"
         />
       </div>
     );

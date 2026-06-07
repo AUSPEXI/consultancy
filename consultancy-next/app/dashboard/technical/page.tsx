@@ -66,7 +66,7 @@ export default function TechnicalPage() {
     fetchFacts();
   }, [user]);
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Premium')) {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Pro')) {
     return (
       <div className="space-y-6">
         <div>
@@ -75,8 +75,8 @@ export default function TechnicalPage() {
         </div>
         <UpgradePrompt
           title="Technical SEO Locked"
-          description="Upgrade to the Premium tier to access the Edge SEO Cloudflare Worker Generator, Semantic HTML Restructuring, and JSON-LD Cite-Magnet Generator."
-          requiredTier="Premium"
+          description="Upgrade to the Pro tier to access the Edge SEO Cloudflare Worker Generator, Semantic HTML Restructuring, and JSON-LD Cite-Magnet Generator."
+          requiredTier="Pro"
         />
       </div>
     );

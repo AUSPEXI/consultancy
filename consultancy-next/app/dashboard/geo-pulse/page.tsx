@@ -17,7 +17,7 @@ export default function GeoPulsePage() {
 
   const savedKeywords: string[] = userData?.keywords ?? [];
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Premium')) {
+  if (role !== 'admin' && !checkTierAccess(tier, 'Pro')) {
     return (
       <div className="space-y-6">
         <div>
@@ -29,8 +29,8 @@ export default function GeoPulsePage() {
         </div>
         <UpgradePrompt
           title="GEO Pulse Index Locked"
-          description="Upgrade to the Premium tier to access real-time brand sentiment benchmarking using our proprietary, compliant data lake."
-          requiredTier="Premium"
+          description="Upgrade to the Pro tier to access real-time brand sentiment benchmarking using our proprietary, compliant data lake."
+          requiredTier="Pro"
         />
       </div>
     );
