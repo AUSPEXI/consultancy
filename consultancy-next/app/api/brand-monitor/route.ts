@@ -1,82 +1,186 @@
 import { NextResponse } from 'next/server';
-import { queryByBrand, avg, dominantSentiment, GeoRow } from '@/lib/geo-data';
+import { z } from 'zod';
+import { getExa } from '@/lib/exa';
+import { llmOrchestrator } from '@/lib/llm-orchestrator';
+import { requireAuth } from '@/lib/api-auth';
+import { dbAdmin } from '@/lib/firebase-admin';
 
-function buildActionPlan(sentiment: string, riskScore: number, driftCount: number): string {
-  if (riskScore > 70) {
-    return `Your brand is under active context pressure. ${driftCount} signals show statistical drift above the 2σ threshold. Immediate action: deploy high-entropy counter-facts to Reddit threads and Quora answers that appear in AI training crawls. Focus on the Fact-Vault to push authoritative statements that crowd out negative narratives before the next LLM training cycle.`;
-  }
-  if (riskScore > 45 || sentiment === 'Negative') {
-    return `Moderate context risk detected. Some forum threads carry negative framing that could be absorbed by LLMs. Recommended action: seed 3–5 positive, statistically-anchored facts across relevant communities. Monitor z-score drift weekly and run this scan again after publishing.`;
-  }
-  if (sentiment === 'Neutral') {
-    return `Sentiment is neutral — your brand lacks strong positive anchors in AI-training sources. This is an opportunity, not a crisis. Publish authoritative, entity-dense content on high-crawl platforms (Medium, Substack, LinkedIn) to build a positive vector presence before competitors do.`;
-  }
-  return `Sentiment is positive and risk is low. Maintain momentum: continue publishing statistical anchors and ensure your Fact-Vault contains fresh, cited statements updated within the last 90 days to stay ahead of data decay.`;
+// The LLM classifies real Exa results by index — it NEVER emits URLs or titles,
+// so every link surfaced to the user is a genuine, crawlable source.
+const ClassificationSchema = z.object({
+  overallSentiment: z.enum(['Positive', 'Neutral', 'Negative']),
+  riskScore: z.number().min(0).max(100),
+  actionPlan: z.string().min(10),
+  threads: z
+    .array(
+      z.object({
+        index: z.number().int().min(0),
+        sentiment: z.enum(['Positive', 'Neutral', 'Negative', 'Mixed']),
+        summary: z.string().min(1),
+      })
+    )
+    .default([]),
+});
+
+interface ExaThread {
+  url: string;
+  title: string;
+  text: string;
+  publishedDate: string | null;
 }
 
-function rowToThread(row: GeoRow) {
-  const platforms = ['Reddit', 'Quora', 'HackerNews', 'LinkedIn', 'ProductHunt'];
-  const platform = platforms[Math.abs(row.id.charCodeAt(4) ?? 0) % platforms.length];
-  const slug = row.search_query.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+async function searchConsensus(brand: string): Promise<ExaThread[]> {
+  const exa = getExa();
+  const queryText = `What are people saying about ${brand}? Discussions, reviews, complaints, and opinions`;
 
-  const positiveTemplates = [
-    `${row.brand} has been a game-changer for our ${row.category.toLowerCase()} workflows. Consistently cited by AI tools.`,
-    `Strong entity density in ${row.brand}'s content means AI engines cite it reliably for "${row.search_query}" queries.`,
-    `Our team switched to ${row.brand} — the statistical anchor score of ${row.statistical_anchors_score.toFixed(0)} speaks for itself.`,
-  ];
-  const negativeTemplates = [
-    `Anyone else finding ${row.brand}'s content outdated? AI responses keep citing old stats — ${row.days_since_published.toFixed(0)} days since last update.`,
-    `Context drift detected: AI engines are no longer citing ${row.brand} for "${row.search_query}". Competitor filling the gap.`,
-    `The entity recall rate on ${row.brand}'s pages is dropping. Noticed a −${Math.abs(row.z_score).toFixed(1)}σ shift in citations this month.`,
-  ];
-  const neutralTemplates = [
-    `Comparing ${row.brand} vs competitors for "${row.search_query}" — mixed AI citation results across engines.`,
-    `${row.brand} shows up in ${row.platform_chatgpt.toFixed(0)}% of ChatGPT responses for this query. Perplexity lower at ${row.platform_perplexity.toFixed(0)}%.`,
-  ];
+  // Primary: restrict to the high-signal consensus platforms that feed LLM training.
+  let results: any[] = [];
+  try {
+    const restricted = await exa.searchAndContents(queryText, {
+      type: 'neural',
+      useAutoprompt: true,
+      numResults: 12,
+      includeDomains: ['reddit.com', 'quora.com', 'news.ycombinator.com'],
+      text: { maxCharacters: 2000 },
+    });
+    results = restricted.results || [];
+  } catch (err) {
+    console.warn('[brand-monitor] restricted Exa search failed, falling back:', err);
+  }
 
-  const templates = row.sentiment === 'Positive' ? positiveTemplates
-    : row.sentiment === 'Negative' ? negativeTemplates
-    : neutralTemplates;
-  const summary = templates[parseInt(row.id.slice(-1)) % templates.length];
+  // Fallback: if the platforms returned nothing, widen to the open web so the
+  // user still gets a real signal instead of an empty (or fabricated) result.
+  if (results.length === 0) {
+    const open = await exa.searchAndContents(queryText, {
+      type: 'neural',
+      useAutoprompt: true,
+      numResults: 10,
+      text: { maxCharacters: 2000 },
+    });
+    results = open.results || [];
+  }
 
-  return {
-    url: `https://www.${platform.toLowerCase()}.com/r/saas/comments/${row.id}/${slug}`,
-    title: `[${platform}] ${row.search_query.charAt(0).toUpperCase() + row.search_query.slice(1)} — brand discussion`,
-    sentiment: row.sentiment,
-    summary,
-  };
+  return results
+    .filter((r: any) => r.url)
+    .map((r: any) => ({
+      url: r.url,
+      title: r.title || r.url,
+      text: (r.text || '').trim(),
+      publishedDate: r.publishedDate || null,
+    }));
 }
 
 export async function POST(request: Request) {
+  const authResult = await requireAuth(request);
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
+
   try {
     const { brand } = await request.json();
     if (!brand?.trim()) {
       return NextResponse.json({ error: 'brand is required' }, { status: 400 });
     }
+    const brandName = brand.trim();
 
-    const rows = queryByBrand(brand.trim(), 300);
+    const threads = await searchConsensus(brandName);
 
-    const riskScore = Math.round(avg(rows.map(r => r.risk_score)));
-    const overallSentiment = dominantSentiment(rows);
-    const driftCount = rows.filter(r => r.drift_detected).length;
-    const actionPlan = buildActionPlan(overallSentiment, riskScore, driftCount);
+    // Log Exa search cost (~$0.025 per neural search)
+    if (dbAdmin && userId) {
+      dbAdmin.collection('cost_audit').add({
+        userId,
+        feature: 'brand-monitor',
+        model: 'exa-neural',
+        provider: 'exa',
+        inputTokens: 0,
+        outputTokens: 0,
+        estimatedCostUsd: 0.025,
+        totalCostUsd: 0.025,
+        exaResults: threads.length,
+        timestamp: new Date().toISOString(),
+      }).catch(() => {});
+    }
 
-    // Pick 5 diverse threads — spread across sentiments
-    const positive = rows.filter(r => r.sentiment === 'Positive').slice(0, 2);
-    const negative = rows.filter(r => r.sentiment === 'Negative').slice(0, 2);
-    const neutral  = rows.filter(r => r.sentiment === 'Neutral').slice(0, 1);
-    const threadRows = [...negative, ...neutral, ...positive];
-    const threads = threadRows.map(rowToThread);
+    if (threads.length === 0) {
+      return NextResponse.json({
+        success: true,
+        result: {
+          overallSentiment: 'Neutral',
+          riskScore: 0,
+          driftCount: 0,
+          totalSignals: 0,
+          actionPlan: `No public discussion of "${brandName}" was found on Reddit, Quora, or Hacker News right now. This is an opportunity: seed authoritative, entity-dense content on these high-crawl platforms to build a positive presence before competitors define the narrative for you.`,
+          threads: [],
+        },
+      });
+    }
+
+    // Build a numbered, source-grounded context for classification.
+    const context = threads
+      .map((t, i) => `[${i}] TITLE: ${t.title}\nURL: ${t.url}\nEXCERPT: ${t.text.substring(0, 1200)}`)
+      .join('\n\n');
+
+    const prompt = `You are a brand perception analyst for Generative Engine Optimization (GEO). The brand being monitored is "${brandName}".
+
+Below are REAL search results from Reddit, Quora, and other public forums about this brand. Each is numbered. Analyse the actual text of each result.
+
+For EACH numbered result, classify the sentiment toward "${brandName}" as Positive, Neutral, Negative, or Mixed, and write a one-sentence factual summary of what the thread actually says (grounded ONLY in the excerpt — do not invent details).
+
+Then assess the OVERALL picture:
+- overallSentiment: the dominant sentiment across all results (Positive, Neutral, or Negative)
+- riskScore (0-100): "context poisoning" risk — how likely negative or misleading narratives about ${brandName} are to be absorbed into future LLM training. More negative/misleading threads on high-authority platforms = higher risk.
+- actionPlan: 2-3 sentences of specific defensive GEO advice based on what you actually found.
+
+RESULTS:
+${context}
+
+Return ONLY valid JSON:
+{
+  "overallSentiment": "Positive|Neutral|Negative",
+  "riskScore": 0-100,
+  "actionPlan": "...",
+  "threads": [ { "index": 0, "sentiment": "Positive|Neutral|Negative|Mixed", "summary": "..." } ]
+}`;
+
+    const result = await llmOrchestrator.executeCall<z.infer<typeof ClassificationSchema>>({
+      userId: userId || 'anonymous',
+      provider: 'gemini',
+      model: 'gemini-2.5-flash',
+      prompt,
+      schema: ClassificationSchema,
+      feature: 'brand-monitor',
+    });
+
+    if (!result.success || !result.data) {
+      return NextResponse.json(
+        { success: false, error: result.error || 'Classification failed' },
+        { status: 500 }
+      );
+    }
+
+    const { overallSentiment, riskScore, actionPlan } = result.data;
+
+    // Map the LLM's per-index classification back onto the REAL Exa threads.
+    // The URL and title always come from Exa, never the model.
+    const classified = result.data.threads
+      .filter((c) => c.index >= 0 && c.index < threads.length)
+      .map((c) => ({
+        url: threads[c.index].url,
+        title: threads[c.index].title,
+        sentiment: c.sentiment,
+        summary: c.summary,
+      }));
+
+    const driftCount = classified.filter((t) => t.sentiment === 'Negative').length;
 
     return NextResponse.json({
       success: true,
       result: {
         overallSentiment,
-        riskScore,
+        riskScore: Math.round(riskScore),
         driftCount,
-        totalSignals: rows.length,
+        totalSignals: threads.length,
         actionPlan,
-        threads,
+        threads: classified,
       },
     });
   } catch (err: any) {

@@ -50,7 +50,13 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
 - ☐ S3.6–S3.9 (TBD from voice audit)
 
 ## Sprint 4 — Satellite Tools
-- ☐ S4.1 Brand Monitor with real Reddit + Exa APIs
+- ☑ S4.1 Brand Monitor now uses REAL data. Replaced the fully-fabricated route
+         (fake reddit.com URLs + templated summaries from synthetic geo-data CSV) with
+         Exa neural search restricted to reddit.com/quora.com/news.ycombinator.com
+         (open-web fallback). Real URLs/titles come straight from Exa; the LLM only
+         classifies sentiment + summarizes per-index (never invents links). Risk score
+         + action plan grounded in actual results. Route now requires auth, logs Exa
+         cost to cost_audit, prefills brand from profile, shows live source count.
 - ☐ S4.2 Simulator recovery/rebuild (see I1)
 - ☐ S4.3 Shadow Link intent + rebuild (see I2)
 - ☐ S4.4–S4.8 (TBD)

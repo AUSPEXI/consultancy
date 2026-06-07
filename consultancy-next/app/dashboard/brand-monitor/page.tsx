@@ -5,10 +5,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
 import { checkTierAccess } from '@/constants/tiers';
+import { authFetch } from '@/lib/auth-fetch';
 
 export default function BrandMonitorPage() {
-  const { tier, role, user } = useAuth();
-  const [brand, setBrand] = useState('');
+  const { tier, role, user, userData } = useAuth();
+  const [brand, setBrand] = useState(userData?.brand || '');
   const [isMonitoring, setIsMonitoring] = useState(false);
   const [results, setResults] = useState<any>(null);
   const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
@@ -40,9 +41,8 @@ export default function BrandMonitorPage() {
     setResults(null);
 
     try {
-      const res = await fetch('/api/brand-monitor', {
+      const res = await authFetch('/api/brand-monitor', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ brand })
       });
 
@@ -138,7 +138,14 @@ export default function BrandMonitorPage() {
           </div>
 
           <div className="lg:col-span-2 space-y-4">
-            <h3 className="text-lg font-semibold text-white mb-4">Recent Consensus Threads</h3>
+            <div className="flex items-baseline justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white">Recent Consensus Threads</h3>
+              {typeof results.totalSignals === 'number' && (
+                <span className="text-xs text-zinc-500">
+                  {results.totalSignals} live source{results.totalSignals === 1 ? '' : 's'} via Exa
+                </span>
+              )}
+            </div>
             {results.threads.map((thread: any, i: number) => (
               <div key={i} className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
                 <div className="flex items-start justify-between gap-4 mb-3">
