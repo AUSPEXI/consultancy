@@ -39,11 +39,12 @@ const NeuralLegend = () => (
   </div>
 );
 
-const RacingDial = ({ value, label, color = "#ec4899", size = "sm" }: { value: number; label: string; color?: string; size?: "sm" | "lg" }) => {
+const RacingDial = ({ value, label, color = "#ec4899", size = "sm" }: { value: number | null; label: string; color?: string; size?: "sm" | "lg" }) => {
+  const safeValue = value ?? 0;
   const data = useMemo(() => [
-    { name: 'value', value: Math.min(100, Math.max(0, value)), fill: color },
-    { name: 'remainder', value: 100 - Math.min(100, Math.max(0, value)), fill: '#18181b' }
-  ], [value, color]);
+    { name: 'value', value: Math.min(100, Math.max(0, safeValue)), fill: value === null ? '#27272a' : color },
+    { name: 'remainder', value: 100 - Math.min(100, Math.max(0, safeValue)), fill: '#18181b' }
+  ], [safeValue, color, value]);
   const isLarge = size === "lg";
   return (
     <div className="flex flex-col items-center">
@@ -54,7 +55,7 @@ const RacingDial = ({ value, label, color = "#ec4899", size = "sm" }: { value: n
           </PieChart>
         </ResponsiveContainer>
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center">
-          <span className={`${isLarge ? 'text-3xl' : 'text-xl'} font-black text-white tracking-tighter`}>{value}%</span>
+          <span className={`${isLarge ? 'text-3xl' : 'text-xl'} font-black tracking-tighter ${value === null ? 'text-zinc-600' : 'text-white'}`}>{value === null ? '—' : `${value}%`}</span>
         </div>
       </div>
       <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-2">{label}</p>
@@ -201,39 +202,9 @@ export default function OverviewPage() {
           throw new Error(msg);
         }
       } else {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        const lastDate = metrics.length > 0 ? new Date(metrics[metrics.length - 1].date) : new Date();
-        if (metrics.length > 0) lastDate.setDate(lastDate.getDate() + 1);
-        const dateStr = lastDate.toISOString().split('T')[0];
-        const shortDate = lastDate.toLocaleDateString('en-US', { weekday: 'short' });
-        const prevAsov = metrics.length > 0 ? metrics[metrics.length - 1].aSov : 12;
-        const prevErr = metrics.length > 0 ? metrics[metrics.length - 1].err : 20;
-        const prevAiTraffic = metrics.length > 0 ? Math.min(metrics[metrics.length - 1].aiTraffic, 9999) : 120;
-        const prevCompA = metrics.length > 0 ? metrics[metrics.length - 1].compA : 45;
-
-        const historicalWrites: Promise<any>[] = [];
-        if (metrics.length === 0) {
-          for (let i = 5; i > 0; i--) {
-            const historyDate = new Date();
-            historyDate.setDate(historyDate.getDate() - i);
-            const hDateStr = historyDate.toISOString().split('T')[0];
-            const hShortDate = historyDate.toLocaleDateString('en-US', { weekday: 'short' });
-            const hAsov = Math.max(5, prevAsov - (i * 2));
-            historicalWrites.push(setDoc(doc(db, 'sovMetrics', `${user.uid}_${hDateStr}`), { userId: user.uid, date: hDateStr, shortDate: hShortDate, aSov: hAsov, err: Math.max(5, prevErr - (i * 3)), compA: prevCompA + 5, compB: 30, aiTraffic: Math.round(hAsov * 7 + Math.floor(Math.random() * 40)), platforms: { chatgpt: hAsov + 5, perplexity: Math.max(0, hAsov - 10), claude: hAsov + 2, gemini: hAsov + 10 } }, { merge: true }));
-          }
-        }
-        await Promise.all(historicalWrites);
-
-        const newAsov = Math.min(100, Math.max(5, prevAsov + (Math.random() > 0.5 ? Math.floor(Math.random() * 12) : -Math.floor(Math.random() * 5))));
-        const newCompA = Math.max(0, Math.min(100, prevCompA + (Math.random() > 0.6 ? Math.floor(Math.random() * 5) : -Math.floor(Math.random() * 8))));
-        const simulatedPlatforms = { chatgpt: Math.min(100, Math.max(5, newAsov + Math.floor(Math.random() * 20))), perplexity: Math.min(100, Math.max(0, newAsov - Math.floor(Math.random() * 15))), claude: Math.min(100, Math.max(5, newAsov + Math.floor(Math.random() * 10))), gemini: Math.min(100, Math.max(5, newAsov + Math.floor(Math.random() * 25))) };
-        await setDoc(doc(db, 'sovMetrics', `${user.uid}_${dateStr}`), { userId: user.uid, date: dateStr, shortDate, aSov: newAsov, err: Math.min(100, Math.max(0, prevErr + Math.floor(Math.random() * 15) - 5)), compGap: newAsov - newCompA, compA: newCompA, compB: Math.max(0, (metrics.length > 0 ? (metrics[metrics.length - 1].compB || 30) : 30) - Math.floor(Math.random() * 5)), aiTraffic: Math.round(newAsov * 7 + Math.floor(Math.random() * 50)), platforms: simulatedPlatforms }, { merge: true });
-        // Stop spinner as soon as data lands — audit log can write silently
         setIsAuditing(false);
-        setAuditSuccess(true);
-        setDriftDismissed(true);
-        setToastMessage({ text: "Simulated Audit Complete! Add your brand in Settings to run a live audit.", type: 'info' });
-        logAuditAction(user.uid, 'Ran Simulated SOV Audit', { date: dateStr });
+        setToastMessage({ text: "Add your brand name in Settings to run a live SOV audit.", type: 'info' });
+        return;
       }
       setTimeout(() => setAuditSuccess(false), 3000);
     } catch (error) {
@@ -398,12 +369,12 @@ export default function OverviewPage() {
 
       {!driftDismissed && (() => {
         const latestAnomaly = pulseData.filter((p: any) => p.isAnomaly).sort((a: any, b: any) => Math.abs(b.zScore) - Math.abs(a.zScore))[0];
-        const showDrift = latestAnomaly || metrics.length === 0;
-        const zScore = latestAnomaly ? latestAnomaly.zScore.toFixed(1) : '-3.2';
-        const driftLabel = latestAnomaly ? `${Math.abs(latestAnomaly.zScore).toFixed(1)}σ Anomaly` : '-3.2σ Threshold';
+        const showDrift = !!latestAnomaly;
+        const zScore = latestAnomaly ? latestAnomaly.zScore.toFixed(1) : '0';
+        const driftLabel = latestAnomaly ? `${Math.abs(latestAnomaly.zScore).toFixed(1)}σ Anomaly` : '';
         const driftMsg = latestAnomaly
           ? `Live anomaly detected (z=${zScore}) in your latent projections. Immediate recalibration recommended to protect your SOV.`
-          : 'Anomaly detected in "API Latency" clusters within your latent space projections. Run an audit to establish your baseline and protect your A-SOV.';
+          : '';
         if (!showDrift) return null;
         return (
           <div className="mb-6 p-6 bg-rose-500/10 border border-rose-500/20 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
@@ -435,7 +406,7 @@ export default function OverviewPage() {
             { label: 'A-SOV Dominance', value: displayAsov, color: '#ec4899', icon: Target, source: asovSource, desc: cpRate !== undefined ? `Citation Probe: ${cpCited} of ${cpTotal} queries cited your brand` : 'Absolute Share of Voice — run Citation Probe for real data' },
             { label: 'Entity Recall', value: Math.round(safeLatest.err), color: '#a855f7', icon: BrainCircuit, source: metrics.length > 0 ? '◌ ESTIMATED' : '◌ SIMULATED', desc: 'Gemini-estimated — run Citation Probe with fact-specific queries for real ERR' },
             { label: 'Platform Sync', value: displayPlatformSync, color: '#3b82f6', icon: Activity, source: platSource, desc: cpRates ? 'Average citation rate across ChatGPT, Claude, Gemini, Perplexity (Citation Probe)' : 'Across-model consistency — run Citation Probe for real data' },
-            { label: 'Sentiment Index', value: 78, color: '#10b981', icon: TrendingUp, source: '◌ ESTIMATED', desc: 'Average qualitative sentiment score across tracked vectors' },
+            { label: 'Sentiment Index', value: null, color: '#10b981', icon: TrendingUp, source: '◌ NO DATA', desc: 'Sentiment analysis not yet implemented — coming in a future update' },
           ].map((dial, i) => (
             <UITooltip key={i}>
               <TooltipTrigger asChild>

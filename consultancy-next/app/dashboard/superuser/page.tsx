@@ -289,8 +289,11 @@ function CostAuditPanel({ userId }: { userId: string }) {
 const ADMIN_BYPASS = process.env.NEXT_PUBLIC_ADMIN_BYPASS === 'true';
 const BYPASS_UID = 'auspexi-admin-bypass';
 
+const SUPERUSER_EMAIL = 'hopiumcalculator@gmail.com';
+
 export default function SuperuserPage() {
   const { user } = useAuth();
+  const isSuperuser = user?.email === SUPERUSER_EMAIL;
   const [isResetting, setIsResetting] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
   const [isGeoSeeding, setIsGeoSeeding] = useState(false);
@@ -304,6 +307,7 @@ export default function SuperuserPage() {
   const TIERS = ['Free', 'Basic', 'Medium', 'Pro', 'Business', 'Premium', 'Enterprise', 'PipelineOffer'];
 
   const updateUserTier = async () => {
+    if (!isSuperuser) { setStatus({ type: 'error', message: 'Tier management restricted to superuser account.' }); return; }
     if (!tierEmail.trim()) return;
     setIsUpdatingTier(true);
     setStatus(null);
@@ -326,7 +330,7 @@ export default function SuperuserPage() {
   };
 
   const setOwnTier = async (tier: string) => {
-    if (!user) return;
+    if (!user || !isSuperuser) { setStatus({ type: 'error', message: 'Tier management restricted to superuser account.' }); return; }
     setIsUpdatingTier(true);
     setStatus(null);
     try {
