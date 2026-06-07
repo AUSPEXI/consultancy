@@ -260,11 +260,37 @@ export async function GET(request: Request) {
   }
 }
 
+// S7.1: probe a single brand/domain across all 4 platforms for a query set,
+// returning per-query cited booleans + an aggregate citation rate. Used for the
+// competitor comparison pass (cited-only, no misinformation analysis).
+async function probeBrandRate(
+  testQueries: string[],
+  brand: string,
+  domain: string,
+): Promise<{ rate: number; perQuery: { query: string; cited: boolean }[] }> {
+  const perQuery = await Promise.all(
+    testQueries.map(async (query) => {
+      const [gemini, chatgpt, perplexity, claude] = await Promise.all([
+        probeGemini(query, brand, domain, []),
+        probeChatGPT(query, brand, domain, []),
+        probePerplexity(query, brand, domain, []),
+        probeClaude(query, brand, domain, []),
+      ]);
+      const active = [gemini, chatgpt, perplexity, claude].filter(p => !p.skipped);
+      return { query, cited: active.some(p => p.cited) };
+    })
+  );
+  const cited = perQuery.filter(r => r.cited).length;
+  const rate = perQuery.length > 0 ? Math.round((cited / perQuery.length) * 100) : 0;
+  return { rate, perQuery };
+}
+
 export async function POST(request: Request) {
   try {
     const {
       brand, domain, userId = 'anonymous', queries, keywords = [],
       negativeStatements: clientFalses = [],
+      competitorBrand = '', competitorDomain = '',
     } = await request.json();
 
     if (!brand || !domain) {
@@ -330,6 +356,30 @@ export async function POST(request: Request) {
     const misinformationCount = queryResults.filter(r => r.cited && !r.accurate).length;
     const activePlatforms = activeRates.length;
 
+    // S7.1: optional competitor comparison — run the SAME queries for a competitor
+    // and compute per-query winners so the user gets a concrete head-to-head benchmark.
+    let competitor: any = null;
+    const isCompetitorMode = Boolean(competitorBrand && competitorDomain);
+    if (isCompetitorMode) {
+      const compProbe = await probeBrandRate(testQueries, competitorBrand, competitorDomain);
+      const compByQuery = new Map(compProbe.perQuery.map(r => [r.query, r.cited]));
+      const comparison = queryResults.map(r => {
+        const youCited = r.cited;
+        const themCited = compByQuery.get(r.query) ?? false;
+        const winner = youCited === themCited ? 'tie' : youCited ? 'you' : 'them';
+        return { query: r.query, youCited, themCited, winner };
+      });
+      competitor = {
+        brand: competitorBrand,
+        domain: competitorDomain,
+        citationRate: compProbe.rate,
+        wins: comparison.filter(c => c.winner === 'you').length,
+        losses: comparison.filter(c => c.winner === 'them').length,
+        ties: comparison.filter(c => c.winner === 'tie').length,
+        comparison,
+      };
+    }
+
     // Closed-loop attribution: correlate this run against the previous one and the
     // facts/articles added in between. Computed BEFORE persisting so the "previous
     // run" lookup doesn't see the run we're about to write. Non-fatal.
@@ -355,6 +405,9 @@ export async function POST(request: Request) {
       activePlatforms, platformRates,
       results: queryResults,
       attribution,
+      mode: isCompetitorMode ? 'competitor' : 'standard',
+      competitorDomain: isCompetitorMode ? competitorDomain : null,
+      competitor,
     };
 
     if (dbAdmin && userId !== 'anonymous') {
