@@ -99,13 +99,21 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          tracking id, persists every link to shadow_links (+ audit_logs), and adds a GET
          history endpoint. Overview page uses authFetch and no longer fabricates an
          untracked link on failure (it surfaces the error). Citacious config → v4.
-- ☐ S4.4 GEO Pulse real data — audit sovMetrics source; if missing/fabricated, show
-         explicit "no data — run Citation Probe" state instead of fake trend lines.
-         (Trust fix, same class as S0.1/S0.2.)  [PRIORITY: trust-first]
-- ☐ S4.5 Competitor Radar real data — audit decay scores; if fabricated, compute real
-         decay = days since last competitor content update (Exa on their domain) weighted
-         by their probe-derived citation rate. No probe data → "run Citation Probe first".
-         [PRIORITY: trust-first]
+- ☑ S4.4 GEO Pulse audited — route was ALREADY honest: fires real probes at all 4 live
+         engines (Gemini/ChatGPT/Perplexity/Claude), computes real per-platform + aggregate
+         SoV, null per-platform when a key is unconfigured, persists to geo_pulse_history.
+         No fabrication present. No change needed.
+- ☑ S4.5 Competitor Radar rebuilt with REAL data. The old /api/analyze-competitor read
+         the synthetic CSV (geo_synthetic_10000.csv) via geo-data.ts — typing a real
+         competitor returned fabricated decay/content/entity scores. Now: requires auth,
+         uses Exa (includeDomains: competitor host) to pull their actual most-recent
+         indexed pages, computes a REAL freshness signal (days since newest published
+         page → healthy/decaying/stale), and runs ONE cheap gemini-2.5-flash pass that
+         scores ONLY the real excerpts (index-grounded) for entity density + statistical
+         anchors + citation-worthiness, deriving vulnerabilities from what's actually there.
+         Trojan-Horse flag = genuine opening (stale/decaying OR weak specificity). No public
+         content → honest insufficientData state (no fabricated verdict, no Firestore write).
+         Exa cost logged to cost_audit. Page uses authFetch + real decayScore.
 - ☐ S4.6 Autopilot real implementation — audit whether the probe→generate→publish→re-probe
          loop actually runs or is a stub. If stub, implement real loop; gate Business tier.
 - ☐ S4.7 Agent webhook delivery confirmation — log webhook HTTP status + response snippet,
@@ -139,10 +147,21 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
 - ☐ S5.4 Mobile responsive audit — audit all pages at 375px. Sidebar → hamburger,
          Overview dials stack, Cite-Probe chart scrollable, voice panel no overflow.
          Goal: usable on mobile, not pixel-perfect.
-- ☐ S5.5 Homepage marketing copy — add human-language, value-focused prose sections
-         between the feature boxes. 5th-grade readability, subtle psychological levers
-         (loss aversion, social proof, future-pacing). Boxes stay (LLM-structured facts);
-         prose balances aesthetic + conversion for first-time human visitors.
+- ☐ S5.5 Homepage marketing copy — the site currently feels clunky: everything is in
+         neat boxes (great for LLM-structured factual ingestion, weak for human visitors).
+         Feature descriptions are accurate but read "genius-robot" — meaningless to a
+         first-time visitor who doesn't yet understand GEO or why Auspexi is worth a
+         subscription. ADD human-language, VALUE-not-feature prose sections flowing down
+         the page BETWEEN the boxes (keep the boxes — they serve the LLM/SEO purpose).
+         Requirements:
+         • ~5th-grade readability (short sentences, plain words, concrete imagery)
+         • Sell the value/outcome, not the mechanism (how marketing actually works)
+         • Subtle psychological levers: loss aversion (you're invisible to AI right now),
+           social proof, future-pacing (picture being the answer AI gives), curiosity gap,
+           authority, simple before/after contrast
+         • Balance the aesthetic (prose softens the box-grid) AND the purpose (conversion)
+         • Lead the reader from "what is GEO / why care" → "why it's urgent" → "why Auspexi"
+           → clear subscribe CTA.
 
 ## Sprint 6 — GEO Lab Feedback Loop
 - ☑ S6.1 Closed the GEO Lab → dashboard loop. Lab experiments now feed live content

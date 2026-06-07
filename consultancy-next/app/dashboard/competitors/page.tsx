@@ -9,13 +9,14 @@ import { collection, addDoc, deleteDoc, doc, onSnapshot, query, where, orderBy }
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
+import { authFetch } from '@/lib/auth-fetch';
 
 interface Competitor {
   id: string;
   name: string;
   url?: string;
   decayScore?: number;
-  decayStatus: 'healthy' | 'decaying' | 'stale';
+  decayStatus: 'healthy' | 'decaying' | 'stale' | 'unknown';
   trojanHorseOpportunity: boolean;
   vulnerabilities?: string[];
   lastUpdated: string;
@@ -144,7 +145,7 @@ export default function Competitors() {
         // Fallback to raw input
       }
 
-      const res = await fetch('/api/analyze-competitor', {
+      const res = await authFetch('/api/analyze-competitor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ hostname })
@@ -160,16 +161,31 @@ export default function Competitors() {
 
       const analysis = data.result;
 
+      // Honest no-data state — don't write a fabricated decay verdict.
+      if (analysis.insufficientData) {
+        showToast(analysis.message || `No public content found for ${hostname}.`, 'info');
+        setIsAnalyzing(false);
+        return;
+      }
+
+      const realDecayScore =
+        analysis.decayStatus === 'stale' ? 85
+        : analysis.decayStatus === 'decaying' ? 60
+        : analysis.decayStatus === 'healthy' ? 30
+        : 50;
+
       // Firestore block
       try {
         await addDoc(collection(db, 'competitors'), {
           userId: user.uid,
           name: analysis.name || hostname,
           url: hostname,
-          decayScore: analysis.decayStatus === 'stale' ? 85 : analysis.decayStatus === 'decaying' || analysis.decayStatus === 'vulnerable' ? 60 : 30,
-          decayStatus: analysis.decayStatus || 'healthy',
+          decayScore: realDecayScore,
+          decayStatus: analysis.decayStatus || 'unknown',
           trojanHorseOpportunity: analysis.trojanHorseOpportunity || false,
           vulnerabilities: analysis.vulnerabilities || [],
+          newestPageAgeDays: analysis.newestPageAgeDays ?? null,
+          entityDensityScore: analysis.entityDensityScore ?? null,
           lastUpdated: new Date().toISOString().split('T')[0],
         });
         await logAuditAction(user.uid, 'Analyzed Competitor', { url: inputUrl, status: analysis.decayStatus, trojanHorse: analysis.trojanHorseOpportunity });
