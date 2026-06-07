@@ -24,7 +24,7 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
 
 ## Sprint 2 — Make Value Visible
 - ☑ S2.1 Overview A-SOV trend + dials driven by real citation data; LIVE/DEMO badge
-- ☐ S2.2 Per-platform citation trend on Cite-Probe (currently overall only)
+- ☑ S2.2 Per-platform citation trend sparklines on Cite-Probe history chart
 
 ## Sprint 3 — Voice Agents (Aura + Citacious)
 - ☐ S3.1 Fix Aura audio context resume on user gesture

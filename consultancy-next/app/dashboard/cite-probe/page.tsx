@@ -68,7 +68,7 @@ export default function CiteProbePage() {
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<{ date: string; rate: number }[]>([]);
   // Persistent history from Firestore (citation_tests) — survives reloads, spans days/weeks
-  const [persistentHistory, setPersistentHistory] = useState<{ timestamp: string; citationRate: number; citedCount: number; totalQueries: number; misinformationCount: number }[]>([]);
+  const [persistentHistory, setPersistentHistory] = useState<{ timestamp: string; citationRate: number; citedCount: number; totalQueries: number; misinformationCount: number; platformRates?: { gemini: number | null; chatgpt: number | null; perplexity: number | null; claude: number | null } | null }[]>([]);
 
   const loadHistory = async () => {
     if (!user?.uid) return;
@@ -673,6 +673,39 @@ export default function CiteProbePage() {
                     {delta > 0 ? '▲' : delta < 0 ? '▼' : '–'} {Math.abs(delta)}% since first probe
                   </span>
                 </div>
+
+                {/* Per-platform mini-trends (S2.2) */}
+                {points.some(p => p.platformRates) && (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5 pt-5 border-t border-zinc-800">
+                    {(Object.keys(PLATFORM_META) as PlatformKey[]).map(pk => {
+                      const meta = PLATFORM_META[pk];
+                      const series = points.map(p => p.platformRates?.[pk]).filter((v): v is number => v !== null && v !== undefined);
+                      if (series.length === 0) return null;
+                      const sw = 100, sh = 32;
+                      const spark = points
+                        .map((p, i) => ({ v: p.platformRates?.[pk], i }))
+                        .filter(d => d.v !== null && d.v !== undefined) as { v: number; i: number }[];
+                      const coords = spark.map((d, idx) => ({
+                        x: spark.length === 1 ? 0 : (idx / (spark.length - 1)) * sw,
+                        y: sh - (Math.min(100, Math.max(0, d.v)) / 100) * sh,
+                      }));
+                      const path = coords.map((c, idx) => `${idx === 0 ? 'M' : 'L'} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`).join(' ');
+                      const lastVal = series[series.length - 1];
+                      return (
+                        <div key={pk} className={`rounded-lg border p-3 ${meta.bg} ${meta.border}`}>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className={`text-[10px] font-bold ${meta.text}`}>{meta.label}</span>
+                            <span className={`text-xs font-black ${rateColor(lastVal)}`}>{lastVal}%</span>
+                          </div>
+                          <svg viewBox={`0 0 ${sw} ${sh}`} preserveAspectRatio="none" className="w-full h-8 overflow-visible">
+                            <path d={path} fill="none" stroke={meta.color} strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+                            {coords.map((c, idx) => <circle key={idx} cx={c.x} cy={c.y} r="1.5" fill={meta.color} vectorEffect="non-scaling-stroke" />)}
+                          </svg>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </>
             );
           })()}
