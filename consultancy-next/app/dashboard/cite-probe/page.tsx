@@ -67,6 +67,19 @@ export default function CiteProbePage() {
   const [probeData, setProbeData] = useState<ProbeRun | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<{ date: string; rate: number }[]>([]);
+  // Persistent history from Firestore (citation_tests) — survives reloads, spans days/weeks
+  const [persistentHistory, setPersistentHistory] = useState<{ timestamp: string; citationRate: number; citedCount: number; totalQueries: number; misinformationCount: number }[]>([]);
+
+  const loadHistory = async () => {
+    if (!user?.uid) return;
+    try {
+      const res = await fetch(`/api/cite-probe?userId=${encodeURIComponent(user.uid)}&limit=30`);
+      const json = await res.json();
+      if (json.success && Array.isArray(json.history)) setPersistentHistory(json.history);
+    } catch (_) {}
+  };
+
+  useEffect(() => { loadHistory(); }, [user?.uid]);
 
   // Known-false statements management
   const [negativeStatements, setNegativeStatements] = useState<string[]>([]);
@@ -180,6 +193,7 @@ export default function CiteProbePage() {
       if (!res.ok || !json.success) throw new Error(json.error || 'Probe failed');
       setProbeData(json);
       setHistory(prev => [{ date: new Date().toLocaleTimeString(), rate: json.citationRate }, ...prev].slice(0, 10));
+      loadHistory(); // refresh persistent trend with the run just saved to Firestore
       markStepComplete(1);
     } catch (e: any) {
       setError(e.message);
@@ -605,6 +619,63 @@ export default function CiteProbePage() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Persistent citation-rate history (from Firestore — spans all past runs) */}
+      {persistentHistory.length > 1 && (
+        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-emerald-400" />
+              <h3 className="text-sm font-semibold text-white">Citation Rate Over Time</h3>
+            </div>
+            <span className="text-[10px] text-zinc-500">{persistentHistory.length} probe{persistentHistory.length !== 1 ? 's' : ''} on record</span>
+          </div>
+          {(() => {
+            const points = persistentHistory;
+            const w = 100, h = 100;
+            const max = 100;
+            const coords = points.map((p, i) => {
+              const x = points.length === 1 ? 0 : (i / (points.length - 1)) * w;
+              const y = h - (Math.min(max, Math.max(0, p.citationRate)) / max) * h;
+              return { x, y, p };
+            });
+            const path = coords.map((c, i) => `${i === 0 ? 'M' : 'L'} ${c.x.toFixed(2)} ${c.y.toFixed(2)}`).join(' ');
+            const first = points[0].citationRate;
+            const last = points[points.length - 1].citationRate;
+            const delta = last - first;
+            return (
+              <>
+                <div className="relative w-full h-40">
+                  <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="w-full h-full overflow-visible">
+                    {[0, 25, 50, 75, 100].map(g => (
+                      <line key={g} x1={0} x2={w} y1={h - (g / max) * h} y2={h - (g / max) * h} stroke="#27272a" strokeWidth="0.5" />
+                    ))}
+                    <path d={`${path} L ${w} ${h} L 0 ${h} Z`} fill="url(#citeGrad)" opacity="0.15" />
+                    <path d={path} fill="none" stroke="#10b981" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+                    {coords.map((c, i) => (
+                      <circle key={i} cx={c.x} cy={c.y} r="1.5" fill="#10b981" vectorEffect="non-scaling-stroke" />
+                    ))}
+                    <defs>
+                      <linearGradient id="citeGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </div>
+                <div className="flex items-center justify-between mt-3 text-xs">
+                  <span className="text-zinc-500">
+                    {new Date(points[0].timestamp).toLocaleDateString()} → {new Date(points[points.length - 1].timestamp).toLocaleDateString()}
+                  </span>
+                  <span className={`font-semibold ${delta > 0 ? 'text-emerald-400' : delta < 0 ? 'text-rose-400' : 'text-zinc-400'}`}>
+                    {delta > 0 ? '▲' : delta < 0 ? '▼' : '–'} {Math.abs(delta)}% since first probe
+                  </span>
+                </div>
+              </>
+            );
+          })()}
         </div>
       )}
 

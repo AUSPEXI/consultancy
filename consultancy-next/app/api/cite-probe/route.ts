@@ -217,6 +217,48 @@ async function probeClaude(query: string, brand: string, domain: string, knownFa
   }
 }
 
+// GET /api/cite-probe?userId=...  → persistent citation-rate history for charting.
+// Reads accumulated citation_tests so the dashboard can show trend across sessions,
+// not just the in-memory history that resets on reload.
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+    if (!userId || userId === 'anonymous') {
+      return NextResponse.json({ success: true, history: [] });
+    }
+    if (!dbAdmin) {
+      return NextResponse.json({ success: true, history: [] });
+    }
+    const limit = Math.min(Number(searchParams.get('limit')) || 30, 100);
+    const snap = await dbAdmin
+      .collection('citation_tests')
+      .where('userId', '==', userId)
+      .get();
+
+    const history = snap.docs
+      .map(d => {
+        const data = d.data();
+        return {
+          timestamp: data.timestamp as string,
+          citationRate: (data.citationRate ?? 0) as number,
+          citedCount: (data.citedCount ?? 0) as number,
+          totalQueries: (data.totalQueries ?? 0) as number,
+          misinformationCount: (data.misinformationCount ?? 0) as number,
+          platformRates: data.platformRates ?? null,
+        };
+      })
+      .filter(h => h.timestamp)
+      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+      .slice(-limit);
+
+    return NextResponse.json({ success: true, history });
+  } catch (err: any) {
+    console.error('cite-probe history error:', err);
+    return NextResponse.json({ success: false, error: err.message, history: [] }, { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const {
