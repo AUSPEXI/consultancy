@@ -73,7 +73,15 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          auth + logs blended cost to cost_audit. Page uses authFetch, shows real
          per-engine response text. Citacious config → v3. (I1: git history held no
          original design — only one unrelated commit touched the route.)
-- ☐ S4.3 Shadow Link intent + rebuild (see I2)
+- ☑ S4.3 Shadow Link rebuilt. Intent (I2): "Dark AI" UTM tracker — AI engines strip
+         referral headers so AI clicks show as "Direct" in GA; a UTM-tagged URL embedded
+         in JSON-LD lets the customer's own analytics attribute that traffic to AI. The
+         UTM mechanism was real but the route minted a Math.random() tracking id and
+         threw it away — no persistence, no history, nothing to prove a link was issued.
+         Now: requires auth, validates the URL, mints a collision-resistant randomUUID
+         tracking id, persists every link to shadow_links (+ audit_logs), and adds a GET
+         history endpoint. Overview page uses authFetch and no longer fabricates an
+         untracked link on failure (it surfaces the error). Citacious config → v4.
 - ☐ S4.4–S4.8 (TBD)
 
 ## Sprint 5 — UI/UX & Pricing
@@ -103,7 +111,10 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
 - ☑ I1 Simulator original intent: git history held nothing — only one unrelated commit
        (voice model revert) ever touched the route. No lost design to recover; rebuilt
        from first principles as a real multi-engine SOV probe (see S4.2).
-- ☐ I2 Shadow Link original intent → informs S4.3
+- ☑ I2 Shadow Link original intent: "Dark AI" attribution. UI copy (overview page)
+       confirms it — UTM-tagged URL embedded in JSON-LD so the customer's GA can
+       attribute otherwise-"Direct" AI traffic to AI. Mechanism was sound; persistence
+       was missing. Rebuilt in S4.3.
 - ☑ I3 Local synonym embedder BUILT + EXPANDED: 341 groups, 2,162 word entries.
        generateWithLocal() runs API + local in parallel on high-priority calls;
        stores embedding + localEmbedding + embeddingAlignmentScore on every fact.

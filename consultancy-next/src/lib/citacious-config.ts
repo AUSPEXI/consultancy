@@ -6,7 +6,7 @@
  * audit logs and conversation history reflect which prompt version was in use.
  */
 
-export const CITACIOUS_CONFIG_VERSION = '2026-06-07-v3';
+export const CITACIOUS_CONFIG_VERSION = '2026-06-07-v4';
 
 export type ToolStatus = 'active' | 'beta' | 'deprecated';
 
@@ -41,7 +41,7 @@ export const DASHBOARD_TOOLS: DashboardTool[] = [
     status: 'active',
     purpose: 'AI Share of Voice command centre — shows A-SOV trend from real Citation Probe history, 768-D Latent Space Map of vault facts, Competitive Citation Dominance chart, and Cite-Magnet Scorecard.',
     metrics: ['A-SOV %', 'Entity Recall Rate (ERR)', 'Competitor Gap', 'AI Referral Traffic', 'Sentiment Index'],
-    actions: ['View SOV trend chart', 'Inspect latent space map', 'Review scorecard'],
+    actions: ['View SOV trend chart', 'Inspect latent space map', 'Review scorecard', 'Generate a "Dark AI" Shadow Link (UTM-tagged URL for JSON-LD) to attribute AI traffic in Google Analytics'],
     flavor: 'AI SOV Command Center',
   },
   {

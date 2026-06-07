@@ -230,12 +230,14 @@ export default function OverviewPage() {
     if (!shadowUrl.trim()) return;
     setIsGeneratingLink(true);
     try {
-      const response = await fetch('/api/shadow-link', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ originalUrl: shadowUrl, userId: user?.uid }) });
+      const response = await authFetch('/api/shadow-link', { method: 'POST', body: JSON.stringify({ originalUrl: shadowUrl }) });
       const data = await response.json();
       if (data.success) { setGeneratedShadowLink(data.shadowUrl); }
       else { throw new Error(data.error || 'Failed to generate link'); }
-    } catch (e) {
-      setGeneratedShadowLink(`${shadowUrl}${shadowUrl.includes('?') ? '&' : '?'}utm_source=llm_ingest&utm_medium=ai_chat&utm_campaign=fact_vault_magnet`);
+    } catch (e: any) {
+      // Don't fabricate an untracked link on failure — that would look real but
+      // never be persisted or attributable. Surface the error instead.
+      setToastMessage({ text: e.message || 'Failed to generate Shadow Link. Please try again.', type: 'error' });
     } finally {
       setIsGeneratingLink(false);
     }
