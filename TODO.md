@@ -114,12 +114,20 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          Trojan-Horse flag = genuine opening (stale/decaying OR weak specificity). No public
          content → honest insufficientData state (no fabricated verdict, no Firestore write).
          Exa cost logged to cost_audit. Page uses authFetch + real decayScore.
-- ☐ S4.6 Autopilot real implementation — audit whether the probe→generate→publish→re-probe
-         loop actually runs or is a stub. If stub, implement real loop; gate Business tier.
-- ☐ S4.7 Agent webhook delivery confirmation — log webhook HTTP status + response snippet,
-         retry on 4xx/5xx (×3), surface per-article delivery status. Store on articles doc.
-- ☐ S4.8 Entity Hub Wikidata export — implement QuickStatements (tab-delimited batch)
-         export from the entity profile. Copy-to-clipboard. Pure formatting, no API call.
+- ☑ S4.6 Autopilot audited — REAL full pipeline already implemented. Both the cron route
+         (daily-autopilot) and the page's runPipeline execute: probe → Exa crawl → extract
+         → JSON-LD schema → article synthesis → GEO score → Firestore → email. Run history
+         in autopilot_runs collection. 6-day dedup check on cron. Fixed: all page-level
+         fetch() calls replaced with authFetch() (was unauthenticated).
+- ☑ S4.7 Webhook delivery confirmation added to Autopilot. CMS webhook now retries up to
+         ×3 on failure (2s, 4s backoff), records webhookStatus/webhookHttpStatus/
+         webhookAttempts/webhookDeliveredAt on the articles Firestore doc after each
+         autopilot run. Real audit trail replaces fire-and-forget.
+- ☑ S4.8 Entity Hub Wikidata QuickStatements export. New "Copy QuickStatements" button
+         below the sameAs section generates a batch-import ready CREATE+LAST block
+         (label, description, alias, official website + sameAs URLs as P856 rows) for
+         paste into the Wikidata QuickStatements toolforge. Pure client-side formatting,
+         no API call. Logs to audit_logs.
 
 ## Sprint 5 — UI/UX & Pricing
 - ☑ S5.1 Consolidate tier enum to 3 real tiers (Starter $149 / Pro $499 / Business $1,899).

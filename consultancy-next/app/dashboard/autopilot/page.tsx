@@ -9,6 +9,7 @@ import { collection, query, where, orderBy, limit, onSnapshot, addDoc, updateDoc
 import { db } from '@/firebase';
 import { checkTierAccess } from '@/constants/tiers';
 import { logAuditAction } from '@/lib/audit';
+import { authFetch } from '@/lib/auth-fetch';
 
 type StepId = 'probe' | 'research' | 'schema' | 'write' | 'publish';
 type ActiveStep = StepId | 'done' | null;
@@ -71,7 +72,7 @@ export default function AutopilotPage() {
     // Step 1: Probe (best-effort — never blocks the pipeline)
     setActiveStep('probe');
     try {
-      await fetch('/api/geo-pulse', {
+      await authFetch('/api/geo-pulse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ keyword: kw, userId: user!.uid, brand: userData?.brand || '', domain: userData?.domain || '' }),
@@ -80,7 +81,7 @@ export default function AutopilotPage() {
 
     // Step 2: Research — crawl then extract facts
     setActiveStep('research');
-    const crawlRes = await fetch('/api/agent/crawl', {
+    const crawlRes = await authFetch('/api/agent/crawl', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ topic: kw, userId: user!.uid }),
@@ -88,21 +89,20 @@ export default function AutopilotPage() {
     const crawlData = await crawlRes.json();
     if (!crawlData.success) throw new Error(crawlData.error || 'Crawl failed');
 
-    const extractRes = await fetch('/api/agent/extract', {
+    const extractRes = await authFetch('/api/agent/extract', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      // crawlerData must be crawlData.result (the {sources, topic, totalSources} object)
       body: JSON.stringify({ topic: kw, crawlerData: crawlData.result, userId: user!.uid }),
     });
     const extractData = await extractRes.json();
     if (!extractData.success) throw new Error(extractData.error || 'Extract failed');
-    const facts: string = extractData.result || ''; // API returns .result, not .facts
+    const facts: string = extractData.result || '';
 
     await new Promise(r => setTimeout(r, 5000));
 
     // Step 3: Schema
     setActiveStep('schema');
-    const schemaRes = await fetch('/api/agent/schema', {
+    const schemaRes = await authFetch('/api/agent/schema', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ facts, userId: user!.uid }),
@@ -115,19 +115,19 @@ export default function AutopilotPage() {
 
     // Step 4: Write article
     setActiveStep('write');
-    const synthRes = await fetch('/api/agent/synthesize', {
+    const synthRes = await authFetch('/api/agent/synthesize', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ topic: kw, facts, brandName: userData?.brand || '', userId: user!.uid }),
     });
     const synthData = await synthRes.json();
     if (!synthData.success) throw new Error(synthData.error || 'Synthesis failed');
-    const article: string = synthData.result || ''; // API returns .result, not .article
+    const article: string = synthData.result || '';
 
     // GEO score — best-effort, doesn't block delivery
     let geoScore = 0;
     try {
-      const scoreRes = await fetch('/api/content-scorer', {
+      const scoreRes = await authFetch('/api/content-scorer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: article, contentType: 'blog', userId: user!.uid }),
@@ -136,7 +136,7 @@ export default function AutopilotPage() {
       geoScore = scoreData.result?.overallScore ?? 0;
     } catch { /* non-blocking */ }
 
-    // Step 5: Save + email
+    // Step 5: Save + email + CMS webhook delivery (S4.7)
     setActiveStep('publish');
     const payload = {
       userId: user!.uid, topic: kw, article, facts, schema,
@@ -144,11 +144,11 @@ export default function AutopilotPage() {
       timestamp: new Date().toISOString(), source: 'autopilot',
     };
 
-    await addDoc(collection(db, 'articles'), payload);
+    const articleRef = await addDoc(collection(db, 'articles'), payload);
 
     let emailed = false;
     try {
-      const emailRes = await fetch('/api/notify-article', {
+      const emailRes = await authFetch('/api/notify-article', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -157,12 +157,31 @@ export default function AutopilotPage() {
       emailed = Boolean(emailData.success && emailData.emailed);
     } catch { /* non-blocking */ }
 
-    // Forward to CMS webhook if it's not the email endpoint
+    // CMS webhook delivery with status logging (S4.7)
     if (userData?.cmsWebhookUrl && !userData.cmsWebhookUrl.includes('/api/notify-article')) {
-      fetch(userData.cmsWebhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+      let webhookStatus: 'delivered' | 'failed' = 'failed';
+      let webhookHttpStatus: number | null = null;
+      let webhookAttempts = 0;
+      const MAX_ATTEMPTS = 3;
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        webhookAttempts = attempt;
+        try {
+          const wRes = await fetch(userData.cmsWebhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          webhookHttpStatus = wRes.status;
+          if (wRes.ok) { webhookStatus = 'delivered'; break; }
+          if (attempt < MAX_ATTEMPTS) await new Promise(r => setTimeout(r, attempt * 2000));
+        } catch {
+          if (attempt < MAX_ATTEMPTS) await new Promise(r => setTimeout(r, attempt * 2000));
+        }
+      }
+      // Persist delivery result so the user has a real audit trail (S4.7)
+      updateDoc(doc(db, 'articles', articleRef.id), {
+        webhookStatus, webhookHttpStatus, webhookAttempts,
+        webhookDeliveredAt: webhookStatus === 'delivered' ? new Date().toISOString() : null,
       }).catch(() => {});
     }
 

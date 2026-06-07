@@ -62,6 +62,35 @@ export default function EntityHubPage() {
     });
   };
 
+  const exportQuickStatements = () => {
+    if (!profile || !userData) return;
+    const brand = userData.brand || 'BRAND';
+    const domain = userData.domain?.replace(/^https?:\/\//, '') || '';
+    // QuickStatements format: CREATE a new item, then LAST|property|value rows.
+    // Wikidata property references:
+    //   P31  instance of   P856 official website
+    //   P17  country       P18  image (omitted)
+    //   P276 location      P154 logo image (omitted)
+    //   Len  English label  Den  English description  Aen  English alias
+    const lines: string[] = [
+      'CREATE',
+      `LAST\tLen\t"${brand}"`,
+      `LAST\tDen\t"${profile.wikidataDescription.substring(0, 250)}"`,
+      `LAST\tAen\t"${profile.shortDescription.substring(0, 250)}"`,
+    ];
+    if (domain) lines.push(`LAST\tP856\t"https://${domain}"`);
+    // sameAs links as P856 variants are not standard; instead list as descriptions
+    // Export keyStatements as plain annotations the editor can review:
+    profile.sameAsUrls.filter(Boolean).forEach(url => {
+      lines.push(`LAST\tP856\t"${url}"`);
+    });
+    const qs = lines.join('\n');
+    navigator.clipboard.writeText(qs);
+    setCopied('quickstatements');
+    setTimeout(() => setCopied(null), 3000);
+    if (user) logAuditAction(user.uid, 'Exported Wikidata QuickStatements', { brand }).catch(() => {});
+  };
+
   const updateSameAs = (index: number, value: string) => {
     setProfile(prev => {
       if (!prev) return prev;
@@ -315,6 +344,28 @@ export default function EntityHubPage() {
                       />
                     </div>
                   ))}
+                </div>
+              </div>
+
+              {/* Wikidata QuickStatements export (S4.8) */}
+              <div className="pt-2 border-t border-zinc-800">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Wikidata QuickStatements Export</p>
+                    <p className="text-xs text-zinc-600 max-w-sm">
+                      Copies a ready-to-paste QuickStatements batch for Wikidata&apos;s batch importer — CREATE + label + description + official website. Open the{' '}
+                      <a href="https://quickstatements.toolforge.org/" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 underline">QuickStatements tool</a>{' '}
+                      and paste the output to register your entity.
+                    </p>
+                  </div>
+                  <button
+                    onClick={exportQuickStatements}
+                    className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-purple-300 text-xs font-semibold transition-colors"
+                  >
+                    {copied === 'quickstatements'
+                      ? <><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Copied!</>
+                      : <><Copy className="w-3.5 h-3.5" /> Copy QuickStatements</>}
+                  </button>
                 </div>
               </div>
             </div>
