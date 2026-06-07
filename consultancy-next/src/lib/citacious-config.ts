@@ -6,7 +6,7 @@
  * audit logs and conversation history reflect which prompt version was in use.
  */
 
-export const CITACIOUS_CONFIG_VERSION = '2026-06-07-v1';
+export const CITACIOUS_CONFIG_VERSION = '2026-06-07-v2';
 
 export type ToolStatus = 'active' | 'beta' | 'deprecated';
 
@@ -104,7 +104,7 @@ export const DASHBOARD_TOOLS: DashboardTool[] = [
     status: 'active',
     purpose: 'Perception Watchtower. Tracks web mentions of brand, products, and key terms across news, forums, and social platforms. Surfaces positive signals to amplify and negative content to counter before it influences AI training.',
     metrics: ['Mention volume', 'Sentiment trend', 'Positive / negative split'],
-    actions: ['Scan brand mentions', 'Flag counter-content opportunities'],
+    actions: ['Scan brand mentions', 'Flag counter-content opportunities', 'Generate seed content for Reddit & LinkedIn (Business)'],
     flavor: 'Perception Watchtower',
   },
   {

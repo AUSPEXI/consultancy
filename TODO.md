@@ -57,6 +57,11 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          classifies sentiment + summarizes per-index (never invents links). Risk score
          + action plan grounded in actual results. Route now requires auth, logs Exa
          cost to cost_audit, prefills brand from profile, shows live source count.
+         Business tier: autonomous seeding panel per thread. POST /api/seed-content
+         generates per-platform drafts (Reddit post/comment with subreddit targeting
+         + LinkedIn post with hashtags) from LLM grounded in actual thread context.
+         Copy-to-clipboard workflow; seed history logged to Firestore seed_history.
+         Non-Business users see upgrade callout. Citacious config bumped to v2.
 - ☐ S4.2 Simulator recovery/rebuild (see I1)
 - ☐ S4.3 Shadow Link intent + rebuild (see I2)
 - ☐ S4.4–S4.8 (TBD)
