@@ -6,7 +6,7 @@
  * audit logs and conversation history reflect which prompt version was in use.
  */
 
-export const CITACIOUS_CONFIG_VERSION = '2026-06-07-v4';
+export const CITACIOUS_CONFIG_VERSION = '2026-06-07-v5';
 
 export type ToolStatus = 'active' | 'beta' | 'deprecated';
 
@@ -200,9 +200,11 @@ export function buildQuestPath(): string {
 1. MEASURE    → cite-probe: establish baseline — what is my current citation rate?
 2. BUILD MOAT → fact-vault: add verified brand Cite-Magnet facts (aim for 50+)
 3. GENERATE   → agents: GEO-optimised articles for each uncited query
-4. PUBLISH    → push to website via webhook; JSON-LD schema markup is critical
-5. PROBE AGAIN → re-run cite-probe; expect improvement in 2–6 weeks
-6. DEFEND     → monthly freshness updates; monitor via overview + geo-pulse`;
+4. SCORE      → content-scorer: quality-check each article before publishing
+5. SCHEMA     → technical (Schema Engine): set up JSON-LD injectors, audit AI crawlability
+6. DEPLOY     → schema-deploy: push live; swap standard links for Shadow Links in JSON-LD
+7. PROBE AGAIN → re-run cite-probe; expect improvement in 2–6 weeks
+8. DEFEND     → monthly freshness updates; monitor via overview + geo-pulse`;
 }
 
 /**

@@ -1,6 +1,6 @@
 'use client'
 
-import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert, Zap, RefreshCw, Building2, Layers, Target, CheckCircle2 } from 'lucide-react';
+import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert, Zap, RefreshCw, Building2, Layers3, Target, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -43,40 +43,42 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     return () => window.removeEventListener('storage', read);
   }, [pathname]);
 
+  // QUEST_STEPS drives the progress bar denominator — keep in sync when steps change.
+  const QUEST_STEPS = 6;
+
   // Sidebar groups reflect the GEO quest workflow order
   const navGroups = [
     {
       label: 'THE QUEST',
       items: [
-        { id: 'cite-probe',     label: 'Citation Probe',   icon: Zap,     requiredTier: 'Starter' as UserTier, path: '/dashboard/cite-probe',    step: '1', wfKey: 'step1' },
-        { id: 'fact-vault',     label: 'Fact Vault',       icon: Database,requiredTier: 'Starter' as UserTier, path: '/dashboard/fact-vault',    step: '2', wfKey: 'step2' },
-        { id: 'agents',         label: 'Content Pipeline', icon: Bot,     requiredTier: 'Pro' as UserTier, path: '/dashboard/agents',        step: '3', wfKey: 'step3' },
-        { id: 'content-scorer', label: 'Score & Refine',   icon: PenTool, requiredTier: 'Starter' as UserTier, path: '/dashboard/content-scorer',step: '4', wfKey: 'step4' },
-        { id: 'technical',      label: 'Schema & Deploy',  icon: Code,    requiredTier: 'Pro' as UserTier, path: '/dashboard/technical',     step: '5', wfKey: 'step5' },
+        { id: 'cite-probe',     label: 'Citation Probe',   icon: Zap,     requiredTier: 'Starter' as UserTier, path: '/dashboard/cite-probe',     step: '1', wfKey: 'step1' },
+        { id: 'fact-vault',     label: 'Fact Vault',       icon: Database,requiredTier: 'Starter' as UserTier, path: '/dashboard/fact-vault',     step: '2', wfKey: 'step2' },
+        { id: 'agents',         label: 'Content Pipeline', icon: Bot,     requiredTier: 'Pro'     as UserTier, path: '/dashboard/agents',         step: '3', wfKey: 'step3' },
+        { id: 'content-scorer', label: 'Score & Refine',   icon: PenTool, requiredTier: 'Starter' as UserTier, path: '/dashboard/content-scorer', step: '4', wfKey: 'step4' },
+        { id: 'technical',      label: 'Schema Engine',    icon: Code,    requiredTier: 'Pro'     as UserTier, path: '/dashboard/technical',      step: '5', wfKey: 'step5' },
+        { id: 'schema-deploy',  label: 'Deploy',           icon: Layers3, requiredTier: 'Pro'     as UserTier, path: '/dashboard/schema-deploy',  step: '6', wfKey: 'step6' },
       ],
     },
     {
       label: 'COMMAND CENTRE',
       items: [
-        { id: 'overview',       label: 'SOV Overview',         icon: LayoutDashboard, requiredTier: 'Starter' as UserTier, path: '/dashboard/overview' },
-        { id: 'geo-pulse',      label: 'GEO Pulse',            icon: Activity,        requiredTier: 'Pro'     as UserTier, path: '/dashboard/geo-pulse' },
-        { id: 'autopilot',      label: 'GEO Autopilot',        icon: RefreshCw,       requiredTier: 'Pro'     as UserTier, path: '/dashboard/autopilot' },
+        { id: 'overview',  label: 'SOV Overview',  icon: LayoutDashboard, requiredTier: 'Starter' as UserTier, path: '/dashboard/overview' },
+        { id: 'geo-pulse', label: 'GEO Pulse',     icon: Activity,        requiredTier: 'Pro'     as UserTier, path: '/dashboard/geo-pulse' },
+        { id: 'autopilot', label: 'GEO Autopilot', icon: RefreshCw,       requiredTier: 'Pro'     as UserTier, path: '/dashboard/autopilot' },
       ],
     },
     {
       label: 'INTELLIGENCE',
       items: [
-        { id: 'competitors',    label: 'Competitor Radar',     icon: Radar,           requiredTier: 'Pro' as UserTier, path: '/dashboard/competitors' },
-        { id: 'brand-monitor',  label: 'Brand Monitor',        icon: Target,          requiredTier: 'Pro' as UserTier, path: '/dashboard/brand-monitor' },
-        { id: 'simulator',      label: 'SOV Simulator',        icon: MonitorPlay,     requiredTier: 'Pro' as UserTier, path: '/dashboard/simulator' },
+        { id: 'competitors',   label: 'Competitor Radar', icon: Radar,       requiredTier: 'Pro' as UserTier, path: '/dashboard/competitors' },
+        { id: 'brand-monitor', label: 'Brand Monitor',    icon: Target,      requiredTier: 'Pro' as UserTier, path: '/dashboard/brand-monitor' },
+        { id: 'simulator',     label: 'SOV Simulator',    icon: MonitorPlay, requiredTier: 'Pro' as UserTier, path: '/dashboard/simulator' },
       ],
     },
     {
-      label: 'ADVANCED',
+      label: 'ENTITY & SCHEMA',
       items: [
-        { id: 'entity-hub',     label: 'Entity Hub',           icon: Building2,       requiredTier: 'Pro' as UserTier, path: '/dashboard/entity-hub' },
-        { id: 'schema-deploy',  label: 'Schema Deploy',        icon: Layers,          requiredTier: 'Pro' as UserTier, path: '/dashboard/schema-deploy' },
-        { id: 'audit-logs',     label: 'Audit Logs',           icon: ShieldCheck,     requiredTier: 'Starter' as UserTier, path: '/dashboard/audit-logs' },
+        { id: 'entity-hub', label: 'Entity Hub', icon: Building2, requiredTier: 'Pro' as UserTier, path: '/dashboard/entity-hub' },
       ],
     },
   ];
@@ -133,7 +135,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 </p>
                 {group.label === 'THE QUEST' && (
                   <span className="text-[9px] text-zinc-600">
-                    {workflowDone.size}/5
+                    {workflowDone.size}/{QUEST_STEPS}
                   </span>
                 )}
               </div>
@@ -141,7 +143,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 <div className="mx-3 mb-2 h-1 bg-zinc-800 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-pink-500 rounded-full transition-all duration-500"
-                    style={{ width: `${(workflowDone.size / 5) * 100}%` }}
+                    style={{ width: `${(workflowDone.size / QUEST_STEPS) * 100}%` }}
                   />
                 </div>
               )}
@@ -243,6 +245,19 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
               Superuser Control
             </Link>
           )}
+          <Link
+            href="/dashboard/audit-logs"
+            onClick={() => setIsOpen(false)}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+              pathname.includes('/dashboard/audit-logs')
+                ? "bg-zinc-800 text-white"
+                : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+            )}
+          >
+            <ShieldCheck className="w-5 h-5" />
+            Audit Logs
+          </Link>
           <Link
             href="/dashboard/settings"
             onClick={() => setIsOpen(false)}

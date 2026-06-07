@@ -95,7 +95,14 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          Fixed live landing page (was 4 cards w/ wrong $999 Pro) → 3 canonical cards.
          Stripe webhook + create-checkout-session aligned to real prices incl. $1,899 Business.
          Fact-Vault limits: Starter 50 / Pro 500 / Business ∞.
-- ☐ S5.2 Sidebar reorganisation
+- ☑ S5.2 Sidebar reorganised. THE QUEST extended to 6 steps: schema-deploy added as
+         step 6 (natural workflow endpoint after technical/Schema Engine step 5);
+         progress bar denominator updated from 5→6. ADVANCED renamed ENTITY & SCHEMA
+         (only entity-hub; schema-deploy promoted to Quest). Audit Logs demoted from
+         nav group to footer (between Back-to-Website and Settings) — it's a Starter
+         utility, not a Pro "advanced" tool. Citacious quest-path updated to 8-step
+         flow (0-config → 1-measure → 2-vault → 3-generate → 4-score → 5-schema
+         → 6-deploy → 7-probe → 8-defend). Config → v5.
 - ☐ S5.3–S5.4 (TBD)
 
 ## Sprint 6 — GEO Lab Feedback Loop
