@@ -231,12 +231,21 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          Non-fatal: falls back to the standard prompt if findings are unavailable.
 
 ## Sprint 7 — Competitive Validation
-- ☐ S7.1 Competitor citation comparison — "Competitor Probe" mode runs the same query set
-         for the user's brand AND a competitor domain; two citation-rate columns, per-query
-         winner. Stored in citation_tests with mode:'competitor' + competitorDomain.
-- ☐ S7.2 Industry citation benchmarks — aggregate anonymised rates (no PII, industry
-         category only) into benchmark bands on the Cite-Probe chart. Opt-in toggle in
-         Settings; weekly aggregation job/cloud function.
+- ☑ S7.1 Competitor citation comparison BUILT. cite-probe route accepts competitorBrand +
+         competitorDomain; runs the SAME query set live against the competitor via a new
+         probeBrandRate() helper, computes per-query winner (you/them/tie) + W-L-T tally +
+         competitor citation rate. Stored on the citation_test doc with mode:'competitor' +
+         competitorDomain + full competitor object. Cite-Probe page: collapsible Competitor
+         Comparison panel (brand + domain inputs) and a "You vs Them" head-to-head results
+         card with dual rates, W/L/T, and per-query win/loss/tie chips.
+- ☑ S7.2 Industry citation benchmarks BUILT. New GET /api/benchmarks?industry= aggregates
+         the latest citation rate of OPTED-IN peers in the same industry (requireAuth);
+         privacy-guarded — only returns an average/median when ≥3 distinct opted-in brands
+         contribute, never any brand name/userId/individual rate. Settings: new Industry
+         Benchmarks card (industry text field + opt-in toggle → users.industry +
+         users.benchmarkOptIn). Cite-Probe shows an industry-average comparison badge under
+         the citation rate (±pp above/below industry, sample size). On-demand aggregation —
+         no cron needed.
 
 ## Sprint 8 — Marketing Honesty + SEO (read-only investigations, parallel track)
 - ☐ S8.1 Frontend honesty check — audit homepage hero/what-we-do/feature grid, Auspexi

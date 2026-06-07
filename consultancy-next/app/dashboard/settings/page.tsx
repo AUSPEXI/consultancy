@@ -101,6 +101,9 @@ export default function SettingsPage() {
   const [isDiscoveringCompetitors, setIsDiscoveringCompetitors] = useState(false);
   const [watchlistCompetitors, setWatchlistCompetitors] = useState<string[]>([]);
   const [watchlistInput, setWatchlistInput] = useState('');
+  // S7.2: industry benchmark opt-in
+  const [industry, setIndustry] = useState('');
+  const [benchmarkOptIn, setBenchmarkOptIn] = useState(false);
   const [formData, setFormData] = useState({
     brand: '', domain: '', cmsWebhookUrl: '',
     keyword1: '', keyword2: '', keyword3: '', keyword4: '', keyword5: '',
@@ -116,6 +119,8 @@ export default function SettingsPage() {
       setAnchors(userData.latentAnchors || []);
       const primary = userData.competitors || [];
       setWatchlistCompetitors(userData.watchlistCompetitors || []);
+      setIndustry(userData.industry || '');
+      setBenchmarkOptIn(!!userData.benchmarkOptIn);
       setFormData({
         brand: userData.brand || '',
         domain: userData.domain || '',
@@ -279,6 +284,8 @@ export default function SettingsPage() {
         competitors,
         watchlistCompetitors: watchlistCompetitors.filter(Boolean),
         keywords,
+        industry: industry.trim(),
+        benchmarkOptIn,
       }, { merge: true });
       await logAuditAction(user.uid, 'Saved Settings', { brand: formData.brand, domain: formData.domain, keywordCount: keywords.length, competitorCount: competitors.length, watchlistCount: watchlistCompetitors.length });
       setSaveMsg({ type: 'success', text: 'Settings saved. Citacious will pick up your brand data on next message.' });
@@ -615,6 +622,42 @@ export default function SettingsPage() {
               Payload: <code className="text-zinc-300">&#123; userId, topic, article, facts, schema, brand, timestamp &#125;</code>
             </p>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* S7.2: Industry benchmarks opt-in */}
+      <Card className="bg-zinc-900 border-zinc-800">
+        <CardHeader>
+          <CardTitle className="text-white">Industry Benchmarks</CardTitle>
+          <CardDescription className="text-zinc-400">
+            See how your citation rate compares to other brands in your industry. Opt in to contribute your anonymised rate and unlock the benchmark band on your Citation Probe chart.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">Industry Category</label>
+            <input
+              type="text"
+              value={industry}
+              onChange={e => setIndustry(e.target.value)}
+              placeholder="e.g. B2B SaaS, E-commerce, Fintech, Healthcare"
+              className="mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/40"
+            />
+          </div>
+          <button
+            onClick={() => setBenchmarkOptIn(v => !v)}
+            className="flex items-center gap-3 text-left"
+          >
+            <span className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${benchmarkOptIn ? 'bg-pink-500' : 'bg-zinc-700'}`}>
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${benchmarkOptIn ? 'translate-x-6' : 'translate-x-1'}`} />
+            </span>
+            <span className="text-sm text-zinc-300">
+              {benchmarkOptIn ? 'Contributing to industry benchmarks' : 'Not contributing (benchmarks hidden)'}
+            </span>
+          </button>
+          <p className="text-xs text-zinc-600">
+            We only ever share aggregated averages across at least 3 opted-in brands — never your brand name, your domain, or your individual rate. You can opt out anytime.
+          </p>
         </CardContent>
       </Card>
 

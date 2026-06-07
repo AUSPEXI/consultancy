@@ -9,6 +9,7 @@ import { checkTierAccess } from '@/constants/tiers';
 import { WorkflowProgress, markStepComplete } from '@/components/dashboard/WorkflowProgress';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
+import { authFetch } from '@/lib/auth-fetch';
 
 interface PlatformResult {
   cited: boolean;
@@ -131,6 +132,17 @@ export default function CiteProbePage() {
   const [showCompetitorPanel, setShowCompetitorPanel] = useState(false);
   const [competitorBrand, setCompetitorBrand] = useState('');
   const [competitorDomain, setCompetitorDomain] = useState('');
+  // S7.2: industry benchmark
+  const [benchmark, setBenchmark] = useState<{ industry: string; averageRate: number; medianRate: number; sampleSize: number } | null>(null);
+
+  useEffect(() => {
+    const ind = (userData?.industry || '').trim();
+    if (!ind || !userData?.benchmarkOptIn) { setBenchmark(null); return; }
+    authFetch(`/api/benchmarks?industry=${encodeURIComponent(ind)}`)
+      .then(r => r.json())
+      .then(d => { if (d.success && d.benchmark) setBenchmark(d.benchmark); })
+      .catch(() => {});
+  }, [userData?.industry, userData?.benchmarkOptIn]);
 
   const brand = userData?.brand || '';
   const domain = userData?.domain || '';
@@ -496,6 +508,21 @@ export default function CiteProbePage() {
                 <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-md px-2.5 py-1.5">
                   <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                   {probeData.misinformationCount} misinformation citation{probeData.misinformationCount > 1 ? 's' : ''} detected
+                </div>
+              )}
+              {/* S7.2: industry benchmark comparison */}
+              {benchmark && (
+                <div className="mt-3 text-xs bg-zinc-950/60 border border-zinc-800 rounded-md px-2.5 py-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-zinc-500">{benchmark.industry} avg</span>
+                    <span className="text-zinc-300 font-semibold">{benchmark.averageRate}%</span>
+                  </div>
+                  <p className={`mt-1 font-medium ${probeData.citationRate >= benchmark.averageRate ? 'text-emerald-400' : 'text-amber-400'}`}>
+                    {probeData.citationRate >= benchmark.averageRate
+                      ? `+${probeData.citationRate - benchmark.averageRate}pp above your industry`
+                      : `${benchmark.averageRate - probeData.citationRate}pp below your industry`}
+                  </p>
+                  <p className="text-[10px] text-zinc-600 mt-0.5">Based on {benchmark.sampleSize} opted-in brands</p>
                 </div>
               )}
             </div>
