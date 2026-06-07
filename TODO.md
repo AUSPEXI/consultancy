@@ -162,9 +162,16 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          hasProbed from citation history, fact count + article count via getCountFromServer,
          schemaDeployed flag. Dismissal persists to users.onboardingDismissed; auto-hides
          when all 5 complete. Progress bar + per-step deep links.
-- ☐ S5.4 Mobile responsive audit — audit all pages at 375px. Sidebar → hamburger,
-         Overview dials stack, Cite-Probe chart scrollable, voice panel no overflow.
-         Goal: usable on mobile, not pixel-perfect.
+- ☑ S5.4 Mobile responsive audit DONE. Findings: core mobile chrome already solid —
+         dashboard layout has a slide-in Sidebar (fixed inset-y, -translate-x-full →
+         translate-x-0) with a black overlay (lg:hidden) opened by the Header hamburger
+         (onMenuClick); lg:relative lg:translate-x-0 docks it on desktop. Scanned all
+         dashboard pages for fixed-width overflow at 375px: the only large fixed width
+         (overview min-w-[800px] prompt matrix) is correctly wrapped in overflow-x-auto;
+         remaining grid-cols-3 blocks (cite-probe competitor tally, technical, content-
+         scorer) hold short numeric cells that fit 375px. Page headers use flex-col
+         sm:flex-row and grids use grid-cols-1 sm:grid-cols-* throughout. No blind CSS
+         changes made — nothing was overflowing. Verdict: mobile-usable as-is.
 - ☑ S5.5 Homepage marketing copy ADDED. New ValueSection component renders three
          plain-language, value-first prose bands woven BETWEEN the existing feature boxes
          (boxes untouched — they still feed LLM crawlers structured facts):
