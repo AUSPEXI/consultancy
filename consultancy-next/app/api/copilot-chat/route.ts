@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
 import { dbAdmin } from '@/lib/firebase-admin';
+import { CITACIOUS_CONFIG_VERSION, buildToolsSection, buildQuestPath, buildToolConnections } from '@/lib/citacious-config';
 
 // Fetch all user context server-side — never trust client-supplied system instructions
 async function fetchUserContext(userId: string) {
@@ -175,6 +176,7 @@ function buildSystemInstruction(ctx: ReturnType<typeof fetchUserContext> extends
   return `You are Citacious (sih-TAY-shus), the strategic GEO advisor embedded in the Auspexi platform. You are user-instance locked — you exist solely to serve ${brand || 'this user'} and their brand. You never reference other users, other brands, or other accounts.
 
 INSTANCE LOCK: This session belongs to ${brand || 'an unconfigured account'} (${domain || 'no domain set'}). All advice, data references, and strategy are specific to this brand only.
+Config version: ${CITACIOUS_CONFIG_VERSION}
 
 ═══ YOUR ROLE ═══
 You help business owners — especially those unfamiliar with GEO — understand what to track, why it matters, and exactly what to do next. You have access to their live account data and use it to give specific, personalised advice.
@@ -201,34 +203,13 @@ Start by asking: "What does your business do, and what would your ideal customer
 ${STAGE_GUIDANCE[stage]}
 
 ═══ DASHBOARD TOOLS ═══
-1. overview       — AI SOV command centre: Share of Voice trend, 768-D latent space map, competitive landscape
-2. cite-probe     — PRIMARY TOOL: 7 live AI questions, checks if your brand gets cited. Start here.
-3. geo-pulse      — Data lake scanner: keyword-level AI visibility, entity density, content drift detection
-4. competitors    — Enemy radar: competitor content decay scores, displacement opportunities
-5. fact-vault     — Knowledge vault: brand facts injected into every AI call as context (RAG)
-6. content-scorer — Pre-publish checker: is this content citation-ready?
-7. simulator      — SOV simulator: model how brand presence affects AI answers
-8. brand-monitor  — Perception watchtower: sentiment shifts before they affect citations
-9. technical      — Schema engine: JSON-LD markup, structured data, technical GEO
-10. agents        — Full pipeline: crawl → extract → schema → article → publish via webhook
-11. audit-logs    — Activity and security history
-12. settings      — Brand config, keywords, competitors, webhook, sitemap
+${buildToolsSection()}
 
 ═══ THE QUEST PATH (step-by-step) ═══
-0. CONFIGURE  → Settings: brand name, domain, keywords, competitors
-1. MEASURE    → Citation Probe: establish baseline — "where am I right now?"
-2. BUILD MOAT → Fact Vault: add 5–10 verified brand facts
-3. GENERATE   → Agents: create GEO articles for each uncited query
-4. PUBLISH    → Push to website via webhook; schema markup is critical
-5. PROBE AGAIN → Re-run Citation Probe; expect improvement in 2–6 weeks
-6. DEFEND     → Monthly freshness updates; monitor via Overview + GEO Pulse
+${buildQuestPath()}
 
 ═══ HOW TOOLS CONNECT ═══
-Fact Vault → feeds into Agent Extract step as RAG context → improves article accuracy
-Agent articles → published on website → LLMs index → Citation Probe rate rises
-Citation Probe missed queries → content gaps → feed directly into Agent topic queue
-GEO Pulse drift detection → content decay alert → trigger freshness update
-Latent Space Map → shows vault facts as real 768-D embeddings projected to 3D
+${buildToolConnections()}
 
 Current tab: ${activeTab}
 ${dataBlock}`;

@@ -9,6 +9,7 @@ import { collection, getDocs, getDoc, doc, query, orderBy, limit, where } from '
 import { db, auth } from '@/firebase';
 import { CITACIOUS_GEO_KNOWLEDGE } from '@/data/faqData';
 import { authFetch } from '@/lib/auth-fetch';
+import { CITACIOUS_CONFIG_VERSION, buildToolsSection, buildQuestPath, buildToolConnections, getActiveToolIds } from '@/lib/citacious-config';
 
 // Lazy initialization of Gemini API (text/HTTP calls via proxy)
 let aiClient: GoogleGenAI | null = null;
@@ -390,38 +391,14 @@ YOUR TONE:
 CURRENT USER CONTEXT:
 The user is currently on the '${activeTab}' tab.
 
-DASHBOARD TOOLS — what each one does:
-1. overview: AI SOV Command Center. Shows Share of Voice trend, 768-D Latent Space Map (real semantic embeddings of vault facts projected to 3D), Competitive Citation Dominance, and the Cite-Magnet Scorecard.
-2. cite-probe: THE PRIMARY MEASUREMENT TOOL. Sends 7 live GEO-space questions through the Auspexi Citation Engine and checks if the brand is cited in each answer. Results show which queries are hitting and which are missing — missing queries become content targets for the Agent. Citation rate is tracked over time.
-3. geo-pulse: First-Party Data Lake scanner. Query any keyword to get AI Share of Voice, entity density scores, drift detection, and trojan horse opportunities from the proprietary 10,000-signal data lake.
-4. competitors: Enemy Radar. Tracks competitor decay scores — competitors with stale, low-entropy content are vulnerable to displacement.
-5. fact-vault: Knowledge Vault. Add brand facts here — they feed directly into every LLM prompt via RAG injection. This is the foundation of GEO authority. Empty vault = no authority.
-6. content-scorer: Analyst's Forge. Verifies if content is fact-dense enough (>80%) for AI citation. Score it before publishing.
-7. simulator: SOV Simulator / Scrying Pool. Run prompt matrices through the Auspexi AI engine to simulate how the Latent Space Moat influences AI responses.
-8. brand-monitor: Perception Watchtower. Tracks sentiment shifts that LLMs will eventually scrape. Identifies context poisoning early.
-9. technical: Edge & Schema Engine Room. Manages JSON-LD Schema Injectors and technical restructuring for GEO-ready pages.
-10. agents: Multi-Agent Orchestration Guild. The full pipeline: Crawler (Auspexi Neural Crawler) → Extraction Agent (fact isolation, no hallucinations) → Schema Agent (JSON-LD generator) → Synthesis Agent (GEO-optimised article). Output can be published directly to the CMS via webhook.
-11. audit-logs: Scribe's Journal. Security and activity logs.
-12. settings: Brand configuration. Set brand name and domain here — required before Citation Probe and Agent runs.
-13. entity-hub: Entity Hub. Manage and enrich brand entities for improved AI recognition.
-14. schema-deploy: Schema Deploy. Deploy JSON-LD schema directly to live pages.
-15. autopilot: Autopilot. Automated GEO task scheduling and execution.
+DASHBOARD TOOLS — what each one does (config version: ${CITACIOUS_CONFIG_VERSION}):
+${buildToolsSection()}
 
 THE BRAND-SEEKER'S QUEST PATH (in order):
-0. CONFIGURE (settings) → Set brand name and domain. Nothing works without this.
-1. MEASURE BASELINE (cite-probe) → Run Citation Probe. Find out your current citation rate and exactly which queries are missing you.
-2. BUILD THE MOAT (fact-vault) → Add your brand's core facts. These inject into every LLM call via RAG.
-3. GENERATE CONTENT (agents) → For each uncited query from the probe, run the Agent with that exact topic. It crawls the web with the Auspexi Neural Crawler, extracts real facts, generates JSON-LD schema, and writes a GEO-optimised article.
-4. PUBLISH → Take the agent's article and publish it on your domain. The JSON-LD schema is critical — it structures the content so LLMs can extract and cite it.
-5. PROBE AGAIN (cite-probe) → Re-run the Citation Probe after publishing. Citation rate should improve within weeks as LLMs index the new content.
-6. DEFEND (overview + geo-pulse) → Monitor SOV trend and entity density. Publish freshness updates monthly to prevent citation decay.
+${buildQuestPath()}
 
 HOW THE TOOLS CONNECT:
-- Fact Vault facts → injected into Agent Extract step as "vault context" → improves article accuracy
-- Agent articles → published on website → LLMs crawl and index → Citation Probe rate improves
-- Citation Probe missed queries → direct link to Agent to generate targeted content
-- GEO Pulse keyword scan → reveals trojan horse opportunities for content targeting
-- Latent Space Map → shows your vault facts as real embeddings in 3D semantic space (axes: Technical Expertise / Market Authority / Competitive Differentiation)
+${buildToolConnections()}
 
 MATHEMATICAL DEFINITIONS:
 - Absolute Share of Voice (A-SOV): % of AI responses where your brand is the primary recommendation.
@@ -501,7 +478,7 @@ ${knowledgeContext}`;
                   properties: {
                     tabId: {
                       type: Type.STRING,
-                      description: 'The dashboard route to navigate to. Valid values: overview, cite-probe, geo-pulse, competitors, fact-vault, content-scorer, simulator, brand-monitor, technical, agents, audit-logs, settings, entity-hub, schema-deploy, autopilot',
+                      description: `The dashboard route to navigate to. Valid values: ${getActiveToolIds().join(', ')}`,
                     }
                   },
                   required: ['tabId']

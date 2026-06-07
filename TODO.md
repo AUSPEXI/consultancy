@@ -29,7 +29,7 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
 - ☑ S2.1 Overview A-SOV trend + dials driven by real citation data; LIVE/DEMO badge
 - ☑ S2.2 Per-platform citation trend sparklines on Cite-Probe history chart
 
-## Sprint 3 — Voice Agents (Aura + Citacious)
+## Sprint 3 — Voice Agents (Aura + Citacious) + Citacious Config
 - ☑ S3.1 Aura audio context resume — resume() on creation + before each playAudio
          (mirrors working Citacious pattern; fixes silent playback on Safari/iOS)
 - ☑ S3.2 Citacious stale-context — fetchKnowledge re-runs on panel open, every 90s
@@ -40,7 +40,14 @@ Legend: ☐ todo · ☑ done · ⧖ in progress
          faqData.ts (AURA_FAQ_KNOWLEDGE, CITACIOUS_GEO_KNOWLEDGE) + inline
          systemInstruction (VoiceAgentContext.tsx, Copilot.tsx). Future: centralize
          into versioned config (optional refactor, not blocking).
-- ☐ S3.5–S3.9 (TBD from voice audit)
+- ☑ S3.5 Centralised Citacious version config — `src/lib/citacious-config.ts` is single source
+         of truth for all dashboard tool descriptions, quest path, and tool connections.
+         DASHBOARD_TOOLS typed manifest with status (active/beta/deprecated).
+         `buildToolsSection()`, `buildQuestPath()`, `buildToolConnections()`, `getActiveToolIds()`
+         imported by both Copilot.tsx (voice) and copilot-chat/route.ts (text).
+         CITACIOUS_CONFIG_VERSION string for audit trail. Sprint discipline: bump version +
+         update DASHBOARD_TOOLS at end of any sprint that changes dashboard features.
+- ☐ S3.6–S3.9 (TBD from voice audit)
 
 ## Sprint 4 — Satellite Tools
 - ☐ S4.1 Brand Monitor with real Reddit + Exa APIs
