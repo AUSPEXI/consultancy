@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 
 // Server-side proxy for outbound webhook calls.
 // Browser fetch() to external URLs fails with CORS — proxying here avoids that entirely.
+// Auth-gated so it can't be abused as an open proxy by unauthenticated callers.
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
   try {
     const { webhookUrl, payload } = await req.json();
     if (!webhookUrl || typeof webhookUrl !== 'string') {

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
   try {
     const { domain, factStatement } = await req.json();
     if (!domain) return NextResponse.json({ error: 'domain required' }, { status: 400 });

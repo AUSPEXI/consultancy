@@ -401,18 +401,16 @@ export default function FactVault() {
 
                             // Always save to schema registry (admin SDK writes to Firestore → layout injects into page head)
                             if (user && userData?.domain) {
-                              fetch('/api/schema-registry', {
+                              authFetch('/api/schema-registry', {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ userId: user.uid, domain: userData.domain, schema: ontologyData, factId: fact.id }),
+                                body: JSON.stringify({ domain: userData.domain, schema: ontologyData, factId: fact.id }),
                               }).catch(() => {});
                             }
 
                             if (userData?.cmsWebhookUrl) {
                               try {
-                                const res = await fetch('/api/webhook-proxy', {
+                                const res = await authFetch('/api/webhook-proxy', {
                                   method: 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
                                   body: JSON.stringify({ webhookUrl: userData.cmsWebhookUrl.trim(), payload: { type: 'ontology_injection', ontology: ontologyData } }),
                                 });
                                 if (!res.ok) throw new Error((await res.json()).error || `HTTP ${res.status}`);
@@ -628,9 +626,8 @@ export default function FactVault() {
                       setIsVerifying(true);
                       setSchemaVerify(null);
                       try {
-                        const res = await fetch('/api/verify-schema', {
+                        const res = await authFetch('/api/verify-schema', {
                           method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ domain: userData.domain, factStatement: schemaPanel.factStatement }),
                         });
                         const data = await res.json();

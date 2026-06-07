@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
+import { requireAuth } from '@/lib/api-auth';
 import { z } from 'zod';
 
 const EntityProfileSchema = z.object({
@@ -14,8 +15,11 @@ const EntityProfileSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
   try {
-    const { userId, brand, domain, keywords, country, description } = await req.json();
+    const { brand, domain, keywords, country, description } = await req.json();
     if (!brand) return NextResponse.json({ error: 'Brand required' }, { status: 400 });
 
     const prompt = `You are an entity intelligence expert specialising in knowledge graph establishment for brand GEO (Generative Engine Optimization).

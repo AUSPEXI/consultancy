@@ -110,7 +110,7 @@ export default function CiteProbePage() {
   const loadHistory = async () => {
     if (!user?.uid) return;
     try {
-      const res = await fetch(`/api/cite-probe?userId=${encodeURIComponent(user.uid)}&limit=30`);
+      const res = await authFetch(`/api/cite-probe?limit=30`);
       const json = await res.json();
       if (json.success && Array.isArray(json.history)) setPersistentHistory(json.history);
     } catch (_) {}
@@ -231,12 +231,10 @@ export default function CiteProbePage() {
     setError(null);
     setProbeData(null);
     try {
-      const res = await fetch('/api/cite-probe', {
+      const res = await authFetch('/api/cite-probe', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           brand, domain,
-          userId: user?.uid || 'anonymous',
           keywords: userData?.keywords || [],
           negativeStatements,
           competitorBrand: showCompetitorPanel ? competitorBrand.trim() : '',

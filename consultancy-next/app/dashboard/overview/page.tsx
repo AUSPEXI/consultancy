@@ -151,7 +151,7 @@ export default function OverviewPage() {
   const [citationHistory, setCitationHistory] = useState<any[]>([]);
   useEffect(() => {
     if (!user?.uid) return;
-    fetch(`/api/cite-probe?userId=${encodeURIComponent(user.uid)}&limit=14`)
+    authFetch(`/api/cite-probe?limit=14`)
       .then(r => r.json())
       .then(j => { if (j.success && Array.isArray(j.history)) setCitationHistory(j.history); })
       .catch(() => {});
@@ -249,7 +249,7 @@ export default function OverviewPage() {
     setIsSyncingCMS(true);
     try {
       const payload = { shadowLink: generatedShadowLink, jsonLd: { "@context": "https://schema.org", "@type": "Product", "name": userData.brand || "Your Brand", "url": generatedShadowLink } };
-      const resp = await fetch('/api/push-to-cms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ webhookUrl: userData.cmsWebhookUrl, payload }) });
+      const resp = await authFetch('/api/push-to-cms', { method: 'POST', body: JSON.stringify({ webhookUrl: userData.cmsWebhookUrl, payload }) });
       const data = await resp.json();
       if (data.success) { setToastMessage({ text: 'Shadow Link and JSON-LD injected via webhook.', type: 'success' }); }
       else { throw new Error(data.error); }

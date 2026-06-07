@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Globe, Sparkles, Loader2, Copy, CheckCircle2, ExternalLink, AlertCircle, Building2, BookOpen, Link2, Pencil } from 'lucide-react';
 import { checkTierAccess } from '@/constants/tiers';
 import { logAuditAction } from '@/lib/audit';
+import { authFetch } from '@/lib/auth-fetch';
 
 const ENTITY_PLATFORMS = [
   { name: 'Wikidata', url: 'https://www.wikidata.org/wiki/Special:NewItem', desc: 'The master knowledge graph that feeds Wikipedia, Google, and most LLMs.', impact: 'Very High', color: 'text-emerald-400', badge: 'bg-emerald-500/10 border-emerald-500/20' },
@@ -105,11 +106,9 @@ export default function EntityHubPage() {
     setIsGenerating(true);
     setError(null);
     try {
-      const res = await fetch('/api/entity-profile', {
+      const res = await authFetch('/api/entity-profile', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: user.uid,
           brand: userData.brand,
           domain: userData.domain,
           keywords: userData.keywords,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbAdmin } from '@/lib/firebase-admin';
+import { requireAuth } from '@/lib/api-auth';
 
 // GET — return all schemas for a domain (used by layout to inject JSON-LD)
 export async function GET(req: NextRequest) {
@@ -20,10 +21,13 @@ export async function GET(req: NextRequest) {
 
 // POST — save a schema to the registry
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
   if (!dbAdmin) return NextResponse.json({ error: 'Admin SDK not available' }, { status: 503 });
   try {
-    const { userId, domain, schema, factId } = await req.json();
-    if (!userId || !domain || !schema) return NextResponse.json({ error: 'userId, domain, schema required' }, { status: 400 });
+    const { domain, schema, factId } = await req.json();
+    if (!domain || !schema) return NextResponse.json({ error: 'domain, schema required' }, { status: 400 });
 
     await dbAdmin.collection('schema_registry').add({
       userId,

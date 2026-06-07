@@ -3,6 +3,7 @@ import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
 import { dbAdmin } from '@/lib/firebase-admin';
 import { computeAttribution } from '@/lib/attribution';
+import { requireAuth } from '@/lib/api-auth';
 
 // Build 7 brand-and-keyword-specific queries so the probe is relevant to the actual client
 function buildQueries(brand: string, _domain: string, keywords: string[]): string[] {
@@ -222,12 +223,11 @@ async function probeClaude(query: string, brand: string, domain: string, knownFa
 // Reads accumulated citation_tests so the dashboard can show trend across sessions,
 // not just the in-memory history that resets on reload.
 export async function GET(request: Request) {
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-    if (!userId || userId === 'anonymous') {
-      return NextResponse.json({ success: true, history: [] });
-    }
     if (!dbAdmin) {
       return NextResponse.json({ success: true, history: [] });
     }
@@ -286,9 +286,12 @@ async function probeBrandRate(
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
   try {
     const {
-      brand, domain, userId = 'anonymous', queries, keywords = [],
+      brand, domain, queries, keywords = [],
       negativeStatements: clientFalses = [],
       competitorBrand = '', competitorDomain = '',
     } = await request.json();
