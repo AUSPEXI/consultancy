@@ -173,7 +173,7 @@ add_action('wp_head', function() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
             {[
               { type: 'Organization', desc: 'Brand identity, URL, semantic anchors as description' },
-              { type: 'FAQPage', desc: 'Your top 15 Fact-Vault entries as structured Q&A pairs' },
+              { type: 'ItemList', desc: 'Your top 15 Fact-Vault statements as structured, citable claims' },
               { type: 'Auto-updates', desc: 'Schema reflects Fact-Vault changes within 5 minutes' },
               { type: 'AI crawler headers', desc: 'Correct Content-Type and Cache-Control for GPTBot, ClaudeBot' },
             ].map(({ type, desc }) => (

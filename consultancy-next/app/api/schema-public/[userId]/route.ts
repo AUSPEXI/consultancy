@@ -29,8 +29,10 @@ export async function GET(
         anchors = d.latentAnchors || [];
       }
 
+      // Facts are stored under `statement` (not `fact`). They are declarative
+      // brand claims, not Q&A pairs, so we represent them as an ItemList below.
       facts = factsSnap.docs
-        .map(d => d.data().fact as string)
+        .map((d: any) => (d.data().statement || d.data().fact) as string)
         .filter(Boolean)
         .slice(0, 15);
     }
@@ -50,11 +52,17 @@ export async function GET(
             : `${brand} — GEO-optimised brand`,
         },
         ...(facts.length > 0 ? [{
-          '@type': 'FAQPage',
-          mainEntity: facts.map((fact, i) => ({
-            '@type': 'Question',
-            name: `What does ${brand} do? (${i + 1})`,
-            acceptedAnswer: { '@type': 'Answer', text: fact },
+          '@type': 'ItemList',
+          '@id': `${siteUrl}/#facts`,
+          name: `Key facts about ${brand}`,
+          itemListElement: facts.map((fact, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            item: {
+              '@type': 'CreativeWork',
+              about: { '@id': `${siteUrl}/#org` },
+              text: fact,
+            },
           })),
         }] : []),
       ],
