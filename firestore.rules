@@ -252,5 +252,14 @@ service cloud.firestore {
     match /scrapes/{id} {
        allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid) && (request.resource == null || request.resource.data.userId == request.auth.uid);
     }
+
+    // GA4 OAuth — holds refresh tokens. Server-side (admin SDK) ONLY.
+    // Never readable or writable by any client, including the owner.
+    match /ga4_integrations/{userId} {
+      allow read, write: if false;
+    }
+    match /oauth_states/{nonce} {
+      allow read, write: if false;
+    }
   }
 }

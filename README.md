@@ -146,6 +146,12 @@ Set these in **Netlify** (production) and `consultancy-next/.env.local` (local).
 | `GEO_FINDINGS_SECRET` | Guards the lab → dashboard findings publish. Set in **both** Netlify and GitHub. |
 | `BRAND_PROBE_MONTHLY_TARGET_USD` / `_CEILING_USD` / `BRAND_PROBE_MAX_COMPETITORS` | Brand-probe budget controls (optional, have defaults) |
 
+### Integrations
+| Var | Notes |
+|-----|-------|
+| `GOOGLE_OAUTH_CLIENT_ID` | GA4 attribution OAuth (Google Cloud → APIs & Services → Credentials → OAuth client). Authorised redirect URI: `https://l8entspace.com/api/integrations/ga4/callback`. Enable the **Google Analytics Admin API** + **Analytics Data API**. Feature hides itself if unset. |
+| `GOOGLE_OAUTH_CLIENT_SECRET` | Paired secret for the above |
+
 ### Site
 | Var | |
 |-----|--|
