@@ -1,5 +1,3 @@
-import { FAQ_CATEGORIES } from '@/data/faqData';
-
 // Shared JSON-LD builders for auspexi.com's own structured data.
 // Auspexi dogfoods its own product: the same comprehensive knowledge base it
 // publishes on /faq is served as JSON-LD site-wide so AI crawlers (GPTBot,
@@ -23,26 +21,7 @@ export function buildOrganizationSchema() {
   };
 }
 
-// FAQPage built from the full FAQ_CATEGORIES knowledge base (every category,
-// every question). These are real, hand-written Q&A pairs — no fabrication.
-export function buildFaqSchema() {
-  return {
-    '@type': 'FAQPage',
-    '@id': 'https://auspexi.com/faq#faqpage',
-    mainEntity: FAQ_CATEGORIES.flatMap((cat) =>
-      cat.items.map((item) => ({
-        '@type': 'Question',
-        name: item.question,
-        acceptedAnswer: { '@type': 'Answer', text: item.answer },
-      }))
-    ),
-  };
-}
-
-// Combined @graph used by the root layout to publish site-wide.
-export function buildSiteSchema() {
-  return {
-    '@context': 'https://schema.org',
-    '@graph': [buildOrganizationSchema(), buildFaqSchema()],
-  };
-}
+// FAQPage is intentionally NOT included here for site-wide use.
+// It lives on /faq only (scoped to the page whose content matches).
+// Experiment 021 in geo-lab will determine whether site-wide FAQPage
+// improves AI citation enough to justify the GSC policy risk.

@@ -3,7 +3,7 @@ import Script from 'next/script'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { NavigationProgress } from '@/components/ui/NavigationProgress'
 import { CookieConsent } from '@/components/ui/cookie-consent'
-import { buildSiteSchema } from '@/lib/site-schema'
+import { buildOrganizationSchema } from '@/lib/site-schema'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -43,11 +43,16 @@ export const metadata: Metadata = {
 }
 
 async function SiteSchemas() {
-  // 1) Static, server-rendered dogfood: Organization + the full FAQ knowledge
-  //    base, emitted on every page so AI crawlers ingest it wherever they land.
-  const siteSchema = buildSiteSchema();
+  // Organization only site-wide — safe for all pages, no policy concerns.
+  // FAQPage is intentionally scoped to /faq only (see app/faq/page.tsx).
+  // Experiment 021 in geo-lab will measure whether site-wide FAQPage improves
+  // AI citation enough to justify the GSC structured-data policy risk.
+  const orgSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [buildOrganizationSchema()],
+  };
 
-  // 2) Any user-saved schemas from the registry (best-effort; non-blocking).
+  // Any user-saved schemas from the registry (best-effort; non-blocking).
   let registrySchemas: any[] = [];
   try {
     const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://auspexi.com';
@@ -57,12 +62,12 @@ async function SiteSchemas() {
       if (Array.isArray(schemas)) registrySchemas = schemas;
     }
   } catch {
-    // registry is optional — the static site schema above always ships
+    // registry is optional — org schema above always ships
   }
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }} />
       {registrySchemas.map((schema: any, i: number) => (
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       ))}
