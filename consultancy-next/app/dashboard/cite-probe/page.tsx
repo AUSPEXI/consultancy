@@ -42,6 +42,8 @@ interface ProbeRun {
   misinformationCount: number;
   totalQueries: number;
   activePlatforms?: number;
+  sentimentBreakdown?: { positive: number; neutral: number; negative: number };
+  avgPositionPct?: number | null;
   platformRates?: {
     gemini: number | null;
     chatgpt: number | null;
@@ -555,6 +557,44 @@ export default function CiteProbePage() {
               )}
             </div>
           </div>
+
+          {/* Sentiment + prominence — only meaningful when the brand was cited */}
+          {probeData.citedCount > 0 && probeData.sentimentBreakdown && (() => {
+            const sb = probeData.sentimentBreakdown;
+            const total = sb.positive + sb.neutral + sb.negative;
+            const pct = (n: number) => total ? Math.round((n / total) * 100) : 0;
+            const pos = probeData.avgPositionPct;
+            const posLabel = pos === null || pos === undefined ? '—'
+              : pos <= 33 ? 'Early' : pos <= 66 ? 'Mid' : 'Late';
+            const posColor = pos === null || pos === undefined ? 'text-zinc-400'
+              : pos <= 33 ? 'text-emerald-400' : pos <= 66 ? 'text-amber-400' : 'text-rose-400';
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 sm:col-span-2">
+                  <p className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-3">How AI talks about {brand}</p>
+                  <div className="flex h-3 rounded-full overflow-hidden bg-zinc-800 mb-3">
+                    {sb.positive > 0 && <div className="bg-emerald-500" style={{ width: `${pct(sb.positive)}%` }} />}
+                    {sb.neutral > 0 && <div className="bg-zinc-500" style={{ width: `${pct(sb.neutral)}%` }} />}
+                    {sb.negative > 0 && <div className="bg-rose-500" style={{ width: `${pct(sb.negative)}%` }} />}
+                  </div>
+                  <div className="flex flex-wrap gap-4 text-xs">
+                    <span className="flex items-center gap-1.5 text-emerald-400"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Positive {pct(sb.positive)}%</span>
+                    <span className="flex items-center gap-1.5 text-zinc-400"><span className="w-2 h-2 rounded-full bg-zinc-500" /> Neutral {pct(sb.neutral)}%</span>
+                    <span className="flex items-center gap-1.5 text-rose-400"><span className="w-2 h-2 rounded-full bg-rose-500" /> Negative {pct(sb.negative)}%</span>
+                  </div>
+                  <p className="text-[11px] text-zinc-600 mt-3">Heuristic sentiment across {total} cited mention{total !== 1 ? 's' : ''}. Indicative, not a guarantee.</p>
+                </div>
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+                  <p className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-2">Prominence</p>
+                  <div className={`text-4xl font-black ${posColor}`}>{posLabel}</div>
+                  <p className="text-xs text-zinc-500 mt-2">
+                    {pos === null || pos === undefined ? 'No position data' : `Brand appears ~${pos}% into the answer on average`}
+                  </p>
+                  <p className="text-[11px] text-zinc-600 mt-2">Earlier mentions carry more weight in AI answers.</p>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Bulk process missed queries */}
           {probeData.results.some(r => !r.cited) && (

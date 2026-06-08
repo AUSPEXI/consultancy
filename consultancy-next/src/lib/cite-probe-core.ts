@@ -8,13 +8,77 @@ import OpenAI from 'openai';
 export type PlatformKey = 'gemini' | 'chatgpt' | 'perplexity' | 'claude';
 export const ALL_ENGINES: PlatformKey[] = ['gemini', 'chatgpt', 'perplexity', 'claude'];
 
+export type Sentiment = 'positive' | 'neutral' | 'negative';
+
 export interface PlatformResult {
   cited: boolean;
   accurate: boolean;
   misinformation: string | null;
   excerpt: string | null;
+  // Sentiment of the brand mention (null when not cited). Heuristic — no extra API cost.
+  sentiment?: Sentiment | null;
+  // Rank of the brand in a recommendation list (1-based) when the answer is a
+  // numbered/bulleted list and the brand appears in it; null otherwise.
+  position?: number | null;
+  // Normalised position of the first brand mention in the answer (0–100; lower =
+  // earlier = more prominent). null when not cited.
+  positionPct?: number | null;
   error?: string;
   skipped?: boolean;
+}
+
+const POSITIVE_WORDS = [
+  'best', 'leading', 'top', 'excellent', 'recommended', 'trusted', 'popular',
+  'powerful', 'innovative', 'reliable', 'strong', 'great', 'preferred', 'superior',
+  'robust', 'effective', 'award', 'high-quality', 'industry-leading', 'standout',
+  'favorite', 'favourite', 'go-to', 'well-regarded', 'reputable', 'cutting-edge',
+];
+const NEGATIVE_WORDS = [
+  'worst', 'poor', 'lacking', 'limited', 'weak', 'outdated', 'criticized', 'criticised',
+  'problem', 'issue', 'concern', 'unreliable', 'difficult', 'complaint', 'scam',
+  'avoid', 'expensive', 'overpriced', 'buggy', 'clunky', 'disappointing', 'subpar',
+  'lacks', 'drawback', 'downside', 'controversial',
+];
+
+// Classify the sentiment of the sentence(s) mentioning the brand.
+function computeSentiment(brandSentences: string[]): Sentiment {
+  let score = 0;
+  for (const s of brandSentences) {
+    const sl = ` ${s.toLowerCase()} `;
+    for (const w of POSITIVE_WORDS) if (sl.includes(` ${w} `) || sl.includes(`${w},`) || sl.includes(`${w}.`)) score++;
+    for (const w of NEGATIVE_WORDS) if (sl.includes(` ${w} `) || sl.includes(`${w},`) || sl.includes(`${w}.`)) score--;
+  }
+  if (score > 0) return 'positive';
+  if (score < 0) return 'negative';
+  return 'neutral';
+}
+
+// Find the brand's rank in a numbered/bulleted recommendation list (1-based),
+// plus a normalised 0–100 position of its first mention in the whole answer.
+function computePosition(response: string, brandLower: string, domainLower: string):
+  { position: number | null; positionPct: number | null } {
+  const matches = (line: string) => {
+    const ll = line.toLowerCase();
+    return ll.includes(brandLower) || (domainLower && ll.includes(domainLower));
+  };
+
+  // List rank: look for numbered or bulleted lines, in order.
+  const lines = response.split('\n');
+  const listLines = lines.filter(l => /^\s*(\d+[.)]|[-*•])\s+/.test(l));
+  if (listLines.length >= 2) {
+    const rank = listLines.findIndex(matches);
+    if (rank >= 0) {
+      const idx = response.toLowerCase().indexOf(brandLower);
+      const pct = idx >= 0 ? Math.round((idx / response.length) * 100) : null;
+      return { position: rank + 1, positionPct: pct };
+    }
+  }
+
+  // Otherwise: normalised character offset of first brand mention.
+  const idx = response.toLowerCase().indexOf(brandLower);
+  const offset = idx >= 0 ? idx : (domainLower ? response.toLowerCase().indexOf(domainLower) : -1);
+  if (offset < 0) return { position: null, positionPct: null };
+  return { position: null, positionPct: Math.round((offset / response.length) * 100) };
 }
 
 // Build 7 brand-and-keyword-specific queries so the probe is relevant to the actual client
@@ -55,7 +119,7 @@ export function checkCitation(
   brand: string,
   domain: string,
   knownFalses: string[] = [],
-): { cited: boolean; accurate: boolean; misinformation: string | null; excerpt: string | null } {
+): { cited: boolean; accurate: boolean; misinformation: string | null; excerpt: string | null; sentiment: Sentiment | null; position: number | null; positionPct: number | null } {
   const lower = response.toLowerCase();
   const brandLower = brand.toLowerCase();
   const domainLower = domain.toLowerCase().replace(/^https?:\/\//, '');
@@ -74,13 +138,20 @@ export function checkCitation(
   const mentionsBrand = lower.includes(brandLower) || lower.includes(domainLower);
 
   if (!mentionsBrand || hasNegative) {
-    return { cited: false, accurate: true, misinformation: null, excerpt: null };
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, sentiment: null, position: null, positionPct: null };
   }
 
   const sentences = response.split(/(?<=[.!?])\s+/);
   const match = sentences.find(s =>
     s.toLowerCase().includes(brandLower) || s.toLowerCase().includes(domainLower)
   );
+
+  const brandSentencesForSentiment = sentences.filter(s => {
+    const sl = s.toLowerCase();
+    return sl.includes(brandLower) || (domainLower && sl.includes(domainLower));
+  });
+  const sentiment = computeSentiment(brandSentencesForSentiment);
+  const { position, positionPct } = computePosition(response, brandLower, domainLower);
 
   const NEGATION_WORDS = [
     " not ", " no ", "isn't", "aren't", "doesn't", "don't", "never",
@@ -115,6 +186,9 @@ export function checkCitation(
     accurate: misinformationSnippet === null,
     misinformation: misinformationSnippet,
     excerpt: match || null,
+    sentiment,
+    position,
+    positionPct,
   };
 }
 
@@ -215,6 +289,7 @@ export interface ProbeAggregate {
   queryResults: Array<{
     query: string; cited: boolean; accurate: boolean;
     misinformation: string | null; excerpt: string | null;
+    sentiment: Sentiment | null; positionPct: number | null;
     platforms: Record<PlatformKey, PlatformResult>; timestamp: string;
   }>;
   platformRates: Record<string, number | null>;
@@ -222,6 +297,11 @@ export interface ProbeAggregate {
   citedCount: number;
   misinformationCount: number;
   activePlatforms: number;
+  // Sentiment of brand mentions across all cited platform results.
+  sentimentBreakdown: { positive: number; neutral: number; negative: number };
+  // Average normalised position of the brand mention (0–100; lower = earlier).
+  // null when the brand was never cited.
+  avgPositionPct: number | null;
 }
 
 // Run a full citation probe for one brand across a query set and aggregate it.
@@ -243,9 +323,14 @@ export async function runCitationProbe(opts: {
       const firstExcerpt = active.find(p => p.cited && p.accurate && p.excerpt)?.excerpt
         || active.find(p => p.cited && p.excerpt)?.excerpt || null;
       const misinformationSnippet = active.find(p => p.misinformation)?.misinformation || null;
+      // Representative sentiment/position for the query = first cited platform's.
+      const citedResult = active.find(p => p.cited);
+      const sentiment = citedResult?.sentiment ?? null;
+      const positionPct = citedResult?.positionPct ?? null;
       return {
         query, cited: citedOnAny, accurate: !hasMisinformation,
         misinformation: misinformationSnippet, excerpt: firstExcerpt,
+        sentiment, positionPct,
         platforms, timestamp,
       };
     })
@@ -265,7 +350,24 @@ export async function runCitationProbe(opts: {
   const citedCount = queryResults.filter(r => r.cited).length;
   const misinformationCount = queryResults.filter(r => r.cited && !r.accurate).length;
 
-  return { queryResults, platformRates, citationRate, citedCount, misinformationCount, activePlatforms: activeRates.length };
+  // Sentiment + position aggregated across every cited platform result.
+  const sentimentBreakdown = { positive: 0, neutral: 0, negative: 0 };
+  const positions: number[] = [];
+  for (const qr of queryResults) {
+    for (const p of ALL_ENGINES) {
+      const pr = qr.platforms[p];
+      if (pr.skipped || !pr.cited) continue;
+      if (pr.sentiment) sentimentBreakdown[pr.sentiment]++;
+      if (typeof pr.positionPct === 'number') positions.push(pr.positionPct);
+    }
+  }
+  const avgPositionPct = positions.length
+    ? Math.round(positions.reduce((a, b) => a + b, 0) / positions.length) : null;
+
+  return {
+    queryResults, platformRates, citationRate, citedCount, misinformationCount,
+    activePlatforms: activeRates.length, sentimentBreakdown, avgPositionPct,
+  };
 }
 
 // Lightweight cited-only probe used for competitor head-to-head comparison.

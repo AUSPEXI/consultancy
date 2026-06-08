@@ -77,6 +77,7 @@ export async function POST(request: Request) {
     const {
       queryResults, platformRates, citationRate,
       citedCount, misinformationCount, activePlatforms,
+      sentimentBreakdown, avgPositionPct,
     } = await runCitationProbe({ brand, domain, queries: testQueries, knownFalses });
 
     // S7.1: optional competitor comparison — run the SAME queries for a competitor
@@ -126,6 +127,7 @@ export async function POST(request: Request) {
       citationRate, citedCount, misinformationCount,
       totalQueries: testQueries.length,
       activePlatforms, platformRates,
+      sentimentBreakdown, avgPositionPct,
       results: queryResults,
       attribution,
       mode: isCompetitorMode ? 'competitor' : 'standard',
