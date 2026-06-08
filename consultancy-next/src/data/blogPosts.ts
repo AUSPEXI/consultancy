@@ -1,5 +1,94 @@
 export const blogPosts = [
   {
+    slug: "latent-space-explorer-see-where-your-brand-lives-in-ai",
+    title: "The Latent Space Explorer: See Where Your Brand Actually Lives Inside an AI",
+    excerpt: "AI models hold a kind of internal map of meaning, and your brand sits somewhere on it. The Latent Space Explorer turns that invisible map into an interactive 3D picture — so you can see what's near your brand, where the citation gaps are, and what to fix.",
+    date: "June 8, 2026",
+    category: "Explainer",
+    author: "Auspexi Team",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## AI Has an Internal Map. Your Brand Is on It.
+
+Here's something most people never think about: an AI model doesn't store words as words. It stores them as positions on a giant internal map of meaning.
+
+On that map, "doctor" sits near "nurse" and "hospital." "Coffee" sits near "espresso" and "caffeine." Things that mean similar things end up close together. Things that are unrelated end up far apart.
+
+Your brand is on this map too. It sits somewhere, surrounded by the concepts the AI associates with you. And **where you sit decides what you get recommended for.**
+
+The problem is that this map is invisible. You can't see it. Until now, you just had to guess where your brand landed.
+
+The **Latent Space Explorer** makes that map visible.
+
+---
+
+## What the Explorer Actually Shows
+
+When you open the Explorer in your dashboard, you see a 3D cloud of points you can rotate, zoom, and fly through. Each point is a concept, a fact, or a topic connected to your brand.
+
+It's built from real data. We take your brand's facts and key concepts and turn each one into an *embedding* — a long list of numbers (768 of them, produced by Google's text-embedding model) that captures its meaning. That's the same kind of representation AI models use internally. We then project those high-dimensional points down into 3D so a human can actually look at them.
+
+The result is a picture of your brand's neighbourhood in the AI's mind.
+
+---
+
+## Reading the Colours
+
+The points are colour-coded so the picture tells a story at a glance:
+
+- **Gold — cited territory.** These are concepts near topics where AI engines *do* mention your brand. This is ground you already own.
+- **Red — citation gaps.** These sit near topics where AI engines *don't* mention you, even though they're relevant. Every red point is an opportunity.
+- **Teal and indigo — untested ground.** Concepts that are part of your map but haven't been probed yet, shaded by whether they carry positive or neutral sentiment.
+
+So instead of a wall of numbers, you get a landscape: here's where you're winning (gold), here's where you're missing (red), and here's territory you haven't explored yet.
+
+---
+
+## Semantic Anchors: Putting Your Map in Context
+
+A map of just your own brand is useful, but the real insight comes from context. That's what **semantic anchors** are for.
+
+Anchors are reference points you drop onto the map — competitors, key industry concepts, or the topics you most want to own. Once they're placed, you can see how close or far your brand's facts sit from each one.
+
+Is your brand clustered tightly around the concept you want to be known for? Or is a competitor sitting right on top of it while you're drifting off to the side? The map shows you.
+
+You can add anchors yourself, or use the **auto-suggest** feature, which asks an AI to propose the most relevant anchors for your brand and domain. It's a fast way to frame your map around what matters.
+
+---
+
+## Why This Is More Than a Pretty Picture
+
+It's genuinely striking to look at — but the point isn't decoration. The Explorer turns an abstract idea ("get cited by AI") into something concrete you can act on:
+
+1. **Spot the gaps.** Red points near valuable topics are a content to-do list. Each one says: "create something here, and you could close this gap."
+2. **Check your positioning.** If your brand's cluster is far from the concept you want to own, that's a signal your facts and content aren't pulling you toward it.
+3. **Watch it move.** As you publish grounded content and re-probe, the map changes. Red turns to gold. That's progress you can actually see, not just a number on a dashboard.
+
+---
+
+## An Honest Note
+
+The Explorer is a real, working tool — and it's also one we're still refining. Turning a 768-dimensional space into a 3D picture always involves some simplification, and we're continuing to improve how accurately the layout reflects true semantic distance. We'd rather tell you that plainly than pretend it's a finished oracle. It's a genuinely useful lens today, and it's getting sharper.
+
+---
+
+## Key Takeaways
+
+- AI models represent meaning as positions on an internal map; your brand sits somewhere on it, and that position shapes what you get recommended for.
+- The **Latent Space Explorer** turns that invisible map into an interactive 3D view, built from real 768-dimensional embeddings of your brand's facts.
+- Colours tell the story: **gold** = cited territory you own, **red** = citation gaps to close, **teal/indigo** = untested ground.
+- **Semantic anchors** let you place competitors and target concepts on the map to see your positioning in context.
+- It's a working tool we're still sharpening — useful today, improving over time.
+
+---
+
+## Take a Look at Your Own Map
+
+The fastest way to understand this is to see your own brand on the map. Open the Latent Space Explorer in your dashboard, drop in a few anchors, and rotate the cloud. The gold and red will tell you, at a glance, where you stand and what to work on next.
+    `.trim(),
+  },
+  {
     slug: "why-im-building-auspexi-in-public",
     title: "Why I'm Building Auspexi in Public (And What That Actually Means)",
     excerpt: "I'm a solo founder building a GEO platform out in the open — sharing the experiments, the wins, and the things that don't work. Here's why I decided to do it this way, and what you can expect from this blog.",
