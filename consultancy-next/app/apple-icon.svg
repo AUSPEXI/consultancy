@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <rect width="180" height="180" rx="40" fill="#000000"/>
+  <!-- Latent Space orbit rings -->
+  <g fill="none">
+    <ellipse cx="90" cy="88" rx="68" ry="35" transform="rotate(30 90 88)" stroke="#ffffff" stroke-width="4" opacity="0.5"/>
+    <ellipse cx="90" cy="88" rx="68" ry="35" transform="rotate(-30 90 88)" stroke="#ff1493" stroke-width="5.5"/>
+  </g>
+  <!-- L8 mark -->
+  <text x="90" y="112" text-anchor="middle" font-family="'Outfit','Plus Jakarta Sans',sans-serif" font-size="78" font-weight="800" fill="#ffffff" letter-spacing="-5">L8</text>
+</svg>
