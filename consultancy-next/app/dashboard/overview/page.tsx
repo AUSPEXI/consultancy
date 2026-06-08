@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer, BarChart, Bar, ComposedChart, Line, LineChart, Cell, ReferenceArea, PieChart, Pie } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer, BarChart, Bar, Cell, PieChart, Pie } from 'recharts';
 import { TrendingUp, Users, Target, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, HelpCircle, Sparkles } from 'lucide-react';
 import { SyntheticDataPanel } from '@/components/dashboard/SyntheticDataPanel';
 import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist';
@@ -78,7 +78,7 @@ export default function OverviewPage() {
 
   const userPrompts = userData?.sentimentPrompts || defaultPrompts;
 
-  const { pulseData, mapPoints, sentimentTrace, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(
+  const { pulseData, mapPoints, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(
     userData?.brand || '',
     userPrompts,
     selectedPlatform,
@@ -173,14 +173,6 @@ export default function OverviewPage() {
     );
   }
 
-  const getSentimentColor = (score: number) => {
-    if (score > 60) return 'bg-emerald-500/30';
-    if (score > 20) return 'bg-emerald-500/10';
-    if (score > -20) return 'bg-zinc-800/40';
-    if (score > -60) return 'bg-rose-500/10';
-    return 'bg-rose-500/30';
-  };
-
   const runAudit = async () => {
     if (!user) return;
     setIsAuditing(true);
@@ -269,7 +261,6 @@ export default function OverviewPage() {
     return {
       shortDate: h.timestamp ? new Date(h.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '',
       aSov: Math.round(h.citationRate ?? 0),
-      err: 0, compGap: 0, compA: 0, compB: 0, aiTraffic: 0,
       platforms: {
         chatgpt: pr.chatgpt ?? 0,
         claude: pr.claude ?? 0,
@@ -282,11 +273,11 @@ export default function OverviewPage() {
 
   // Synthetic demo ramp — only shown when the user has NO real data at all
   const demoTrend = [
-    { shortDate: 'Mon', aSov: 12, err: 20, compGap: -33, compA: 45, compB: 30, aiTraffic: 120, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } },
-    { shortDate: 'Tue', aSov: 18, err: 35, compGap: -24, compA: 42, compB: 28, aiTraffic: 132, platforms: { chatgpt: 25, claude: 20, gemini: 30, perplexity: 15 } },
-    { shortDate: 'Wed', aSov: 25, err: 45, compGap: -13, compA: 38, compB: 25, aiTraffic: 250, platforms: { chatgpt: 35, claude: 30, gemini: 40, perplexity: 20 } },
-    { shortDate: 'Thu', aSov: 32, err: 60, compGap: -3, compA: 35, compB: 22, aiTraffic: 280, platforms: { chatgpt: 45, claude: 40, gemini: 50, perplexity: 25 } },
-    { shortDate: 'Fri', aSov: 45, err: 80, compGap: 15, compA: 30, compB: 18, aiTraffic: 310, platforms: { chatgpt: 60, claude: 55, gemini: 70, perplexity: 35 } },
+    { shortDate: 'Mon', aSov: 12, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } },
+    { shortDate: 'Tue', aSov: 18, platforms: { chatgpt: 25, claude: 20, gemini: 30, perplexity: 15 } },
+    { shortDate: 'Wed', aSov: 25, platforms: { chatgpt: 35, claude: 30, gemini: 40, perplexity: 20 } },
+    { shortDate: 'Thu', aSov: 32, platforms: { chatgpt: 45, claude: 40, gemini: 50, perplexity: 25 } },
+    { shortDate: 'Fri', aSov: 45, platforms: { chatgpt: 60, claude: 55, gemini: 70, perplexity: 35 } },
   ];
 
   const displayData = metrics.length > 0 ? metrics : realTrend.length > 0 ? realTrend : demoTrend;
@@ -294,28 +285,8 @@ export default function OverviewPage() {
 
   const latest = metrics.length > 0 ? metrics[metrics.length - 1]
     : realTrend.length > 0 ? realTrend[realTrend.length - 1]
-    : { id: 'placeholder', aSov: 12, err: 20, compGap: -33, compA: 45, compB: 30, aiTraffic: 120, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } };
-  const previous = metrics.length > 1 ? metrics[metrics.length - 2]
-    : realTrend.length > 1 ? realTrend[realTrend.length - 2]
-    : latest;
-  const safeLatest = { aSov: latest.aSov ?? 0, err: latest.err ?? 0, compGap: latest.compGap ?? 0, aiTraffic: Math.min(latest.aiTraffic ?? 0, 9999), compA: latest.compA ?? 0, platforms: latest.platforms || {}, radar: latest.radar || [], sentiment: latest.sentiment || [], topUrls: latest.topUrls || [] };
-  const safePrevious = { aSov: previous.aSov ?? 0, err: previous.err ?? 0, compGap: previous.compGap ?? 0, aiTraffic: Math.min(previous.aiTraffic ?? 0, 9999), compA: previous.compA ?? 0 };
-  const asovTrend = Math.round(safeLatest.aSov - safePrevious.aSov);
-  const trafficTrend = Math.round(safeLatest.aiTraffic - safePrevious.aiTraffic);
-  const errTrend = Math.round(safeLatest.err - safePrevious.err);
-  const gapTrend = Math.round(safeLatest.compGap - safePrevious.compGap);
-
-  const radarData = (latest.radar || [
-    { subject: 'Brand Trust', brandScore: safeLatest.aSov + 20, compScore: safeLatest.compA + 10 },
-    { subject: 'Technical Moat', brandScore: safeLatest.aSov - 5, compScore: safeLatest.compA + 25 },
-    { subject: 'Citation Depth', brandScore: safeLatest.aSov + 10, compScore: safeLatest.compA - 15 },
-    { subject: 'Fact Veracity', brandScore: safeLatest.aSov + 30, compScore: safeLatest.compA - 20 },
-    { subject: 'Neural Sync', brandScore: safeLatest.aSov - 15, compScore: safeLatest.compA + 20 },
-    { subject: 'Market Dominance', brandScore: safeLatest.aSov + 5, compScore: safeLatest.compA }
-  ]).map((d: any) => ({ subject: d.subject, A: Math.round(Math.min(100, Math.max(0, d.brandScore))), B: Math.round(Math.min(100, Math.max(0, d.compScore))), diff: Math.round(Math.abs((d.brandScore || 0) - (d.compScore || 0))), fullMark: 100 }));
-
-  const computedRadarData = mapPoints.length > 0 ? mapPoints.slice(0, 6).map((point: any) => ({ subject: point.type || point.label || 'General', A: Math.round(Math.min(100, Math.max(0, 100 - (point.distance || 0.1) * 100))), B: Math.round(Math.min(100, Math.max(0, 80 - (point.distance || 0.2) * 100))), fullMark: 100 })) : radarData;
-
+    : { id: 'placeholder', aSov: 12, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } };
+  const safeLatest = { aSov: latest.aSov ?? 0, platforms: latest.platforms || {} };
   const lp = safeLatest.platforms || {};
   const safePlatforms = { chatgpt: lp.chatgpt || (safeLatest.aSov > 0 ? safeLatest.aSov + 15 : 20), perplexity: lp.perplexity || (safeLatest.aSov > 0 ? Math.max(2, safeLatest.aSov - 25) : 10), claude: lp.claude || (safeLatest.aSov > 0 ? safeLatest.aSov + 5 : 15), gemini: lp.gemini || (safeLatest.aSov > 0 ? safeLatest.aSov + 25 : 30) };
   const finalPlatformSync = Math.round((safePlatforms.chatgpt + safePlatforms.claude + safePlatforms.gemini) / 3);
@@ -325,6 +296,22 @@ export default function OverviewPage() {
   const cpRate = citationData?.citationRate as number | undefined;
   const cpCited = citationData?.citedCount as number | undefined;
   const cpTotal = citationData?.totalQueries as number | undefined;
+  const cpMisinfo = citationData?.misinformationCount as number | undefined;
+
+  // Real competitor head-to-head — populated only when the latest probe ran in
+  // competitor mode. No fabrication: if there's no competitor object, we show an
+  // empty state prompting the user to run a competitor probe.
+  const comp = citationData?.competitor as
+    | { brand?: string; domain?: string; citationRate?: number; wins?: number; losses?: number; ties?: number; comparison?: any[] }
+    | null
+    | undefined;
+  const hasCompetitor = !!(comp && typeof comp.citationRate === 'number');
+  const compGapReal = hasCompetitor ? Math.round((cpRate ?? 0) - (comp!.citationRate ?? 0)) : null;
+
+  // Misinformation rate — % of cited answers that contained an inaccuracy (real).
+  const misinfoRate = cpCited && cpCited > 0 && cpMisinfo !== undefined
+    ? Math.round((cpMisinfo / cpCited) * 100)
+    : null;
 
   // Per-platform rates: prefer Citation Probe (real), fall back to sovMetrics (estimated)
   const activePlatforms = cpRates ? {
@@ -349,29 +336,6 @@ export default function OverviewPage() {
     { name: 'Claude', visibility: Math.min(100, Math.max(0, activePlatforms.claude ?? safePlatforms.claude)), fill: '#d97757' },
     { name: 'Google AI', visibility: Math.min(100, Math.max(0, activePlatforms.gemini ?? safePlatforms.gemini)), fill: '#4285f4' },
   ];
-
-  const chartData = metrics.length > 0 ? metrics.slice(-5) : displayData.slice(-5);
-
-  const sentimentData = sentimentTrace.length > 0
-    ? sentimentTrace.map(t => ({ prompt: t.prompt, scores: t.data.map((d: any) => d.positive - d.negative) }))
-    : userPrompts.map((p: string, rowIdx: number) => {
-        const base = rowIdx === 0 ? 60 : rowIdx === 1 ? 10 : rowIdx === 2 ? -80 : 20;
-        const flex = rowIdx === 0 ? 40 : rowIdx === 1 ? 30 : rowIdx === 2 ? -40 : -20;
-        return { prompt: p, scores: chartData.map((d, i) => { const progress = i / Math.max(1, chartData.length - 1); const isLatest = i === chartData.length - 1; let finalScore = base + Math.floor((flex - base) * progress); if (isLatest) { if (rowIdx === 0) finalScore = safeLatest.aSov + 40; if (rowIdx === 1) finalScore = safeLatest.aSov > 20 ? 80 : 30; if (rowIdx === 2) finalScore = safeLatest.aSov > 25 ? 20 : -40; } return finalScore; }) };
-      });
-
-  const safeTopUrls = latest.topUrls || [
-    { path: '/blog/enterprise-geo-audit-logging', citations: 45 },
-    { path: '/pricing', citations: 32 },
-    { path: '/features', citations: 28 },
-    { path: '/about', citations: Math.max(2, Math.floor(safeLatest.aSov / 3)) }
-  ];
-  const scorecardData = safeTopUrls.map((urlObj: any) => {
-    const historyLine = chartData.map((d, i) => { const diff = Math.floor(urlObj.citations * 0.4); const start = Math.max(1, urlObj.citations - diff); const progress = i / Math.max(1, chartData.length - 1); return start + Math.floor((urlObj.citations - start) * progress); });
-    const previousCitations = historyLine.length > 1 ? historyLine[historyLine.length - 2] : historyLine[0];
-    const trendValue = previousCitations > 0 ? Math.round(((urlObj.citations - previousCitations) / previousCitations) * 100) : 0;
-    return { url: urlObj.path, citations: urlObj.citations, trend: `${trendValue >= 0 ? '+' : ''}${trendValue}%`, metrics: historyLine };
-  }).sort((a: any, b: any) => b.citations - a.citations).slice(0, 4);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-20 relative">
@@ -449,12 +413,11 @@ export default function OverviewPage() {
       })()}
 
       <TooltipProvider>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
             { label: 'A-SOV Dominance', value: displayAsov, color: '#ec4899', icon: Target, source: asovSource, desc: cpRate !== undefined ? `Citation Probe: ${cpCited} of ${cpTotal} queries cited your brand` : 'Absolute Share of Voice — run Citation Probe for real data' },
-            { label: 'Entity Recall', value: Math.round(safeLatest.err), color: '#a855f7', icon: BrainCircuit, source: metrics.length > 0 ? '◌ ESTIMATED' : '◌ SIMULATED', desc: 'Gemini-estimated — run Citation Probe with fact-specific queries for real ERR' },
             { label: 'Platform Sync', value: displayPlatformSync, color: '#3b82f6', icon: Activity, source: platSource, desc: cpRates ? 'Average citation rate across ChatGPT, Claude, Gemini, Perplexity (Citation Probe)' : 'Across-model consistency — run Citation Probe for real data' },
-            { label: 'Sentiment Index', value: null, color: '#10b981', icon: TrendingUp, source: '◌ NO DATA', desc: 'Sentiment analysis not yet implemented — coming in a future update' },
+            { label: 'Misinformation Risk', value: misinfoRate, color: '#f43f5e', icon: TrendingUp, source: misinfoRate !== null ? '● CITE-PROBE' : '◌ NO DATA', desc: misinfoRate !== null ? `${cpMisinfo} of ${cpCited} cited answers contained an inaccuracy about your brand` : 'Run Citation Probe to measure how often LLMs cite your brand inaccurately' },
           ].map((dial, i) => (
             <UITooltip key={i}>
               <TooltipTrigger asChild>
@@ -472,7 +435,7 @@ export default function OverviewPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[
-          { label: 'Competitor Gap', value: `${safeLatest.compGap > 0 ? '+' : ''}${Math.round(safeLatest.compGap)}%`, trend: `${gapTrend >= 0 ? '+' : ''}${gapTrend} pts`, source: '◌ ESTIMATED', icon: TrendingUp, color: 'text-blue-400', desc: 'Estimated gap vs top competitor — run competitor Citation Probe for real data' },
+          { label: 'Competitor Gap', value: hasCompetitor ? `${compGapReal! > 0 ? '+' : ''}${compGapReal}%` : '—', trend: hasCompetitor ? `you ${cpRate ?? 0}% vs ${comp!.brand || 'them'} ${comp!.citationRate}%` : 'Run a competitor probe', source: hasCompetitor ? '● CITE-PROBE' : '◌ NO DATA', icon: TrendingUp, color: hasCompetitor && compGapReal! >= 0 ? 'text-emerald-400' : 'text-blue-400', desc: hasCompetitor ? `Real head-to-head citation-rate gap vs ${comp!.domain || comp!.brand}` : 'Run a Citation Probe with the competitor panel open to measure a real gap' },
           { label: 'Citations Found', value: cpCited !== undefined ? `${cpCited} / ${cpTotal}` : '— / —', trend: cpRate !== undefined ? `${Math.round(cpRate)}% rate` : 'Run Citation Probe', source: cpCited !== undefined ? '● CITE-PROBE' : '◌ NO DATA', icon: Users, color: 'text-emerald-400', desc: cpCited !== undefined ? 'Queries where your brand was cited by LLMs' : 'Run Citation Probe to measure real brand citations across LLMs' },
         ].map((kpi, i) => (
           <div key={i} className="bg-zinc-900/40 border border-zinc-800/60 rounded-xl p-5 flex items-center justify-between">
@@ -512,48 +475,50 @@ export default function OverviewPage() {
                 <YAxis stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}%`} />
                 <ChartTooltip contentStyle={{ backgroundColor: '#000000', borderColor: '#3f3f46', borderRadius: '12px', color: '#ffffff' }} itemStyle={{ color: '#ffffff' }} labelStyle={{ color: '#ffffff', fontWeight: 'bold' }} />
                 <Area type="monotone" dataKey="aSov" name="Our A-SOV" stroke="#ec4899" strokeWidth={2} fillOpacity={1} fill="url(#colorBrand)" />
-                <Area type="monotone" dataKey="compA" name="Top Competitor" stroke="#52525b" strokeWidth={2} fillOpacity={0} fill="transparent" strokeDasharray="4 4" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-          <div className="mb-6"><h3 className="text-base font-semibold text-white">Entity Recall Rate & AI Traffic</h3><p className="text-xs text-zinc-400 mt-1">Proof that injecting Facts into the Vault creates actual referral clicks.</p></div>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height={300} minWidth={0}>
-              <ComposedChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-                <XAxis dataKey="shortDate" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis yAxisId="left" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}%`} />
-                <YAxis yAxisId="right" orientation="right" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
-                <ChartTooltip contentStyle={{ backgroundColor: '#000000', borderColor: '#3f3f46', borderRadius: '12px', color: '#ffffff' }} itemStyle={{ color: '#ffffff' }} labelStyle={{ color: '#ffffff', fontWeight: 'bold' }} />
-                <Bar yAxisId="right" dataKey="aiTraffic" name="AI Referral Traffic" fill="#a855f7" fillOpacity={0.2} radius={[4, 4, 0, 0]} />
-                <Line yAxisId="left" type="monotone" dataKey="err" name="Fact Recall Rate" stroke="#a855f7" strokeWidth={2} dot={{ r: 4, fill: '#a855f7', strokeWidth: 0 }} />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-          <div className="mb-6"><h3 className="text-base font-semibold text-white">Competitive Citation Dominance</h3><p className="text-xs text-zinc-400 mt-1">Relative neural dominance per vector: Brands vs Nearest Enterprise Rival.</p></div>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height={300} minWidth={0}>
-              <BarChart data={computedRadarData} layout="vertical" margin={{ top: 5, right: 30, left: 100, bottom: 5 }} stackOffset="sign">
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={false} />
-                <XAxis type="number" hide domain={[-100, 100]} />
-                <YAxis dataKey="subject" type="category" stroke="#a1a1aa" fontSize={10} tickLine={false} axisLine={false} />
-                <ChartTooltip cursor={{ fill: '#27272a', opacity: 0.1 }} contentStyle={{ backgroundColor: '#000000', borderColor: '#27272a', borderRadius: '12px', color: '#ffffff' }} itemStyle={{ color: '#ffffff' }} labelStyle={{ color: '#ffffff' }} formatter={(value: any, name: any) => { const abs = Math.abs(value); const label = name === 'A' ? 'Your Brand' : 'Competitor'; return [`${abs}% Dominance`, label]; }} />
-                <ReferenceArea x1={-100} x2={100} fill="transparent" />
-                <Bar dataKey="A" name="A" stackId="stack" fill="#ec4899" radius={[0, 4, 4, 0]} />
-                <Bar dataKey={(d: any) => -d.B} name="B" stackId="stack" fill="#3f3f46" radius={[4, 0, 0, 4]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="flex justify-between items-center mt-4 px-10">
-            <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">← Competitor Dominance</span>
-            <span className="text-[10px] font-black text-pink-500 uppercase tracking-widest">Brand Dominance →</span>
-          </div>
+          <div className="mb-6"><h3 className="text-base font-semibold text-white">Competitor Head-to-Head</h3><p className="text-xs text-zinc-400 mt-1">Real per-query citation winners from your latest competitor probe.</p></div>
+          {hasCompetitor ? (
+            <div className="space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-zinc-950 border border-pink-500/20 rounded-xl p-4 text-center">
+                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">You</p>
+                  <p className="text-3xl font-black text-pink-400">{cpRate ?? 0}%</p>
+                  <p className="text-[10px] text-zinc-500 mt-1 truncate">{userData?.brand || 'Your brand'}</p>
+                </div>
+                <div className="bg-zinc-950 border border-zinc-700/40 rounded-xl p-4 text-center">
+                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Them</p>
+                  <p className="text-3xl font-black text-zinc-300">{comp!.citationRate}%</p>
+                  <p className="text-[10px] text-zinc-500 mt-1 truncate">{comp!.brand || comp!.domain}</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-center gap-6 text-xs font-bold">
+                <span className="text-emerald-400">{comp!.wins ?? 0} WINS</span>
+                <span className="text-zinc-500">{comp!.ties ?? 0} TIES</span>
+                <span className="text-rose-400">{comp!.losses ?? 0} LOSSES</span>
+              </div>
+              <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-1">
+                {(comp!.comparison || []).slice(0, 8).map((c: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between gap-3 text-[11px] py-1.5 px-2 rounded-md bg-zinc-950/60 border border-zinc-900">
+                    <span className="text-zinc-400 truncate flex-1" title={c.query}>{c.query}</span>
+                    <span className={`shrink-0 font-bold uppercase tracking-wider ${c.winner === 'you' ? 'text-emerald-400' : c.winner === 'them' ? 'text-rose-400' : 'text-zinc-500'}`}>
+                      {c.winner === 'you' ? 'WIN' : c.winner === 'them' ? 'LOSS' : 'TIE'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="h-[260px] flex flex-col items-center justify-center text-center gap-3">
+              <Users className="w-10 h-10 text-zinc-700" />
+              <p className="text-sm text-zinc-400 font-medium max-w-xs">No competitor data yet.</p>
+              <p className="text-xs text-zinc-600 max-w-xs">Open the Citation Probe, expand the competitor panel, and run a head-to-head probe to populate this with real data.</p>
+            </div>
+          )}
         </div>
 
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
@@ -613,53 +578,8 @@ export default function OverviewPage() {
           <NeuralLegend />
         </div>
 
-        <div className="lg:col-span-2 bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 relative">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-            <div><h3 className="text-base font-semibold text-white">"Share of Sentiment" Trace</h3><p className="text-xs text-zinc-400 mt-1">Tracks AI response sentiment across high-risk reputational queries.</p></div>
-            <div className="flex items-center gap-3 mt-4 sm:mt-0 text-xs text-zinc-400">
-              <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-rose-500"></div> Negative</div>
-              <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-zinc-600"></div> Neutral</div>
-              <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-emerald-500"></div> Positive</div>
-              <button onClick={() => setIsEditingPrompts(true)} className="ml-2 p-1.5 hover:bg-zinc-800 rounded-md transition-colors"><Settings className="w-3.5 h-3.5 text-zinc-500 hover:text-zinc-300" /></button>
-            </div>
-          </div>
+        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
           <NeuralTraceConfig isOpen={isEditingPrompts} onClose={() => setIsEditingPrompts(false)} userId={user?.uid || ''} initialPrompts={userPrompts} onSaved={refetchGeo} />
-          <div className="overflow-x-auto pb-4">
-            <div className="min-w-[800px]">
-              <div className="grid gap-2 mb-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest" style={{ gridTemplateColumns: `2fr repeat(${chartData.length}, 1fr)` }}>
-                <div>Reputational Prompt</div>
-                {chartData.map((d: any, i: number) => (<div key={i} className="text-center">{d.shortDate || `D-${chartData.length - i}`}</div>))}
-              </div>
-              <div className="space-y-3">
-                {sentimentData.map((row, i) => (
-                  <div key={i} className="grid gap-2 items-center" style={{ gridTemplateColumns: `2fr repeat(${row.scores.length}, 1fr)` }}>
-                    <div className="text-xs font-medium text-zinc-400 truncate pr-4" title={row.prompt}>{row.prompt}</div>
-                    {row.scores.map((score: number, colIdx: number) => (
-                      <div key={colIdx} className="flex justify-center group/cell relative">
-                        <div className={`w-full h-10 rounded-md transition-all duration-500 border border-white/5 ${getSentimentColor(score)}`} />
-                        <div className="absolute opacity-0 group-hover/cell:opacity-100 transition-all -top-10 bg-zinc-900 text-white text-[10px] font-bold px-2 py-1.5 rounded-lg pointer-events-none whitespace-nowrap z-50 border border-zinc-700 shadow-2xl">NET SENTIMENT: {score > 0 ? '+' : ''}{score}</div>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-          <div className="mb-6"><h3 className="text-base font-semibold text-white">"Cite-Magnet" Scorecard</h3><p className="text-xs text-zinc-400 mt-1">Top performing URLs driving AI citations.</p></div>
-          <div className="space-y-4">
-            {scorecardData.map((item: any, idx: number) => (
-              <div key={idx} className="flex items-center justify-between border-b border-zinc-800/50 pb-4 last:border-0 last:pb-0">
-                <div className="overflow-hidden pr-4 max-w-[55%]"><p className="text-sm font-medium text-zinc-200 truncate">{item.url}</p><p className="text-xs text-zinc-500 mt-1">Citation Freq: {item.citations} <span className={item.trend.startsWith('+') ? 'text-emerald-400' : 'text-rose-400'}>({item.trend})</span></p></div>
-                <div className="w-24 h-10"><ResponsiveContainer width={96} height={40} minWidth={0}><LineChart data={item.metrics.map((v: number) => ({ value: v }))}><Line type="monotone" dataKey="value" stroke={item.trend.startsWith('-') ? '#f43f5e' : '#10b981'} strokeWidth={2} dot={{ r: 2, fill: item.trend.startsWith('-') ? '#f43f5e' : '#10b981', strokeWidth: 0 }} /></LineChart></ResponsiveContainer></div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
           <div className="flex justify-between items-start mb-6">
             <div><div className="flex items-center gap-2 mb-1"><h3 className="text-base font-semibold text-white">Monitoring Objectives</h3><span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-bold border border-emerald-500/20">LIVE SYNC</span></div><p className="text-xs text-zinc-400">Define the reputational anchors and risk vectors the AI monitors.</p></div>
             <button onClick={() => setIsEditingPrompts(true)} className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-pink-400 transition-colors"><Plus className="w-4 h-4" /></button>
@@ -671,26 +591,6 @@ export default function OverviewPage() {
                 <div className="px-1.5 py-0.5 rounded bg-zinc-900 text-[9px] text-zinc-500 font-mono flex items-center gap-1"><Activity className="w-3 h-3" />{geoLoading ? 'FETCHING' : 'ACTIVE'}</div>
               </div>
             ))}
-          </div>
-        </div>
-
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-          <div className="mb-6"><h3 className="text-base font-semibold text-white">LLM Conversion Pipeline</h3><p className="text-xs text-zinc-400 mt-1">Attribution funnel for AI-referred traffic.</p></div>
-          <div className="h-[280px] w-full mt-2">
-            <ResponsiveContainer width="100%" height={300} minWidth={0}>
-              <ComposedChart data={[
-                { stage: 'AI Citations', amount: Math.round(500 + safeLatest.aSov * 10), fill: '#3b82f6' },
-                { stage: 'AI Referral Clicks', amount: Math.round(safeLatest.aiTraffic), fill: '#8b5cf6' },
-                { stage: 'Signups', amount: Math.round(safeLatest.aiTraffic * 0.15), fill: '#ec4899' },
-                { stage: 'Active Users', amount: Math.round(safeLatest.aiTraffic * 0.05), fill: '#10b981' },
-              ]} layout="vertical" margin={{ top: 0, right: 30, left: 40, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={true} vertical={false} />
-                <XAxis type="number" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis dataKey="stage" type="category" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
-                <ChartTooltip cursor={{ fill: '#27272a', opacity: 0.4 }} contentStyle={{ backgroundColor: '#000000', borderColor: '#3f3f46', borderRadius: '8px', color: '#ffffff' }} itemStyle={{ color: '#ffffff' }} labelStyle={{ color: '#ffffff' }} formatter={(value) => [value, 'Volume']} />
-                <Bar dataKey="amount" barSize={24} radius={[0, 4, 4, 0]}>{[{ fill: '#3b82f6' }, { fill: '#8b5cf6' }, { fill: '#ec4899' }, { fill: '#10b981' }].map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.fill} />))}</Bar>
-              </ComposedChart>
-            </ResponsiveContainer>
           </div>
         </div>
 
