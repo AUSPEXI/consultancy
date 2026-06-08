@@ -741,6 +741,26 @@ export default function AgentsPage() {
                   <div className="bg-zinc-950 rounded-lg p-4 text-xs text-zinc-300 max-h-64 overflow-y-auto prose prose-invert prose-xs max-w-none">
                     <ReactMarkdown>{r.article}</ReactMarkdown>
                   </div>
+                  {r.scoreFeedback && r.scoreFeedback.length > 0 && (
+                    <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg p-3">
+                      <p className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-1.5">Scorer Feedback</p>
+                      <ul className="space-y-1">
+                        {r.scoreFeedback.map((f, fi) => (
+                          <li key={fi} className="text-[11px] text-zinc-400 flex gap-1.5"><span className="text-amber-500">•</span>{f}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {r.facts && (
+                    <details>
+                      <summary className="text-xs text-zinc-500 cursor-pointer hover:text-zinc-300 transition-colors select-none flex items-center gap-1">
+                        <FileText className="w-3 h-3" /> View Isolated Facts (hallucination check)
+                      </summary>
+                      <div className="mt-2 bg-zinc-950 rounded-lg p-3 text-xs text-zinc-300 max-h-48 overflow-y-auto prose prose-invert prose-xs max-w-none">
+                        <ReactMarkdown>{r.facts}</ReactMarkdown>
+                      </div>
+                    </details>
+                  )}
                   <details>
                     <summary className="text-xs text-zinc-500 cursor-pointer hover:text-zinc-300 transition-colors select-none flex items-center gap-1">
                       <Code2 className="w-3 h-3" /> View JSON-LD Schema
@@ -822,7 +842,7 @@ export default function AgentsPage() {
             </div>
           </div>
 
-          {showResults && (
+          {showResults && bulkResults.length === 0 && (
             <div className="mt-12 space-y-6 animate-in slide-in-from-bottom-8 duration-700">
               <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
                 <h3 className="text-lg font-bold text-white">Orchestration Results</h3>
