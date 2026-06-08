@@ -6,6 +6,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import { Code2, Copy, CheckCircle2, RefreshCw, Globe, Zap, Shield, Layers } from 'lucide-react';
 import { checkTierAccess } from '@/constants/tiers';
+import { db } from '@/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
 
 export default function SchemaDeployPage() {
   const { user, userData, tier } = useAuth();
@@ -48,6 +50,11 @@ add_action('wp_head', function() {
     navigator.clipboard.writeText(text);
     setCopied(key);
     setTimeout(() => setCopied(null), 2000);
+    // Copying a deploy snippet (JS or WordPress) is the act of deploying — mark
+    // the onboarding quest's final step complete. Copying the URL alone doesn't.
+    if ((key === 'js' || key === 'wp') && user) {
+      updateDoc(doc(db, 'users', user.uid), { schemaDeployed: true }).catch(() => {});
+    }
   };
 
   const loadPreview = async () => {
