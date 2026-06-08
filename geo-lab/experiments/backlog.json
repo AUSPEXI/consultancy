@@ -254,18 +254,18 @@
       "note": "Run after experiments 001 and 006 to investigate interaction effects."
     },
     {
-      "id": "020",
-      "slug": "live-mode-flagship",
-      "title": "Live-Mode Flagship: Publish and Wait",
-      "hypothesis": "Statistical anchor content published on real indexed URLs will show higher parametric citation rates at 6-week re-probe than content without anchors, demonstrating training-weight GEO beyond in-context retrieval preference.",
-      "variable": "Statistical anchor presence on live published pages (not in-context)",
-      "lever": "live-parametric",
+      "id": "021",
+      "slug": "schema-scope-sitewide-vs-pagescoped",
+      "title": "Schema Scope: Site-Wide vs Page-Scoped JSON-LD",
+      "hypothesis": "If FAQPage + Organisation JSON-LD is published on every page of a site (root layout), then citation rate will be higher than the same schema published only on the /faq page, because AI crawlers may land on any page and will ingest the structured data regardless of entry point — whereas page-scoped markup is only discoverable if the crawler happens to visit that one URL.",
+      "variable": "Scope of JSON-LD injection: root layout (all pages) vs /faq page only",
+      "lever": "schema-scope",
       "predicted_winner": "B",
       "platforms": ["perplexity", "gemini"],
-      "n_per_variant": 20,
-      "priority": 20,
+      "n_per_variant": 30,
+      "priority": 21,
       "status": "queued",
-      "note": "Quarterly flagship. Requires publishing real URLs on auspexi.com or a dedicated test domain. Run after fast-mode results establish the baseline."
+      "note": "Live-mode only — fast in-context probes cannot distinguish where the JSON-LD appeared. Requires two comparable indexed sites (or a before/after on auspexi.com with a 4-week re-probe window). Builds directly on experiment 018 (JSON-LD presence vs absence) and 020 (live-mode baseline). Run after both are complete. Also tests the counterfactual that Google's crawler-duplication concern about site-wide FAQPage is real vs theoretical."
     }
   ]
 }
