@@ -122,6 +122,8 @@ Set these in **Netlify** (production) and `consultancy-next/.env.local` (local).
 | `OPENAI_API_KEY` | Citation Probe (ChatGPT) + embeddings |
 | `ANTHROPIC_API_KEY` | Citation Probe (Claude) |
 | `PERPLEXITY_API_KEY` | Citation Probe (Perplexity) |
+| `XAI_API_KEY` *(or `GROK_API_KEY`)* | Citation Probe (Grok / xAI) — optional; engine skipped if unset |
+| `DEEPSEEK_API_KEY` | Citation Probe (DeepSeek) — optional; engine skipped if unset |
 | `EXA_API_KEY` | Research crawl in the agent pipeline |
 
 ### Payments

@@ -5,8 +5,8 @@ import OpenAI from 'openai';
 // /api/cite-probe route and the scheduled /api/cron/brand-probe route, so the
 // probe logic never drifts between manual and automated runs.
 
-export type PlatformKey = 'gemini' | 'chatgpt' | 'perplexity' | 'claude';
-export const ALL_ENGINES: PlatformKey[] = ['gemini', 'chatgpt', 'perplexity', 'claude'];
+export type PlatformKey = 'gemini' | 'chatgpt' | 'perplexity' | 'claude' | 'grok' | 'deepseek';
+export const ALL_ENGINES: PlatformKey[] = ['gemini', 'chatgpt', 'perplexity', 'claude', 'grok', 'deepseek'];
 
 export type Sentiment = 'positive' | 'neutral' | 'negative';
 
@@ -271,18 +271,55 @@ async function probeClaude(query: string, brand: string, domain: string, knownFa
   }
 }
 
+// Grok (x.ai) and DeepSeek are OpenAI-compatible — same pattern as Perplexity.
+async function probeGrok(query: string, brand: string, domain: string, knownFalses: string[]): Promise<PlatformResult> {
+  const apiKey = process.env.XAI_API_KEY || process.env.GROK_API_KEY || '';
+  if (!apiKey) return SKIPPED;
+  try {
+    const client = new OpenAI({ apiKey, baseURL: 'https://api.x.ai/v1' });
+    const response = await client.chat.completions.create({
+      model: 'grok-2-latest',
+      messages: [{ role: 'user', content: query }],
+      max_tokens: 600, temperature: 0.3,
+    } as any);
+    const text = response.choices[0]?.message?.content || '';
+    return checkCitation(text, brand, domain, knownFalses);
+  } catch (e: any) {
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
+  }
+}
+
+async function probeDeepSeek(query: string, brand: string, domain: string, knownFalses: string[]): Promise<PlatformResult> {
+  const apiKey = process.env.DEEPSEEK_API_KEY || '';
+  if (!apiKey) return SKIPPED;
+  try {
+    const client = new OpenAI({ apiKey, baseURL: 'https://api.deepseek.com' });
+    const response = await client.chat.completions.create({
+      model: 'deepseek-chat',
+      messages: [{ role: 'user', content: query }],
+      max_tokens: 600, temperature: 0.3,
+    } as any);
+    const text = response.choices[0]?.message?.content || '';
+    return checkCitation(text, brand, domain, knownFalses);
+  } catch (e: any) {
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
+  }
+}
+
 // Probe one query across the requested engines. Engines not in `engines` are
 // returned as skipped without making (or paying for) an API call.
 async function probeQuery(
   query: string, brand: string, domain: string, knownFalses: string[], engines: Set<PlatformKey>,
 ): Promise<Record<PlatformKey, PlatformResult>> {
-  const [gemini, chatgpt, perplexity, claude] = await Promise.all([
+  const [gemini, chatgpt, perplexity, claude, grok, deepseek] = await Promise.all([
     engines.has('gemini') ? probeGemini(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
     engines.has('chatgpt') ? probeChatGPT(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
     engines.has('perplexity') ? probePerplexity(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
     engines.has('claude') ? probeClaude(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
+    engines.has('grok') ? probeGrok(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
+    engines.has('deepseek') ? probeDeepSeek(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
   ]);
-  return { gemini, chatgpt, perplexity, claude };
+  return { gemini, chatgpt, perplexity, claude, grok, deepseek };
 }
 
 export interface ProbeAggregate {
@@ -393,6 +430,8 @@ export function estimateProbeCost(numQueries: number, engines: Set<PlatformKey>,
     (engines.has('gemini') ? (numQueries * 500 / 1_000_000) * 0.40 : 0) +
     (engines.has('chatgpt') ? (numQueries * 800 / 1_000_000) * 0.60 : 0) +
     (engines.has('perplexity') ? numQueries * 0.005 : 0) +
-    (engines.has('claude') ? (numQueries * 800 / 1_000_000) * 4.00 : 0);
+    (engines.has('claude') ? (numQueries * 800 / 1_000_000) * 4.00 : 0) +
+    (engines.has('grok') ? (numQueries * 800 / 1_000_000) * 2.00 : 0) +
+    (engines.has('deepseek') ? (numQueries * 800 / 1_000_000) * 0.28 : 0);
   return perPass * passes;
 }

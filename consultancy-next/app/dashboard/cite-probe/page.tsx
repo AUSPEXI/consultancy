@@ -44,12 +44,7 @@ interface ProbeRun {
   activePlatforms?: number;
   sentimentBreakdown?: { positive: number; neutral: number; negative: number };
   avgPositionPct?: number | null;
-  platformRates?: {
-    gemini: number | null;
-    chatgpt: number | null;
-    perplexity: number | null;
-    claude: number | null;
-  };
+  platformRates?: Record<string, number | null>;
   results: ProbeResult[];
   timestamp: string;
   attribution?: Attribution | null;
@@ -95,6 +90,8 @@ const PLATFORM_META = {
   chatgpt:    { label: 'ChatGPT',       color: '#10a37f', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-400' },
   perplexity: { label: 'Perplexity',    color: '#22d3ee', bg: 'bg-cyan-500/10',    border: 'border-cyan-500/20',    text: 'text-cyan-400'    },
   claude:     { label: 'Claude',        color: '#d97757', bg: 'bg-orange-500/10',  border: 'border-orange-500/20',  text: 'text-orange-400'  },
+  grok:       { label: 'Grok (xAI)',    color: '#e5e7eb', bg: 'bg-zinc-500/10',    border: 'border-zinc-500/20',    text: 'text-zinc-300'    },
+  deepseek:   { label: 'DeepSeek',      color: '#8b5cf6', bg: 'bg-violet-500/10',  border: 'border-violet-500/20',  text: 'text-violet-400'  },
 } as const;
 
 type PlatformKey = keyof typeof PLATFORM_META;
@@ -107,7 +104,7 @@ export default function CiteProbePage() {
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<{ date: string; rate: number }[]>([]);
   // Persistent history from Firestore (citation_tests) — survives reloads, spans days/weeks
-  const [persistentHistory, setPersistentHistory] = useState<{ timestamp: string; citationRate: number; citedCount: number; totalQueries: number; misinformationCount: number; platformRates?: { gemini: number | null; chatgpt: number | null; perplexity: number | null; claude: number | null } | null }[]>([]);
+  const [persistentHistory, setPersistentHistory] = useState<{ timestamp: string; citationRate: number; citedCount: number; totalQueries: number; misinformationCount: number; platformRates?: Record<string, number | null> | null }[]>([]);
 
   const loadHistory = async () => {
     if (!user?.uid) return;
