@@ -9,17 +9,19 @@ AI engines (ChatGPT, Gemini, Claude, Perplexity) instead of being invisible.
 Site: https://auspexi.com
 
 ## Core product concepts (use the real names)
-- **Cite-Probe** — live citation testing across the four engines.
+- **Citation Probe** — live citation testing across ChatGPT, Gemini, Claude, Perplexity.
 - **Share of Voice (GEO)** — % of AI answers that cite you for a keyword set.
-- **Fact-Vault** — store of high-entropy, citable atomic facts.
-- **Cite-Magnet** — JSON-LD schema designed to be cited.
-- **Latent Space Moat** — 768-D semantic map of a brand's citation footprint.
-- **Citacious** — the analyst voice agent.
-- Multi-agent pipeline: crawl → extract → schema → synthesize → publish → re-probe.
+- **Fact Vault** — store of high-entropy, citable atomic facts.
+- **Schema Deploy (Cite-Magnet)** — JSON-LD schema designed to be cited, deployed via JS snippet.
+- **Latent Space Explorer** — interactive 3D UMAP visualisation of brand embeddings (768-D via Gemini text-embedding-004), showing where your brand sits in semantic space vs. competitors and anchors.
+- **Content Scorer** — Gemini-scored citeability rating (0–100) across 4 dimensions.
+- **Agent Pipeline** — Exa research → fact extraction → synthesis → schema → publish → re-probe.
+- **Brand Probe Pipeline** — scheduled autopilot: weekly probe → score → email summary.
+- **Citacious** — the AI analyst assistant in the dashboard.
 
 ## Positioning (one line)
 "Traditional SEO optimises for ranking. GEO engineers the knowledge structures
-AI cites from. Auspexi makes that deterministic instead of accidental."
+AI cites from. Auspexi makes that measurable and improvable, not guesswork."
 
 ## How to mention it (the soft CTA)
 The video's value must stand alone. At the **end** only:
