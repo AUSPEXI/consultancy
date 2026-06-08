@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { authFetch } from '@/lib/auth-fetch';
 import { checkTierAccess } from '@/constants/tiers';
@@ -8,7 +9,7 @@ import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import {
   EXPERIMENT_LEVERS, EXPERIMENT_ENGINES, ENGINE_LABELS, type PlatformKey,
 } from '@/lib/geo-experiment-levers';
-import { FlaskConical, Loader2, Trophy, Minus, Copy, Check, AlertTriangle } from 'lucide-react';
+import { FlaskConical, Loader2, Trophy, Minus, Copy, Check, AlertTriangle, SendHorizonal } from 'lucide-react';
 
 interface VariantTally { cited: number; trials: number; rate: number }
 interface EngineResult { engine: PlatformKey; a: VariantTally; b: VariantTally; skipped: boolean }
@@ -31,7 +32,15 @@ function Bar({ rate, color }: { rate: number; color: string }) {
 
 export default function ExperimentsPage() {
   const { tier, role } = useAuth();
+  const router = useRouter();
   const hasAccess = role === 'admin' || checkTierAccess(tier, 'Pro');
+
+  const sendToPipeline = (winner: string) => {
+    // The Content Scorer (publish gateway) hydrates from this key on mount.
+    localStorage.setItem('contentScorer_content', winner);
+    localStorage.removeItem('contentScorer_result');
+    router.push('/dashboard/content-scorer');
+  };
 
   const [content, setContent] = useState('');
   const [topic, setTopic] = useState('');
@@ -237,14 +246,22 @@ export default function ExperimentsPage() {
           {/* Winning variant to copy */}
           {pooled.winner === 'B' && (
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-semibold text-white">Winning version (copy it)</p>
-                <button
-                  onClick={() => { navigator.clipboard.writeText(data.variantB); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-                  className="flex items-center gap-1.5 text-xs text-pink-400 hover:text-pink-300"
-                >
-                  {copied ? <><Check className="w-3.5 h-3.5" /> Copied</> : <><Copy className="w-3.5 h-3.5" /> Copy</>}
-                </button>
+              <div className="flex items-center justify-between mb-2 gap-3">
+                <p className="text-sm font-semibold text-white">Winning version</p>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(data.variantB); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+                    className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-200"
+                  >
+                    {copied ? <><Check className="w-3.5 h-3.5" /> Copied</> : <><Copy className="w-3.5 h-3.5" /> Copy</>}
+                  </button>
+                  <button
+                    onClick={() => sendToPipeline(data.variantB)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-xs font-medium transition-colors"
+                  >
+                    <SendHorizonal className="w-3.5 h-3.5" /> Send to Content Pipeline
+                  </button>
+                </div>
               </div>
               <pre className="text-xs text-zinc-300 whitespace-pre-wrap max-h-72 overflow-y-auto bg-zinc-950 border border-zinc-800 rounded-lg p-3">{data.variantB}</pre>
             </div>
