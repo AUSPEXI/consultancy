@@ -59,7 +59,7 @@ jobs:
       - name: Commit results back to repo
         run: |
           git config user.name "GEO Lab Bot"
-          git config user.email "geo-lab@auspexi.com"
+          git config user.email "geo-lab@l8entspace.com"
           git add geo-lab/experiments/ geo-lab/lab-state.json
           # Only commit if there are staged changes
           if git diff --cached --quiet; then

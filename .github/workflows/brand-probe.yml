@@ -30,7 +30,7 @@ jobs:
           if [ ${#missing[@]} -gt 0 ]; then
             echo "❌ Missing GitHub Secrets: ${missing[*]}"
             echo "Fix: repo → Settings → Secrets and variables → Actions"
-            echo "  APP_URL      = https://auspexi.com"
+            echo "  APP_URL      = https://l8entspace.com"
             echo "  CRON_SECRET  = copy the CRON_SECRET value from Netlify env vars"
             exit 1
           fi
