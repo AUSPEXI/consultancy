@@ -109,7 +109,7 @@ export function PitchDeckViewer() {
               <div className="p-2 bg-pink-500/10 rounded-lg hidden sm:block">
                 <Maximize2 className="w-4 h-4 text-pink-400" />
               </div>
-              <span className="text-sm font-medium text-white">Auspexi Series A Deck</span>
+              <span className="text-sm font-medium text-white">L8EntSpace Series A Deck</span>
               <span className="text-xs font-mono text-zinc-500">{currentSlide + 1} / {SLIDES.length}</span>
             </div>
             <button
@@ -137,7 +137,7 @@ export function PitchDeckViewer() {
           <div className="p-2 bg-pink-500/10 rounded-lg hidden sm:block">
             <Maximize2 className="w-4 h-4 text-pink-400" />
           </div>
-          <span className="text-xs md:text-sm font-medium text-white">Auspexi Series A Deck</span>
+          <span className="text-xs md:text-sm font-medium text-white">L8EntSpace Series A Deck</span>
           <span className="text-[10px] md:text-xs font-mono text-zinc-500 ml-1">{currentSlide + 1} / {SLIDES.length}</span>
         </div>
         <button

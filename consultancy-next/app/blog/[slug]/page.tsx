@@ -20,16 +20,16 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { slug } = await params;
   const post = blogPosts.find((p) => p.slug === slug);
-  if (!post) return { title: 'Post Not Found | Auspexi' };
+  if (!post) return { title: 'Post Not Found | L8EntSpace' };
   return {
-    title: `${post.title} | Auspexi`,
+    title: `${post.title} | L8EntSpace`,
     description: post.excerpt,
-    metadataBase: new URL('https://auspexi.com'),
-    alternates: { canonical: `https://auspexi.com/blog/${post.slug}` },
+    metadataBase: new URL('https://l8entspace.com'),
+    alternates: { canonical: `https://l8entspace.com/blog/${post.slug}` },
     openGraph: {
       title: post.title,
       description: post.excerpt,
-      url: `https://auspexi.com/blog/${post.slug}`,
+      url: `https://l8entspace.com/blog/${post.slug}`,
       type: 'article',
     },
     twitter: {
@@ -53,21 +53,21 @@ export default async function BlogPostPage(
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.excerpt,
-    url: `https://auspexi.com/blog/${post.slug}`,
+    url: `https://l8entspace.com/blog/${post.slug}`,
     datePublished: post.date,
-    image: `https://auspexi.com/blog/${post.slug}/opengraph-image`,
+    image: `https://l8entspace.com/blog/${post.slug}/opengraph-image`,
     articleSection: post.category,
     author: {
       '@type': 'Organization',
-      name: 'Auspexi',
-      url: 'https://auspexi.com',
+      name: 'L8EntSpace',
+      url: 'https://l8entspace.com',
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Auspexi',
-      logo: { '@type': 'ImageObject', url: 'https://auspexi.com/auspexi-logo.png' },
+      name: 'L8EntSpace',
+      logo: { '@type': 'ImageObject', url: 'https://l8entspace.com/l8entspace-logo.svg' },
     },
-    isPartOf: { '@id': 'https://auspexi.com/blog' },
+    isPartOf: { '@id': 'https://l8entspace.com/blog' },
   };
 
   return (
@@ -88,7 +88,7 @@ export default async function BlogPostPage(
               <span>•</span>
               <span>{post.date}</span>
             </div>
-            <div className="w-full min-h-[300px] md:min-h-[400px] flex rounded-2xl overflow-hidden relative bg-[#0B0E14] group shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+            <div className="w-full min-h-[300px] md:min-h-[400px] flex rounded-2xl overflow-hidden relative bg-[#0B0E14] group shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
               <BlogHero title={post.title} category={post.category} compact={false} />
             </div>
           </div>
@@ -127,12 +127,12 @@ export default async function BlogPostPage(
               </div>
             )}
 
-            <div className="bg-zinc-900/50 rounded-xl p-8 my-12 text-center shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+            <div className="bg-zinc-900/50 rounded-xl p-8 my-12 text-center shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
               <h3 className="text-2xl font-bold mb-4 mt-0">Ready to dominate AI search?</h3>
               <p className="text-zinc-400 mb-6">
                 Start extracting high-entropy facts and tracking your Share of Voice today.
               </p>
-              <Link href="/" className="inline-flex items-center justify-center bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+              <Link href="/" className="inline-flex items-center justify-center bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
                 Get Your Free Report
               </Link>
             </div>

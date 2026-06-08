@@ -3,19 +3,19 @@ import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
 
 export const metadata: Metadata = {
-  title: 'Privacy & Cookie Policy | Auspexi',
-  description: 'How Auspexi collects, uses, and protects your personal data. UK GDPR compliant — covering AI data processing, voice data, cookies, and your data rights.',
-  metadataBase: new URL('https://auspexi.com'),
-  alternates: { canonical: 'https://auspexi.com/privacy' },
+  title: 'Privacy & Cookie Policy | L8EntSpace',
+  description: 'How L8EntSpace collects, uses, and protects your personal data. UK GDPR compliant — covering AI data processing, voice data, cookies, and your data rights.',
+  metadataBase: new URL('https://l8entspace.com'),
+  alternates: { canonical: 'https://l8entspace.com/privacy' },
   openGraph: {
-    title: 'Privacy & Cookie Policy | Auspexi',
-    description: 'How Auspexi collects, uses, and protects your personal data in compliance with UK GDPR.',
-    url: 'https://auspexi.com/privacy',
+    title: 'Privacy & Cookie Policy | L8EntSpace',
+    description: 'How L8EntSpace collects, uses, and protects your personal data in compliance with UK GDPR.',
+    url: 'https://l8entspace.com/privacy',
     type: 'website',
   },
   twitter: {
     card: 'summary',
-    title: 'Privacy & Cookie Policy | Auspexi',
+    title: 'Privacy & Cookie Policy | L8EntSpace',
     description: 'UK GDPR-compliant privacy policy covering AI data processing, voice data, and your rights.',
   },
 };
@@ -24,9 +24,9 @@ const privacyJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
   name: 'Privacy & Cookie Policy',
-  url: 'https://auspexi.com/privacy',
-  description: 'Auspexi privacy and cookie policy — UK GDPR compliant.',
-  isPartOf: { '@id': 'https://auspexi.com/#website' },
+  url: 'https://l8entspace.com/privacy',
+  description: 'L8EntSpace privacy and cookie policy — UK GDPR compliant.',
+  isPartOf: { '@id': 'https://l8entspace.com/#website' },
 };
 
 export default function PrivacyPolicyPage() {
@@ -38,15 +38,15 @@ export default function PrivacyPolicyPage() {
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-bold font-heading mb-4">Privacy &amp; Cookie Policy</h1>
           <p className="text-zinc-400 mb-2 font-mono text-xs">Last updated: May 2026 &nbsp;·&nbsp; Version 2.0</p>
-          <p className="text-zinc-500 text-xs mb-12">Applies to all users of auspexi.com and the Auspexi platform.</p>
+          <p className="text-zinc-500 text-xs mb-12">Applies to all users of l8entspace.com and the L8EntSpace platform.</p>
 
           <div className="prose prose-invert prose-zinc max-w-none text-sm leading-relaxed space-y-10 font-sans">
 
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-white font-heading">1. Who We Are</h2>
-              <p className="text-zinc-300">Auspexi (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) is a Generative Engine Optimization (GEO) platform. We are the <strong>data controller</strong> responsible for your personal data collected through this website and platform.</p>
-              <p className="text-zinc-300 mt-3"><strong>Contact:</strong> For all privacy matters, write to us at <a href="mailto:sales@auspexi.com" className="text-pink-400 hover:text-pink-300">sales@auspexi.com</a> with the subject line &ldquo;Privacy Request&rdquo;. We aim to respond within 72 hours and will always respond within the statutory 30-day period.</p>
-              <p className="text-zinc-400 mt-3 text-xs">Note: If you are a UK business using Auspexi to process personal data about third parties on your behalf, please contact us to discuss a Data Processing Agreement (DPA).</p>
+              <p className="text-zinc-300">L8EntSpace (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) is a Generative Engine Optimization (GEO) platform. We are the <strong>data controller</strong> responsible for your personal data collected through this website and platform.</p>
+              <p className="text-zinc-300 mt-3"><strong>Contact:</strong> For all privacy matters, write to us at <a href="mailto:sales@l8entspace.com" className="text-pink-400 hover:text-pink-300">sales@l8entspace.com</a> with the subject line &ldquo;Privacy Request&rdquo;. We aim to respond within 72 hours and will always respond within the statutory 30-day period.</p>
+              <p className="text-zinc-400 mt-3 text-xs">Note: If you are a UK business using L8EntSpace to process personal data about third parties on your behalf, please contact us to discuss a Data Processing Agreement (DPA).</p>
             </section>
 
             <section>
@@ -186,7 +186,7 @@ export default function PrivacyPolicyPage() {
 
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-white font-heading">8. Your Rights Under UK GDPR</h2>
-              <p className="text-zinc-300 mb-4">You have the following rights regarding your personal data. To exercise any of them, email <a href="mailto:sales@auspexi.com" className="text-pink-400 hover:text-pink-300">sales@auspexi.com</a> with the subject &ldquo;Privacy Request&rdquo;. We will respond within 30 days and will not charge a fee for reasonable requests.</p>
+              <p className="text-zinc-300 mb-4">You have the following rights regarding your personal data. To exercise any of them, email <a href="mailto:sales@l8entspace.com" className="text-pink-400 hover:text-pink-300">sales@l8entspace.com</a> with the subject &ldquo;Privacy Request&rdquo;. We will respond within 30 days and will not charge a fee for reasonable requests.</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {[
                   { right: 'Right of Access', desc: 'Request a copy of all personal data we hold about you.' },
@@ -219,7 +219,7 @@ export default function PrivacyPolicyPage() {
                 <li>Role-based access control — staff access is need-to-know only</li>
                 <li>Firestore security rules restricting data access to the owning user UID</li>
                 <li>Automated audit trails for all data mutations</li>
-                <li>Multi-tenant data isolation — your data is never shared with or visible to other Auspexi customers</li>
+                <li>Multi-tenant data isolation — your data is never shared with or visible to other L8EntSpace customers</li>
               </ul>
               <p className="text-zinc-400 mt-3 text-xs">No system is 100% secure. In the event of a data breach that poses a risk to your rights and freedoms, we will notify the ICO within 72 hours and notify affected individuals without undue delay.</p>
             </section>
@@ -231,7 +231,7 @@ export default function PrivacyPolicyPage() {
 
             <section className="bg-zinc-900/30 border border-pink-500/20 rounded-2xl p-6">
               <h2 className="text-xl font-semibold mb-3 text-white font-heading">Contact &amp; Complaints</h2>
-              <p className="text-zinc-300 text-sm">For any privacy questions or to exercise your rights: <a href="mailto:sales@auspexi.com" className="text-pink-400 hover:text-pink-300">sales@auspexi.com</a></p>
+              <p className="text-zinc-300 text-sm">For any privacy questions or to exercise your rights: <a href="mailto:sales@l8entspace.com" className="text-pink-400 hover:text-pink-300">sales@l8entspace.com</a></p>
               <p className="text-zinc-300 text-sm mt-2">To complain to the UK supervisory authority: <a href="https://ico.org.uk/make-a-complaint/" className="text-pink-400 hover:text-pink-300" target="_blank" rel="noopener noreferrer">ico.org.uk/make-a-complaint</a> or call 0303 123 1113.</p>
               <p className="text-zinc-500 text-xs mt-4">You have the right to complain to the ICO at any time. However, we would appreciate the opportunity to address your concerns first.</p>
             </section>

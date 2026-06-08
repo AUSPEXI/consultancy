@@ -49,7 +49,7 @@ export default function RoadmapPage() {
                   transition={{ delay: 0.1, duration: 0.5 }}
                   className={`relative flex flex-col md:flex-row items-center ${isEven ? 'md:flex-row-reverse' : ''}`}
                 >
-                  <div className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-zinc-950 border-4 border-zinc-900 items-center justify-center z-10 shadow-[0_0_15px_rgba(236,72,153,0.15)]">
+                  <div className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-zinc-950 border-4 border-zinc-900 items-center justify-center z-10 shadow-[0_0_15px_rgba(255,20,147,0.15)]">
                     <div className="w-4 h-4 rounded-full bg-pink-500 animate-pulse"></div>
                   </div>
                   <div className="w-full md:w-1/2 flex justify-center">
@@ -59,7 +59,7 @@ export default function RoadmapPage() {
                         <div className="absolute top-[20%] left-[20%] w-[40%] h-[40%] bg-pink-500/10 rounded-full blur-[40px] mix-blend-screen pointer-events-none group-hover:bg-pink-500/20 transition-all" />
                         <div className="relative z-10">
                           <div className="flex items-center gap-4 mb-6">
-                            <div className="w-12 h-12 shrink-0 rounded-full bg-zinc-950 border border-pink-500/50 shadow-[0_0_15px_rgba(236,72,153,0.3)] flex items-center justify-center group-hover:scale-110 transition-transform p-2">
+                            <div className="w-12 h-12 shrink-0 rounded-full bg-zinc-950 border border-pink-500/50 shadow-[0_0_15px_rgba(255,20,147,0.3)] flex items-center justify-center group-hover:scale-110 transition-transform p-2">
                               {React.createElement(item.icon, { className: "w-6 h-6 text-pink-400" })}
                             </div>
                             <span className="px-3 py-1.5 text-xs font-bold rounded-full bg-zinc-950 text-zinc-200 border border-zinc-800 backdrop-blur-md font-mono">{item.status}</span>

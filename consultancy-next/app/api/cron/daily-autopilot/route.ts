@@ -27,7 +27,7 @@ async function buildEmailHtml(topic: string, brand: string, article: string, sch
 
   return `<div style="font-family:sans-serif;max-width:680px;margin:0 auto;background:#09090b;color:#fafafa;border-radius:8px;border:1px solid #27272a">
     <div style="padding:24px 32px;border-bottom:1px solid #27272a">
-      <p style="margin:0;font-size:11px;color:#71717a;text-transform:uppercase;letter-spacing:.1em">Auspexi · Daily Autopilot</p>
+      <p style="margin:0;font-size:11px;color:#71717a;text-transform:uppercase;letter-spacing:.1em">L8EntSpace · Daily Autopilot</p>
       <h1 style="margin:6px 0 4px;font-size:20px;font-weight:700;color:#fff">New GEO Article Ready</h1>
       <p style="margin:0;font-size:13px;color:#71717a">${date}</p>
     </div>
@@ -153,7 +153,7 @@ async function sendEmail(toEmail: string, topic: string, brand: string, article:
     });
     const html = await buildEmailHtml(topic, brand, article, schema);
     await transporter.sendMail({
-      from: `"Auspexi Autopilot" <${user}>`,
+      from: `"L8EntSpace Autopilot" <${user}>`,
       to: toEmail,
       subject: `GEO Article Ready: ${topic}`,
       html,

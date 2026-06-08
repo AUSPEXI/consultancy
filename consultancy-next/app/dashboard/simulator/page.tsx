@@ -117,7 +117,7 @@ export default function SimulatorPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-sm font-medium text-zinc-400 mb-1">Target Brand</label>
-            <input type="text" value={brand} onChange={e => setBrand(e.target.value)} placeholder="e.g., Auspexi" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-pink-500" />
+            <input type="text" value={brand} onChange={e => setBrand(e.target.value)} placeholder="e.g., L8EntSpace" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-pink-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-zinc-400 mb-1">User Query</label>

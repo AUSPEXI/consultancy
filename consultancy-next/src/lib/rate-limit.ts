@@ -1,5 +1,5 @@
 /**
- * AUSPEXI Rate Limiting Engine
+ * L8ENTSPACE Rate Limiting Engine
  * 
  * Implements token-bucket rate limiting per LLM provider with exponential backoff
  * Prevents API bans and guarantees sustainable 10K+/day query volume

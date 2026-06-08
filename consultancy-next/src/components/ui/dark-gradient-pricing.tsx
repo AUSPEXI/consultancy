@@ -59,7 +59,7 @@ export const PricingCard = ({
         className={cn(
           "relative flex h-full flex-col rounded-3xl border p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl",
           isPopular 
-            ? "border-transparent bg-zinc-900/80 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]"
+            ? "border-transparent bg-zinc-900/80 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]"
             : "border-white/10 bg-zinc-950/50 hover:border-white/20",
           className
         )}
@@ -102,7 +102,7 @@ export const PricingCard = ({
 
         <Button
           className={cn(
-            "w-full rounded-xl h-14 text-base font-bold transition-all duration-300 mt-auto shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]",
+            "w-full rounded-xl h-14 text-base font-bold transition-all duration-300 mt-auto shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]",
             isPopular
               ? "bg-pink-600 text-white hover:bg-pink-500 hover:shadow-lg hover:shadow-pink-500/25"
               : "bg-white text-black hover:bg-zinc-200"

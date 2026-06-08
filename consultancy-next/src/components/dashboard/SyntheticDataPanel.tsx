@@ -9,7 +9,7 @@ import { Database, TrendingUp, Zap, ShieldAlert, BarChart3, ChevronDown } from '
 import { useGeoData } from '@/hooks/useGeoData';
 
 const BRAND_COLORS: Record<string, string> = {
-  AcmeCloud: '#ec4899',
+  AcmeCloud: '#ff1493',
   ClearSignal: '#8b5cf6',
   ContentEdge: '#06b6d4',
   DataPulse: '#10b981',
@@ -23,7 +23,7 @@ const ENGINE_COLORS: Record<string, string> = {
   ChatGPT: '#10b981',
   Claude: '#f59e0b',
   'Google AI': '#3b82f6',
-  Perplexity: '#ec4899',
+  Perplexity: '#ff1493',
 };
 
 const DECAY_BADGE: Record<string, string> = {
@@ -166,7 +166,7 @@ export function SyntheticDataPanel({ realPlatformRates, realArticles = [], userB
                         <Tooltip contentStyle={{ backgroundColor: '#09090b', border: '1px solid #27272a', borderRadius: '8px' }} itemStyle={{ fontSize: 11 }} />
                         <Bar dataKey="sov" radius={[4, 4, 0, 0]}>
                           {data.sovByBrand.map(entry => (
-                            <Cell key={entry.brand} fill={BRAND_COLORS[entry.brand] || '#ec4899'} />
+                            <Cell key={entry.brand} fill={BRAND_COLORS[entry.brand] || '#ff1493'} />
                           ))}
                         </Bar>
                       </BarChart>
@@ -239,7 +239,7 @@ export function SyntheticDataPanel({ realPlatformRates, realArticles = [], userB
                         <RadarChart data={radarData}>
                           <PolarGrid stroke="#27272a" />
                           <PolarAngleAxis dataKey="subject" tick={{ fill: '#a1a1aa', fontSize: 11 }} />
-                          <Radar dataKey="value" stroke="#ec4899" fill="#ec4899" fillOpacity={0.2} strokeWidth={2} />
+                          <Radar dataKey="value" stroke="#ff1493" fill="#ff1493" fillOpacity={0.2} strokeWidth={2} />
                           <Tooltip contentStyle={{ backgroundColor: '#09090b', border: '1px solid #27272a', borderRadius: '8px' }} />
                         </RadarChart>
                       </ResponsiveContainer>
@@ -428,7 +428,7 @@ export function SyntheticDataPanel({ realPlatformRates, realArticles = [], userB
                       <XAxis dataKey="brand" stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} />
                       <YAxis stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} domain={[0, 100]} />
                       <Tooltip contentStyle={{ backgroundColor: '#09090b', border: '1px solid #27272a', borderRadius: '8px' }} />
-                      <Bar dataKey="content_score" name="Content" fill="#ec4899" radius={[2, 2, 0, 0]} maxBarSize={14} />
+                      <Bar dataKey="content_score" name="Content" fill="#ff1493" radius={[2, 2, 0, 0]} maxBarSize={14} />
                       <Bar dataKey="entity_density" name="Entity Density" fill="#8b5cf6" radius={[2, 2, 0, 0]} maxBarSize={14} />
                       <Bar dataKey="statistical_anchors" name="Stat Anchors" fill="#06b6d4" radius={[2, 2, 0, 0]} maxBarSize={14} />
                       <Bar dataKey="inverted_pyramid" name="Inv. Pyramid" fill="#10b981" radius={[2, 2, 0, 0]} maxBarSize={14} />
@@ -437,7 +437,7 @@ export function SyntheticDataPanel({ realPlatformRates, realArticles = [], userB
                   </ResponsiveContainer>
                 </div>
                 <div className="flex gap-4 flex-wrap">
-                  {[['Content', '#ec4899'], ['Entity Density', '#8b5cf6'], ['Stat Anchors', '#06b6d4'], ['Inv. Pyramid', '#10b981'], ['Entropy', '#f59e0b']].map(([label, color]) => (
+                  {[['Content', '#ff1493'], ['Entity Density', '#8b5cf6'], ['Stat Anchors', '#06b6d4'], ['Inv. Pyramid', '#10b981'], ['Entropy', '#f59e0b']].map(([label, color]) => (
                     <div key={label} className="flex items-center gap-1.5">
                       <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: color }} />
                       <span className="text-[10px] text-zinc-400">{label}</span>

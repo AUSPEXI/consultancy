@@ -57,7 +57,7 @@ const [finding, design, channelStrategy, brandContext] = await Promise.all([
   fs.readFile(findingPath, 'utf8').catch(() => { throw new Error('FINDING.md not found — run analyze.mjs first'); }),
   fs.readFile(designPath, 'utf8').catch(() => ''),
   fs.readFile(path.join(contextDir, 'youtube-channel.md'), 'utf8'),
-  fs.readFile(path.join(contextDir, 'auspexi-brand.md'), 'utf8'),
+  fs.readFile(path.join(contextDir, 'l8entspace-brand.md'), 'utf8'),
 ]);
 
 const variantFiles = await fs.readdir(path.join(experimentDir, 'variants')).catch(() => []);
@@ -77,7 +77,7 @@ The audience: founders, marketers, and SEO/AEO practitioners who are smart, data
 Hard rules:
 - The number in the title MUST match the exact figure in FINDING.md.
 - Null results get honest titles (e.g. "Turns out it doesn't matter — I tested 240 prompts").
-- Auspexi soft CTA goes at the END of the script only, using the exact approved language.
+- L8EntSpace soft CTA goes at the END of the script only, using the exact approved language.
 - Spoken script target: 1,200–1,800 words (8–12 min at speaking pace).
 - Include [ON SCREEN:] cues and [B-ROLL:] suggestions throughout the script.`;
 
@@ -121,8 +121,8 @@ Include real numbers from the finding.
 <DESCRIPTION_MD>
 [150-word SEO description with finding in first sentence]
 [5–7 chapter timestamps matching the script]
-[Links section: Auspexi website, experiment folder placeholder, related videos placeholder]
-[Auspexi™ on first mention]
+[Links section: L8EntSpace website, experiment folder placeholder, related videos placeholder]
+[L8EntSpace™ on first mention]
 </DESCRIPTION_MD>
 
 <PINNED_COMMENT_MD>

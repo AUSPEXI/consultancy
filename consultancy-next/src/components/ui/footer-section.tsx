@@ -41,8 +41,8 @@ export function Footerdemo() {
           {/* Brand + Newsletter */}
           <div className="relative">
             <div className="flex items-center gap-3 mb-3">
-              <img src="/auspexi-logo.png" alt="Auspexi" className="w-8 h-8 object-contain" />
-              <span className="font-heading text-xl font-bold text-white tracking-widest">AUSPEXI</span>
+              <img src="/l8entspace-logo.svg" alt="L8EntSpace" className="w-8 h-8 object-contain" />
+              <span className="font-heading text-xl font-bold text-white tracking-widest">L8<span className="text-pink-500">ENT</span>SPACE</span>
             </div>
             <p className="mb-6 text-sm text-zinc-400">Master Brand Visibility in the Era of AI Search.</p>
             <form className="relative" onSubmit={handleSubscribe}>
@@ -94,12 +94,12 @@ export function Footerdemo() {
             <h3 className="mb-4 text-sm font-semibold text-white font-heading">Follow Us</h3>
             <div className="mb-6 flex flex-wrap gap-3">
               {[
-                { href: 'https://x.com/Auspexi', label: 'X (formerly Twitter)', Icon: XIcon },
-                { href: 'https://www.instagram.com/auspexidotcom/', label: 'Instagram', Icon: Instagram },
-                { href: 'https://www.tiktok.com/@auspexi.com', label: 'TikTok', Icon: TiktokIcon },
+                { href: 'https://x.com/L8EntSpace', label: 'X (formerly Twitter)', Icon: XIcon },
+                { href: 'https://www.instagram.com/l8entspacedotcom/', label: 'Instagram', Icon: Instagram },
+                { href: 'https://www.tiktok.com/@l8entspace.com', label: 'TikTok', Icon: TiktokIcon },
                 { href: 'https://www.youtube.com/channel/UCYcTIGhBKY_IIx5WcM68zdg', label: 'YouTube', Icon: Youtube },
                 { href: 'https://www.reddit.com/user/Gold-Charge-6536/', label: 'Reddit', Icon: MessageSquare },
-                { href: 'https://www.linkedin.com/company/auspexi', label: 'LinkedIn', Icon: LinkedinIcon },
+                { href: 'https://www.linkedin.com/company/l8entspace', label: 'LinkedIn', Icon: LinkedinIcon },
               ].map(({ href, label, Icon }) => (
                 <a
                   key={label}
@@ -118,7 +118,7 @@ export function Footerdemo() {
 
         {/* Bottom bar */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-zinc-800 pt-8 text-center md:flex-row">
-          <p className="text-sm text-zinc-500">&copy; {new Date().getFullYear()} Auspexi. All rights reserved.</p>
+          <p className="text-sm text-zinc-500">&copy; {new Date().getFullYear()} L8EntSpace. All rights reserved.</p>
           <nav className="flex gap-6 text-sm">
             <Link href="/privacy" className="transition-colors hover:text-white">Privacy Policy</Link>
             <Link href="/terms" className="transition-colors hover:text-white">Terms of Service</Link>

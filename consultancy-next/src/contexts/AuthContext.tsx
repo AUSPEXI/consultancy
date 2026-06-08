@@ -66,7 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (currentUser) {
         const userDocRef = doc(db, 'users', currentUser.uid)
-        const isAdmin = currentUser.email === 'hopiumcalculator@gmail.com' || currentUser.email === 'sales@auspexi.com'
+        const isAdmin = currentUser.email === 'hopiumcalculator@gmail.com' || currentUser.email === 'sales@l8entspace.com'
         const defaultTier = currentUser.email === 'hopiumcalculator@gmail.com' ? 'Enterprise' : 'Free'
 
         // Resolve role and tier immediately from email so tier-gated pages don't flash

@@ -7,14 +7,14 @@ Paste the block below into a new Claude Code session opened in the `geo-lab/` fo
 ```
 You are the research engineer for the GEO Lab — a Claude Code project that runs
 rigorous A/B experiments on LLM citation behaviour and turns the results into
-YouTube videos promoting Gwylym Pryce-Owen and Auspexi (https://auspexi.com).
+YouTube videos promoting Gwylym Pryce-Owen and L8EntSpace (https://l8entspace.com).
 
 Read CLAUDE.md first — it is the complete operating context for this lab.
 
 Then read:
 - context/geo-principles.md
 - context/experiment-methodology.md
-- context/auspexi-brand.md
+- context/l8entspace-brand.md
 - context/youtube-channel.md
 
 The lab has four specialist agents (in .claude/agents/) and four slash commands:
@@ -55,28 +55,28 @@ ANTHROPIC_API_KEY=      # Anthropic console
 All four are optional individually — the probe skips platforms with missing keys.
 You need at least two to run a meaningful comparative experiment.
 
-## Optional: Auspexi platform integration
+## Optional: L8EntSpace platform integration
 
-If you want to run probes against your live Auspexi Cite-Probe pipeline
+If you want to run probes against your live L8EntSpace Cite-Probe pipeline
 (instead of the lab's direct probe script), set:
 
 ```
-AUSPEXI_API_URL=https://auspexi.com
-AUSPEXI_FIREBASE_ID_TOKEN=<your Firebase ID token from the dashboard>
+L8ENTSPACE_API_URL=https://l8entspace.com
+L8ENTSPACE_FIREBASE_ID_TOKEN=<your Firebase ID token from the dashboard>
 ```
 
-Then in DESIGN.md you can specify `probe_mode: auspexi` and the probe runner
+Then in DESIGN.md you can specify `probe_mode: l8entspace` and the probe runner
 will call your `/api/cite-probe` endpoint instead of calling the LLMs directly.
 This lets experiments use the same logic that runs in production.
 
 ## Optional: publish findings to the dashboard
 
 When an experiment completes, the orchestrator's analyze phase can push the
-verdict into the Auspexi dashboard's content-recommendation loop (it appears as
+verdict into the L8EntSpace dashboard's content-recommendation loop (it appears as
 a "Lab-Validated GEO Lever" on the Content Scorer). Set:
 
 ```
-DASHBOARD_URL=https://auspexi.com         # the consultancy-next deployment
+DASHBOARD_URL=https://l8entspace.com         # the consultancy-next deployment
 GEO_FINDINGS_SECRET=<shared secret>       # must match the dashboard's env var
 ```
 

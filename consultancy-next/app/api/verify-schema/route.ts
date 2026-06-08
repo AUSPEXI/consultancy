@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     let html = '';
     try {
       const res = await fetch(url, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AuspexiBot/1.0; +https://auspexi.com)' },
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; L8EntSpaceBot/1.0; +https://l8entspace.com)' },
         signal: AbortSignal.timeout(10000),
       });
       html = await res.text();

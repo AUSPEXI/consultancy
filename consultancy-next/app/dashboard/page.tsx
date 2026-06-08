@@ -36,7 +36,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-8 text-center">
         <div>
-          <h1 className="font-heading text-3xl font-bold tracking-widest mb-2">AUSPEXI</h1>
+          <h1 className="font-heading text-3xl font-bold tracking-widest mb-2">L8ENTSPACE</h1>
           <p className="text-zinc-400 text-sm">Generative Engine Optimization Platform</p>
         </div>
 
@@ -72,7 +72,7 @@ export default function DashboardPage() {
         </div>
 
         <a href="/" className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors">
-          ← Back to auspexi.com
+          ← Back to l8entspace.com
         </a>
       </div>
     </div>

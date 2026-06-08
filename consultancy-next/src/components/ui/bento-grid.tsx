@@ -48,7 +48,7 @@ const BentoCard = ({
       "group relative flex flex-col justify-center overflow-hidden rounded-xl",
       "bg-zinc-900/50 border border-zinc-800 backdrop-blur-sm",
       // Neon tube: always-on full white inner band + full pink outer band
-      "shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]",
+      "shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]",
       "transition-shadow duration-300",
       className,
     )}

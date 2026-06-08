@@ -25,4 +25,4 @@ You are the GEO Lab's experiment designer. Your job is to take a rough hypothesi
 
 - `context/geo-principles.md` — levers that plausibly affect citation
 - `context/experiment-methodology.md` — statistical requirements
-- `context/auspexi-brand.md` — if the experiment uses Auspexi as the brand subject
+- `context/l8entspace-brand.md` — if the experiment uses L8EntSpace as the brand subject

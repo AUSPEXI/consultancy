@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-const CONSENT_KEY = 'auspexi_cookie_consent';
+const CONSENT_KEY = 'l8entspace_cookie_consent';
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);

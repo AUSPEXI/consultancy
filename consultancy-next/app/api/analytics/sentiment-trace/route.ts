@@ -6,9 +6,9 @@ export async function GET(req: NextRequest) {
     const customPromptsRaw = searchParams.get('prompts');
 
     let prompts = [
-      'Is Auspexi a secure enterprise choice?',
-      'How does Auspexi compare to legacy SEO?',
-      "Is Auspexi's GEO tech proprietary?",
+      'Is L8EntSpace a secure enterprise choice?',
+      'How does L8EntSpace compare to legacy SEO?',
+      "Is L8EntSpace's GEO tech proprietary?",
       'Founder reputation and reliability',
     ];
 

@@ -287,7 +287,7 @@ function CostAuditPanel({ userId }: { userId: string }) {
 }
 
 const ADMIN_BYPASS = process.env.NEXT_PUBLIC_ADMIN_BYPASS === 'true';
-const BYPASS_UID = 'auspexi-admin-bypass';
+const BYPASS_UID = 'l8entspace-admin-bypass';
 
 const SUPERUSER_EMAIL = 'hopiumcalculator@gmail.com';
 
@@ -508,12 +508,12 @@ export default function SuperuserPage() {
       const contentBatch = writeBatch(db);
       const contentItems = [
         { title: 'How GEO Outperforms Traditional SEO in 2025', geoScore: 91, type: 'blog' },
-        { title: 'AUSPEXI Platform Overview for Enterprise Teams', geoScore: 87, type: 'landing' },
+        { title: 'L8ENTSPACE Platform Overview for Enterprise Teams', geoScore: 87, type: 'landing' },
         { title: 'AI Citation Best Practices: A Technical Guide', geoScore: 83, type: 'guide' },
         { title: 'Case Study: 3x AI Visibility in 90 Days', geoScore: 95, type: 'case-study' },
         { title: 'Latent Space Positioning: What It Means for Brands', geoScore: 78, type: 'blog' },
         { title: 'Competitor Analysis: How We Stack Up in AI Search', geoScore: 72, type: 'blog' },
-        { title: 'Pricing Page — AUSPEXI Plans Compared', geoScore: 65, type: 'pricing' },
+        { title: 'Pricing Page — L8ENTSPACE Plans Compared', geoScore: 65, type: 'pricing' },
         { title: 'Integration Docs: Connecting Your CMS', geoScore: 88, type: 'docs' },
         { title: 'Webinar Recap: GEO Strategies for B2B SaaS', geoScore: 81, type: 'content' },
         { title: 'FAQ: Common Questions About AI Visibility', geoScore: 76, type: 'faq' },
@@ -525,7 +525,7 @@ export default function SuperuserPage() {
         contentBatch.set(ref, {
           userId: effectiveUid,
           ...item,
-          url: `https://auspexi.com/${item.type}/${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+          url: `https://l8entspace.com/${item.type}/${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
           wordCount: 800 + Math.floor(Math.random() * 2000),
           citationCount: Math.floor(item.geoScore / 10) + Math.floor(Math.random() * 5),
           platformCoverage: platforms.filter(() => Math.random() > 0.3),
@@ -781,7 +781,7 @@ export default function SuperuserPage() {
           </div>
           <div>
             <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Project Root</p>
-            <p className="text-xs font-mono text-zinc-300">auspexi-enterprise-01</p>
+            <p className="text-xs font-mono text-zinc-300">l8entspace-enterprise-01</p>
           </div>
         </div>
       </div>

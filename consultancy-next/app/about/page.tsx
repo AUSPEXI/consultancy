@@ -52,13 +52,13 @@ const PILLARS = [
 const aboutJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  '@id': 'https://auspexi.com/#org',
-  name: 'Auspexi',
-  url: 'https://auspexi.com',
-  logo: 'https://auspexi.com/geo-infographic.png',
+  '@id': 'https://l8entspace.com/#org',
+  name: 'L8EntSpace',
+  url: 'https://l8entspace.com',
+  logo: 'https://l8entspace.com/geo-infographic.png',
   description: 'GEO platform engineering structured knowledge for AI-era brand authority across ChatGPT, Gemini, Claude, and Perplexity.',
   foundingDate: '2025',
-  sameAs: ['https://linkedin.com/company/auspexi', 'https://x.com/auspexi'],
+  sameAs: ['https://linkedin.com/company/l8entspace', 'https://x.com/l8entspace'],
 };
 
 const PLATFORM_STATS = [
@@ -116,7 +116,7 @@ export default function AboutPage() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-px bg-zinc-800 rounded-2xl overflow-hidden mb-32 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]"
+          className="grid grid-cols-2 md:grid-cols-4 gap-px bg-zinc-800 rounded-2xl overflow-hidden mb-32 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]"
         >
           {PLATFORM_STATS.map((s, i) => (
             <div key={i} className="bg-zinc-950 px-8 py-10 text-center">
@@ -131,14 +131,14 @@ export default function AboutPage() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-zinc-900/50 rounded-3xl p-8 md:p-16 mb-32 relative overflow-hidden shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]"
+          className="bg-zinc-900/50 rounded-3xl p-8 md:p-16 mb-32 relative overflow-hidden shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]"
         >
           <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-zinc-800/30 rounded-full blur-3xl" />
           <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold text-white">Why Generative Engine Optimization?</h2>
             <p className="text-xl text-zinc-400">We are moving from an era of probabilistic guesswork to deterministic truth.</p>
             <p className="text-lg text-zinc-300 leading-relaxed">
-              When a customer asks an AI for a recommendation, the model doesn&apos;t crawl the web in real time — it retrieves from structured knowledge. Brands that have engineered their presence into that knowledge layer get cited. Brands that haven&apos;t, don&apos;t. Auspexi exists to close that gap systematically, measurably, and permanently.
+              When a customer asks an AI for a recommendation, the model doesn&apos;t crawl the web in real time — it retrieves from structured knowledge. Brands that have engineered their presence into that knowledge layer get cited. Brands that haven&apos;t, don&apos;t. L8EntSpace exists to close that gap systematically, measurably, and permanently.
             </p>
             <blockquote className="border-l-4 border-zinc-500 pl-8 py-4 my-12 text-2xl font-medium italic text-zinc-200 text-left bg-zinc-900/50 rounded-r-xl">
               &ldquo;The future of digital visibility is engineering the fundamental knowledge structure so your brand becomes the irrefutable answer in the AI era.&rdquo;
@@ -160,7 +160,7 @@ export default function AboutPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-zinc-900 rounded-2xl p-8 hover:bg-zinc-800/80 transition-colors shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]"
+                className="bg-zinc-900 rounded-2xl p-8 hover:bg-zinc-800/80 transition-colors shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]"
               >
                 <div className="w-12 h-12 bg-zinc-950 border border-zinc-800 rounded-xl flex items-center justify-center mb-6">{p.icon}</div>
                 <h3 className="text-xl font-bold text-white mb-3">{p.title}</h3>
@@ -180,7 +180,7 @@ export default function AboutPage() {
           <div className="max-w-4xl mx-auto bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 md:p-12">
             <div className="flex flex-col md:flex-row gap-8 items-start">
               <div className="shrink-0">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden border border-zinc-700 shadow-[0_0_0_2px_rgba(190,24,93,0.4)]">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden border border-zinc-700 shadow-[0_0_0_2px_rgba(255,20,147,0.4)]">
                   <img
                     src="/bio-pic.png"
                     alt="Gwylym Pryce-Owen"
@@ -190,11 +190,11 @@ export default function AboutPage() {
               </div>
               <div className="flex-1">
                 <p className="text-zinc-300 text-lg leading-relaxed italic mb-6">
-                  &ldquo;Two decades in digital strategy taught me one thing — every major platform shift creates a brief window where early movers lock in structural advantages that compound for years. We are at that window with AI now. Auspexi is built to make sure the brands that move first get the citations that matter, before the space saturates.&rdquo;
+                  &ldquo;Two decades in digital strategy taught me one thing — every major platform shift creates a brief window where early movers lock in structural advantages that compound for years. We are at that window with AI now. L8EntSpace is built to make sure the brands that move first get the citations that matter, before the space saturates.&rdquo;
                 </p>
                 <div>
                   <div className="font-bold text-white">Gwylym Pryce-Owen</div>
-                  <div className="text-sm text-zinc-500">Founder, Auspexi</div>
+                  <div className="text-sm text-zinc-500">Founder, L8EntSpace</div>
                 </div>
               </div>
             </div>
@@ -206,7 +206,7 @@ export default function AboutPage() {
           <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-8">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Built on Evidence, Not Estimates</h2>
-              <p className="text-xl text-zinc-400 mb-8">Every Auspexi recommendation is grounded in live measurement — not industry averages or projected models.</p>
+              <p className="text-xl text-zinc-400 mb-8">Every L8EntSpace recommendation is grounded in live measurement — not industry averages or projected models.</p>
               <ul className="space-y-5">
                 {[
                   'Live citation testing across AI engines — not simulated, not sampled',
@@ -222,14 +222,14 @@ export default function AboutPage() {
               </ul>
             </div>
           </motion.div>
-          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="bg-zinc-900 rounded-3xl p-8 md:p-12 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="bg-zinc-900 rounded-3xl p-8 md:p-12 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
             <ShieldCheck className="w-12 h-12 text-zinc-100 mb-8" />
             <h3 className="text-3xl font-bold text-white mb-4">The Window Is Open Now</h3>
             <p className="text-zinc-400 text-lg mb-10 leading-relaxed">
               The transition to AI-first search is happening faster than most organisations have planned for. The brands that establish GEO authority in the next 12 months will be the ones competitors are paying to catch up to in 36.
             </p>
             <Link href="/#pricing">
-              <Button className="w-full bg-white text-black hover:bg-zinc-200 rounded-xl py-6 text-lg font-medium shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+              <Button className="w-full bg-white text-black hover:bg-zinc-200 rounded-xl py-6 text-lg font-medium shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
                 Start Your GEO Journey <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>

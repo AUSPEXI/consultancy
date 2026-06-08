@@ -41,13 +41,13 @@ export async function POST(request: Request) {
 
     if (normalized === 'Starter') {
       unitAmount = 14900; // $149.00
-      productName = 'Auspexi Starter';
+      productName = 'L8EntSpace Starter';
     } else if (normalized === 'Pro') {
       unitAmount = 49900; // $499.00
-      productName = 'Auspexi Pro';
+      productName = 'L8EntSpace Pro';
     } else if (normalized === 'Business') {
       unitAmount = 189900; // $1,899.00
-      productName = 'Auspexi Business';
+      productName = 'L8EntSpace Business';
     } else {
       return NextResponse.json({ error: 'Invalid tier selected' }, { status: 400 });
     }

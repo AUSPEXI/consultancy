@@ -6,20 +6,20 @@ import { blogPosts } from '@/data/blogPosts';
 import { BlogHero } from '@/components/BlogHero';
 
 export const metadata: Metadata = {
-  title: 'GEO Strategy Insights | Auspexi Blog',
+  title: 'GEO Strategy Insights | L8EntSpace Blog',
   description: 'The latest tactics, research and case studies on Generative Engine Optimization. Learn how to dominate AI search across ChatGPT, Gemini, Claude and Perplexity.',
-  metadataBase: new URL('https://auspexi.com'),
-  alternates: { canonical: 'https://auspexi.com/blog' },
+  metadataBase: new URL('https://l8entspace.com'),
+  alternates: { canonical: 'https://l8entspace.com/blog' },
   openGraph: {
-    title: 'GEO Strategy Insights | Auspexi Blog',
+    title: 'GEO Strategy Insights | L8EntSpace Blog',
     description: 'The latest tactics, research and case studies on Generative Engine Optimization.',
-    url: 'https://auspexi.com/blog',
+    url: 'https://l8entspace.com/blog',
     type: 'website',
-    images: [{ url: '/geo-infographic.png', width: 1200, height: 630, alt: 'Auspexi Blog — GEO Strategy Insights' }],
+    images: [{ url: '/geo-infographic.png', width: 1200, height: 630, alt: 'L8EntSpace Blog — GEO Strategy Insights' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'GEO Strategy Insights | Auspexi Blog',
+    title: 'GEO Strategy Insights | L8EntSpace Blog',
     description: 'The latest tactics, research and case studies on Generative Engine Optimization.',
     images: ['/geo-infographic.png'],
   },
@@ -41,7 +41,7 @@ export default function BlogPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogPosts.map((post) => (
-              <Link href={`/blog/${post.slug}`} key={post.slug} className="group cursor-pointer bg-zinc-900 rounded-2xl overflow-hidden flex flex-col shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+              <Link href={`/blog/${post.slug}`} key={post.slug} className="group cursor-pointer bg-zinc-900 rounded-2xl overflow-hidden flex flex-col shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
                 <div className="w-full h-[220px] flex-shrink-0 overflow-hidden border-b border-zinc-800 relative bg-[#0B0E14]">
                   <BlogHero title={post.title} category={post.category} compact={true} />
                 </div>

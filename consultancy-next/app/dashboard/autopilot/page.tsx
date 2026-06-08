@@ -45,7 +45,7 @@ export default function AutopilotPage() {
   const [isBulkRunning, setIsBulkRunning] = useState(false);
   const [isSingleRunning, setIsSingleRunning] = useState(false);
 
-  const isAdmin = user?.email === 'hopiumcalculator@gmail.com' || user?.email === 'sales@auspexi.com';
+  const isAdmin = user?.email === 'hopiumcalculator@gmail.com' || user?.email === 'sales@l8entspace.com';
   const hasAccess = isAdmin || checkTierAccess(tier, 'Pro');
   const keywords = (userData?.keywords || []).filter(Boolean);
   const isRunning = isSingleRunning || isBulkRunning;

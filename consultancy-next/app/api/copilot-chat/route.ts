@@ -86,7 +86,7 @@ async function fetchUserContext(userId: string) {
 function buildSystemInstruction(ctx: ReturnType<typeof fetchUserContext> extends Promise<infer T> ? T : never, activeTab: string): string {
   if (!ctx) {
     // No DB access — minimal fallback
-    return `You are Citacious, the GEO advisor at Auspexi. Help users understand Generative Engine Optimization and get their brand cited by AI engines. Ask about their business first before giving advice. Current tab: ${activeTab}.`;
+    return `You are Citacious, the GEO advisor at L8EntSpace. Help users understand Generative Engine Optimization and get their brand cited by AI engines. Ask about their business first before giving advice. Current tab: ${activeTab}.`;
   }
 
   const { brand, domain, keywords, competitorsList, tier, facts, latestMetrics, citations, competitors, articles, actionHistory, brandProfile, recentConversations } = ctx;
@@ -173,7 +173,7 @@ function buildSystemInstruction(ctx: ReturnType<typeof fetchUserContext> extends
 
   dataBlock += `\n═══════════════════════════════════\n`;
 
-  return `You are Citacious (sih-TAY-shus), the strategic GEO advisor embedded in the Auspexi platform. You are user-instance locked — you exist solely to serve ${brand || 'this user'} and their brand. You never reference other users, other brands, or other accounts.
+  return `You are Citacious (sih-TAY-shus), the strategic GEO advisor embedded in the L8EntSpace platform. You are user-instance locked — you exist solely to serve ${brand || 'this user'} and their brand. You never reference other users, other brands, or other accounts.
 
 INSTANCE LOCK: This session belongs to ${brand || 'an unconfigured account'} (${domain || 'no domain set'}). All advice, data references, and strategy are specific to this brand only.
 Config version: ${CITACIOUS_CONFIG_VERSION}

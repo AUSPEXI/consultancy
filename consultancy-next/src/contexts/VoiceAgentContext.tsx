@@ -199,10 +199,10 @@ export function VoiceAgentProvider({ children }: { children: ReactNode }) {
       // S3.7: Aura onboarding — detect first-visit / unconfigured state and proactively guide
       const isUnconfigured = !userData?.brand;
       const visitorContext = userData?.brand
-        ? `\n\nVISITOR CONTEXT: You are speaking with someone from "${userData.brand}"${userData.domain ? ` (${userData.domain})` : ''}. They are already an Auspexi customer. Welcome them warmly and offer to guide them to their dashboard.`
-        : `\n\nVISITOR CONTEXT: This visitor has not yet set up their brand. As soon as you greet them, ask: "Before I can show you what Auspexi can do for your brand specifically, can you tell me your company name and website?" Once they share their company name, warmly acknowledge it and use navigateToPage("dashboard") so they can set up. If they are not ready to share, just answer their questions about GEO.`;
+        ? `\n\nVISITOR CONTEXT: You are speaking with someone from "${userData.brand}"${userData.domain ? ` (${userData.domain})` : ''}. They are already an L8EntSpace customer. Welcome them warmly and offer to guide them to their dashboard.`
+        : `\n\nVISITOR CONTEXT: This visitor has not yet set up their brand. As soon as you greet them, ask: "Before I can show you what L8EntSpace can do for your brand specifically, can you tell me your company name and website?" Once they share their company name, warmly acknowledge it and use navigateToPage("dashboard") so they can set up. If they are not ready to share, just answer their questions about GEO.`;
 
-      const systemInstruction = `You are Aura — Auspexi's voice brand guide on the public website. You are warm, knowledgeable, and concise.
+      const systemInstruction = `You are Aura — L8EntSpace's voice brand guide on the public website. You are warm, knowledgeable, and concise.
 
 SITE NAVIGATION — CRITICAL:
 You have a navigateToPage tool. Call it IMMEDIATELY whenever a visitor asks to go anywhere or wants to see something. Do not describe how to navigate — just do it.
@@ -230,7 +230,7 @@ YOUR TONE:
 - Warm, confident, concise. Friendly but professional.
 - DO NOT USE MARKDOWN. Speak in clear, natural English.
 - Keep answers to 2-4 sentences. If navigation would help, do it while you speak.
-- If you don't know something, offer to connect them with sales@auspexi.com.
+- If you don't know something, offer to connect them with sales@l8entspace.com.
 ${visitorContext}`;
 
       const sessionPromise = ai.live.connect({
@@ -247,7 +247,7 @@ ${visitorContext}`;
             functionDeclarations: [
               {
                 name: "navigateToPage",
-                description: "Navigates the user's browser to a specific page on the Auspexi website.",
+                description: "Navigates the user's browser to a specific page on the L8EntSpace website.",
                 parameters: {
                   type: Type.OBJECT,
                   properties: {
@@ -258,7 +258,7 @@ ${visitorContext}`;
               },
               {
                 name: "sendCallLog",
-                description: "Sends a summary of the conversation to the Auspexi team for follow-up.",
+                description: "Sends a summary of the conversation to the L8EntSpace team for follow-up.",
                 parameters: {
                   type: Type.OBJECT,
                   properties: {

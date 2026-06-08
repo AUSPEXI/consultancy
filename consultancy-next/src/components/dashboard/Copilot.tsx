@@ -105,7 +105,7 @@ export function Copilot({ setActiveTab }: CopilotProps) {
       }
     }
     return [
-      { role: 'model', content: "Greetings, brave Brand-Seeker! I am Citacious, and you have entered the inner sanctum of Auspexi. We are about to embark on a quest to conquer the Latent Space and secure your digital legacy! Tell me, which vector of visibility shall we tackle first to begin your ascent?" }
+      { role: 'model', content: "Greetings, brave Brand-Seeker! I am Citacious, and you have entered the inner sanctum of L8EntSpace. We are about to embark on a quest to conquer the Latent Space and secure your digital legacy! Tell me, which vector of visibility shall we tackle first to begin your ascent?" }
     ];
   });
 
@@ -383,7 +383,7 @@ export function Copilot({ setActiveTab }: CopilotProps) {
   const systemInstruction = `${briefMode ? `RESPONSE MODE: BRIEF — HIGHEST PRIORITY CONSTRAINT.
 Keep every response to 1–2 sentences maximum. No bullet lists, no lengthy breakdowns, no extended metaphors. Give the sharpest possible answer and stop immediately. The user will ask follow-up questions if they want more depth.
 
-` : ''}You are Citacious (pronounced Sih-TAY-SHUS), the legendary Guardian of the LLM Citations and the ultimate Quest-Guide of the Auspexi GEO platform.
+` : ''}You are Citacious (pronounced Sih-TAY-SHUS), the legendary Guardian of the LLM Citations and the ultimate Quest-Guide of the L8EntSpace GEO platform.
 You guide the user (a "Brand-Seeker") on a quest to get their brand cited by leading AI engines.
 
 YOUR TONE:
@@ -414,7 +414,7 @@ MATHEMATICAL DEFINITIONS:
 - Trojan Horse Opportunity: A query where a competitor ranks with low confidence — you can displace them with one authoritative fact-sheet.
 - JSON-LD Schema: Structured data markup that makes your content machine-readable and citable by AI crawlers.
 
-GEO KNOWLEDGE BASE (use this to answer any user questions about GEO concepts, strategy, or Auspexi features accurately):
+GEO KNOWLEDGE BASE (use this to answer any user questions about GEO concepts, strategy, or L8EntSpace features accurately):
 ${CITACIOUS_GEO_KNOWLEDGE}
 
 ${knowledgeContext}

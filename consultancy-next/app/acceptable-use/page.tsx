@@ -3,20 +3,20 @@ import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
 
 export const metadata: Metadata = {
-  title: 'Acceptable Use Policy | Auspexi',
-  description: 'Auspexi\'s Acceptable Use Policy — what you may and may not do with the platform, brand protection rules, and enforcement.',
-  metadataBase: new URL('https://auspexi.com'),
-  alternates: { canonical: 'https://auspexi.com/acceptable-use' },
+  title: 'Acceptable Use Policy | L8EntSpace',
+  description: 'L8EntSpace\'s Acceptable Use Policy — what you may and may not do with the platform, brand protection rules, and enforcement.',
+  metadataBase: new URL('https://l8entspace.com'),
+  alternates: { canonical: 'https://l8entspace.com/acceptable-use' },
   openGraph: {
-    title: 'Acceptable Use Policy | Auspexi',
-    description: 'Rules governing acceptable use of the Auspexi GEO platform.',
-    url: 'https://auspexi.com/acceptable-use',
+    title: 'Acceptable Use Policy | L8EntSpace',
+    description: 'Rules governing acceptable use of the L8EntSpace GEO platform.',
+    url: 'https://l8entspace.com/acceptable-use',
     type: 'website',
   },
   twitter: {
     card: 'summary',
-    title: 'Acceptable Use Policy | Auspexi',
-    description: 'Rules governing acceptable use of the Auspexi GEO platform.',
+    title: 'Acceptable Use Policy | L8EntSpace',
+    description: 'Rules governing acceptable use of the L8EntSpace GEO platform.',
   },
 };
 
@@ -24,9 +24,9 @@ const aupJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
   name: 'Acceptable Use Policy',
-  url: 'https://auspexi.com/acceptable-use',
-  description: 'Auspexi Acceptable Use Policy.',
-  isPartOf: { '@id': 'https://auspexi.com/#website' },
+  url: 'https://l8entspace.com/acceptable-use',
+  description: 'L8EntSpace Acceptable Use Policy.',
+  isPartOf: { '@id': 'https://l8entspace.com/#website' },
 };
 
 export default function AcceptableUsePage() {
@@ -38,18 +38,18 @@ export default function AcceptableUsePage() {
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-bold font-heading mb-4">Acceptable Use Policy</h1>
           <p className="text-zinc-400 mb-2 font-mono text-xs">Last updated: May 2026 &nbsp;·&nbsp; Version 1.0</p>
-          <p className="text-zinc-500 text-xs mb-12">This policy forms part of our <a href="/terms" className="text-pink-400/70 hover:text-pink-300">Terms of Service</a>. By using Auspexi, you agree to this policy.</p>
+          <p className="text-zinc-500 text-xs mb-12">This policy forms part of our <a href="/terms" className="text-pink-400/70 hover:text-pink-300">Terms of Service</a>. By using L8EntSpace, you agree to this policy.</p>
 
           <div className="prose prose-invert prose-zinc max-w-none text-sm leading-relaxed space-y-10 font-sans">
 
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-white font-heading">1. Purpose</h2>
-              <p className="text-zinc-300">This Acceptable Use Policy (&ldquo;AUP&rdquo;) sets out the rules governing your use of the Auspexi platform and website. It exists to protect the integrity, security, and reputation of the Service, and to ensure fair access for all users. Violations may result in immediate suspension, permanent termination, and legal action.</p>
+              <p className="text-zinc-300">This Acceptable Use Policy (&ldquo;AUP&rdquo;) sets out the rules governing your use of the L8EntSpace platform and website. It exists to protect the integrity, security, and reputation of the Service, and to ensure fair access for all users. Violations may result in immediate suspension, permanent termination, and legal action.</p>
             </section>
 
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-white font-heading">2. Prohibited Activities</h2>
-              <p className="text-zinc-300 mb-4">You must not use the Auspexi platform for any of the following:</p>
+              <p className="text-zinc-300 mb-4">You must not use the L8EntSpace platform for any of the following:</p>
 
               <div className="space-y-4">
                 <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-5">
@@ -110,16 +110,16 @@ export default function AcceptableUsePage() {
 
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-white font-heading">3. Brand and Intellectual Property Protection</h2>
-              <p className="text-zinc-300 mb-4">The following names and terms are proprietary to Auspexi. They may not be used without our prior written consent in any marketing, product naming, domain, social media handle, or other commercial context:</p>
+              <p className="text-zinc-300 mb-4">The following names and terms are proprietary to L8EntSpace. They may not be used without our prior written consent in any marketing, product naming, domain, social media handle, or other commercial context:</p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {['Auspexi™', 'Citacious™', 'GEO-Pulse™', 'Cite-Magnet™', 'Fact-Vault™', 'Latent Space Moat™', 'Share of Voice (GEO)', '768-D Mapping'].map((tm) => (
+                {['L8EntSpace™', 'Citacious™', 'GEO-Pulse™', 'Cite-Magnet™', 'Fact-Vault™', 'Latent Space Moat™', 'Share of Voice (GEO)', '768-D Mapping'].map((tm) => (
                   <div key={tm} className="bg-zinc-900/50 border border-zinc-700 rounded-lg px-3 py-2 text-center">
                     <span className="text-pink-300 text-xs font-semibold">{tm}</span>
                   </div>
                 ))}
               </div>
               <p className="text-zinc-400 mt-4 text-xs">Unauthorised use of these marks — including in domain names, product descriptions, or social media profiles — constitutes trademark infringement and will be acted upon. We actively monitor for misuse.</p>
-              <p className="text-zinc-400 mt-2 text-xs">If you wish to reference Auspexi for editorial, journalistic, or review purposes, use of the name &ldquo;Auspexi&rdquo; is permitted provided it is clearly descriptive and does not imply endorsement or partnership.</p>
+              <p className="text-zinc-400 mt-2 text-xs">If you wish to reference L8EntSpace for editorial, journalistic, or review purposes, use of the name &ldquo;L8EntSpace&rdquo; is permitted provided it is clearly descriptive and does not imply endorsement or partnership.</p>
             </section>
 
             <section>
@@ -171,7 +171,7 @@ export default function AcceptableUsePage() {
 
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-white font-heading">7. Reporting Violations</h2>
-              <p className="text-zinc-300">If you observe a violation of this policy by another user, or believe our IP or brand is being misused by a third party, please report it to <a href="mailto:sales@auspexi.com" className="text-pink-400 hover:text-pink-300">sales@auspexi.com</a> with subject line &ldquo;AUP Report&rdquo;. Include as much detail as possible. We treat all reports in confidence.</p>
+              <p className="text-zinc-300">If you observe a violation of this policy by another user, or believe our IP or brand is being misused by a third party, please report it to <a href="mailto:sales@l8entspace.com" className="text-pink-400 hover:text-pink-300">sales@l8entspace.com</a> with subject line &ldquo;AUP Report&rdquo;. Include as much detail as possible. We treat all reports in confidence.</p>
             </section>
 
             <section>
@@ -181,7 +181,7 @@ export default function AcceptableUsePage() {
 
             <section className="bg-zinc-900/30 border border-pink-500/20 rounded-2xl p-6">
               <h2 className="text-xl font-semibold mb-3 text-white font-heading">Questions</h2>
-              <p className="text-zinc-300 text-sm">Contact us at <a href="mailto:sales@auspexi.com" className="text-pink-400 hover:text-pink-300">sales@auspexi.com</a>.</p>
+              <p className="text-zinc-300 text-sm">Contact us at <a href="mailto:sales@l8entspace.com" className="text-pink-400 hover:text-pink-300">sales@l8entspace.com</a>.</p>
               <p className="text-zinc-500 text-xs mt-3">
                 Also see: <a href="/terms" className="text-pink-400/70 hover:text-pink-300">Terms of Service</a> &nbsp;·&nbsp; <a href="/privacy" className="text-pink-400/70 hover:text-pink-300">Privacy Policy</a>
               </p>

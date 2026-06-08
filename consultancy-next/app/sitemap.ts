@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { blogPosts } from '@/data/blogPosts';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = 'https://auspexi.com';
+  const base = 'https://l8entspace.com';
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: base,                         lastModified: new Date(), changeFrequency: 'weekly',  priority: 1.0 },

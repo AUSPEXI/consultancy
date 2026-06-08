@@ -175,7 +175,7 @@ export default function GeoLabPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold font-heading mb-2">GEO Lab Results</h1>
-          <p className="text-zinc-400">Live experiment findings from the Auspexi GEO Lab.</p>
+          <p className="text-zinc-400">Live experiment findings from the L8EntSpace GEO Lab.</p>
         </div>
         <UpgradePrompt title="GEO Lab Locked" description="Upgrade to Pro to see live lab experiment results and apply proven GEO tactics to your content." requiredTier="Pro" />
       </div>
@@ -191,7 +191,7 @@ export default function GeoLabPage() {
             GEO Lab Results
           </h1>
           <p className="text-zinc-400 max-w-2xl">
-            Live findings from the Auspexi GEO Lab — real A/B experiments measuring which content tactics lift citation rate. Only statistically significant results appear here.
+            Live findings from the L8EntSpace GEO Lab — real A/B experiments measuring which content tactics lift citation rate. Only statistically significant results appear here.
           </p>
         </div>
         <div className="flex items-center gap-3 text-xs text-zinc-500 shrink-0">

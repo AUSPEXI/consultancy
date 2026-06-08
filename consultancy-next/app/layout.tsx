@@ -7,16 +7,16 @@ import { buildOrganizationSchema } from '@/lib/site-schema'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Auspexi | Generative Engine Optimization (GEO)',
+  title: 'L8EntSpace | Generative Engine Optimization (GEO)',
   description:
-    "Auspexi is the leading Generative Engine Optimization (GEO) platform. Track your brand's AI Share of Voice across ChatGPT, Gemini, Claude and Perplexity.",
+    "L8EntSpace is the leading Generative Engine Optimization (GEO) platform. Track your brand's AI Share of Voice across ChatGPT, Gemini, Claude and Perplexity.",
   keywords:
     'generative engine optimization, GEO, AI search optimization, LLM SEO, brand visibility AI, AI share of voice, ChatGPT SEO',
-  metadataBase: new URL('https://auspexi.com'),
+  metadataBase: new URL('https://l8entspace.com'),
   openGraph: {
     type: 'website',
-    url: 'https://auspexi.com',
-    title: 'Auspexi | Generative Engine Optimization (GEO)',
+    url: 'https://l8entspace.com',
+    title: 'L8EntSpace | Generative Engine Optimization (GEO)',
     description:
       'Ensure your brand is cited by ChatGPT, Gemini, Claude and Perplexity. Track AI Share of Voice, inject cite-magnet facts, detect sentiment drift.',
     images: [
@@ -24,13 +24,13 @@ export const metadata: Metadata = {
         url: '/geo-infographic.png',
         width: 1200,
         height: 630,
-        alt: 'Auspexi Generative Engine Optimization Dashboard',
+        alt: 'L8EntSpace Generative Engine Optimization Dashboard',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Auspexi | Generative Engine Optimization (GEO)',
+    title: 'L8EntSpace | Generative Engine Optimization (GEO)',
     description:
       'The premier GEO platform. Track your brand across ChatGPT, Gemini, Claude and Perplexity.',
     images: ['/geo-infographic.png'],
@@ -55,8 +55,8 @@ async function SiteSchemas() {
   // Any user-saved schemas from the registry (best-effort; non-blocking).
   let registrySchemas: any[] = [];
   try {
-    const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://auspexi.com';
-    const res = await fetch(`${base}/api/schema-registry?domain=auspexi.com`, { next: { revalidate: 300 } });
+    const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://l8entspace.com';
+    const res = await fetch(`${base}/api/schema-registry?domain=l8entspace.com`, { next: { revalidate: 300 } });
     if (res.ok) {
       const { schemas } = await res.json();
       if (Array.isArray(schemas)) registrySchemas = schemas;

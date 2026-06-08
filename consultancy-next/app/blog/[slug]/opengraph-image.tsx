@@ -8,7 +8,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const { slug } = await params;
   const post = blogPosts.find(p => p.slug === slug);
 
-  const title = post?.title || 'Auspexi — GEO Strategy';
+  const title = post?.title || 'L8EntSpace — GEO Strategy';
   const category = post?.category || 'GEO';
   const fontSize = title.length > 70 ? 40 : title.length > 50 ? 48 : 56;
 
@@ -32,7 +32,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             position: 'absolute',
             inset: 0,
             backgroundImage:
-              'linear-gradient(rgba(236,72,153,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(236,72,153,0.12) 1px, transparent 1px)',
+              'linear-gradient(rgba(255,20,147,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,20,147,0.12) 1px, transparent 1px)',
             backgroundSize: '60px 60px',
           }}
         />
@@ -46,7 +46,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             width: '600px',
             height: '600px',
             borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(236,72,153,0.18) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(255,20,147,0.18) 0%, transparent 70%)',
           }}
         />
 
@@ -64,7 +64,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           style={{
             position: 'absolute',
             inset: '0px',
-            border: '4px solid rgba(190,24,93,0.9)',
+            border: '4px solid rgba(255,20,147,0.9)',
             display: 'flex',
           }}
         />
@@ -92,8 +92,8 @@ export default async function Image({ params }: { params: Promise<{ slug: string
                 fontSize: '13px',
                 fontWeight: 700,
                 color: '#f9a8d4',
-                backgroundColor: 'rgba(236,72,153,0.15)',
-                border: '1px solid rgba(236,72,153,0.4)',
+                backgroundColor: 'rgba(255,20,147,0.15)',
+                border: '1px solid rgba(255,20,147,0.4)',
                 padding: '5px 16px',
                 borderRadius: '100px',
                 textTransform: 'uppercase',
@@ -125,20 +125,20 @@ export default async function Image({ params }: { params: Promise<{ slug: string
                 width: '36px',
                 height: '36px',
                 borderRadius: '8px',
-                backgroundColor: 'rgba(236,72,153,0.2)',
-                border: '1px solid rgba(236,72,153,0.4)',
+                backgroundColor: 'rgba(255,20,147,0.2)',
+                border: '1px solid rgba(255,20,147,0.4)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <span style={{ color: '#ec4899', fontSize: '18px', fontWeight: 900 }}>A</span>
+              <span style={{ color: '#ff1493', fontSize: '18px', fontWeight: 900 }}>A</span>
             </div>
-            <span style={{ color: '#ec4899', fontSize: '20px', fontWeight: 800, letterSpacing: '-0.02em' }}>
-              Auspexi
+            <span style={{ color: '#ff1493', fontSize: '20px', fontWeight: 800, letterSpacing: '-0.02em' }}>
+              L8EntSpace
             </span>
             <span style={{ color: '#3f3f46', fontSize: '20px' }}>·</span>
-            <span style={{ color: '#71717a', fontSize: '16px' }}>auspexi.com</span>
+            <span style={{ color: '#71717a', fontSize: '16px' }}>l8entspace.com</span>
           </div>
         </div>
       </div>

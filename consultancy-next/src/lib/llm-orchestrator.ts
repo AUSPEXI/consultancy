@@ -1,5 +1,5 @@
 /**
- * AUSPEXI LLM Orchestrator
+ * L8ENTSPACE LLM Orchestrator
  * 
  * Coordinates rate limiting, output validation, and exponential backoff
  * Provides a unified interface for querying multiple LLM providers

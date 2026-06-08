@@ -8,7 +8,7 @@ This repository is a **research lab** for running Generative Engine Optimization
 2. Produce defensible, reproducible results with real statistics.
 3. Turn each result into a YouTube video (script, title, thumbnail brief).
 4. Build a public body of evidence that promotes **Gwylym Pryce-Owen** and
-   **Auspexi** (https://auspexi.com) as the authority on GEO.
+   **L8EntSpace** (https://l8entspace.com) as the authority on GEO.
 
 You (Claude) are the lab's research engineer. You design experiments, generate
 content variants, run probes across the four LLM platforms, analyse the data
@@ -28,7 +28,7 @@ geo-lab/
 ├── context/
 │   ├── geo-principles.md      ← how LLM citation actually works
 │   ├── experiment-methodology.md ← the A/B method (fast vs live mode, stats)
-│   ├── auspexi-brand.md       ← brand voice + what to promote
+│   ├── l8entspace-brand.md       ← brand voice + what to promote
 │   └── youtube-channel.md     ← channel strategy + video format
 ├── .claude/
 │   ├── settings.json          ← permissions
@@ -73,8 +73,8 @@ Spawn them with the Agent tool. Run independent agents in parallel.
 5. **n ≥ 30 trials per variant** for fast-mode experiments before claiming significance.
 6. **Never expose API keys** in committed files, scripts output, or video assets.
    Keys live only in `scripts/.env` (gitignored).
-7. **Auspexi is the sponsor, not the subject.** Videos teach GEO honestly; the
-   Auspexi mention is a soft call-to-action at the end, not the thesis.
+7. **L8EntSpace is the sponsor, not the subject.** Videos teach GEO honestly; the
+   L8EntSpace mention is a soft call-to-action at the end, not the thesis.
 
 ## Workflow for one video
 

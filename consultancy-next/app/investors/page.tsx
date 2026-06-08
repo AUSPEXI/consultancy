@@ -23,13 +23,13 @@ import { PitchDeckViewer } from '@/components/ui/PitchDeckViewer';
 import { UmapVisualization } from '@/components/ui/UmapVisualization';
 import { cn } from '@/lib/utils';
 
-const NEON = 'shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]';
+const NEON = 'shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]';
 
 const INVESTMENT_HIGHLIGHTS = [
   {
     title: "First-Mover Advantage in GEO",
     icon: TrendingUp,
-    description: "As search volume fundamentally shifts from traditional aggregate engines (Google) to deterministic answer engines (ChatGPT, Gemini), Auspexi is capturing the emerging multi-billion dollar Generative Engine Optimization space before incumbents can pivot."
+    description: "As search volume fundamentally shifts from traditional aggregate engines (Google) to deterministic answer engines (ChatGPT, Gemini), L8EntSpace is capturing the emerging multi-billion dollar Generative Engine Optimization space before incumbents can pivot."
   },
   {
     title: "Proprietary Infrastructure",
@@ -44,7 +44,7 @@ const INVESTMENT_HIGHLIGHTS = [
   {
     title: "Defensible IP & Architecture",
     icon: ShieldCheck,
-    description: "Our roadmap introduces Sentiment Drift Detection and Unified GEO Benchmarking, establishing Auspexi not just as a tool, but as the industry-standard arbiter of AI visibility."
+    description: "Our roadmap introduces Sentiment Drift Detection and Unified GEO Benchmarking, establishing L8EntSpace not just as a tool, but as the industry-standard arbiter of AI visibility."
   }
 ];
 
@@ -90,7 +90,7 @@ const REVENUE_DATA = [
 ];
 
 const USE_OF_FUNDS = [
-  { name: 'Engineering', value: 45, color: '#ec4899', description: 'Phase III SLM Development & RAG Optimization' },
+  { name: 'Engineering', value: 45, color: '#ff1493', description: 'Phase III SLM Development & RAG Optimization' },
   { name: 'Sales & Growth', value: 35, color: '#f472b6', description: '2 AE Hires + $30k/mo Media Spend' },
   { name: 'Ops & Infra', value: 20, color: '#3f3f46', description: '50M Vector Cluster & 12mo Runway' },
 ];
@@ -191,15 +191,15 @@ function MarginExpansionChart() {
           <AreaChart data={MARGIN_EXPANSION_DATA}>
             <defs>
               <linearGradient id="marginGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ec4899" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#ec4899" stopOpacity={0} />
+                <stop offset="5%" stopColor="#ff1493" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#ff1493" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
             <XAxis dataKey="quarter" fontSize={10} axisLine={false} tickLine={false} tick={{ fill: '#71717a' }} />
             <YAxis fontSize={10} axisLine={false} tickLine={false} tick={{ fill: '#71717a' }} tickFormatter={(v) => `${v}%`} />
             <Tooltip contentStyle={{ backgroundColor: '#09090b', border: '1px solid #27272a' }} labelStyle={{ fontWeight: 'bold', color: 'white', marginBottom: '4px' }} />
-            <Area type="monotone" dataKey="margin" stroke="#ec4899" strokeWidth={3} fill="url(#marginGrad)" name="Gross Margin" />
+            <Area type="monotone" dataKey="margin" stroke="#ff1493" strokeWidth={3} fill="url(#marginGrad)" name="Gross Margin" />
             <Area type="monotone" dataKey="cost" stroke="#52525b" strokeWidth={2} fill="transparent" name="Inference Cost" />
           </AreaChart>
         </ResponsiveContainer>
@@ -354,14 +354,14 @@ function InvestorCalculator() {
 }
 
 const PRESEED_FUNDS = [
-  { name: 'Founder Runway', value: 40, color: '#ec4899', description: 'Minimal founder salaries to go full-time, no distractions' },
+  { name: 'Founder Runway', value: 40, color: '#ff1493', description: 'Minimal founder salaries to go full-time, no distractions' },
   { name: 'Product & Infra', value: 30, color: '#f472b6', description: 'Cloud hosting, AI API costs, dev tooling, pgvector cluster' },
   { name: 'First Customers', value: 20, color: '#a78bfa', description: 'High-touch outreach, demos, content to land first 20-50 subscribers' },
   { name: 'Legal & Ops', value: 10, color: '#3f3f46', description: 'Company structure, founder agreements, accounting' },
 ];
 
 const SEED_FUNDS = [
-  { name: 'Team Building', value: 45, color: '#ec4899', description: '2-3 strategic hires: data scientist, growth marketer, content lead' },
+  { name: 'Team Building', value: 45, color: '#ff1493', description: '2-3 strategic hires: data scientist, growth marketer, content lead' },
   { name: 'Data & Infra', value: 25, color: '#f472b6', description: 'Scale pgvector to 50M+ embeddings, real-time monitoring, SLM R&D begins' },
   { name: 'Market Authority', value: 20, color: '#a78bfa', description: 'GEO research publications, conference presence, thought leadership' },
   { name: 'Enterprise Outreach', value: 10, color: '#3f3f46', description: 'Enterprise CRM, sales tools, pilot programs with agency partners' },
@@ -600,7 +600,7 @@ export default function InvestorHubPage() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
             className="text-xl md:text-2xl text-zinc-400 max-w-3xl mx-auto mb-6 leading-relaxed"
           >
-            Auspexi has built the deterministic infrastructure for Generative Engine Optimization from scratch — no external capital, no compromises. We are at pre-seed: the platform is live, the workflow is proven, and the first paying subscribers are one funding round away.
+            L8EntSpace has built the deterministic infrastructure for Generative Engine Optimization from scratch — no external capital, no compromises. We are at pre-seed: the platform is live, the workflow is proven, and the first paying subscribers are one funding round away.
           </motion.p>
 
           {/* Stage progress strip */}
@@ -620,7 +620,7 @@ export default function InvestorHubPage() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <a
-              href="mailto:sales@auspexi.com?subject=Pre-seed Investment Enquiry"
+              href="mailto:sales@l8entspace.com?subject=Pre-seed Investment Enquiry"
               className={`px-8 py-4 bg-white text-black font-semibold rounded-full hover:bg-zinc-200 transition-colors flex items-center gap-2 w-full sm:w-auto justify-center ${NEON}`}
             >
               <Flame className="w-4 h-4" /> Enquire About Pre-seed
@@ -814,7 +814,7 @@ export default function InvestorHubPage() {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <a
                       href="/deck.pdf"
-                      download="auspexi_seriesA_prospectus_v4.2.pdf"
+                      download="l8entspace_seriesA_prospectus_v4.2.pdf"
                       className={`px-6 py-2.5 bg-pink-600 hover:bg-pink-500 text-white text-sm font-bold rounded-full transition-colors flex items-center gap-2 ${NEON}`}
                     >
                       <FileText className="w-4 h-4" /> Download Full Prospectus
@@ -843,15 +843,15 @@ export default function InvestorHubPage() {
                         <AreaChart data={REVENUE_DATA}>
                           <defs>
                             <linearGradient id="colorArr" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#ec4899" stopOpacity={0.3} />
-                              <stop offset="95%" stopColor="#ec4899" stopOpacity={0} />
+                              <stop offset="5%" stopColor="#ff1493" stopOpacity={0.3} />
+                              <stop offset="95%" stopColor="#ff1493" stopOpacity={0} />
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                           <XAxis dataKey="year" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
                           <YAxis stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}M`} />
-                          <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '12px' }} itemStyle={{ color: '#ec4899' }} />
-                          <Area type="monotone" dataKey="arr" stroke="#ec4899" strokeWidth={3} fillOpacity={1} fill="url(#colorArr)" />
+                          <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '12px' }} itemStyle={{ color: '#ff1493' }} />
+                          <Area type="monotone" dataKey="arr" stroke="#ff1493" strokeWidth={3} fillOpacity={1} fill="url(#colorArr)" />
                         </AreaChart>
                       </ResponsiveContainer>
                     </div>
@@ -1200,7 +1200,7 @@ export default function InvestorHubPage() {
                   Request access to our P&L statements, CAP table, and complete technical specifications via our investor relations team.
                 </p>
                 <a
-                  href="mailto:sales@auspexi.com?subject=Full Data Room Request"
+                  href="mailto:sales@l8entspace.com?subject=Full Data Room Request"
                   className={`px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-bold rounded-full transition-colors flex items-center gap-2 ${NEON}`}
                 >
                   <FileText className="w-4 h-4" /> Request Full Prospectus

@@ -1,22 +1,22 @@
-// Shared JSON-LD builders for auspexi.com's own structured data.
-// Auspexi dogfoods its own product: the same comprehensive knowledge base it
+// Shared JSON-LD builders for l8entspace.com's own structured data.
+// L8EntSpace dogfoods its own product: the same comprehensive knowledge base it
 // publishes on /faq is served as JSON-LD site-wide so AI crawlers (GPTBot,
 // ClaudeBot, Google-Extended) can ingest it on any page they land on.
 
 export function buildOrganizationSchema() {
   return {
     '@type': 'Organization',
-    '@id': 'https://auspexi.com/#org',
-    name: 'Auspexi',
-    url: 'https://auspexi.com',
-    logo: 'https://auspexi.com/geo-infographic.png',
+    '@id': 'https://l8entspace.com/#org',
+    name: 'L8EntSpace',
+    url: 'https://l8entspace.com',
+    logo: 'https://l8entspace.com/geo-infographic.png',
     description:
-      "Auspexi is the leading Generative Engine Optimization (GEO) platform. Track your brand's AI Share of Voice across ChatGPT, Gemini, Claude and Perplexity, inject cite-magnet facts, and detect sentiment drift.",
+      "L8EntSpace is the leading Generative Engine Optimization (GEO) platform. Track your brand's AI Share of Voice across ChatGPT, Gemini, Claude and Perplexity, inject cite-magnet facts, and detect sentiment drift.",
     sameAs: [] as string[],
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'sales',
-      email: 'sales@auspexi.com',
+      email: 'sales@l8entspace.com',
     },
   };
 }

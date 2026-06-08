@@ -1,5 +1,5 @@
 /**
- * AUSPEXI Output Validation Engine
+ * L8ENTSPACE Output Validation Engine
  * 
  * Validates all LLM responses against strict schemas
  * Auto-retries with reduced temperature if validation fails
@@ -211,7 +211,7 @@ export type AnchorsResult = z.infer<typeof AnchorsSchema>;
 
 const AnchorTEOObjectSchema = z.object({
   label: z.string().min(1).max(40),
-  color: z.enum(['#ec4899', '#06b6d4', '#8b5cf6', '#f59e0b']),
+  color: z.enum(['#ff1493', '#06b6d4', '#8b5cf6', '#f59e0b']),
   baseType: z.enum(['Systemic Anchor', 'Signal Point', 'Emergent Trend', 'Risk Vector']),
   axisAlignment: z.union([z.literal(1), z.literal(2), z.literal(3)]),
   description: z.string().max(200),

@@ -1,4 +1,4 @@
-# Auspexi Blog Guidelines
+# L8EntSpace Blog Guidelines
 
 ## Who We're Writing For
 
@@ -90,7 +90,7 @@ The sweet spot: **confident about what we've observed, honest about what we don'
 1. **Hook** — one punchy sentence or question (not a rhetorical one)
 2. **The problem** — what's broken or confusing for the reader right now
 3. **The answer** — what actually works, grounded in facts/experiments
-4. **How Auspexi helps** — natural mention, not a hard sell
+4. **How L8EntSpace helps** — natural mention, not a hard sell
 5. **What to do next** — one clear CTA (try the probe, read a related post, etc.)
 
 ### For GEO Lab Posts
@@ -117,8 +117,8 @@ Posts about the journey, decisions, experiments, failures, and pivots. These bui
 *Priority: high — currently zero posts in this category.*
 
 Post ideas:
-- "Why I'm Building Auspexi in Public (and What That Actually Means)"
-- "The Pivot That Changed Auspexi's Direction"
+- "Why I'm Building L8EntSpace in Public (and What That Actually Means)"
+- "The Pivot That Changed L8EntSpace's Direction"
 - "Six Months of Building a GEO Platform as a Solo Founder"
 - "What I Got Wrong About AI Search in Year One"
 
@@ -153,7 +153,7 @@ Honest announcements of new and improved features, written in plain English with
 Post ideas:
 - "Introducing the Brand Probe Pipeline: Weekly AI Health Checks, Automated"
 - "The Bulk Agent Pipeline: From Probe to Published in One Click"
-- "What's New in the Auspexi Dashboard (June 2026)"
+- "What's New in the L8EntSpace Dashboard (June 2026)"
 
 ### 5. Community and YouTube
 Posts that invite people in, explain where to follow along, and document the content roadmap.
@@ -161,9 +161,9 @@ Posts that invite people in, explain where to follow along, and document the con
 *Priority: medium — zero posts currently.*
 
 Post ideas:
-- "The Auspexi YouTube Channel Is Coming: Here's What We're Planning"
+- "The L8EntSpace YouTube Channel Is Coming: Here's What We're Planning"
 - "Join the GEO Lab Community: Experiments, Results, and Office Hours"
-- "How to Follow Along as We Build Auspexi in Public"
+- "How to Follow Along as We Build L8EntSpace in Public"
 
 ### 6. Strategy and Concepts (existing strength — extend carefully)
 The existing posts here are good. Only add new ones when there's a genuine new insight or experiment result to anchor the post.

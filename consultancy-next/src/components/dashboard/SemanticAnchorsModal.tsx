@@ -81,7 +81,7 @@ export function SemanticAnchorsModal({
       if (data.success && data.anchors && Array.isArray(data.anchors)) {
         setEditAnchorsState(data.anchors.map((a: any) => ({
           label: a.label,
-          color: a.color || '#ec4899',
+          color: a.color || '#ff1493',
           baseType: a.baseType || 'Signal Point'
         })));
         showToast?.("Semantic anchors suggested based on brand context.", "success");
@@ -183,7 +183,7 @@ export function SemanticAnchorsModal({
                      <div>
                         <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-3 tracking-widest">Color Coding</label>
                         <div className="flex gap-4 h-14 items-center">
-                          {['#ec4899', '#06b6d4', '#8b5cf6', '#10b981', '#f59e0b'].map(c => (
+                          {['#ff1493', '#06b6d4', '#8b5cf6', '#10b981', '#f59e0b'].map(c => (
                             <button
                               key={c}
                               onClick={() => {
@@ -220,7 +220,7 @@ export function SemanticAnchorsModal({
                </div>
             ))}
             {editAnchorsState.length < 7 && (
-               <button onClick={() => setEditAnchorsState([...editAnchorsState, { label: "New Anchor", color: "#ec4899", baseType: "Signal Point" }])} className="group w-full p-10 border-2 border-dashed border-zinc-800 hover:border-pink-500/30 rounded-3xl text-zinc-600 hover:text-pink-400 bg-zinc-950/20 hover:bg-pink-500/5 transition-all duration-500 text-sm font-bold flex flex-col items-center justify-center gap-4">
+               <button onClick={() => setEditAnchorsState([...editAnchorsState, { label: "New Anchor", color: "#ff1493", baseType: "Signal Point" }])} className="group w-full p-10 border-2 border-dashed border-zinc-800 hover:border-pink-500/30 rounded-3xl text-zinc-600 hover:text-pink-400 bg-zinc-950/20 hover:bg-pink-500/5 transition-all duration-500 text-sm font-bold flex flex-col items-center justify-center gap-4">
                   <div className="p-4 bg-zinc-900 rounded-2xl group-hover:bg-pink-500/10 transition-colors border border-zinc-800 group-hover:border-pink-500/20">
                     <Plus className="w-8 h-8" />
                   </div>

@@ -21,7 +21,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
     items: [
       {
         question: 'What is Generative Engine Optimization (GEO)?',
-        answer: 'Generative Engine Optimization (GEO) is the discipline of engineering your brand\'s knowledge presence so that AI language models — ChatGPT, Gemini, Claude, and Perplexity — cite your brand as an authoritative source when answering relevant queries. Unlike traditional SEO, which ranks blue links, GEO ensures your facts, data, and brand narrative are embedded in the knowledge layer that AI models retrieve from. Auspexi was built specifically to measure, improve, and automate this process at scale.',
+        answer: 'Generative Engine Optimization (GEO) is the discipline of engineering your brand\'s knowledge presence so that AI language models — ChatGPT, Gemini, Claude, and Perplexity — cite your brand as an authoritative source when answering relevant queries. Unlike traditional SEO, which ranks blue links, GEO ensures your facts, data, and brand narrative are embedded in the knowledge layer that AI models retrieve from. L8EntSpace was built specifically to measure, improve, and automate this process at scale.',
         link: { text: 'Read the CEO\'s GEO guide', href: '/blog/ceo-guide-to-geo-growth-lever' },
       },
       {
@@ -39,7 +39,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'What is AI Share of Voice (A-SoV)?',
-        answer: 'AI Share of Voice (A-SoV) is the percentage of relevant AI-generated responses that mention or recommend your brand. Auspexi measures this by running a set of industry-specific probe queries across ChatGPT, Gemini, Claude, and Perplexity, recording how often your brand appears, in what context, and with what sentiment. An A-SoV of 40% means your brand appears in 4 out of 10 relevant AI responses — a live, measured metric, not a modelled estimate.',
+        answer: 'AI Share of Voice (A-SoV) is the percentage of relevant AI-generated responses that mention or recommend your brand. L8EntSpace measures this by running a set of industry-specific probe queries across ChatGPT, Gemini, Claude, and Perplexity, recording how often your brand appears, in what context, and with what sentiment. An A-SoV of 40% means your brand appears in 4 out of 10 relevant AI responses — a live, measured metric, not a modelled estimate.',
       },
       {
         question: 'How long does GEO take to produce results?',
@@ -51,7 +51,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'What is the "knowledge layer" that AI models draw from?',
-        answer: 'AI models retrieve information from two sources: training data (facts embedded during model training) and real-time retrieval — RAG (Retrieval-Augmented Generation). The knowledge layer is the intersection of both: the body of high-quality, authoritative content that consistently surfaces whether an AI is drawing on training memory or live web retrieval. Auspexi engineers your brand\'s presence in both layers simultaneously through structured content, schema markup, and omnichannel seeding.',
+        answer: 'AI models retrieve information from two sources: training data (facts embedded during model training) and real-time retrieval — RAG (Retrieval-Augmented Generation). The knowledge layer is the intersection of both: the body of high-quality, authoritative content that consistently surfaces whether an AI is drawing on training memory or live web retrieval. L8EntSpace engineers your brand\'s presence in both layers simultaneously through structured content, schema markup, and omnichannel seeding.',
       },
       {
         question: 'What types of businesses benefit most from GEO?',
@@ -60,7 +60,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       {
         question: 'What is the window of opportunity for GEO right now?',
         answer: 'Fewer than 3% of brands currently have any structured GEO presence. The brands that establish AI citation authority in the next 12–18 months will be the default answers for their category queries — a position that is self-reinforcing, since AI models cite authoritative sources more often, increasing their perceived authority further. Late movers will pay to displace established citations rather than claim them. The window is open now.',
-        link: { text: 'See Auspexi\'s roadmap', href: '/roadmap' },
+        link: { text: 'See L8EntSpace\'s roadmap', href: '/roadmap' },
       },
       {
         question: 'Is GEO only relevant for large brands?',
@@ -68,7 +68,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'What is deterministic inference vs probabilistic SEO?',
-        answer: 'Traditional SEO is probabilistic — rankings fluctuate based on algorithm updates, competitor activity, and link velocity in ways that are difficult to predict or control. GEO aims for deterministic inference: engineering your brand facts so precisely that when an AI model is asked a relevant question, your brand is the logically consistent, most authoritative answer. Auspexi\'s approach shifts brand visibility from "hoping to rank" to "engineering to be cited."',
+        answer: 'Traditional SEO is probabilistic — rankings fluctuate based on algorithm updates, competitor activity, and link velocity in ways that are difficult to predict or control. GEO aims for deterministic inference: engineering your brand facts so precisely that when an AI model is asked a relevant question, your brand is the logically consistent, most authoritative answer. L8EntSpace\'s approach shifts brand visibility from "hoping to rank" to "engineering to be cited."',
       },
     ],
   },
@@ -79,8 +79,8 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
     icon: 'Brain',
     items: [
       {
-        question: 'Which AI engines does Auspexi track?',
-        answer: 'Auspexi tracks your brand\'s AI Share of Voice across four major generative AI engines: ChatGPT (OpenAI), Gemini (Google), Claude (Anthropic), and Perplexity AI. Each engine uses different training data, retrieval architectures, and citation heuristics, which means your brand may perform very differently across them. Auspexi provides per-engine SoV scores and a blended overall score so you can identify where to focus your GEO efforts.',
+        question: 'Which AI engines does L8EntSpace track?',
+        answer: 'L8EntSpace tracks your brand\'s AI Share of Voice across four major generative AI engines: ChatGPT (OpenAI), Gemini (Google), Claude (Anthropic), and Perplexity AI. Each engine uses different training data, retrieval architectures, and citation heuristics, which means your brand may perform very differently across them. L8EntSpace provides per-engine SoV scores and a blended overall score so you can identify where to focus your GEO efforts.',
       },
       {
         question: 'How does ChatGPT decide what to cite?',
@@ -88,11 +88,11 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'How does Google Gemini handle brand citations?',
-        answer: 'Google Gemini draws on Google\'s own web index as well as its training corpus. Gemini tends to favour structured content — pages with clear schema markup, defined entities, and strong domain authority in Google Search. A high traditional SEO ranking correlates with, but does not guarantee, Gemini citation. Auspexi\'s schema and entity engineering targets the specific signals Gemini\'s retrieval layer prioritises.',
+        answer: 'Google Gemini draws on Google\'s own web index as well as its training corpus. Gemini tends to favour structured content — pages with clear schema markup, defined entities, and strong domain authority in Google Search. A high traditional SEO ranking correlates with, but does not guarantee, Gemini citation. L8EntSpace\'s schema and entity engineering targets the specific signals Gemini\'s retrieval layer prioritises.',
       },
       {
         question: 'How does Claude (Anthropic) approach factual brand responses?',
-        answer: 'Claude is trained to be precise and conservative about brand claims. It is less likely to cite a brand without multiple high-authority corroborating sources, and it actively avoids repetitive marketing language. Claude responds well to content that uses clear declarative sentences, avoids promotional tone, and presents data in a structured, verifiable format. Auspexi\'s Fact-Vault format — short, specific, authority-attributed statements — is calibrated for Claude\'s citation pattern.',
+        answer: 'Claude is trained to be precise and conservative about brand claims. It is less likely to cite a brand without multiple high-authority corroborating sources, and it actively avoids repetitive marketing language. Claude responds well to content that uses clear declarative sentences, avoids promotional tone, and presents data in a structured, verifiable format. L8EntSpace\'s Fact-Vault format — short, specific, authority-attributed statements — is calibrated for Claude\'s citation pattern.',
       },
       {
         question: 'How does Perplexity AI differ from other AI search engines?',
@@ -100,19 +100,19 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'Do different AI engines have different biases?',
-        answer: 'Yes, significantly. Gemini tends to favour content that aligns with Google\'s E-E-A-T quality standards (Experience, Expertise, Authoritativeness, Trustworthiness). ChatGPT has been trained on a broader corpus and can cite niche sources. Perplexity weights recency heavily. Claude weights precision and source authority. Because each engine behaves differently, Auspexi tracks them individually — a brand with high SoV on Perplexity may have very different performance on Claude.',
+        answer: 'Yes, significantly. Gemini tends to favour content that aligns with Google\'s E-E-A-T quality standards (Experience, Expertise, Authoritativeness, Trustworthiness). ChatGPT has been trained on a broader corpus and can cite niche sources. Perplexity weights recency heavily. Claude weights precision and source authority. Because each engine behaves differently, L8EntSpace tracks them individually — a brand with high SoV on Perplexity may have very different performance on Claude.',
       },
       {
         question: 'How often are AI models updated, and how does this affect my citations?',
-        answer: 'Major foundation model retraining happens every few months for most providers, but retrieval layers (RAG) update continuously. This means your citation profile can change without any action on your part — new model weights may deprioritise your brand, or a competitor\'s content campaign may displace you in the training data. Auspexi\'s continuous monitoring detects these shifts as Z-score drift events so you can respond before the impact compounds.',
+        answer: 'Major foundation model retraining happens every few months for most providers, but retrieval layers (RAG) update continuously. This means your citation profile can change without any action on your part — new model weights may deprioritise your brand, or a competitor\'s content campaign may displace you in the training data. L8EntSpace\'s continuous monitoring detects these shifts as Z-score drift events so you can respond before the impact compounds.',
       },
       {
         question: 'What is "generative noise"?',
-        answer: 'Generative noise is when an AI model generates incorrect or misleading claims about your brand — not because of a deliberate attack, but because the model is confusing you with a similar brand, extrapolating from outdated data, or hallucinating from incomplete training. Auspexi detects generative noise by comparing AI-generated statements about your brand against your verified Fact-Vault, flagging discrepancies so you can publish corrections before the false narrative embeds further.',
+        answer: 'Generative noise is when an AI model generates incorrect or misleading claims about your brand — not because of a deliberate attack, but because the model is confusing you with a similar brand, extrapolating from outdated data, or hallucinating from incomplete training. L8EntSpace detects generative noise by comparing AI-generated statements about your brand against your verified Fact-Vault, flagging discrepancies so you can publish corrections before the false narrative embeds further.',
       },
       {
         question: 'Can AI engines be influenced to cite my brand more often?',
-        answer: 'Yes, through systematic content engineering rather than any form of manipulation. Publishing high-entropy, authoritative content and distributing consistent facts across third-party platforms — Reddit, LinkedIn, industry publications, structured schema — increases the probability that both training data and real-time retrieval surface your brand in relevant responses. This is the entire basis of GEO, and Auspexi\'s platform systematises this process end-to-end.',
+        answer: 'Yes, through systematic content engineering rather than any form of manipulation. Publishing high-entropy, authoritative content and distributing consistent facts across third-party platforms — Reddit, LinkedIn, industry publications, structured schema — increases the probability that both training data and real-time retrieval surface your brand in relevant responses. This is the entire basis of GEO, and L8EntSpace\'s platform systematises this process end-to-end.',
       },
       {
         question: 'Which AI engine drives the most referral traffic?',
@@ -120,11 +120,11 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'How does AI handle contradictory brand information?',
-        answer: 'When AI models encounter contradictory information about a brand across different sources, they either average the positions (producing vague, hedged statements) or defer to the highest-authority source. This is why consistent omnichannel presence is critical — brand facts that appear identically across your website, LinkedIn, industry publications, and structured schema override contradictory claims from lower-authority sources. Auspexi measures this consistency gap and flags it as a remediation priority.',
+        answer: 'When AI models encounter contradictory information about a brand across different sources, they either average the positions (producing vague, hedged statements) or defer to the highest-authority source. This is why consistent omnichannel presence is critical — brand facts that appear identically across your website, LinkedIn, industry publications, and structured schema override contradictory claims from lower-authority sources. L8EntSpace measures this consistency gap and flags it as a remediation priority.',
       },
       {
         question: 'What is a RAG citation vs a training citation?',
-        answer: 'A training citation is embedded in an AI model\'s weights during the training process — recalled from memory without referencing external sources. A RAG (Retrieval-Augmented Generation) citation occurs when an AI actively retrieves live web content to answer a query. Auspexi\'s strategy targets both: structured, authoritative content for real-time RAG retrieval, and high-entropy facts seeded across multiple platforms to influence future training cycles as models are periodically retrained.',
+        answer: 'A training citation is embedded in an AI model\'s weights during the training process — recalled from memory without referencing external sources. A RAG (Retrieval-Augmented Generation) citation occurs when an AI actively retrieves live web content to answer a query. L8EntSpace\'s strategy targets both: structured, authoritative content for real-time RAG retrieval, and high-entropy facts seeded across multiple platforms to influence future training cycles as models are periodically retrained.',
       },
     ],
   },
@@ -135,8 +135,8 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
     icon: 'LineChart',
     items: [
       {
-        question: 'How is Auspexi\'s A-SoV measurement different from estimated metrics?',
-        answer: 'Auspexi measures AI Share of Voice by running live probe queries across four AI engines and recording brand appearances in real time. Unlike estimated or modelled SoV metrics, every data point represents an actual AI engine response — not a projection from web traffic data or keyword rankings. This makes Auspexi\'s SoV measurement deterministic: what you see is exactly what the AI is saying about your brand category right now.',
+        question: 'How is L8EntSpace\'s A-SoV measurement different from estimated metrics?',
+        answer: 'L8EntSpace measures AI Share of Voice by running live probe queries across four AI engines and recording brand appearances in real time. Unlike estimated or modelled SoV metrics, every data point represents an actual AI engine response — not a projection from web traffic data or keyword rankings. This makes L8EntSpace\'s SoV measurement deterministic: what you see is exactly what the AI is saying about your brand category right now.',
       },
       {
         question: 'What is a good A-SoV score?',
@@ -144,39 +144,39 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'What is "sentiment drift" in AI brand tracking?',
-        answer: 'Sentiment drift is a statistically significant shift in the emotional tone or association of AI-generated statements about your brand over time, distinct from normal model variance. Auspexi detects sentiment drift using Z-score analysis: if your brand sentiment deviates more than 2 standard deviations from its rolling baseline, this is flagged as a drift event. Gradual drift — AI models slowly associating your brand with outdated or negative concepts — is the harder-to-detect and more damaging form.',
+        answer: 'Sentiment drift is a statistically significant shift in the emotional tone or association of AI-generated statements about your brand over time, distinct from normal model variance. L8EntSpace detects sentiment drift using Z-score analysis: if your brand sentiment deviates more than 2 standard deviations from its rolling baseline, this is flagged as a drift event. Gradual drift — AI models slowly associating your brand with outdated or negative concepts — is the harder-to-detect and more damaging form.',
       },
       {
-        question: 'What is a Z-Score and why does Auspexi use it?',
-        answer: 'A Z-score measures how many standard deviations a data point is from a statistical mean. Applied to brand sentiment or citation rate, a Z-score above 2.0 or below -2.0 indicates a change that is statistically unlikely to be random variance — it is a meaningful signal requiring investigation. Auspexi uses rolling Z-score analysis so that gradual drift is caught early, not after it has compounded into a structural problem in how AI models represent your brand.',
+        question: 'What is a Z-Score and why does L8EntSpace use it?',
+        answer: 'A Z-score measures how many standard deviations a data point is from a statistical mean. Applied to brand sentiment or citation rate, a Z-score above 2.0 or below -2.0 indicates a change that is statistically unlikely to be random variance — it is a meaningful signal requiring investigation. L8EntSpace uses rolling Z-score analysis so that gradual drift is caught early, not after it has compounded into a structural problem in how AI models represent your brand.',
       },
       {
         question: 'How do I know if my GEO strategy is working?',
-        answer: 'The primary signal is A-SoV increase over time on your target probe queries. Secondary signals include improvement in your Moat Score (semantic proximity to target brand attributes), reduction in generative noise events, and an increase in AI referral traffic sessions. Auspexi\'s dashboard tracks all of these with trend lines across weekly data points, so you can distinguish genuine improvement from normal model variance.',
+        answer: 'The primary signal is A-SoV increase over time on your target probe queries. Secondary signals include improvement in your Moat Score (semantic proximity to target brand attributes), reduction in generative noise events, and an increase in AI referral traffic sessions. L8EntSpace\'s dashboard tracks all of these with trend lines across weekly data points, so you can distinguish genuine improvement from normal model variance.',
       },
       {
         question: 'How often should I run an AI brand audit?',
-        answer: 'Auspexi recommends weekly automated audits for enterprise brands and at minimum bi-weekly for growth-stage brands. AI models update their retrieval layers continuously, meaning your citation profile can change at any time. Weekly auditing ensures you detect competitive displacement, negative drift, or generative noise within days of occurrence — giving you time to respond with fresh content before the problem compounds.',
+        answer: 'L8EntSpace recommends weekly automated audits for enterprise brands and at minimum bi-weekly for growth-stage brands. AI models update their retrieval layers continuously, meaning your citation profile can change at any time. Weekly auditing ensures you detect competitive displacement, negative drift, or generative noise within days of occurrence — giving you time to respond with fresh content before the problem compounds.',
       },
       {
         question: 'What is the difference between citation rate and Share of Voice?',
         answer: 'Citation rate is the raw count of how often your brand appears across a set of AI responses. Share of Voice is citation rate expressed as a percentage relative to your tracked competitors. For example, if your brand appears in 30 out of 100 AI responses and your leading competitor appears in 45, your SoV is 40% and theirs is 60%. SoV is always more actionable for strategic decision-making than an absolute citation count.',
       },
       {
-        question: 'What is the Auspexi Moat Score?',
+        question: 'What is the L8EntSpace Moat Score?',
         answer: 'The Moat Score measures how closely an AI model\'s latent space associates your brand with the key attributes you want to own — such as "reliable," "innovative," "cost-effective," or "enterprise-grade." It is calculated by computing the vector cosine similarity between your brand\'s embedding and target concept embeddings in a 768-dimensional semantic space. A Moat Score moving toward 1.0 means AI models are developing stronger associations between your brand and those values.',
       },
       {
-        question: 'How does Auspexi\'s 768-dimensional mapping work?',
-        answer: 'Auspexi uses Google Gemini\'s text-embedding-004 model, which maps text into 768-dimensional vectors. Your brand name and core brand facts are embedded into this mathematical space, and the cosine similarity between your brand vector and vectors for target concepts is measured. Changes in these distances over time indicate whether your brand is becoming more or less closely associated with the values you are targeting in AI model memory.',
+        question: 'How does L8EntSpace\'s 768-dimensional mapping work?',
+        answer: 'L8EntSpace uses Google Gemini\'s text-embedding-004 model, which maps text into 768-dimensional vectors. Your brand name and core brand facts are embedded into this mathematical space, and the cosine similarity between your brand vector and vectors for target concepts is measured. Changes in these distances over time indicate whether your brand is becoming more or less closely associated with the values you are targeting in AI model memory.',
       },
       {
         question: 'Can I measure the revenue impact of GEO?',
-        answer: 'Indirect revenue attribution from GEO is possible through three signals: AI referral traffic (sessions originating from AI engine source links, tracked in Auspexi\'s Overview), branded search lift (users searching for your brand after seeing it cited in an AI response), and pipeline influence (deals where prospects first encountered the brand through an AI recommendation). Auspexi tracks AI referral sessions and SoV trends, which can be correlated with CRM pipeline data.',
+        answer: 'Indirect revenue attribution from GEO is possible through three signals: AI referral traffic (sessions originating from AI engine source links, tracked in L8EntSpace\'s Overview), branded search lift (users searching for your brand after seeing it cited in an AI response), and pipeline influence (deals where prospects first encountered the brand through an AI recommendation). L8EntSpace tracks AI referral sessions and SoV trends, which can be correlated with CRM pipeline data.',
       },
       {
         question: 'What does a declining A-SoV mean?',
-        answer: 'A declining A-SoV can indicate several things: a competitor has intensified their GEO content activity, an AI model has been retrained with data that deprioritises your brand, or your content freshness has degraded relative to competitors. Auspexi\'s drift detection flags sudden declines as anomalies. For gradual declines, reviewing which specific probe queries show reduced brand appearances identifies the topic clusters where you are losing ground.',
+        answer: 'A declining A-SoV can indicate several things: a competitor has intensified their GEO content activity, an AI model has been retrained with data that deprioritises your brand, or your content freshness has degraded relative to competitors. L8EntSpace\'s drift detection flags sudden declines as anomalies. For gradual declines, reviewing which specific probe queries show reduced brand appearances identifies the topic clusters where you are losing ground.',
       },
     ],
   },
@@ -188,16 +188,16 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
     items: [
       {
         question: 'What is a "Cite-Magnet"?',
-        answer: 'A Cite-Magnet is a precisely structured brand fact engineered to be cited by AI models. Cite-Magnets contain three elements: a specific, verifiable claim (not generic marketing language), a quantified detail (a number, percentage, named methodology, or timeframe), and a clear subject-object relationship that identifies your brand as the source. "Auspexi maps brand-concept associations across 768 semantic dimensions" is a Cite-Magnet. "We provide AI solutions" is not.',
+        answer: 'A Cite-Magnet is a precisely structured brand fact engineered to be cited by AI models. Cite-Magnets contain three elements: a specific, verifiable claim (not generic marketing language), a quantified detail (a number, percentage, named methodology, or timeframe), and a clear subject-object relationship that identifies your brand as the source. "L8EntSpace maps brand-concept associations across 768 semantic dimensions" is a Cite-Magnet. "We provide AI solutions" is not.',
         link: { text: 'Explore Cite-Magnet strategy', href: '/blog' },
       },
       {
         question: 'What makes a fact "high-entropy" for GEO purposes?',
-        answer: 'In information theory, entropy measures the information density of a statement. A high-entropy fact contains specific data that is non-obvious and cannot be inferred from context — numbers, named methodologies, specific mechanisms, or proprietary processes. "Our platform uses machine learning" has near-zero entropy — any AI company could say this. "Auspexi detects AI brand sentiment drift using rolling Z-score analysis across four major LLM engines" is high-entropy. Every word carries information that distinguishes your brand.',
+        answer: 'In information theory, entropy measures the information density of a statement. A high-entropy fact contains specific data that is non-obvious and cannot be inferred from context — numbers, named methodologies, specific mechanisms, or proprietary processes. "Our platform uses machine learning" has near-zero entropy — any AI company could say this. "L8EntSpace detects AI brand sentiment drift using rolling Z-score analysis across four major LLM engines" is high-entropy. Every word carries information that distinguishes your brand.',
       },
       {
         question: 'How many facts do I need in my Fact-Vault?',
-        answer: 'Quality matters more than quantity, but breadth matters for coverage. A well-structured Fact-Vault with 50–100 high-entropy facts covering multiple topic clusters — features, use cases, proof points, methodology, founding story — is sufficient to drive meaningful GEO impact. Auspexi\'s Content Scorer grades each fact on entropy, specificity, and semantic relevance, so you know which facts are doing work and which are filler.',
+        answer: 'Quality matters more than quantity, but breadth matters for coverage. A well-structured Fact-Vault with 50–100 high-entropy facts covering multiple topic clusters — features, use cases, proof points, methodology, founding story — is sufficient to drive meaningful GEO impact. L8EntSpace\'s Content Scorer grades each fact on entropy, specificity, and semantic relevance, so you know which facts are doing work and which are filler.',
         link: { text: 'Go to Fact-Vault', href: '/dashboard' },
       },
       {
@@ -214,7 +214,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'Should my brand facts include statistics and numbers?',
-        answer: 'Yes — numbers are among the most citable elements in AI responses because they are specific, memorable, and verifiable. Percentages, counts, time frames, and dimensional specifics create high-entropy anchors that AI models repeat precisely. "Auspexi reduces time-to-GEO-insight from weeks to hours" is less citable than "Auspexi delivers a complete AI Share of Voice report across four AI engines, measuring citation frequency, sentiment, and semantic positioning simultaneously."',
+        answer: 'Yes — numbers are among the most citable elements in AI responses because they are specific, memorable, and verifiable. Percentages, counts, time frames, and dimensional specifics create high-entropy anchors that AI models repeat precisely. "L8EntSpace reduces time-to-GEO-insight from weeks to hours" is less citable than "L8EntSpace delivers a complete AI Share of Voice report across four AI engines, measuring citation frequency, sentiment, and semantic positioning simultaneously."',
       },
       {
         question: 'What is the difference between a Cite-Magnet and a keyword?',
@@ -222,7 +222,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'How do AI models decide which source to cite when multiple sources agree?',
-        answer: 'When multiple sources agree on a fact, AI models typically cite the source with the highest perceived authority in that domain — measured by domain rating, backlink profile, content depth, and entity clarity. If authority is roughly equal, recency becomes the tiebreaker. Auspexi\'s omnichannel seeding strategy is designed to make your brand\'s owned channels the canonical source of your brand\'s facts, so that when AI models cross-reference multiple sites, your content is traced back to first.',
+        answer: 'When multiple sources agree on a fact, AI models typically cite the source with the highest perceived authority in that domain — measured by domain rating, backlink profile, content depth, and entity clarity. If authority is roughly equal, recency becomes the tiebreaker. L8EntSpace\'s omnichannel seeding strategy is designed to make your brand\'s owned channels the canonical source of your brand\'s facts, so that when AI models cross-reference multiple sites, your content is traced back to first.',
       },
       {
         question: 'Can video and audio content become citable by AI?',
@@ -239,11 +239,11 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       {
         question: 'What is JSON-LD schema and why does it matter for GEO?',
         answer: 'JSON-LD (JSON for Linked Data) is a structured data format embedded in web pages that gives AI crawlers an unambiguous, machine-readable description of your content. Schema types like Organization, FAQPage, Article, and SoftwareApplication tell AI crawlers exactly what your brand is, what questions you answer, and what content you publish — reducing interpretive ambiguity. Pages with correct, comprehensive schema markup are significantly more likely to be indexed and retrieved accurately by AI engines.',
-        link: { text: 'Check your schema with Auspexi', href: '/dashboard' },
+        link: { text: 'Check your schema with L8EntSpace', href: '/dashboard' },
       },
       {
         question: 'What is a 768-dimensional latent space?',
-        answer: 'A latent space is the mathematical representation of meaning used internally by AI language models. Google Gemini\'s text-embedding-004 model maps text into 768 numerical dimensions, where semantically similar concepts cluster together in this high-dimensional space. Auspexi uses this same embedding space to measure how closely your brand is associated with target concepts like "reliable," "innovative," or "enterprise-grade," and tracks how these associations change over time as you execute your GEO strategy.',
+        answer: 'A latent space is the mathematical representation of meaning used internally by AI language models. Google Gemini\'s text-embedding-004 model maps text into 768 numerical dimensions, where semantically similar concepts cluster together in this high-dimensional space. L8EntSpace uses this same embedding space to measure how closely your brand is associated with target concepts like "reliable," "innovative," or "enterprise-grade," and tracks how these associations change over time as you execute your GEO strategy.',
       },
       {
         question: 'What is entity density in GEO content?',
@@ -255,15 +255,15 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'What technical site factors affect AI crawlability?',
-        answer: 'The primary factors are: a clean sitemap, no JavaScript-blocking of critical content, structured schema markup, fast page load times (Core Web Vitals), canonical URLs, and a robots.txt that explicitly allows AI crawlers — GPTBot, ClaudeBot, PerplexityBot, and Google-Extended. Auspexi\'s Technical Analyzer audits all of these and generates a prioritised remediation list. A site that is technically invisible to AI crawlers cannot be cited regardless of content quality.',
+        answer: 'The primary factors are: a clean sitemap, no JavaScript-blocking of critical content, structured schema markup, fast page load times (Core Web Vitals), canonical URLs, and a robots.txt that explicitly allows AI crawlers — GPTBot, ClaudeBot, PerplexityBot, and Google-Extended. L8EntSpace\'s Technical Analyzer audits all of these and generates a prioritised remediation list. A site that is technically invisible to AI crawlers cannot be cited regardless of content quality.',
       },
       {
-        question: 'What is pgvector and how does Auspexi use it?',
-        answer: 'pgvector is an open-source PostgreSQL extension for storing and querying vector embeddings at scale. Auspexi uses a pgvector backend to store brand embeddings, competitor embeddings, and concept embeddings in the same 768-dimensional space as Gemini\'s embedding model. This enables hybrid search — combining traditional metadata filtering (brand name, date, category) with dense vector similarity — to find exactly which topic clusters your brand is weakest in relative to competitors.',
+        question: 'What is pgvector and how does L8EntSpace use it?',
+        answer: 'pgvector is an open-source PostgreSQL extension for storing and querying vector embeddings at scale. L8EntSpace uses a pgvector backend to store brand embeddings, competitor embeddings, and concept embeddings in the same 768-dimensional space as Gemini\'s embedding model. This enables hybrid search — combining traditional metadata filtering (brand name, date, category) with dense vector similarity — to find exactly which topic clusters your brand is weakest in relative to competitors.',
       },
       {
         question: 'What is ontological interoperability in GEO?',
-        answer: 'Different AI models use different internal representations of knowledge. Ontological interoperability means structuring your brand content using universal schema standards — Schema.org ontologies — so that whether Claude, ChatGPT, Gemini, or an edge LLM reads your data, they all arrive at the same consistent conclusion about your brand\'s identity, authority, and relationship to relevant topics. Auspexi\'s schema engineering layer implements this across all major schema types for your domain.',
+        answer: 'Different AI models use different internal representations of knowledge. Ontological interoperability means structuring your brand content using universal schema standards — Schema.org ontologies — so that whether Claude, ChatGPT, Gemini, or an edge LLM reads your data, they all arrive at the same consistent conclusion about your brand\'s identity, authority, and relationship to relevant topics. L8EntSpace\'s schema engineering layer implements this across all major schema types for your domain.',
       },
       {
         question: 'How does GPTBot differ from Googlebot?',
@@ -271,7 +271,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'Which structured data schema types matter most for GEO?',
-        answer: 'The highest-impact schema types for GEO are: Organization (defines your brand entity and its attributes), FAQPage (pre-formats Q&A content in the exact format AI models prefer), Article and BlogPosting (gives AI structured access to your content with metadata), SoftwareApplication (for SaaS products), and HowTo (for procedural content). Auspexi\'s Technical Analyzer identifies which schema types are missing or incorrectly implemented on your domain and provides corrected code.',
+        answer: 'The highest-impact schema types for GEO are: Organization (defines your brand entity and its attributes), FAQPage (pre-formats Q&A content in the exact format AI models prefer), Article and BlogPosting (gives AI structured access to your content with metadata), SoftwareApplication (for SaaS products), and HowTo (for procedural content). L8EntSpace\'s Technical Analyzer identifies which schema types are missing or incorrectly implemented on your domain and provides corrected code.',
       },
       {
         question: 'How does AI crawling differ from traditional web crawling?',
@@ -292,16 +292,16 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'How does competitor data decay work in AI models?',
-        answer: 'AI models are trained on data up to a knowledge cutoff and retrieve real-time data through RAG. Competitor content that was authoritative at training time may become stale if the competitor stops publishing, their claims become outdated by market developments, or better sources emerge. Auspexi\'s Competitors module monitors which of your competitors\' topic clusters are showing evidence of data decay — identifying where targeted content can displace their weakening AI presence.',
+        answer: 'AI models are trained on data up to a knowledge cutoff and retrieve real-time data through RAG. Competitor content that was authoritative at training time may become stale if the competitor stops publishing, their claims become outdated by market developments, or better sources emerge. L8EntSpace\'s Competitors module monitors which of your competitors\' topic clusters are showing evidence of data decay — identifying where targeted content can displace their weakening AI presence.',
       },
       {
         question: 'What is a "generative vulnerability" in a competitor\'s AI profile?',
-        answer: 'A generative vulnerability is a topic area where a competitor\'s AI presence is weak — either because they lack content, their content is outdated, or AI models are already associating them with negative signals in that area. Auspexi identifies these vulnerabilities by running competitor probe queries and analysing response quality, source recency, and sentiment. Your content strategy targets these vulnerabilities specifically, with high-entropy Cite-Magnets positioned to fill the gap.',
+        answer: 'A generative vulnerability is a topic area where a competitor\'s AI presence is weak — either because they lack content, their content is outdated, or AI models are already associating them with negative signals in that area. L8EntSpace identifies these vulnerabilities by running competitor probe queries and analysing response quality, source recency, and sentiment. Your content strategy targets these vulnerabilities specifically, with high-entropy Cite-Magnets positioned to fill the gap.',
       },
       {
         question: 'Is the Trojan Horse strategy ethical?',
-        answer: 'Yes — entirely. The Trojan Horse strategy does not involve manipulating AI systems, spreading misinformation, or attacking competitors\' infrastructure. It involves publishing accurate, high-quality content that provides a better, more current answer than existing sources. Winning a citation on content quality is the same mechanism that earns a top Google ranking. Auspexi explicitly prohibits generating false or misleading content through its Acceptable Use Policy.',
-        link: { text: 'Read Auspexi\'s Acceptable Use Policy', href: '/acceptable-use' },
+        answer: 'Yes — entirely. The Trojan Horse strategy does not involve manipulating AI systems, spreading misinformation, or attacking competitors\' infrastructure. It involves publishing accurate, high-quality content that provides a better, more current answer than existing sources. Winning a citation on content quality is the same mechanism that earns a top Google ranking. L8EntSpace explicitly prohibits generating false or misleading content through its Acceptable Use Policy.',
+        link: { text: 'Read L8EntSpace\'s Acceptable Use Policy', href: '/acceptable-use' },
       },
       {
         question: 'How quickly can a competitor\'s AI presence be displaced?',
@@ -309,41 +309,41 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'Can I track when a competitor\'s AI presence is weakening?',
-        answer: 'Yes. Auspexi\'s Competitors module runs probe queries on competitor brands and tracks their SoV trend, sentiment, and presence across the four major AI engines over time. A declining competitor SoV trend — especially when combined with reduced content freshness on their site — is a signal to increase your own content output in those topic areas before a third competitor fills the gap instead.',
+        answer: 'Yes. L8EntSpace\'s Competitors module runs probe queries on competitor brands and tracks their SoV trend, sentiment, and presence across the four major AI engines over time. A declining competitor SoV trend — especially when combined with reduced content freshness on their site — is a signal to increase your own content output in those topic areas before a third competitor fills the gap instead.',
       },
       {
         question: 'Should I name competitors directly in my GEO content?',
-        answer: 'Direct competitor comparisons are a legitimate GEO tactic when factual and accurate. "Unlike [Competitor], which [factual limitation], Auspexi [specific differentiator]" is a high-entropy fact that AI models will cite when asked to compare solutions in your category. However, all comparative claims must be accurate and verifiable — AI models cross-reference claims against other sources and will not consistently cite content that is inconsistent with the wider information landscape.',
+        answer: 'Direct competitor comparisons are a legitimate GEO tactic when factual and accurate. "Unlike [Competitor], which [factual limitation], L8EntSpace [specific differentiator]" is a high-entropy fact that AI models will cite when asked to compare solutions in your category. However, all comparative claims must be accurate and verifiable — AI models cross-reference claims against other sources and will not consistently cite content that is inconsistent with the wider information landscape.',
       },
       {
         question: 'How do I protect my own brand from a Trojan Horse attack?',
-        answer: 'The best defence is an active, current, high-quality GEO presence. Brands with consistent, frequently updated content across multiple authoritative platforms are significantly harder to displace. Auspexi\'s continuous monitoring alerts you when a competitor\'s content is gaining citation share on your core probe queries — giving you time to respond with fresh authoritative content before the displacement compounds into a structural problem.',
+        answer: 'The best defence is an active, current, high-quality GEO presence. Brands with consistent, frequently updated content across multiple authoritative platforms are significantly harder to displace. L8EntSpace\'s continuous monitoring alerts you when a competitor\'s content is gaining citation share on your core probe queries — giving you time to respond with fresh authoritative content before the displacement compounds into a structural problem.',
       },
       {
         question: 'What is "latent space displacement"?',
-        answer: 'Latent space displacement occurs when a competitor successfully moves their brand closer to key concepts — "best GEO tool," "most accurate AI tracking" — in the semantic embedding space, simultaneously moving your brand further from those concepts. It is not about keyword ranking — it is about the underlying associative structure AI models use to form responses. Auspexi\'s Moat Score detects latent space displacement by tracking vector cosine distances between your brand and target concepts over time.',
+        answer: 'Latent space displacement occurs when a competitor successfully moves their brand closer to key concepts — "best GEO tool," "most accurate AI tracking" — in the semantic embedding space, simultaneously moving your brand further from those concepts. It is not about keyword ranking — it is about the underlying associative structure AI models use to form responses. L8EntSpace\'s Moat Score detects latent space displacement by tracking vector cosine distances between your brand and target concepts over time.',
       },
       {
         question: 'What is a "counter-fact" and how do I deploy one?',
-        answer: 'A counter-fact is a high-entropy, authoritative statement that provides a more specific, current, and accurate alternative to a competitor claim that AI models are currently repeating. Rather than directly attacking the competitor, a counter-fact positions your brand as the updated, more accurate source on that topic. Auspexi\'s Competitors module generates counter-facts automatically and deploys them to your Fact-Vault for use in content campaigns. The goal is always a factually superior claim, not a refutation.',
-        link: { text: 'Manage competitors in Auspexi', href: '/dashboard' },
+        answer: 'A counter-fact is a high-entropy, authoritative statement that provides a more specific, current, and accurate alternative to a competitor claim that AI models are currently repeating. Rather than directly attacking the competitor, a counter-fact positions your brand as the updated, more accurate source on that topic. L8EntSpace\'s Competitors module generates counter-facts automatically and deploys them to your Fact-Vault for use in content campaigns. The goal is always a factually superior claim, not a refutation.',
+        link: { text: 'Manage competitors in L8EntSpace', href: '/dashboard' },
       },
     ],
   },
   {
     id: 'platform',
-    title: 'The Auspexi Platform',
-    description: 'What each Auspexi tool does, how to use it, and how the platform\'s modules work together as an integrated GEO system.',
+    title: 'The L8EntSpace Platform',
+    description: 'What each L8EntSpace tool does, how to use it, and how the platform\'s modules work together as an integrated GEO system.',
     icon: 'LayoutDashboard',
     items: [
       {
         question: 'What is GEO-Pulse?',
-        answer: 'GEO-Pulse is Auspexi\'s keyword scanning tool. Enter any search query and GEO-Pulse tests it across AI engines, returning a real-time analysis of how AI models are currently answering that query — including whether your brand is cited, in what context, and with what competitive positioning. Saved keywords are tracked automatically so you can see how citation rates for your most important queries change over time.',
+        answer: 'GEO-Pulse is L8EntSpace\'s keyword scanning tool. Enter any search query and GEO-Pulse tests it across AI engines, returning a real-time analysis of how AI models are currently answering that query — including whether your brand is cited, in what context, and with what competitive positioning. Saved keywords are tracked automatically so you can see how citation rates for your most important queries change over time.',
         link: { text: 'Open GEO-Pulse', href: '/dashboard' },
       },
       {
         question: 'What is the Fact-Vault?',
-        answer: 'The Fact-Vault is your brand\'s structured knowledge base within Auspexi. It stores your high-entropy Cite-Magnet facts and structured claims in a format optimised for AI ingestion. Facts in the Fact-Vault feed into Auspexi\'s content generation (Agents module), competitor counter-fact deployment (Competitors module), and the Citacious voice assistant\'s brand knowledge base. A well-populated Fact-Vault is the foundation of every GEO strategy built on the Auspexi platform.',
+        answer: 'The Fact-Vault is your brand\'s structured knowledge base within L8EntSpace. It stores your high-entropy Cite-Magnet facts and structured claims in a format optimised for AI ingestion. Facts in the Fact-Vault feed into L8EntSpace\'s content generation (Agents module), competitor counter-fact deployment (Competitors module), and the Citacious voice assistant\'s brand knowledge base. A well-populated Fact-Vault is the foundation of every GEO strategy built on the L8EntSpace platform.',
         link: { text: 'Build your Fact-Vault', href: '/dashboard' },
       },
       {
@@ -362,7 +362,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'What is Citacious and how do I use it?',
-        answer: 'Citacious is Auspexi\'s real-time AI voice assistant, powered by Google Gemini Live. It has deep knowledge of GEO strategy, your brand\'s Fact-Vault, and your live platform metrics. Speak naturally — ask about your SoV trends, request strategic recommendations for your next campaign, or have Citacious navigate you to a specific dashboard module. Citacious responds within 500 milliseconds and can control dashboard navigation on your behalf when instructed.',
+        answer: 'Citacious is L8EntSpace\'s real-time AI voice assistant, powered by Google Gemini Live. It has deep knowledge of GEO strategy, your brand\'s Fact-Vault, and your live platform metrics. Speak naturally — ask about your SoV trends, request strategic recommendations for your next campaign, or have Citacious navigate you to a specific dashboard module. Citacious responds within 500 milliseconds and can control dashboard navigation on your behalf when instructed.',
         link: { text: 'Talk to Citacious', href: '/voice-agents' },
       },
       {
@@ -377,21 +377,21 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'What is the Agents module?',
-        answer: 'The Agents module is Auspexi\'s automated content pipeline. It uses AI to generate GEO-optimised blog articles, structured fact sets, and schema-ready content based on your Fact-Vault and target keywords. Each piece of content produced by Agents is pre-structured with Cite-Magnets, entity-dense paragraphs, and schema markup — ready to publish and begin accumulating AI citations from day one. Generated articles also automatically extract new facts back into your Fact-Vault.',
+        answer: 'The Agents module is L8EntSpace\'s automated content pipeline. It uses AI to generate GEO-optimised blog articles, structured fact sets, and schema-ready content based on your Fact-Vault and target keywords. Each piece of content produced by Agents is pre-structured with Cite-Magnets, entity-dense paragraphs, and schema markup — ready to publish and begin accumulating AI citations from day one. Generated articles also automatically extract new facts back into your Fact-Vault.',
         link: { text: 'Generate GEO content', href: '/dashboard' },
       },
       {
-        question: 'What data does Auspexi use to calculate Share of Voice?',
-        answer: 'A-SoV is calculated from live probe queries — a set of industry-specific questions representing how real users query AI engines about your category. Auspexi runs these queries across ChatGPT, Gemini, Claude, and Perplexity, parses each response for brand mentions (yours and competitors\'), and calculates each brand\'s appearance rate. The result is a per-engine and blended SoV score based on actual AI responses, not modelled estimates from web traffic or keyword data.',
+        question: 'What data does L8EntSpace use to calculate Share of Voice?',
+        answer: 'A-SoV is calculated from live probe queries — a set of industry-specific questions representing how real users query AI engines about your category. L8EntSpace runs these queries across ChatGPT, Gemini, Claude, and Perplexity, parses each response for brand mentions (yours and competitors\'), and calculates each brand\'s appearance rate. The result is a per-engine and blended SoV score based on actual AI responses, not modelled estimates from web traffic or keyword data.',
       },
       {
         question: 'How do I add facts to my Fact-Vault?',
-        answer: 'Navigate to the Fact-Vault in your Auspexi dashboard. You can add facts manually by typing individual Cite-Magnet statements, or use the Content Scorer to extract high-entropy facts from existing content you paste in. Each fact is automatically scored on entropy and semantic relevance. Articles generated through the Agents module also populate the Fact-Vault automatically with extracted facts. Aim for facts that are specific, verifiable, and brand-attributed.',
+        answer: 'Navigate to the Fact-Vault in your L8EntSpace dashboard. You can add facts manually by typing individual Cite-Magnet statements, or use the Content Scorer to extract high-entropy facts from existing content you paste in. Each fact is automatically scored on entropy and semantic relevance. Articles generated through the Agents module also populate the Fact-Vault automatically with extracted facts. Aim for facts that are specific, verifiable, and brand-attributed.',
         link: { text: 'Go to Fact-Vault', href: '/dashboard' },
       },
       {
-        question: 'How do the Auspexi modules work together?',
-        answer: 'Auspexi is designed as an integrated GEO system. Your Fact-Vault is the core knowledge base that feeds every other module: the Content Scorer grades your existing content against it, the Agents module generates new content from it, the Competitors module deploys counter-facts from it, and Citacious uses it to answer brand-specific questions. GEO-Pulse tests how well your Fact-Vault facts are being cited by live AI engines, creating a feedback loop that continuously improves citation rates.',
+        question: 'How do the L8EntSpace modules work together?',
+        answer: 'L8EntSpace is designed as an integrated GEO system. Your Fact-Vault is the core knowledge base that feeds every other module: the Content Scorer grades your existing content against it, the Agents module generates new content from it, the Competitors module deploys counter-facts from it, and Citacious uses it to answer brand-specific questions. GEO-Pulse tests how well your Fact-Vault facts are being cited by live AI engines, creating a feedback loop that continuously improves citation rates.',
       },
     ],
   },
@@ -402,26 +402,26 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
     icon: 'CreditCard',
     items: [
       {
-        question: 'How does Auspexi\'s pricing work?',
-        answer: 'Auspexi offers tiered subscription plans billed monthly or annually. Each tier unlocks a higher volume of probe queries, additional competitor tracking slots, and access to advanced platform features. Annual plans offer a significant discount compared to monthly billing. All plans include the core GEO-Pulse, Fact-Vault, Content Scorer, and Citacious features from day one.',
+        question: 'How does L8EntSpace\'s pricing work?',
+        answer: 'L8EntSpace offers tiered subscription plans billed monthly or annually. Each tier unlocks a higher volume of probe queries, additional competitor tracking slots, and access to advanced platform features. Annual plans offer a significant discount compared to monthly billing. All plans include the core GEO-Pulse, Fact-Vault, Content Scorer, and Citacious features from day one.',
         link: { text: 'See pricing', href: '/#pricing' },
       },
       {
-        question: 'Is there a free way to try Auspexi?',
-        answer: 'Auspexi offers a Starter plan that gives you immediate access to the core platform features with no long-term commitment. For Enterprise plan features — including unlimited queries, custom integrations, and dedicated onboarding — contact our team at sales@auspexi.com to discuss a tailored evaluation.',
+        question: 'Is there a free way to try L8EntSpace?',
+        answer: 'L8EntSpace offers a Starter plan that gives you immediate access to the core platform features with no long-term commitment. For Enterprise plan features — including unlimited queries, custom integrations, and dedicated onboarding — contact our team at sales@l8entspace.com to discuss a tailored evaluation.',
         link: { text: 'View plans', href: '/#pricing' },
       },
       {
         question: 'Can I cancel my subscription at any time?',
-        answer: 'Yes. You can cancel your Auspexi subscription at any time from your account settings without speaking to anyone. Your access continues until the end of the current billing period. There are no lock-in periods on monthly plans. Annual plan holders who cancel retain access until their annual period expires.',
+        answer: 'Yes. You can cancel your L8EntSpace subscription at any time from your account settings without speaking to anyone. Your access continues until the end of the current billing period. There are no lock-in periods on monthly plans. Annual plan holders who cancel retain access until their annual period expires.',
       },
       {
-        question: 'What is Auspexi\'s refund policy?',
-        answer: 'Auspexi is a digital service delivered immediately upon account creation. Under the Consumer Contracts Regulations 2013 (UK), the 14-day cancellation right is waived once you begin using the Service. Refunds are provided where required by the Consumer Rights Act 2015 (e.g., material service fault) or at our discretion. If you believe you are entitled to a refund, contact sales@auspexi.com and we will review your case.',
+        question: 'What is L8EntSpace\'s refund policy?',
+        answer: 'L8EntSpace is a digital service delivered immediately upon account creation. Under the Consumer Contracts Regulations 2013 (UK), the 14-day cancellation right is waived once you begin using the Service. Refunds are provided where required by the Consumer Rights Act 2015 (e.g., material service fault) or at our discretion. If you believe you are entitled to a refund, contact sales@l8entspace.com and we will review your case.',
       },
       {
         question: 'What happens to my data if I cancel?',
-        answer: 'Your Fact-Vault, brand settings, and historical SoV data are retained for 30 days after cancellation, giving you time to export your data. After 30 days, your data is permanently deleted in accordance with our Privacy Policy. Billing records are retained for 7 years as required by HMRC. You can request immediate deletion of your personal data at any time by contacting sales@auspexi.com.',
+        answer: 'Your Fact-Vault, brand settings, and historical SoV data are retained for 30 days after cancellation, giving you time to export your data. After 30 days, your data is permanently deleted in accordance with our Privacy Policy. Billing records are retained for 7 years as required by HMRC. You can request immediate deletion of your personal data at any time by contacting sales@l8entspace.com.',
         link: { text: 'Read our Privacy Policy', href: '/privacy' },
       },
       {
@@ -430,12 +430,12 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'What happens if I secured a promotional or lifetime deal rate?',
-        answer: 'Promotional and discounted rates — including early-adopter pricing — are locked in for as long as your subscription remains continuously active. If you cancel and resubscribe at a later date, the promotional rate is no longer available and standard pricing applies at that time. We recommend contacting us at sales@auspexi.com before cancelling if you have a promotional rate, as we may be able to help.',
+        answer: 'Promotional and discounted rates — including early-adopter pricing — are locked in for as long as your subscription remains continuously active. If you cancel and resubscribe at a later date, the promotional rate is no longer available and standard pricing applies at that time. We recommend contacting us at sales@l8entspace.com before cancelling if you have a promotional rate, as we may be able to help.',
       },
       {
         question: 'Is there an enterprise plan?',
-        answer: 'Yes. Enterprise plans include unlimited probe queries, custom AI engine integrations, multi-brand management, dedicated onboarding and strategic support, SLA-backed uptime, and a Data Processing Agreement (DPA) for GDPR compliance. Enterprise pricing is tailored to your requirements. Contact us at sales@auspexi.com to start a conversation.',
-        link: { text: 'Contact us for enterprise pricing', href: 'mailto:sales@auspexi.com' },
+        answer: 'Yes. Enterprise plans include unlimited probe queries, custom AI engine integrations, multi-brand management, dedicated onboarding and strategic support, SLA-backed uptime, and a Data Processing Agreement (DPA) for GDPR compliance. Enterprise pricing is tailored to your requirements. Contact us at sales@l8entspace.com to start a conversation.',
+        link: { text: 'Contact us for enterprise pricing', href: 'mailto:sales@l8entspace.com' },
       },
     ],
   },
@@ -447,34 +447,34 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
     items: [
       {
         question: 'Where is my data stored?',
-        answer: 'All Auspexi platform data is stored in Google Firestore — Google Cloud\'s globally distributed, enterprise-grade database. Data is stored with multi-tenant isolation: your brand data, Fact-Vault, and SoV metrics are accessible only by your authenticated user account and are never shared with or visible to other Auspexi customers. Google Cloud operates under ISO 27001, SOC 2, and GDPR-compliant data centre standards.',
+        answer: 'All L8EntSpace platform data is stored in Google Firestore — Google Cloud\'s globally distributed, enterprise-grade database. Data is stored with multi-tenant isolation: your brand data, Fact-Vault, and SoV metrics are accessible only by your authenticated user account and are never shared with or visible to other L8EntSpace customers. Google Cloud operates under ISO 27001, SOC 2, and GDPR-compliant data centre standards.',
       },
       {
-        question: 'Is Auspexi GDPR compliant?',
-        answer: 'Yes. Auspexi is operated from the UK and complies with UK GDPR. We maintain a full Privacy Policy disclosing all data processing activities, lawful bases, third-party processors, and data retention periods. All users have the complete set of UK GDPR rights: access, rectification, erasure, restriction, portability, and the right to complain to the Information Commissioner\'s Office (ICO).',
+        question: 'Is L8EntSpace GDPR compliant?',
+        answer: 'Yes. L8EntSpace is operated from the UK and complies with UK GDPR. We maintain a full Privacy Policy disclosing all data processing activities, lawful bases, third-party processors, and data retention periods. All users have the complete set of UK GDPR rights: access, rectification, erasure, restriction, portability, and the right to complain to the Information Commissioner\'s Office (ICO).',
         link: { text: 'Read the Privacy Policy', href: '/privacy' },
       },
       {
-        question: 'Does Auspexi share my brand data with AI companies to train their models?',
+        question: 'Does L8EntSpace share my brand data with AI companies to train their models?',
         answer: 'No. Your brand data — keywords, Fact-Vault entries, competitor information — is sent to third-party AI APIs (Google Gemini, OpenAI, Anthropic, Perplexity) only to process your specific platform queries. It is not used for model training by those providers. We include contractual restrictions on training use where API terms make this available. Your brand strategy and proprietary Fact-Vault data are treated as confidential.',
         link: { text: 'See our AI processor disclosures', href: '/privacy' },
       },
       {
-        question: 'Who can see my brand data within Auspexi?',
-        answer: 'Only your authenticated user account can access your brand data in Auspexi. Firestore security rules restrict data access to the owning user UID at the database level. Auspexi staff do not have routine access to customer Fact-Vaults or brand strategies. Any exceptional staff access requires explicit authorisation and is recorded in our SOC2 audit trail, which logs all data mutations across the platform.',
+        question: 'Who can see my brand data within L8EntSpace?',
+        answer: 'Only your authenticated user account can access your brand data in L8EntSpace. Firestore security rules restrict data access to the owning user UID at the database level. L8EntSpace staff do not have routine access to customer Fact-Vaults or brand strategies. Any exceptional staff access requires explicit authorisation and is recorded in our SOC2 audit trail, which logs all data mutations across the platform.',
       },
       {
         question: 'How is my data encrypted?',
-        answer: 'All data stored in Auspexi is encrypted at rest using AES-256 encryption. All data transmitted between your browser and Auspexi\'s servers is encrypted in transit using TLS 1.3. Voice audio processed by Citacious is transmitted directly to Google\'s Gemini Live API over encrypted connections and is not retained by Auspexi beyond the duration of the voice session.',
+        answer: 'All data stored in L8EntSpace is encrypted at rest using AES-256 encryption. All data transmitted between your browser and L8EntSpace\'s servers is encrypted in transit using TLS 1.3. Voice audio processed by Citacious is transmitted directly to Google\'s Gemini Live API over encrypted connections and is not retained by L8EntSpace beyond the duration of the voice session.',
       },
       {
         question: 'Is voice data from Citacious recorded?',
-        answer: 'Citacious processes your microphone audio in real time through Google Gemini Live API. Auspexi does not record or store your voice audio. Call transcripts may be retained for up to 30 days for service quality and improvement purposes, after which they are permanently deleted. You can end a Citacious session at any time — audio processing ceases immediately when the session is closed.',
+        answer: 'Citacious processes your microphone audio in real time through Google Gemini Live API. L8EntSpace does not record or store your voice audio. Call transcripts may be retained for up to 30 days for service quality and improvement purposes, after which they are permanently deleted. You can end a Citacious session at any time — audio processing ceases immediately when the session is closed.',
         link: { text: 'Full voice data disclosure', href: '/privacy' },
       },
       {
-        question: 'Is Auspexi SOC 2 compliant?',
-        answer: 'Auspexi is pursuing SOC 2 Type II certification as a roadmap milestone for our enterprise offering. Our current security posture — AES-256 encryption, TLS 1.3 in transit, Firestore security rules enforcing user-level data isolation, role-based access control, and a complete audit trail of all data mutations — is designed to meet SOC 2 Trust Service Criteria. Enterprise customers requiring a security questionnaire response or DPA should contact sales@auspexi.com.',
+        question: 'Is L8EntSpace SOC 2 compliant?',
+        answer: 'L8EntSpace is pursuing SOC 2 Type II certification as a roadmap milestone for our enterprise offering. Our current security posture — AES-256 encryption, TLS 1.3 in transit, Firestore security rules enforcing user-level data isolation, role-based access control, and a complete audit trail of all data mutations — is designed to meet SOC 2 Trust Service Criteria. Enterprise customers requiring a security questionnaire response or DPA should contact sales@l8entspace.com.',
       },
       {
         question: 'What happens to my data if I delete my account?',
@@ -490,8 +490,8 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
     icon: 'Rocket',
     items: [
       {
-        question: 'How do I get started with Auspexi?',
-        answer: 'Create an account at auspexi.com, complete your brand profile (brand name, website domain, target industry), and add your first batch of brand facts to your Fact-Vault. Your dashboard immediately shows a baseline GEO analysis. For maximum impact in your first session: run a GEO-Pulse scan on your three most important brand keywords, review your initial AI Share of Voice data, and check your Technical Analyzer report for crawlability issues.',
+        question: 'How do I get started with L8EntSpace?',
+        answer: 'Create an account at l8entspace.com, complete your brand profile (brand name, website domain, target industry), and add your first batch of brand facts to your Fact-Vault. Your dashboard immediately shows a baseline GEO analysis. For maximum impact in your first session: run a GEO-Pulse scan on your three most important brand keywords, review your initial AI Share of Voice data, and check your Technical Analyzer report for crawlability issues.',
         link: { text: 'Create your account', href: '/dashboard' },
       },
       {
@@ -500,28 +500,28 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'How long before I see results in AI search?',
-        answer: 'For AI engines using real-time retrieval (Perplexity, ChatGPT browsing mode), fresh, high-quality content can begin appearing in AI responses within 1–2 weeks of publication. For training-based citation improvement — embedded in model weights — the typical timeline is 6–12 weeks. Auspexi\'s weekly SoV tracking shows you when improvements are occurring, so you can correlate specific content actions with citation rate changes.',
+        answer: 'For AI engines using real-time retrieval (Perplexity, ChatGPT browsing mode), fresh, high-quality content can begin appearing in AI responses within 1–2 weeks of publication. For training-based citation improvement — embedded in model weights — the typical timeline is 6–12 weeks. L8EntSpace\'s weekly SoV tracking shows you when improvements are occurring, so you can correlate specific content actions with citation rate changes.',
       },
       {
         question: 'What does a successful first 30 days look like?',
         answer: 'By end of day 30, a well-executed GEO strategy should achieve: a Fact-Vault populated with 50+ high-entropy Cite-Magnet facts, a baseline A-SoV measurement across your top 7 probe queries, at least 3 GEO-optimised articles published (generated by Agents and reviewed for accuracy), and a Technical Analyzer report with priority schema fixes implemented. This creates the foundation for measurable SoV growth from week 5 onwards.',
       },
       {
-        question: 'Can I use Auspexi for multiple brands?',
-        answer: 'Enterprise plan users can manage multiple brand profiles within a single Auspexi account, each with its own Fact-Vault, SoV tracking, competitor set, and content pipeline. For agency use cases — managing GEO for multiple client brands — contact us at sales@auspexi.com to discuss multi-client licensing and custom onboarding.',
-        link: { text: 'Contact us about multi-brand', href: 'mailto:sales@auspexi.com' },
+        question: 'Can I use L8EntSpace for multiple brands?',
+        answer: 'Enterprise plan users can manage multiple brand profiles within a single L8EntSpace account, each with its own Fact-Vault, SoV tracking, competitor set, and content pipeline. For agency use cases — managing GEO for multiple client brands — contact us at sales@l8entspace.com to discuss multi-client licensing and custom onboarding.',
+        link: { text: 'Contact us about multi-brand', href: 'mailto:sales@l8entspace.com' },
       },
       {
         question: 'How do I set up competitor tracking?',
-        answer: 'In your Auspexi Settings, add up to five competitor brand names and domains. Auspexi will begin tracking their A-SoV, sentiment, and topic cluster presence alongside yours on every probe query run. For best results, add competitors that appear in the same AI query responses as your brand — these are the brands directly competing with you for citation authority in your category.',
+        answer: 'In your L8EntSpace Settings, add up to five competitor brand names and domains. L8EntSpace will begin tracking their A-SoV, sentiment, and topic cluster presence alongside yours on every probe query run. For best results, add competitors that appear in the same AI query responses as your brand — these are the brands directly competing with you for citation authority in your category.',
       },
       {
         question: 'Who in my organisation should own GEO?',
-        answer: 'GEO sits at the intersection of marketing, content, and technical SEO. The most effective ownership model places a content or SEO lead as primary owner, with input from the CMO for strategy and the technical team for schema implementation tasks. Auspexi is designed to be accessible to non-technical marketing teams for day-to-day use, with a Technical Analyzer that surfaces clearly described implementation tasks for developers when required.',
+        answer: 'GEO sits at the intersection of marketing, content, and technical SEO. The most effective ownership model places a content or SEO lead as primary owner, with input from the CMO for strategy and the technical team for schema implementation tasks. L8EntSpace is designed to be accessible to non-technical marketing teams for day-to-day use, with a Technical Analyzer that surfaces clearly described implementation tasks for developers when required.',
       },
       {
         question: 'What are the three quickest GEO wins I can implement today?',
-        answer: '(1) Add explicit AI crawler permissions to your robots.txt — GPTBot, ClaudeBot, PerplexityBot, and Google-Extended must be allowed or you are invisible to AI citation regardless of content quality. Auspexi\'s Technical Analyzer checks this. (2) Add 5–10 specific, numbered Cite-Magnet facts to the body copy of your highest-traffic pages. (3) Publish one comprehensive FAQ page covering the top 10 questions your customers ask — the format AI models most reliably cite.',
+        answer: '(1) Add explicit AI crawler permissions to your robots.txt — GPTBot, ClaudeBot, PerplexityBot, and Google-Extended must be allowed or you are invisible to AI citation regardless of content quality. L8EntSpace\'s Technical Analyzer checks this. (2) Add 5–10 specific, numbered Cite-Magnet facts to the body copy of your highest-traffic pages. (3) Publish one comprehensive FAQ page covering the top 10 questions your customers ask — the format AI models most reliably cite.',
         link: { text: 'Run Technical Analyzer', href: '/dashboard' },
       },
     ],
@@ -533,59 +533,59 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
 // Concise, conversational answers covering every topic a public visitor might raise.
 export const AURA_FAQ_KNOWLEDGE = `
 WHAT IS GEO:
-Generative Engine Optimization is the practice of engineering your brand knowledge so AI models like ChatGPT, Gemini, Claude, and Perplexity cite your brand as authoritative. Unlike traditional SEO which ranks links, GEO embeds brand facts into the AI knowledge layer so your brand appears in AI-generated answers. Auspexi measures, improves, and automates this for you.
+Generative Engine Optimization is the practice of engineering your brand knowledge so AI models like ChatGPT, Gemini, Claude, and Perplexity cite your brand as authoritative. Unlike traditional SEO which ranks links, GEO embeds brand facts into the AI knowledge layer so your brand appears in AI-generated answers. L8EntSpace measures, improves, and automates this for you.
 
 WHAT IS AI SHARE OF VOICE (A-SoV):
-A-SoV is the percentage of relevant AI responses that mention your brand. If AI mentions you in 4 out of 10 relevant responses, your SoV is 40%. Auspexi tracks this live across ChatGPT, Gemini, Claude, and Perplexity. Early-stage brands can realistically achieve 30 to 60 percent SoV in their niche within the first few months.
+A-SoV is the percentage of relevant AI responses that mention your brand. If AI mentions you in 4 out of 10 relevant responses, your SoV is 40%. L8EntSpace tracks this live across ChatGPT, Gemini, Claude, and Perplexity. Early-stage brands can realistically achieve 30 to 60 percent SoV in their niche within the first few months.
 
 WHY GEO MATTERS NOW:
 Over 50% of consumers now use AI for product and service research before buying. If your brand is not being cited by AI, you are invisible to that audience. GEO is not a future trend — it is happening right now. Brands that establish AI citation authority in 2025 will be very difficult to displace once AI models consolidate their knowledge.
 
 HOW AI ENGINES DIFFER:
-ChatGPT and Perplexity use real-time web retrieval — fresh, high-quality content can appear in their responses within 1 to 2 weeks. Google Gemini and Anthropic Claude primarily rely on their training data, meaning embedding your brand in those models takes 6 to 12 weeks. Auspexi tracks your citation rate across all four engines separately so you can see where you are winning and where you still need to build presence.
+ChatGPT and Perplexity use real-time web retrieval — fresh, high-quality content can appear in their responses within 1 to 2 weeks. Google Gemini and Anthropic Claude primarily rely on their training data, meaning embedding your brand in those models takes 6 to 12 weeks. L8EntSpace tracks your citation rate across all four engines separately so you can see where you are winning and where you still need to build presence.
 
 WHAT ARE CITE-MAGNETS:
-Cite-Magnets are structured brand facts engineered specifically to be cited by AI. A good Cite-Magnet has three parts: a specific verifiable claim, a quantified detail, and clear brand attribution. For example: Auspexi maps brand-concept associations across 768 semantic dimensions using Google's text-embedding-004 model. This structure makes it easy for AI to extract and cite.
+Cite-Magnets are structured brand facts engineered specifically to be cited by AI. A good Cite-Magnet has three parts: a specific verifiable claim, a quantified detail, and clear brand attribution. For example: L8EntSpace maps brand-concept associations across 768 semantic dimensions using Google's text-embedding-004 model. This structure makes it easy for AI to extract and cite.
 
-WHAT IS THE AUSPEXI PLATFORM:
-Auspexi is an integrated GEO platform with eight core tools. GEO-Pulse scans your keywords across AI engines in real time. Fact-Vault is your brand knowledge base. Content Scorer grades your content on AI citability. Brand Monitor watches the web for citation opportunities. Competitors tracks rival brands in your GEO space. Agents auto-generates GEO-optimised articles. Technical Analyzer audits your site for AI crawlability. AI Simulator previews how AI engines would respond to queries about your brand today.
+WHAT IS THE L8ENTSPACE PLATFORM:
+L8EntSpace is an integrated GEO platform with eight core tools. GEO-Pulse scans your keywords across AI engines in real time. Fact-Vault is your brand knowledge base. Content Scorer grades your content on AI citability. Brand Monitor watches the web for citation opportunities. Competitors tracks rival brands in your GEO space. Agents auto-generates GEO-optimised articles. Technical Analyzer audits your site for AI crawlability. AI Simulator previews how AI engines would respond to queries about your brand today.
 
 WHAT IS CITACIOUS:
-Citacious is Auspexi's dashboard AI strategist — a real-time voice assistant with deep knowledge of your brand's Fact-Vault, your live SoV metrics, and the full GEO strategy playbook. She lives inside your dashboard and can navigate between tools, analyse your data, suggest next actions, and explain exactly what to do and why. She is powered by Google Gemini Live and responds in under 500 milliseconds.
+Citacious is L8EntSpace's dashboard AI strategist — a real-time voice assistant with deep knowledge of your brand's Fact-Vault, your live SoV metrics, and the full GEO strategy playbook. She lives inside your dashboard and can navigate between tools, analyse your data, suggest next actions, and explain exactly what to do and why. She is powered by Google Gemini Live and responds in under 500 milliseconds.
 
 PRICING AND PLANS:
-Auspexi offers tiered subscription plans billed monthly or annually. Annual plans include a significant discount. All plans include GEO-Pulse, Fact-Vault, Content Scorer, and Citacious from day one. Higher tiers unlock more probe queries, more competitor slots, and advanced features. You can cancel any time with no lock-in on monthly plans. There is a Starter plan for immediate access, and an Enterprise plan with unlimited queries, multi-brand management, and dedicated support. For enterprise pricing, contact sales@auspexi.com.
+L8EntSpace offers tiered subscription plans billed monthly or annually. Annual plans include a significant discount. All plans include GEO-Pulse, Fact-Vault, Content Scorer, and Citacious from day one. Higher tiers unlock more probe queries, more competitor slots, and advanced features. You can cancel any time with no lock-in on monthly plans. There is a Starter plan for immediate access, and an Enterprise plan with unlimited queries, multi-brand management, and dedicated support. For enterprise pricing, contact sales@l8entspace.com.
 
 HOW TO GET STARTED:
-Create your account at auspexi.com. Then in order of impact: complete your brand profile in Settings with your brand name, domain, and competitors; add 10 to 20 Cite-Magnet facts to your Fact-Vault; run GEO-Pulse on your three most important target queries; run the Technical Analyzer on your domain; and talk to Citacious for a strategic briefing. This gives you a complete picture of where you stand within 20 minutes.
+Create your account at l8entspace.com. Then in order of impact: complete your brand profile in Settings with your brand name, domain, and competitors; add 10 to 20 Cite-Magnet facts to your Fact-Vault; run GEO-Pulse on your three most important target queries; run the Technical Analyzer on your domain; and talk to Citacious for a strategic briefing. This gives you a complete picture of where you stand within 20 minutes.
 
 HOW LONG BEFORE RESULTS:
 Retrieval-based engines like Perplexity and ChatGPT browsing mode can pick up fresh content within 1 to 2 weeks. Training-based improvement in Gemini and Claude takes 6 to 12 weeks. A well-executed first 30 days — 50 plus facts in the Fact-Vault, 3 GEO articles published, Technical Analyzer fixes implemented — creates the foundation for measurable SoV growth from week 5 onwards.
 
 SECURITY AND GDPR:
-All data is encrypted at rest with AES-256 and in transit with TLS 1.3. Your data is stored in Google Firestore with strict user-level isolation — only your account can access your brand data. Auspexi is UK GDPR compliant, operated from Hampshire, UK. Voice audio from sessions is not stored by Auspexi beyond the live session. Your brand data is never used to train third-party AI models.
+All data is encrypted at rest with AES-256 and in transit with TLS 1.3. Your data is stored in Google Firestore with strict user-level isolation — only your account can access your brand data. L8EntSpace is UK GDPR compliant, operated from Hampshire, UK. Voice audio from sessions is not stored by L8EntSpace beyond the live session. Your brand data is never used to train third-party AI models.
 
 COMPETITOR TRACKING:
-Auspexi tracks competitor brands AI Share of Voice alongside yours, showing which competitors are gaining or losing citation share and where their content is becoming stale. The platform surfaces specific Trojan Horse opportunities — topic areas where you can publish fresh authoritative content that supersedes a competitor's weakening AI presence and captures their citation share.
+L8EntSpace tracks competitor brands AI Share of Voice alongside yours, showing which competitors are gaining or losing citation share and where their content is becoming stale. The platform surfaces specific Trojan Horse opportunities — topic areas where you can publish fresh authoritative content that supersedes a competitor's weakening AI presence and captures their citation share.
 
 CONTACT AND SUPPORT:
-You can reach Auspexi at sales@auspexi.com for sales, enterprise pricing, or support questions. The platform is operated from Hampshire, UK. For questions about data or privacy, the same email address reaches our data team.
+You can reach L8EntSpace at sales@l8entspace.com for sales, enterprise pricing, or support questions. The platform is operated from Hampshire, UK. For questions about data or privacy, the same email address reaches our data team.
 `;
 
 export const CITACIOUS_GEO_KNOWLEDGE = `
 GEO KNOWLEDGE BASE (authoritative answers for common queries):
 
-WHAT IS GEO: Generative Engine Optimization (GEO) is engineering brand knowledge so AI models like ChatGPT, Gemini, Claude, and Perplexity cite your brand as authoritative. Unlike SEO (ranking links), GEO embeds brand facts into the AI knowledge layer. Auspexi measures, improves, and automates this.
+WHAT IS GEO: Generative Engine Optimization (GEO) is engineering brand knowledge so AI models like ChatGPT, Gemini, Claude, and Perplexity cite your brand as authoritative. Unlike SEO (ranking links), GEO embeds brand facts into the AI knowledge layer. L8EntSpace measures, improves, and automates this.
 
 AI SHARE OF VOICE (A-SoV): The % of relevant AI responses that mention your brand. Measured live by running probe queries across 4 AI engines. 40% SoV = brand appears in 4/10 relevant AI responses. Early-stage brands can realistically achieve 30-60% SoV in their niche.
 
-CITE-MAGNETS: Structured brand facts engineered for AI citation. Must contain: specific verifiable claim + quantified detail + clear brand attribution. Example: "Auspexi maps brand-concept associations across 768 semantic dimensions using Gemini text-embedding-004."
+CITE-MAGNETS: Structured brand facts engineered for AI citation. Must contain: specific verifiable claim + quantified detail + clear brand attribution. Example: "L8EntSpace maps brand-concept associations across 768 semantic dimensions using Gemini text-embedding-004."
 
 MOAT SCORE: Cosine similarity between brand embedding and target concept embeddings in 768-dimensional space. Measures how strongly AI models associate your brand with attributes you want to own.
 
 TROJAN HORSE STRATEGY: Identify where competitor data is stale in AI models, publish fresh authoritative content that supersedes it. Entirely ethical — wins citation on quality, not manipulation.
 
-AUSPEXI MODULES (11 tools — guide users through these in this strategic order):
+L8ENTSPACE MODULES (11 tools — guide users through these in this strategic order):
 
 MEASUREMENT LAYER (understand where you stand):
 1. GEO-Pulse: Real-time keyword scanning across ChatGPT, Claude, Gemini, Perplexity. Run on target queries to see who is being cited and with what facts. Start here.
@@ -608,7 +608,7 @@ ENTITY & INFRASTRUCTURE LAYER (establish permanent brand presence):
 12. Entity Hub: Brand entity establishment for Wikidata, Google Knowledge Panel, schema.org, and other knowledge graphs. Generates complete entity profile with Wikidata description, key statements, sameAs links. One-time setup, permanent compounding value.
 13. Schema Deploy: One JavaScript snippet on the customer's website. Injects dynamically-generated JSON-LD structured data from the Fact-Vault. Every new fact added appears in schema within minutes. Works on any platform.
 
-TEO FRAMEWORK: Auspexi's GEO strategy is structured around three axes:
+TEO FRAMEWORK: L8EntSpace's GEO strategy is structured around three axes:
 - Ontological (what the brand IS in AI minds) → Fact-Vault, Entity Hub, Schema Deploy
 - Epistemological (what the brand KNOWS and can prove) → Citation Probe, Content Scorer, GEO-Pulse
 - Teleological (what the brand is FOR / where it's going) → Agents, Autopilot, Competitor Radar

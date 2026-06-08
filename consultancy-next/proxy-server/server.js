@@ -13,9 +13,9 @@ if (!GEMINI_API_KEY) {
 
 app.use(cors({
   origin: [
-    'https://auspexi.com',
-    'https://www.auspexi.com',
-    /\.auspexi\.com$/,
+    'https://l8entspace.com',
+    'https://www.l8entspace.com',
+    /\.l8entspace\.com$/,
     // allow localhost for dev
     /^http:\/\/localhost(:\d+)?$/,
   ],
@@ -53,7 +53,7 @@ const wsProxy = createProxyMiddleware({
 app.use('/api/genai', httpProxy);
 
 const server = app.listen(PORT, () => {
-  console.log(`Auspexi GenAI proxy running on port ${PORT}`);
+  console.log(`L8EntSpace GenAI proxy running on port ${PORT}`);
 });
 
 // Intercept WebSocket upgrade requests

@@ -23,7 +23,7 @@ export default function SchemaDeployPage() {
 
   const publicSchemaUrl = user ? `${origin}/api/schema-public/${user.uid}` : '';
 
-  const snippet = `<!-- Auspexi Schema Deploy — dynamic structured data from your Fact-Vault -->
+  const snippet = `<!-- L8EntSpace Schema Deploy — dynamic structured data from your Fact-Vault -->
 <script>
   fetch('${publicSchemaUrl}')
     .then(r => r.json())

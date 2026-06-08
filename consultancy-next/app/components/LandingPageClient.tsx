@@ -69,7 +69,7 @@ function ValueSection({
 function VideoPlayer() {
   const [playing, setPlaying] = useState(false);
   return (
-    <div className="aspect-video rounded-2xl overflow-hidden bg-zinc-950 relative group shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+    <div className="aspect-video rounded-2xl overflow-hidden bg-zinc-950 relative group shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
       <video
         controls
         className="w-full h-full object-cover bg-zinc-950"
@@ -175,7 +175,7 @@ export function LandingPageClient() {
     {
       Icon: RefreshCw,
       name: "GEO Autopilot",
-      description: "The complete probe→generate→publish→re-probe execution loop in one action. Target a query, watch Auspexi identify what's being cited, generate stronger counter-content, publish it to your Fact-Vault, and measure the impact — automatically.",
+      description: "The complete probe→generate→publish→re-probe execution loop in one action. Target a query, watch L8EntSpace identify what's being cited, generate stronger counter-content, publish it to your Fact-Vault, and measure the impact — automatically.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
     },
@@ -217,7 +217,7 @@ export function LandingPageClient() {
     {
       Icon: Globe,
       name: "768-D Latent Space Map",
-      description: "Visualise your brand's semantic position in embedding space. Auspexi maps 768-dimensional Gemini embeddings onto a TEO framework — Ontological, Epistemological, and Teleological axes — so you can see where you own the narrative and where gaps exist.",
+      description: "Visualise your brand's semantic position in embedding space. L8EntSpace maps 768-dimensional Gemini embeddings onto a TEO framework — Ontological, Epistemological, and Teleological axes — so you can see where you own the narrative and where gaps exist.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-fuchsia-700/50 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-5",
     },
@@ -278,10 +278,10 @@ export function LandingPageClient() {
                 Don&apos;t let AI leave your <span className="text-white">brand behind.</span>
               </h1>
               <p className="text-xl text-zinc-400 mb-6 leading-relaxed">
-                Traditional SEO is dying. Auspexi is the premier Generative Engine Optimization (GEO) platform that ensures your brand is cited, recommended, and prioritized by AI models like Gemini, ChatGPT, and Claude.
+                Traditional SEO is dying. L8EntSpace is the premier Generative Engine Optimization (GEO) platform that ensures your brand is cited, recommended, and prioritized by AI models like Gemini, ChatGPT, and Claude.
               </p>
 
-              <div className="bg-zinc-900/50 rounded-xl p-5 mb-8 backdrop-blur-sm shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+              <div className="bg-zinc-900/50 rounded-xl p-5 mb-8 backdrop-blur-sm shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
                 <h3 className="text-white font-semibold mb-2">What is Generative Engine Optimization (GEO)?</h3>
                 <p className="text-sm text-zinc-300 leading-relaxed">
                   Generative Engine Optimization (GEO) is the process of optimizing your brand&apos;s content so that it is cited as the primary source of truth by AI models like ChatGPT, Google Gemini, Claude, and Perplexity.
@@ -336,7 +336,7 @@ export function LandingPageClient() {
                     className="absolute flex items-center gap-2 whitespace-nowrap"
                   >
                     <div className="w-2.5 h-2.5 rounded-full bg-pink-400 shadow-[0_0_20px_#EC4899,0_0_40px_#EC4899]" />
-                    <span className="text-[12px] font-mono font-bold tracking-widest text-pink-50 text-white uppercase drop-shadow-[0_0_15px_rgba(236,72,153,1)] px-2 py-0.5 rounded-sm bg-pink-600/40 backdrop-blur-[4px] border border-pink-400">
+                    <span className="text-[12px] font-mono font-bold tracking-widest text-pink-50 text-white uppercase drop-shadow-[0_0_15px_rgba(255,20,147,1)] px-2 py-0.5 rounded-sm bg-pink-600/40 backdrop-blur-[4px] border border-pink-400">
                       {node.label}
                     </span>
                   </motion.div>
@@ -380,7 +380,7 @@ export function LandingPageClient() {
         </p>
         <p>
           The good news is that almost no one has worked this out yet. The brands that move first
-          will own the answer for years. Auspexi exists to make sure the name the AI says out
+          will own the answer for years. L8EntSpace exists to make sure the name the AI says out
           loud is <span className="text-white font-semibold">yours</span>.
         </p>
       </ValueSection>
@@ -389,7 +389,7 @@ export function LandingPageClient() {
       <section id="features" className="py-24 relative bg-zinc-950">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">The Auspexi Arsenal</h2>
+              <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">The L8EntSpace Arsenal</h2>
               <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
                 Everything you need to dominate AI Answer Engines and secure your Share of Voice.
               </p>
@@ -433,7 +433,7 @@ export function LandingPageClient() {
             <li className="min-h-[14rem] list-none md:[grid-area:1/1/2/7] xl:[grid-area:1/1/2/5]">
               <div className="relative h-full rounded-[1.25rem] border border-zinc-800 p-2 md:rounded-[1.5rem] md:p-3 bg-zinc-950">
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
-                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
                   <div className="space-y-3">
                     <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
                       <BarChart3 className="w-5 h-5 text-zinc-300" />
@@ -447,7 +447,7 @@ export function LandingPageClient() {
             <li className="min-h-[14rem] list-none md:[grid-area:1/7/2/13] xl:[grid-area:2/1/3/5]">
               <div className="relative h-full rounded-[1.25rem] border border-zinc-800 p-2 md:rounded-[1.5rem] md:p-3 bg-zinc-950">
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
-                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
                   <div className="space-y-3">
                     <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
                       <Target className="w-5 h-5 text-zinc-300" />
@@ -461,7 +461,7 @@ export function LandingPageClient() {
             <li className="min-h-[14rem] list-none md:[grid-area:2/1/3/7] xl:[grid-area:1/5/3/8]">
               <div className="relative h-full rounded-[1.25rem] border border-zinc-800 p-2 md:rounded-[1.5rem] md:p-3 bg-zinc-950">
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
-                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
                   <div className="space-y-3">
                     <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
                       <ShieldAlert className="w-5 h-5 text-zinc-300" />
@@ -475,7 +475,7 @@ export function LandingPageClient() {
             <li className="min-h-[14rem] list-none md:[grid-area:2/7/3/13] xl:[grid-area:1/8/2/13]">
               <div className="relative h-full rounded-[1.25rem] border border-zinc-800 p-2 md:rounded-[1.5rem] md:p-3 bg-zinc-950">
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
-                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
                   <div className="space-y-3">
                     <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
                       <Database className="w-5 h-5 text-zinc-300" />
@@ -489,7 +489,7 @@ export function LandingPageClient() {
             <li className="min-h-[14rem] list-none md:[grid-area:3/1/4/13] xl:[grid-area:2/8/3/13]">
               <div className="relative h-full rounded-[1.25rem] border border-zinc-800 p-2 md:rounded-[1.5rem] md:p-3 bg-zinc-950">
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
-                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
                   <div className="space-y-3">
                     <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
                       <Search className="w-5 h-5 text-zinc-300" />
@@ -539,14 +539,14 @@ export function LandingPageClient() {
         </p>
         <p>
           And unlike an ad, it doesn&apos;t switch off the moment you stop paying. The facts you build
-          with Auspexi keep working for you — in answer after answer, day after day.
+          with L8EntSpace keep working for you — in answer after answer, day after day.
         </p>
         <p>
           Most of our customers were already spending far more on clicks that disappear the second
           the budget runs out. This costs less, and it builds on itself over time.
         </p>
         <p className="text-white font-semibold">
-          So the real question isn&apos;t whether you can afford Auspexi. It&apos;s whether you can afford
+          So the real question isn&apos;t whether you can afford L8EntSpace. It&apos;s whether you can afford
           to let a competitor become the answer instead.
         </p>
       </ValueSection>
@@ -635,10 +635,10 @@ export function LandingPageClient() {
 
           <div className="mt-8 text-center text-sm text-zinc-500">
             Need custom volumes, SSO, or a whitelabel dashboard?{' '}
-            <a href="mailto:sales@auspexi.com" className="text-pink-400 hover:text-pink-300 underline">Talk to sales</a>.
+            <a href="mailto:sales@l8entspace.com" className="text-pink-400 hover:text-pink-300 underline">Talk to sales</a>.
           </div>
 
-          <div className="mt-12 text-center text-sm text-zinc-500 max-w-3xl mx-auto bg-zinc-900/30 rounded-xl p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+          <div className="mt-12 text-center text-sm text-zinc-500 max-w-3xl mx-auto bg-zinc-900/30 rounded-xl p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
               <div>
                 <p className="mb-3 flex items-start gap-2">
@@ -681,7 +681,7 @@ export function LandingPageClient() {
                 Latest tactics and research on Generative Engine Optimization.
               </p>
             </div>
-            <Link href="/blog" className="flex items-center justify-center text-zinc-300 hover:text-white hover:bg-zinc-800 px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+            <Link href="/blog" className="flex items-center justify-center text-zinc-300 hover:text-white hover:bg-zinc-800 px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
               View all articles
             </Link>
           </div>
@@ -689,7 +689,7 @@ export function LandingPageClient() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {blogPosts.slice(0, 3).map((post, i) => (
               <Link href={`/blog/${post.slug}`} key={i} className="group cursor-pointer flex flex-col">
-                <div className="w-full h-[220px] flex-shrink-0 rounded-xl overflow-hidden mb-4 relative bg-[#0B0E14] shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+                <div className="w-full h-[220px] flex-shrink-0 rounded-xl overflow-hidden mb-4 relative bg-[#0B0E14] shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
                   <BlogHero title={post.title} category={post.category} compact={true} />
                 </div>
                 <div className="flex items-center gap-3 text-xs font-medium text-zinc-500 mb-2">
@@ -720,10 +720,10 @@ export function LandingPageClient() {
             Join the top brands that are already securing their Share of Voice in the Generative Engine era.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button onClick={() => handleOpenModal('trial')} size="lg" className="w-full sm:w-auto bg-white hover:bg-zinc-200 text-black text-lg px-8 h-14 rounded-xl shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+            <Button onClick={() => handleOpenModal('trial')} size="lg" className="w-full sm:w-auto bg-white hover:bg-zinc-200 text-black text-lg px-8 h-14 rounded-xl shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
               Get Your Free Report
             </Button>
-            <Button onClick={() => handleOpenModal('demo')} size="lg" variant="outline" className="w-full sm:w-auto text-zinc-300 hover:text-white hover:bg-zinc-800 text-lg px-8 h-14 rounded-xl bg-zinc-900/50 backdrop-blur-sm shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]">
+            <Button onClick={() => handleOpenModal('demo')} size="lg" variant="outline" className="w-full sm:w-auto text-zinc-300 hover:text-white hover:bg-zinc-800 text-lg px-8 h-14 rounded-xl bg-zinc-900/50 backdrop-blur-sm shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
               Book a Demo
             </Button>
           </div>

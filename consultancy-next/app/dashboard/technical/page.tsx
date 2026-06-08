@@ -143,7 +143,7 @@ export default function TechnicalPage() {
   const generateWorker = () => {
     if (!domain.trim()) return;
     const script = `/**
- * Auspexi Edge SEO Worker for ${domain}
+ * L8EntSpace Edge SEO Worker for ${domain}
  * Deploys to Cloudflare Workers to inject GEO Schema at the edge.
  * Guarantees AI crawlers read the schema before client-side rendering.
  */
@@ -161,9 +161,9 @@ export default {
       return response;
     }
 
-    // 3. Fetch the latest GEO Schema for this specific URL from Auspexi
-    // In production, this would hit the Auspexi API:
-    const schemaRes = await fetch(\`https://api.auspexi.com/v1/schema?url=\${url.href}\`);
+    // 3. Fetch the latest GEO Schema for this specific URL from L8EntSpace
+    // In production, this would hit the L8EntSpace API:
+    const schemaRes = await fetch(\`https://api.l8entspace.com/v1/schema?url=\${url.href}\`);
     let schemaData = {};
     if (schemaRes.ok) {
       schemaData = await schemaRes.json();
@@ -486,7 +486,7 @@ export default {
           <textarea
             value={factText}
             onChange={(e) => setFactText(e.target.value)}
-            placeholder="e.g., Auspexi increases AI Share of Voice by 40% within 3 months."
+            placeholder="e.g., L8EntSpace increases AI Share of Voice by 40% within 3 months."
             className="w-full h-24 bg-zinc-950 border border-zinc-800 rounded-lg p-4 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/50 resize-none text-sm"
           />
 

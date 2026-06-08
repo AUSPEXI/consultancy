@@ -22,8 +22,8 @@ export function PublicHeader() {
     <nav className="fixed top-0 w-full z-50 border-b border-zinc-800/50 bg-zinc-950/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <img src="/auspexi-logo.png" alt="Auspexi Logo" className="w-10 h-10 object-contain shrink-0" />
-          <span className="font-heading text-xl font-bold tracking-widest text-white">AUSPEXI</span>
+          <img src="/l8entspace-logo.svg" alt="L8EntSpace Logo" className="w-10 h-10 object-contain shrink-0" />
+          <span className="font-heading text-xl font-bold tracking-widest text-white">L8<span className="text-pink-500">ENT</span>SPACE</span>
         </Link>
 
         {/* Desktop nav */}
@@ -38,7 +38,7 @@ export function PublicHeader() {
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard"
-            className="hidden md:inline-flex px-5 py-2 rounded-full text-sm font-semibold text-white bg-zinc-900 hover:bg-zinc-800 transition-all shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]"
+            className="hidden md:inline-flex px-5 py-2 rounded-full text-sm font-semibold text-white bg-zinc-900 hover:bg-zinc-800 transition-all shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]"
           >
             Dashboard
           </Link>

@@ -391,7 +391,7 @@ export default function AgentsPage() {
         } catch (_) { /* skip */ }
       }
       setPublishStage('done');
-      setPipelineMsg(`Published ${published} article${published !== 1 ? 's' : ''}${userData?.cmsWebhookUrl ? ' to your CMS' : ' to Auspexi'}`);
+      setPipelineMsg(`Published ${published} article${published !== 1 ? 's' : ''}${userData?.cmsWebhookUrl ? ' to your CMS' : ' to L8EntSpace'}`);
       if (user) logAuditAction(user.uid, 'Bulk Pipeline Published', { count: published }).catch(() => {});
     } catch (_) {
       setPublishStage('error');
@@ -422,7 +422,7 @@ export default function AgentsPage() {
         const webhookData = await response.json().catch(() => ({}));
         setPublishMsg(webhookData.emailed ? `Saved and pushed to your CMS (email receipt sent to ${webhookData.to}).` : 'Article saved and pushed to your CMS via webhook.');
       } else {
-        setPublishMsg('Article saved to Auspexi. Add a CMS Webhook URL in Settings → Integrations to automatically push to your site.');
+        setPublishMsg('Article saved to L8EntSpace. Add a CMS Webhook URL in Settings → Integrations to automatically push to your site.');
       }
     } catch (error: any) {
       setPublishMsg(`Error: ${error.message}`);
@@ -655,7 +655,7 @@ export default function AgentsPage() {
                   )}
                 </div>
               </div>
-              <p className="text-[10px] text-zinc-500 leading-relaxed">Save all articles to Auspexi{userData?.cmsWebhookUrl ? ' and push to your CMS' : ''}. Download schema pack for site-wide JSON-LD deployment.</p>
+              <p className="text-[10px] text-zinc-500 leading-relaxed">Save all articles to L8EntSpace{userData?.cmsWebhookUrl ? ' and push to your CMS' : ''}. Download schema pack for site-wide JSON-LD deployment.</p>
             </div>
           </div>
 

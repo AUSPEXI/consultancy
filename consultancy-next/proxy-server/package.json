@@ -1,5 +1,5 @@
 {
-  "name": "auspexi-genai-proxy",
+  "name": "l8entspace-genai-proxy",
   "version": "1.0.0",
   "description": "WebSocket proxy for Gemini Live API — keeps API key server-side",
   "main": "server.js",

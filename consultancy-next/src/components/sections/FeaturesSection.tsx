@@ -38,7 +38,7 @@ export function FeaturesSection() {
     <section id="features" className="py-24 px-6 relative">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">The Auspexi Arsenal</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">The L8EntSpace Arsenal</h2>
           <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
             Everything you need to dominate AI Answer Engines and secure your Share of Voice.
           </p>

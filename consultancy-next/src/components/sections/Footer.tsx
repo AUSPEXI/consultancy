@@ -6,7 +6,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h4 className="font-semibold text-white mb-4">Auspexi</h4>
+            <h4 className="font-semibold text-white mb-4">L8EntSpace</h4>
             <p className="text-sm text-zinc-400">
               The premier GEO platform for dominating AI Answer Engines.
             </p>
@@ -64,7 +64,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-zinc-900 pt-8 text-center text-sm text-zinc-500">
-          <p>&copy; 2026 Auspexi. All rights reserved.</p>
+          <p>&copy; 2026 L8EntSpace. All rights reserved.</p>
         </div>
       </div>
     </footer>

@@ -151,7 +151,7 @@ export function LeadCaptureModal({ isOpen, onClose, source, initialEmail = '', i
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Full Access Pipeline Offer</h3>
                 <p className="text-zinc-400 text-sm mb-6">
-                  Get full access to the Auspexi GEO Dashboard. Track your Share of Voice, analyze competitors, and extract Cite-Magnets.
+                  Get full access to the L8EntSpace GEO Dashboard. Track your Share of Voice, analyze competitors, and extract Cite-Magnets.
                 </p>
                 
                 <div className="mb-6">

@@ -12,7 +12,7 @@ import { logAuditAction } from '@/lib/audit';
 import { authFetch } from '@/lib/auth-fetch';
 import { Chrome, Linkedin, Twitter, MessageCircle, Instagram, Music2, CheckCircle2, Loader2, Sparkles, Network, X, Search } from 'lucide-react';
 
-const AUSPEXI_GEO_KEYWORDS = [
+const L8ENTSPACE_GEO_KEYWORDS = [
   'generative engine optimization',
   'GEO optimization',
   'AI search visibility',
@@ -25,27 +25,27 @@ const AUSPEXI_GEO_KEYWORDS = [
   'AI engine optimization',
 ];
 
-const AUSPEXI_PRIMARY_COMPETITORS = ['brightedge.com', 'semrush.com', 'conductor.com', 'clearscope.io'];
-const AUSPEXI_WATCHLIST_COMPETITORS = ['marketmuse.com', 'botify.com', 'rankscience.com', 'surfer seo'];
+const L8ENTSPACE_PRIMARY_COMPETITORS = ['brightedge.com', 'semrush.com', 'conductor.com', 'clearscope.io'];
+const L8ENTSPACE_WATCHLIST_COMPETITORS = ['marketmuse.com', 'botify.com', 'rankscience.com', 'surfer seo'];
 
-const AUSPEXI_SOCIALS: Record<string, string> = {
-  linkedin:  'https://linkedin.com/company/auspexi',
-  twitter:   'https://x.com/auspexi',
-  instagram: 'https://instagram.com/auspexi',
-  tiktok:    'https://tiktok.com/@auspexi',
-  reddit:    'u/auspexi',
+const L8ENTSPACE_SOCIALS: Record<string, string> = {
+  linkedin:  'https://linkedin.com/company/l8entspace',
+  twitter:   'https://x.com/l8entspace',
+  instagram: 'https://instagram.com/l8entspace',
+  tiktok:    'https://tiktok.com/@l8entspace',
+  reddit:    'u/l8entspace',
 };
 
-// Full TEO-structured anchor set for Auspexi.
+// Full TEO-structured anchor set for L8EntSpace.
 // 2 Ontological (Systemic Anchor) · 2 Epistemological (Signal Point)
 // · 2 Teleological (Emergent Trend) · 1 Risk Vector
-const AUSPEXI_ANCHORS = [
-  { label: 'GEO Category Owner',       color: '#ec4899', baseType: 'Systemic Anchor', axisAlignment: 1, description: 'Auspexi is the defining brand in the Generative Engine Optimization category — the first mover whose name becomes the category name.' },
-  { label: 'AI Visibility Platform',   color: '#ec4899', baseType: 'Systemic Anchor', axisAlignment: 1, description: 'Auspexi is the infrastructure layer for tracking and building brand presence across AI-generated responses at scale.' },
-  { label: 'Citation Engineering',     color: '#06b6d4', baseType: 'Signal Point',    axisAlignment: 2, description: 'Auspexi owns a verifiable, named methodology — the Cite-Magnet framework — with documented techniques for generating AI citations.' },
-  { label: 'AI Share of Voice Data',   color: '#06b6d4', baseType: 'Signal Point',    axisAlignment: 2, description: 'Auspexi produces real, auditable SOV measurements across ChatGPT, Claude, Gemini, and Perplexity — no other tool does this.' },
-  { label: 'AI-Era Brand Authority',   color: '#8b5cf6', baseType: 'Emergent Trend',  axisAlignment: 3, description: 'Auspexi is becoming the standard framework for how forward-thinking brands build authority in the AI search era.' },
-  { label: 'GEO as Growth Channel',    color: '#8b5cf6', baseType: 'Emergent Trend',  axisAlignment: 3, description: 'Positioning GEO as a measurable, revenue-generating channel alongside traditional SEO — a category Auspexi is creating.' },
+const L8ENTSPACE_ANCHORS = [
+  { label: 'GEO Category Owner',       color: '#ff1493', baseType: 'Systemic Anchor', axisAlignment: 1, description: 'L8EntSpace is the defining brand in the Generative Engine Optimization category — the first mover whose name becomes the category name.' },
+  { label: 'AI Visibility Platform',   color: '#ff1493', baseType: 'Systemic Anchor', axisAlignment: 1, description: 'L8EntSpace is the infrastructure layer for tracking and building brand presence across AI-generated responses at scale.' },
+  { label: 'Citation Engineering',     color: '#06b6d4', baseType: 'Signal Point',    axisAlignment: 2, description: 'L8EntSpace owns a verifiable, named methodology — the Cite-Magnet framework — with documented techniques for generating AI citations.' },
+  { label: 'AI Share of Voice Data',   color: '#06b6d4', baseType: 'Signal Point',    axisAlignment: 2, description: 'L8EntSpace produces real, auditable SOV measurements across ChatGPT, Claude, Gemini, and Perplexity — no other tool does this.' },
+  { label: 'AI-Era Brand Authority',   color: '#8b5cf6', baseType: 'Emergent Trend',  axisAlignment: 3, description: 'L8EntSpace is becoming the standard framework for how forward-thinking brands build authority in the AI search era.' },
+  { label: 'GEO as Growth Channel',    color: '#8b5cf6', baseType: 'Emergent Trend',  axisAlignment: 3, description: 'Positioning GEO as a measurable, revenue-generating channel alongside traditional SEO — a category L8EntSpace is creating.' },
   { label: 'SEO Legacy Resistance',    color: '#f59e0b', baseType: 'Risk Vector',     axisAlignment: 2, description: 'The primary threat: brands and agencies anchored in traditional SEO frameworks, mischaracterising GEO as an SEO variant.' },
 ];
 
@@ -54,36 +54,36 @@ const SOCIAL_PLATFORMS = [
     key: 'linkedin', label: 'LinkedIn', sub: 'Professional network post seeding',
     Icon: Linkedin, bg: 'bg-[#0A66C2]/10', color: 'text-[#0A66C2]',
     hint: 'For posting (Amplify), paste your LinkedIn OAuth Access Token. For monitoring (Pulse), enter your Profile URL.',
-    placeholder: 'https://linkedin.com/company/auspexi or OAuth token',
+    placeholder: 'https://linkedin.com/company/l8entspace or OAuth token',
   },
   {
     key: 'twitter', label: 'X / Twitter', sub: 'Real-time narrative seeding',
     Icon: Twitter, bg: 'bg-white/10', color: 'text-white',
     hint: 'Enter your X/Twitter profile URL or API Bearer Token for automated posting.',
-    placeholder: 'https://x.com/auspexi or Bearer token',
+    placeholder: 'https://x.com/l8entspace or Bearer token',
   },
   {
     key: 'instagram', label: 'Instagram', sub: 'Visual brand authority',
     Icon: Instagram, bg: 'bg-pink-500/10', color: 'text-pink-500',
     hint: 'Enter your Instagram profile URL. Full posting requires a Meta Business Account access token.',
-    placeholder: 'https://instagram.com/auspexi',
+    placeholder: 'https://instagram.com/l8entspace',
   },
   {
     key: 'tiktok', label: 'TikTok', sub: 'Short-form viral seeding',
     Icon: Music2, bg: 'bg-cyan-500/10', color: 'text-cyan-400',
     hint: 'Enter your TikTok profile URL for monitoring, or access token for automated content.',
-    placeholder: 'https://tiktok.com/@auspexi',
+    placeholder: 'https://tiktok.com/@l8entspace',
   },
   {
     key: 'reddit', label: 'Reddit', sub: 'Consensus seeding in communities',
     Icon: MessageCircle, bg: 'bg-[#FF4500]/10', color: 'text-[#FF4500]',
     hint: 'Enter your Reddit username or subreddit URLs you participate in for GEO monitoring.',
-    placeholder: 'u/auspexi or r/seo,r/marketing',
+    placeholder: 'u/l8entspace or r/seo,r/marketing',
   },
   {
     key: 'webform', label: 'Webform / API', sub: 'Custom endpoint integration',
     Icon: Chrome, bg: 'bg-zinc-100/10', color: 'text-zinc-100',
-    hint: 'Custom API endpoint. Auspexi will POST structured brand data here.',
+    hint: 'Custom API endpoint. L8EntSpace will POST structured brand data here.',
     placeholder: 'https://your-server.com/api/social-push',
   },
 ];
@@ -204,35 +204,35 @@ export default function SettingsPage() {
     }
   };
 
-  const applyAuspexiDefaults = async () => {
+  const applyL8EntSpaceDefaults = async () => {
     setFormData(prev => ({
       ...prev,
-      brand: 'Auspexi',
-      domain: 'auspexi.com',
+      brand: 'L8EntSpace',
+      domain: 'l8entspace.com',
       cmsWebhookUrl: origin ? `${origin}/api/notify-article` : prev.cmsWebhookUrl,
-      keyword1: AUSPEXI_GEO_KEYWORDS[0], keyword2: AUSPEXI_GEO_KEYWORDS[1],
-      keyword3: AUSPEXI_GEO_KEYWORDS[2], keyword4: AUSPEXI_GEO_KEYWORDS[3],
-      keyword5: AUSPEXI_GEO_KEYWORDS[4], keyword6: AUSPEXI_GEO_KEYWORDS[5],
-      keyword7: AUSPEXI_GEO_KEYWORDS[6], keyword8: AUSPEXI_GEO_KEYWORDS[7],
-      keyword9: AUSPEXI_GEO_KEYWORDS[8], keyword10: AUSPEXI_GEO_KEYWORDS[9],
-      competitor1: AUSPEXI_PRIMARY_COMPETITORS[0], competitor2: AUSPEXI_PRIMARY_COMPETITORS[1],
-      competitor3: AUSPEXI_PRIMARY_COMPETITORS[2], competitor4: AUSPEXI_PRIMARY_COMPETITORS[3],
+      keyword1: L8ENTSPACE_GEO_KEYWORDS[0], keyword2: L8ENTSPACE_GEO_KEYWORDS[1],
+      keyword3: L8ENTSPACE_GEO_KEYWORDS[2], keyword4: L8ENTSPACE_GEO_KEYWORDS[3],
+      keyword5: L8ENTSPACE_GEO_KEYWORDS[4], keyword6: L8ENTSPACE_GEO_KEYWORDS[5],
+      keyword7: L8ENTSPACE_GEO_KEYWORDS[6], keyword8: L8ENTSPACE_GEO_KEYWORDS[7],
+      keyword9: L8ENTSPACE_GEO_KEYWORDS[8], keyword10: L8ENTSPACE_GEO_KEYWORDS[9],
+      competitor1: L8ENTSPACE_PRIMARY_COMPETITORS[0], competitor2: L8ENTSPACE_PRIMARY_COMPETITORS[1],
+      competitor3: L8ENTSPACE_PRIMARY_COMPETITORS[2], competitor4: L8ENTSPACE_PRIMARY_COMPETITORS[3],
     }));
     // Seed the full TEO anchor set
-    setAnchors(AUSPEXI_ANCHORS);
-    setWatchlistCompetitors(AUSPEXI_WATCHLIST_COMPETITORS);
-    // Auto-connect all known Auspexi social accounts
-    const socialKeys = Object.keys(AUSPEXI_SOCIALS);
+    setAnchors(L8ENTSPACE_ANCHORS);
+    setWatchlistCompetitors(L8ENTSPACE_WATCHLIST_COMPETITORS);
+    // Auto-connect all known L8EntSpace social accounts
+    const socialKeys = Object.keys(L8ENTSPACE_SOCIALS);
     setConnectedSocials(socialKeys);
     if (user) {
       try {
         await setDoc(doc(db, 'users', user.uid), {
           connectedSocials: socialKeys,
-          latentAnchors: AUSPEXI_ANCHORS,
+          latentAnchors: L8ENTSPACE_ANCHORS,
         }, { merge: true });
       } catch {}
     }
-    setSaveMsg({ type: 'success', text: 'Auspexi defaults applied — TEO anchors, competitors, CMS webhook, and social accounts all set. Hit Save Settings to persist the rest.' });
+    setSaveMsg({ type: 'success', text: 'L8EntSpace defaults applied — TEO anchors, competitors, CMS webhook, and social accounts all set. Hit Save Settings to persist the rest.' });
   };
 
   // ── AI competitor discovery ─────────────────────────────────────────────────
@@ -311,13 +311,13 @@ export default function SettingsPage() {
           <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Account Settings</h1>
           <p className="text-zinc-400">Configure your brand profile. Everything Citacious and the agent pipeline uses flows from here.</p>
         </div>
-        {/* Quick-fill for Auspexi account */}
-        {userData?.email === 'hopiumcalculator@gmail.com' || userData?.email === 'sales@auspexi.com' ? (
+        {/* Quick-fill for L8EntSpace account */}
+        {userData?.email === 'hopiumcalculator@gmail.com' || userData?.email === 'sales@l8entspace.com' ? (
           <button
-            onClick={applyAuspexiDefaults}
+            onClick={applyL8EntSpaceDefaults}
             className="text-xs px-3 py-1.5 border border-pink-500/30 text-pink-400 hover:bg-pink-500/10 rounded-lg transition-colors whitespace-nowrap"
           >
-            Fill Auspexi defaults
+            Fill L8EntSpace defaults
           </button>
         ) : null}
       </div>
@@ -343,11 +343,11 @@ export default function SettingsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-zinc-300">Brand Name</label>
-              <Input name="brand" value={formData.brand} onChange={handleChange} placeholder="e.g. Auspexi" className="bg-zinc-950 border-zinc-800 text-white" />
+              <Input name="brand" value={formData.brand} onChange={handleChange} placeholder="e.g. L8EntSpace" className="bg-zinc-950 border-zinc-800 text-white" />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-zinc-300">Primary Domain</label>
-              <Input name="domain" value={formData.domain} onChange={handleChange} placeholder="auspexi.com" className="bg-zinc-950 border-zinc-800 text-white" />
+              <Input name="domain" value={formData.domain} onChange={handleChange} placeholder="l8entspace.com" className="bg-zinc-950 border-zinc-800 text-white" />
             </div>
           </div>
         </CardContent>
@@ -486,7 +486,7 @@ export default function SettingsPage() {
             <div className="flex flex-wrap gap-3">
               {anchors.map((a: any, i: number) => (
                 <div key={i} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium ${ANCHOR_TYPE_COLORS[a.baseType] || 'text-zinc-400 border-zinc-700 bg-zinc-800'}`}>
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: a.color || '#ec4899' }} />
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: a.color || '#ff1493' }} />
                   <span>{a.label}</span>
                   <span className="text-zinc-500 font-normal">· {a.baseType}</span>
                 </div>
@@ -500,7 +500,7 @@ export default function SettingsPage() {
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="text-white">Connected Social Accounts</CardTitle>
-          <CardDescription className="text-zinc-400">Connect platforms to enable Fact Amplifier one-click publishing. Your credentials are stored only in your browser session — not transmitted to Auspexi servers.</CardDescription>
+          <CardDescription className="text-zinc-400">Connect platforms to enable Fact Amplifier one-click publishing. Your credentials are stored only in your browser session — not transmitted to L8EntSpace servers.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -574,36 +574,36 @@ export default function SettingsPage() {
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="text-white">Integrations</CardTitle>
-          <CardDescription className="text-zinc-400">Connect Auspexi to your internal server and submit your sitemap to search engines.</CardDescription>
+          <CardDescription className="text-zinc-400">Connect L8EntSpace to your internal server and submit your sitemap to search engines.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Sitemap */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-300">Sitemap URL</label>
             <div className="flex gap-2">
-              <Input readOnly value="https://auspexi.com/sitemap.xml" className="bg-zinc-950 border-zinc-800 text-zinc-400 font-mono text-xs" />
-              <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText('https://auspexi.com/sitemap.xml')}>Copy</Button>
+              <Input readOnly value="https://l8entspace.com/sitemap.xml" className="bg-zinc-950 border-zinc-800 text-zinc-400 font-mono text-xs" />
+              <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText('https://l8entspace.com/sitemap.xml')}>Copy</Button>
             </div>
             <p className="text-xs text-zinc-500">Submit to Google Search Console and Bing Webmaster Tools. All 40+ public pages are indexed here — critical for AI crawler discovery.</p>
           </div>
 
           {/* Inbound webhook */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">Inbound Webhook — Your Server → Auspexi</label>
+            <label className="text-sm font-medium text-zinc-300">Inbound Webhook — Your Server → L8EntSpace</label>
             <div className="flex gap-2">
-              <Input readOnly value={origin ? `${origin}/api/webhooks/auspexi` : ''} className="bg-zinc-950 border-zinc-800 text-zinc-400 font-mono text-xs" />
-              <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(`${origin}/api/webhooks/auspexi`)}>Copy</Button>
+              <Input readOnly value={origin ? `${origin}/api/webhooks/l8entspace` : ''} className="bg-zinc-950 border-zinc-800 text-zinc-400 font-mono text-xs" />
+              <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(`${origin}/api/webhooks/l8entspace`)}>Copy</Button>
             </div>
             <p className="text-xs text-zinc-500">
-              Configure your internal server to POST here when content is published. Header: <code className="text-zinc-300">x-auspexi-secret</code>. Body: <code className="text-zinc-300">&#123; userId, type: &quot;article&quot;|&quot;fact&quot;, title, content, url &#125;</code>
+              Configure your internal server to POST here when content is published. Header: <code className="text-zinc-300">x-l8entspace-secret</code>. Body: <code className="text-zinc-300">&#123; userId, type: &quot;article&quot;|&quot;fact&quot;, title, content, url &#125;</code>
             </p>
           </div>
 
           {/* Outbound webhook */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">Outbound Webhook — Auspexi → Your CMS</label>
+            <label className="text-sm font-medium text-zinc-300">Outbound Webhook — L8EntSpace → Your CMS</label>
             <div className="flex gap-2">
-              <Input name="cmsWebhookUrl" value={formData.cmsWebhookUrl} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" placeholder="https://your-internal-server.com/api/auspexi-push" />
+              <Input name="cmsWebhookUrl" value={formData.cmsWebhookUrl} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" placeholder="https://your-internal-server.com/api/l8entspace-push" />
               {origin && (
                 <Button
                   type="button"
@@ -617,7 +617,7 @@ export default function SettingsPage() {
               )}
             </div>
             <p className="text-xs text-zinc-500">
-              Auspexi posts generated articles and schema to this URL when you click &quot;Publish to Database &amp; CMS&quot;.{' '}
+              L8EntSpace posts generated articles and schema to this URL when you click &quot;Publish to Database &amp; CMS&quot;.{' '}
               No CMS yet? Click <strong className="text-zinc-400">Use Email Notify</strong> — we&apos;ll email the article directly to your account address instead.
               Payload: <code className="text-zinc-300">&#123; userId, topic, article, facts, schema, brand, timestamp &#125;</code>
             </p>

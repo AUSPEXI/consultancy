@@ -272,7 +272,7 @@ export default function ContentScorerPage() {
                 <h3 className="text-sm font-semibold text-white">Lab-Validated GEO Levers</h3>
               </div>
               <p className="text-xs text-zinc-500 mb-3">
-                Apply these while drafting — each is backed by a real A/B citation experiment in the Auspexi GEO Lab.
+                Apply these while drafting — each is backed by a real A/B citation experiment in the L8EntSpace GEO Lab.
               </p>
               <div className="space-y-2">
                 {labLevers.map((lev) => (

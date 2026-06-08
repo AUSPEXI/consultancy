@@ -26,7 +26,7 @@ const NeuralLegend = () => (
       <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">Positive Anchor</span>
     </div>
     <div className="flex items-center gap-2">
-      <div className="w-2.5 h-2.5 rounded-full bg-pink-500 shadow-[0_0_8px_rgba(236,72,153,0.4)]" />
+      <div className="w-2.5 h-2.5 rounded-full bg-pink-500 shadow-[0_0_8px_rgba(255,20,147,0.4)]" />
       <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">Risk / Neg. Citation</span>
     </div>
     <div className="flex items-center gap-2">
@@ -40,7 +40,7 @@ const NeuralLegend = () => (
   </div>
 );
 
-const RacingDial = ({ value, label, color = "#ec4899", size = "sm" }: { value: number | null; label: string; color?: string; size?: "sm" | "lg" }) => {
+const RacingDial = ({ value, label, color = "#ff1493", size = "sm" }: { value: number | null; label: string; color?: string; size?: "sm" | "lg" }) => {
   const safeValue = value ?? 0;
   const data = useMemo(() => [
     { name: 'value', value: Math.min(100, Math.max(0, safeValue)), fill: value === null ? '#27272a' : color },
@@ -70,9 +70,9 @@ export default function OverviewPage() {
   const [selectedTimeframe, setSelectedTimeframe] = useState<string>('current');
 
   const defaultPrompts = useMemo(() => [
-    "Is Auspexi a secure enterprise choice?",
-    "How does Auspexi compare to legacy SEO?",
-    "Is Auspexi's GEO tech proprietary?",
+    "Is L8EntSpace a secure enterprise choice?",
+    "How does L8EntSpace compare to legacy SEO?",
+    "Is L8EntSpace's GEO tech proprietary?",
     "Founder reputation and reliability"
   ], []);
 
@@ -102,7 +102,7 @@ export default function OverviewPage() {
   const [driftDismissed, setDriftDismissed] = useState(false);
 
   const userAnchors = userData?.latentAnchors || [
-    { label: "Reputational Moat", color: "#ec4899", baseType: "Systemic Anchor" },
+    { label: "Reputational Moat", color: "#ff1493", baseType: "Systemic Anchor" },
     { label: "Technical Competence", color: "#06b6d4", baseType: "Signal Point" },
     { label: "Pricing Perception", color: "#8b5cf6", baseType: "Emergent Trend" },
   ];
@@ -431,7 +431,7 @@ export default function OverviewPage() {
       <TooltipProvider>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { label: 'A-SOV Dominance', value: displayAsov, color: '#ec4899', icon: Target, source: asovSource, desc: cpRate !== undefined ? `Citation Probe: ${cpCited} of ${cpTotal} queries cited your brand` : 'Absolute Share of Voice — run Citation Probe for real data' },
+            { label: 'A-SOV Dominance', value: displayAsov, color: '#ff1493', icon: Target, source: asovSource, desc: cpRate !== undefined ? `Citation Probe: ${cpCited} of ${cpTotal} queries cited your brand` : 'Absolute Share of Voice — run Citation Probe for real data' },
             { label: 'Platform Sync', value: displayPlatformSync, color: '#3b82f6', icon: Activity, source: platSource, desc: cpRates ? 'Average citation rate across ChatGPT, Claude, Gemini, Perplexity (Citation Probe)' : 'Across-model consistency — run Citation Probe for real data' },
             { label: 'Misinformation Risk', value: misinfoRate, color: '#f43f5e', icon: TrendingUp, source: misinfoRate !== null ? '● CITE-PROBE' : '◌ NO DATA', desc: misinfoRate !== null ? `${cpMisinfo} of ${cpCited} cited answers contained an inaccuracy about your brand` : 'Run Citation Probe to measure how often LLMs cite your brand inaccurately' },
           ].map((dial, i) => (
@@ -485,12 +485,12 @@ export default function OverviewPage() {
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height={300} minWidth={0}>
               <AreaChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs><linearGradient id="colorBrand" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#ec4899" stopOpacity={0.3}/><stop offset="95%" stopColor="#ec4899" stopOpacity={0}/></linearGradient></defs>
+                <defs><linearGradient id="colorBrand" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#ff1493" stopOpacity={0.3}/><stop offset="95%" stopColor="#ff1493" stopOpacity={0}/></linearGradient></defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                 <XAxis dataKey="shortDate" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}%`} />
                 <ChartTooltip contentStyle={{ backgroundColor: '#000000', borderColor: '#3f3f46', borderRadius: '12px', color: '#ffffff' }} itemStyle={{ color: '#ffffff' }} labelStyle={{ color: '#ffffff', fontWeight: 'bold' }} />
-                <Area type="monotone" dataKey="aSov" name="Our A-SOV" stroke="#ec4899" strokeWidth={2} fillOpacity={1} fill="url(#colorBrand)" />
+                <Area type="monotone" dataKey="aSov" name="Our A-SOV" stroke="#ff1493" strokeWidth={2} fillOpacity={1} fill="url(#colorBrand)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -616,7 +616,7 @@ export default function OverviewPage() {
             <p className="text-xs text-zinc-400 mt-1">AI engines natively strip referral headers, making physical traffic look like "Direct" in Google Analytics. Generate a Shadow Link to embed in your JSON-LD Schema to definitively prove AI ROI.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <input type="text" value={shadowUrl} onChange={(e) => setShadowUrl(e.target.value)} placeholder="e.g., auspexi.com/latency-report" className="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50 text-sm" />
+            <input type="text" value={shadowUrl} onChange={(e) => setShadowUrl(e.target.value)} placeholder="e.g., l8entspace.com/latency-report" className="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50 text-sm" />
             <button onClick={generateShadowLink} disabled={isGeneratingLink || !shadowUrl.trim()} className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-2">
               {isGeneratingLink ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
               {isGeneratingLink ? 'Generating...' : 'Generate UTM parameters'}

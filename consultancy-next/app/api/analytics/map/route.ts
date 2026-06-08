@@ -14,8 +14,8 @@ const SEMANTIC_AXES = [
 
 // Default fallback anchors — one per TEO axis, covering all types
 const DEFAULT_ANCHORS = [
-  { label: 'Core Brand Identity',     color: '#ec4899', baseType: 'Systemic Anchor',  axisAlignment: 1 },
-  { label: 'Knowledge Authority',     color: '#ec4899', baseType: 'Systemic Anchor',  axisAlignment: 1 },
+  { label: 'Core Brand Identity',     color: '#ff1493', baseType: 'Systemic Anchor',  axisAlignment: 1 },
+  { label: 'Knowledge Authority',     color: '#ff1493', baseType: 'Systemic Anchor',  axisAlignment: 1 },
   { label: 'Verifiable Claims',       color: '#06b6d4', baseType: 'Signal Point',     axisAlignment: 2 },
   { label: 'Citation Credibility',    color: '#06b6d4', baseType: 'Signal Point',     axisAlignment: 2 },
   { label: 'Strategic Direction',     color: '#8b5cf6', baseType: 'Emergent Trend',   axisAlignment: 3 },

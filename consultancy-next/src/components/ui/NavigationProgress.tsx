@@ -30,7 +30,7 @@ export function NavigationProgress() {
 
   return (
     <div
-      className="fixed top-0 left-0 z-[9999] h-[2px] bg-pink-500 shadow-[0_0_8px_rgba(236,72,153,0.6)] pointer-events-none"
+      className="fixed top-0 left-0 z-[9999] h-[2px] bg-pink-500 shadow-[0_0_8px_rgba(255,20,147,0.6)] pointer-events-none"
       style={{
         width: visible ? `${progress}%` : '0%',
         opacity: visible ? 1 : 0,

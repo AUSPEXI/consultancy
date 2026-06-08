@@ -28,7 +28,7 @@ function buildArticleEmail(topic: string, brand: string, article: string, schema
   return `
 <div style="font-family:'Inter',sans-serif;max-width:680px;margin:0 auto;background:#09090b;color:#fafafa;border-radius:8px;overflow:hidden;border:1px solid #27272a;">
   <div style="padding:28px 32px;border-bottom:1px solid #27272a;background:linear-gradient(to right,#18181b,#09090b);">
-    <p style="margin:0;font-size:12px;font-weight:600;color:#a1a1aa;text-transform:uppercase;letter-spacing:0.1em;">Auspexi · Agent Orchestration</p>
+    <p style="margin:0;font-size:12px;font-weight:600;color:#a1a1aa;text-transform:uppercase;letter-spacing:0.1em;">L8EntSpace · Agent Orchestration</p>
     <h1 style="margin:8px 0 4px;font-size:20px;font-weight:700;color:#fff;">New GEO Article Ready</h1>
     <p style="margin:0;font-size:13px;color:#71717a;">${date}</p>
   </div>
@@ -57,7 +57,7 @@ function buildArticleEmail(topic: string, brand: string, article: string, schema
   </div>
 
   <div style="padding:20px 32px;text-align:center;border-top:1px solid #27272a;color:#52525b;font-size:11px;">
-    © ${new Date().getFullYear()} Auspexi. All rights reserved.
+    © ${new Date().getFullYear()} L8EntSpace. All rights reserved.
   </div>
 </div>`;
 }
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
     });
 
     await transporter.sendMail({
-      from: `"Auspexi" <${emailUser}>`,
+      from: `"L8EntSpace" <${emailUser}>`,
       to: recipientEmail,
       subject: `New GEO Article Ready: "${topic}"`,
       html: buildArticleEmail(topic, brand || '', article, schema || '', timestamp || new Date().toISOString()),

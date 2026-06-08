@@ -5,7 +5,7 @@ export const blogPosts = [
     excerpt: "AI models hold a kind of internal map of meaning, and your brand sits somewhere on it. The Latent Space Explorer turns that invisible map into an interactive 3D picture — so you can see what's near your brand, where the citation gaps are, and what to fix.",
     date: "June 8, 2026",
     category: "Explainer",
-    author: "Auspexi Team",
+    author: "L8EntSpace Team",
     readTime: "5 min read",
     image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=1200&auto=format&fit=crop",
     content: `
@@ -89,8 +89,8 @@ The fastest way to understand this is to see your own brand on the map. Open the
     `.trim(),
   },
   {
-    slug: "why-im-building-auspexi-in-public",
-    title: "Why I'm Building Auspexi in Public (And What That Actually Means)",
+    slug: "why-im-building-l8entspace-in-public",
+    title: "Why I'm Building L8EntSpace in Public (And What That Actually Means)",
     excerpt: "I'm a solo founder building a GEO platform out in the open — sharing the experiments, the wins, and the things that don't work. Here's why I decided to do it this way, and what you can expect from this blog.",
     date: "June 8, 2026",
     category: "Building in Public",
@@ -104,7 +104,7 @@ Most company blogs are written to make the company look finished. Polished case 
 
 That's not how building a product actually feels. It's messy. You try things that fail. You change direction. You spend weeks on something nobody needed.
 
-I've decided to do the opposite of the polished-blog thing. I'm building Auspexi **in public** — sharing the real journey, including the parts that don't make a tidy story.
+I've decided to do the opposite of the polished-blog thing. I'm building L8EntSpace **in public** — sharing the real journey, including the parts that don't make a tidy story.
 
 This post explains what that means and why I think it's the right call.
 
@@ -114,7 +114,7 @@ This post explains what that means and why I think it's the right call.
 
 It's a simple idea: instead of hiding the work until it's perfect, you share it as you go.
 
-For Auspexi, that means three things:
+For L8EntSpace, that means three things:
 
 **I'll show you the experiments.** We run real tests on what makes AI engines like ChatGPT and Gemini cite a brand. When a test works, I'll tell you. When it doesn't, I'll tell you that too — a result that says "this doesn't matter" is just as useful as one that says it does.
 
@@ -128,7 +128,7 @@ For Auspexi, that means three things:
 
 ### Because trust is the whole game
 
-Auspexi helps brands get recognised by AI. That only works if people trust what we say. I can't ask you to trust the product while hiding how it's made. Building in public is me showing my working.
+L8EntSpace helps brands get recognised by AI. That only works if people trust what we say. I can't ask you to trust the product while hiding how it's made. Building in public is me showing my working.
 
 ### Because I'm one person
 
@@ -155,7 +155,7 @@ There's also a YouTube channel coming, where I'll show some of this work on came
 
 ## Key Takeaways
 
-- Auspexi is being built **in public** by a solo founder — the experiments, decisions, and lessons are all shared openly.
+- L8EntSpace is being built **in public** by a solo founder — the experiments, decisions, and lessons are all shared openly.
 - We only claim what the product actually does. No invented statistics, no features that don't exist.
 - Expect plain-English explainers, real lab experiments (including null results), feature updates, and founder notes.
 - The goal is simple: earn trust by showing the work, not hiding it.
@@ -172,7 +172,7 @@ The best way to start is to run a Citation Probe on your own brand — it shows 
   {
     slug: "what-i-got-wrong-about-ai-search-year-one",
     title: "What I Got Wrong About AI Search in Year One",
-    excerpt: "Building a GEO platform meant chasing a few ideas that turned out to be dead ends. Here's an honest account of the wrong turns, what they taught me, and where Auspexi landed as a result.",
+    excerpt: "Building a GEO platform meant chasing a few ideas that turned out to be dead ends. Here's an honest account of the wrong turns, what they taught me, and where L8EntSpace landed as a result.",
     date: "June 6, 2026",
     category: "Building in Public",
     author: "Gwylym Pryce-Owen",
@@ -183,7 +183,7 @@ The best way to start is to run a Citation Probe on your own brand — it shows 
 
 When a product finally clicks, it's tempting to tell the story as if it was obvious from the start. It almost never is.
 
-Building Auspexi over the past year involved several wrong turns — ideas I was sure about that turned out to be dead ends. This post is an honest account of them, because the mistakes are more useful than a tidy success story.
+Building L8EntSpace over the past year involved several wrong turns — ideas I was sure about that turned out to be dead ends. This post is an honest account of them, because the mistakes are more useful than a tidy success story.
 
 ---
 
@@ -229,7 +229,7 @@ I've since gone through the entire blog and cut anything I can't stand behind. I
 
 ## Where This Left Us
 
-Each wrong turn pushed Auspexi toward the same place: **simpler, more honest, more focused.**
+Each wrong turn pushed L8EntSpace toward the same place: **simpler, more honest, more focused.**
 
 The product today does a handful of things, and does them for real:
 
@@ -264,7 +264,7 @@ If you want to see where all this landed, run a Citation Probe on your own brand
     excerpt: "We run real A/B experiments on what makes AI engines cite a brand — and we publish the results, including the ones that fail. Here's what the GEO Lab is, why it exists, and how it keeps us honest.",
     date: "June 5, 2026",
     category: "GEO Lab",
-    author: "Auspexi Team",
+    author: "L8EntSpace Team",
     readTime: "5 min read",
     image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1200&auto=format&fit=crop",
     content: `
@@ -317,7 +317,7 @@ These rules are boring. That's the point. Boring process is what separates real 
 
 ## How This Connects to the Product
 
-When the Lab proves something works, that finding flows into Auspexi. The content-generation pipeline can apply the tactics that experiments have actually validated — not folk wisdom, but tested levers.
+When the Lab proves something works, that finding flows into L8EntSpace. The content-generation pipeline can apply the tactics that experiments have actually validated — not folk wisdom, but tested levers.
 
 So the Lab isn't a side project. It's the research engine that keeps the product grounded in reality.
 
@@ -328,7 +328,7 @@ So the Lab isn't a side project. It's the research engine that keeps the product
 - The **GEO Lab** runs controlled A/B experiments to find out what actually makes AI engines cite a brand.
 - Each experiment changes **only one thing**, writes the hypothesis down first, and shows its raw data.
 - We publish **null results** — the experiments that fail — because that's what makes the successes trustworthy.
-- Validated findings flow into the Auspexi product as real, tested tactics.
+- Validated findings flow into the L8EntSpace product as real, tested tactics.
 
 ---
 
@@ -345,7 +345,7 @@ Follow along, and you'll learn what works at the same time we do.
     excerpt: "When someone asks an AI about your industry, a lot happens in the background that decides whether your business gets mentioned. Here's a plain-English look at what's going on — and why it matters for you.",
     date: "June 4, 2026",
     category: "Explainer",
-    author: "Auspexi Team",
+    author: "L8EntSpace Team",
     readTime: "4 min read",
     image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?q=80&w=1200&auto=format&fit=crop",
     content: `
@@ -431,7 +431,7 @@ The fastest way to make this real is to actually ask. A Citation Probe runs real
     excerpt: "Your website can look perfect to human visitors and still be nearly invisible to the AI engines recommending businesses to your customers. Here's why that happens, in plain English, and what to do about it.",
     date: "June 3, 2026",
     category: "Explainer",
-    author: "Auspexi Team",
+    author: "L8EntSpace Team",
     readTime: "5 min read",
     image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?q=80&w=1200&auto=format&fit=crop",
     content: `
@@ -515,7 +515,7 @@ Not sure which of these is affecting you? Start with a Citation Probe — it sho
     excerpt: "Citation Probe is the simplest way to find out whether AI engines mention your brand. Here's what it does, what the results mean, and how to act on them — no jargon.",
     date: "June 2, 2026",
     category: "Explainer",
-    author: "Auspexi Team",
+    author: "L8EntSpace Team",
     readTime: "4 min read",
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop",
     content: `
@@ -592,7 +592,7 @@ The hardest part of GEO is that it feels invisible — you can't see whether you
     excerpt: "Checking how AI engines talk about your brand shouldn't be a manual chore. The new Brand Probe Pipeline runs the check for you on a schedule and emails you the results. Here's how it works.",
     date: "June 7, 2026",
     category: "Product Update",
-    author: "Auspexi Team",
+    author: "L8EntSpace Team",
     readTime: "4 min read",
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop",
     content: `
@@ -660,13 +660,13 @@ If you've run a manual probe before and thought "I should do this regularly," th
     excerpt: "Turning a list of AI visibility gaps into finished, scored, published content used to mean clicking through each article one at a time. The new bulk pipeline does the whole batch in one flow. Here's how it works.",
     date: "June 1, 2026",
     category: "Product Update",
-    author: "Auspexi Team",
+    author: "L8EntSpace Team",
     readTime: "5 min read",
     image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop",
     content: `
 ## The Tedious Part We Just Removed
 
-Here's how making GEO content used to go in Auspexi: you'd find a batch of topics where your brand was missing from AI answers, queue them up, and the agents would research and draft each one. Good so far.
+Here's how making GEO content used to go in L8EntSpace: you'd find a batch of topics where your brand was missing from AI answers, queue them up, and the agents would research and draft each one. Good so far.
 
 Then came the slog. For *each* article, one at a time, you'd score it, improve it if needed, generate its schema, and publish it. Six articles meant doing that whole dance six times. Lots of clicks, lots of waiting, lots of "wait, which one was I on?"
 
@@ -732,7 +732,7 @@ If you've got a list of topics where your brand is missing from AI answers, this
     excerpt: "Google quietly removed support for FAQ rich results. Most businesses barely noticed. But it's one of the clearest signals yet that the rules of being found online have fundamentally changed — and the businesses adapting now will own the next decade.",
     date: "May 28, 2026",
     category: "Strategy",
-    author: "Auspexi Team",
+    author: "L8EntSpace Team",
     readTime: "5 min read",
     image: "/geo-infographic.png",
     content: `
@@ -826,10 +826,10 @@ The question isn't whether AI search is coming. It's already here. The question 
   {
     slug: "geo-autopilot-probe-correct-publish-loop",
     title: "GEO Autopilot: Closing the Probe-Correct-Publish Loop",
-    excerpt: "Measuring your AI citation share is useful. Automatically fixing it is the product. Meet GEO Autopilot — Auspexi's execution engine that probes, generates counter-content, publishes, and re-probes in one unbroken loop.",
+    excerpt: "Measuring your AI citation share is useful. Automatically fixing it is the product. Meet GEO Autopilot — L8EntSpace's execution engine that probes, generates counter-content, publishes, and re-probes in one unbroken loop.",
     date: "May 27, 2026",
     category: "Product",
-    author: "Auspexi Team",
+    author: "L8EntSpace Team",
     readTime: "6 min read",
     image: "/geo-infographic.png",
     tags: ["GEO Autopilot", "Automation", "AI Citations", "Probe-Correct Loop"],
@@ -877,7 +877,7 @@ This is what Generative Engine Optimization looks like when it is built as an ex
     excerpt: "AI models can only cite what they know exists as a discrete entity. Most brands are invisible at the entity layer — not missing citations, missing existence. The Entity Intelligence Hub fixes this.",
     date: "May 27, 2026",
     category: "Strategy",
-    author: "Auspexi Team",
+    author: "L8EntSpace Team",
     readTime: "6 min read",
     image: "/geo-infographic.png",
     tags: ["Entity Intelligence", "Knowledge Graphs", "Wikidata", "Schema.org", "GEO"],
@@ -904,13 +904,13 @@ Schema.org Organisation markup on your website tells crawlers how to interpret y
 
 ## The TEO Foundation: Ontology First
 
-In the TEO framework Auspexi uses to organise GEO strategy, the Ontological axis is the foundation. Ontology is what your brand *is* — your entity definition. Before you can build the Epistemological layer (what you know, your Fact-Vault claims) or the Teleological layer (what you do, your published content), the ontological layer must be solid.
+In the TEO framework L8EntSpace uses to organise GEO strategy, the Ontological axis is the foundation. Ontology is what your brand *is* — your entity definition. Before you can build the Epistemological layer (what you know, your Fact-Vault claims) or the Teleological layer (what you do, your published content), the ontological layer must be solid.
 
 A brand that has rich Fact-Vault content but a weak entity layer is building on sand. The AI may encounter your facts in training data or retrieval contexts, but without a resolved entity to attach them to, those facts may be attributed to the wrong brand, attributed to no one, or simply discarded as low-confidence information.
 
 ## What the Entity Intelligence Hub Automates
 
-Auspexi's Entity Intelligence Hub is designed to handle the entity establishment workflow systematically, rather than leaving it as a manual research project.
+L8EntSpace's Entity Intelligence Hub is designed to handle the entity establishment workflow systematically, rather than leaving it as a manual research project.
 
 The Hub generates your complete entity profile — the structured data that needs to exist across each platform to establish your brand as a resolved entity. It checks your current Knowledge Panel status, identifies whether your brand is appearing in AI-powered search overviews, and surfaces the gaps. It generates Wikidata-compatible entity data in the correct statement format. It produces schema.org Organisation markup ready to deploy on your site. And it shows you, specifically, where to submit each piece.
 
@@ -925,7 +925,7 @@ You cannot get cited if you do not exist. The Entity Intelligence Hub ensures yo
     excerpt: "Static schema markup goes stale. Your Fact-Vault grows daily. Schema Deploy bridges the gap — a single JavaScript snippet keeps your website's structured data in sync with your brand knowledge base, automatically.",
     date: "May 27, 2026",
     category: "Product",
-    author: "Auspexi Team",
+    author: "L8EntSpace Team",
     readTime: "5 min read",
     image: "/geo-infographic.png",
     tags: ["Schema Markup", "Structured Data", "JSON-LD", "GEO", "Schema Deploy"],
@@ -946,9 +946,9 @@ The root cause is structural: static schema files have no connection to your act
 
 ## How Schema Deploy Works
 
-Auspexi's Schema Deploy feature solves this with a different architecture. Instead of writing schema manually and hardcoding it into your site, you add a single JavaScript snippet to your website's head section. That snippet calls Auspexi's API on each page load and retrieves dynamically generated JSON-LD built from your current Fact-Vault.
+L8EntSpace's Schema Deploy feature solves this with a different architecture. Instead of writing schema manually and hardcoding it into your site, you add a single JavaScript snippet to your website's head section. That snippet calls L8EntSpace's API on each page load and retrieves dynamically generated JSON-LD built from your current Fact-Vault.
 
-The flow is straightforward. You add a fact to your Fact-Vault — say, a new integration your product supports, or an updated pricing figure, or a new FAQ your customers are asking. Within minutes, the Auspexi API generates updated JSON-LD reflecting that fact, and the snippet injects it into every page that loads after that point. No developer involvement. No deployment. No manual schema editing.
+The flow is straightforward. You add a fact to your Fact-Vault — say, a new integration your product supports, or an updated pricing figure, or a new FAQ your customers are asking. Within minutes, the L8EntSpace API generates updated JSON-LD reflecting that fact, and the snippet injects it into every page that loads after that point. No developer involvement. No deployment. No manual schema editing.
 
 This means your structured data is always in sync with your brand knowledge base. The moment your Fact-Vault changes, your schema changes.
 
@@ -1063,7 +1063,7 @@ The shift from keyword-based search to agentic, multi-modal search is already we
   },
   {
     slug: "token-bucket-algorithms-scaling-llm-requests",
-    title: "Reliability at Scale: How Auspexi Ensures Mission-Critical AI Audits",
+    title: "Reliability at Scale: How L8EntSpace Ensures Mission-Critical AI Audits",
     category: "Infrastructure & Reliability",
     date: "May 17, 2026",
     image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80",
@@ -1071,7 +1071,7 @@ The shift from keyword-based search to agentic, multi-modal search is already we
     content: `
 ## The Architecture of Reliability
 
-When monitoring brand reputation across multiple LLMs, consistency is everything. To maintain a "Reputational Twin," we must process thousands of data points with zero downtime. Auspexi employs a sophisticated orchestration layer that manages these flows with surgical precision.
+When monitoring brand reputation across multiple LLMs, consistency is everything. To maintain a "Reputational Twin," we must process thousands of data points with zero downtime. L8EntSpace employs a sophisticated orchestration layer that manages these flows with surgical precision.
 
 ### Ensuring Data Continuity
 
@@ -1081,7 +1081,7 @@ By balancing request volume with intelligent resource allocation, we provide a c
 
 ### Operational Efficiency
 
-Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is engineered to optimize every interaction, ensuring that you get the deepest insights possible without the inefficiency commonly found in unmanaged AI deployments. This architectural efficiency is a core part of the Auspexi value proposition—allowing you to scale your GEO efforts with complete confidence in both performance and cost-predictability.
+Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is engineered to optimize every interaction, ensuring that you get the deepest insights possible without the inefficiency commonly found in unmanaged AI deployments. This architectural efficiency is a core part of the L8EntSpace value proposition—allowing you to scale your GEO efforts with complete confidence in both performance and cost-predictability.
 `
   },
   {
@@ -1111,7 +1111,7 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
       </p>
       <h2>Deploying Truth as a Strategy</h2>
       <p>
-        At Auspexi, we apply semantic principles directly to our Fact-Vault and Content Scorer. When you write a "High-Entropy Fact", we don't just inject keywords. We establish a premise, support it with verifiable data, and map how that data correlates with broader industry truths. By structuring your brand's narrative as clear, verifiable claims rather than vague marketing copy, you give leading LLMs the kind of signal they are most likely to cite — moving your marketing from guesswork toward something measurable.
+        At L8EntSpace, we apply semantic principles directly to our Fact-Vault and Content Scorer. When you write a "High-Entropy Fact", we don't just inject keywords. We establish a premise, support it with verifiable data, and map how that data correlates with broader industry truths. By structuring your brand's narrative as clear, verifiable claims rather than vague marketing copy, you give leading LLMs the kind of signal they are most likely to cite — moving your marketing from guesswork toward something measurable.
       </p>
       <h2>Architecting Knowledge for the AI Era</h2>
       <p>
@@ -1134,7 +1134,7 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
     image:
       "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80",
     excerpt:
-      "Discover why standard web ontologies like Schema.org are evolving, and how Auspexi uses advanced semantic mapping to make your brand universally understood by AI.",
+      "Discover why standard web ontologies like Schema.org are evolving, and how L8EntSpace uses advanced semantic mapping to make your brand universally understood by AI.",
     content: `
 
       <h2>Beyond Keywords: The Knowledge Graph Era</h2>
@@ -1148,9 +1148,9 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
       <p>
         When ChatGPT answers a B2B query, it must synthesize data from diverse, sometimes incompatible knowledge bases. If your technical documentation, your product pricing, and your public relations messaging exist in disconnected silos without a unifying ontology, the AI will fail to resolve the entity. It will simply look past you.
       </p>
-      <h2>Auspexi's Semantic Interoperability Layer</h2>
+      <h2>L8EntSpace's Semantic Interoperability Layer</h2>
       <p>
-        We built the Auspexi platform to solve this exact problem. The new <strong>Ontological Interoperability Export</strong> available to our business and enterprise clients automatically formats your High-Entropy Facts into complex node-and-edge relationships. 
+        We built the L8EntSpace platform to solve this exact problem. The new <strong>Ontological Interoperability Export</strong> available to our business and enterprise clients automatically formats your High-Entropy Facts into complex node-and-edge relationships. 
       </p>
       <p>
         This ensures that when an LLM connects a problem to a solution, it traces the edge directly to your brand. By managing your brand's ontology, you dictate the rules of semantic engagement in the AI era.
@@ -1176,15 +1176,15 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
     content: `
       <h2>The Dashboard AI Strategist Who Actually Knows Your Brand</h2>
       <p>
-        Most analytics tools give you numbers and leave you to figure out what to do with them. Citacious is different. She is Auspexi's built-in GEO strategist — a conversational AI that lives inside your dashboard and carries deep, current knowledge of the entire platform, your live Fact-Vault, and your real-time Share of Voice metrics. She doesn't just answer questions; she tells you what to do next and why.
+        Most analytics tools give you numbers and leave you to figure out what to do with them. Citacious is different. She is L8EntSpace's built-in GEO strategist — a conversational AI that lives inside your dashboard and carries deep, current knowledge of the entire platform, your live Fact-Vault, and your real-time Share of Voice metrics. She doesn't just answer questions; she tells you what to do next and why.
       </p>
       <p>
-        Citacious has evolved well beyond a basic AI assistant. She knows the Auspexi platform end to end — Citation Probe, Fact-Vault management, the Agents content pipeline, the Content Scorer, Schema Deploy, Entity Intelligence, competitor analysis, and the Analytics dashboard. Ask her about any of them and she'll give you a specific, actionable answer grounded in how those features work and what your current data shows.
+        Citacious has evolved well beyond a basic AI assistant. She knows the L8EntSpace platform end to end — Citation Probe, Fact-Vault management, the Agents content pipeline, the Content Scorer, Schema Deploy, Entity Intelligence, competitor analysis, and the Analytics dashboard. Ask her about any of them and she'll give you a specific, actionable answer grounded in how those features work and what your current data shows.
       </p>
 
       <h2>The TEO Framework: How Citacious Frames Your GEO Strategy</h2>
       <p>
-        Citacious organises GEO strategy around what Auspexi calls the TEO framework — three axes that define how AI models understand and cite your brand.
+        Citacious organises GEO strategy around what L8EntSpace calls the TEO framework — three axes that define how AI models understand and cite your brand.
       </p>
       <ul>
         <li><strong>Ontology</strong> — What your brand <em>is</em>. This is the entity layer: your name, your domain, your category, your relationships to known entities in the knowledge graph. It is the foundation. If the AI doesn't know you exist as a discrete, unambiguous entity, nothing else matters.</li>
@@ -1221,7 +1221,7 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
     image:
       "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80",
     excerpt:
-      "The biggest enemy of AI search is Data Decay. Learn how Auspexi's CMS Auto-Sync ensures that the moment you update a feature or price on your website, it is instantly structured and fed to AI crawlers.",
+      "The biggest enemy of AI search is Data Decay. Learn how L8EntSpace's CMS Auto-Sync ensures that the moment you update a feature or price on your website, it is instantly structured and fed to AI crawlers.",
     content: `
       <h2>The Synchronization Gap</h2>
       <p>
@@ -1239,7 +1239,7 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
         When your schema decays and falls out of sync with your actual product, LLMs begin to hallucinate, citing old prices or deprecated features to your potential customers.
       </p>
 
-      <h2>The Solution: Auspexi CMS Auto-Sync</h2>
+      <h2>The Solution: L8EntSpace CMS Auto-Sync</h2>
       <p>
         To completely eradicate Data Decay, we built <strong>CMS Auto-Sync</strong>. This feature transforms your existing Content Management System (whether it's Webflow, WordPress, Contentful, or a custom React frontend) into a real-time LLM grounding engine.
       </p>
@@ -1247,14 +1247,14 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
         Here is how the pipeline works:
       </p>
       <ol>
-        <li><strong>Content Generation:</strong> When you trigger an article from the Agents tab, Auspexi's four-agent pipeline researches, extracts, schemas, and writes a GEO-optimised article grounded in your Fact-Vault.</li>
-        <li><strong>Fact-Vault Update:</strong> The extracted facts are stored in your centralized Auspexi Fact-Vault, keeping your brand knowledge base current and consistent.</li>
-        <li><strong>Webhook Publishing:</strong> When you click Publish, Auspexi sends the completed article — including the full text, extracted facts, and JSON-LD schema — to your configured CMS webhook URL. Your CMS receives the payload and creates or updates the page automatically.</li>
-        <li><strong>Email Delivery Fallback:</strong> If you don't have a CMS webhook set up yet, Auspexi's <code>notify-article</code> endpoint emails the full article content directly to your account address, ready to paste into any website editor.</li>
+        <li><strong>Content Generation:</strong> When you trigger an article from the Agents tab, L8EntSpace's four-agent pipeline researches, extracts, schemas, and writes a GEO-optimised article grounded in your Fact-Vault.</li>
+        <li><strong>Fact-Vault Update:</strong> The extracted facts are stored in your centralized L8EntSpace Fact-Vault, keeping your brand knowledge base current and consistent.</li>
+        <li><strong>Webhook Publishing:</strong> When you click Publish, L8EntSpace sends the completed article — including the full text, extracted facts, and JSON-LD schema — to your configured CMS webhook URL. Your CMS receives the payload and creates or updates the page automatically.</li>
+        <li><strong>Email Delivery Fallback:</strong> If you don't have a CMS webhook set up yet, L8EntSpace's <code>notify-article</code> endpoint emails the full article content directly to your account address, ready to paste into any website editor.</li>
       </ol>
 
       <blockquote>
-        "With CMS Auto-Sync, we have achieved Continuous LLM Grounding. Your marketing team doesn't need to learn how to write JSON-LD or understand vector embeddings. They publish content through Auspexi, and the structured facts reach your website and the AI crawlers automatically." <br/><strong>— Auspexi Infrastructure Team</strong>
+        "With CMS Auto-Sync, we have achieved Continuous LLM Grounding. Your marketing team doesn't need to learn how to write JSON-LD or understand vector embeddings. They publish content through L8EntSpace, and the structured facts reach your website and the AI crawlers automatically." <br/><strong>— L8EntSpace Infrastructure Team</strong>
       </blockquote>
 
       <h2>Set It and Forget It GEO</h2>
@@ -1262,7 +1262,7 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
         Enterprise GEO should not require a dedicated team of data engineers manually updating schemas. It should be an invisible, automated layer of your existing marketing stack.
       </p>
       <p>
-        By deploying Auspexi's CMS Auto-Sync, you close the Synchronization Gap permanently. The moment your brand evolves, the AI evolves with it.
+        By deploying L8EntSpace's CMS Auto-Sync, you close the Synchronization Gap permanently. The moment your brand evolves, the AI evolves with it.
       </p>
 `,
   },
@@ -1275,7 +1275,7 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
     image:
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
     excerpt:
-      "Ranking #1 on Google is a vanity metric. Learn how Auspexi's Citation Probe measures your true brand visibility across ChatGPT, Perplexity, Claude, and Gemini.",
+      "Ranking #1 on Google is a vanity metric. Learn how L8EntSpace's Citation Probe measures your true brand visibility across ChatGPT, Perplexity, Claude, and Gemini.",
     content: `
       <h2>The Death of Traditional Rank Tracking</h2>
       <p>
@@ -1296,32 +1296,32 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
         But how do you measure this? LLMs are black boxes. They don't provide Google Search Console data. They don't give you impression metrics. 
       </p>
 
-      <h2>The Auspexi Citation Probe</h2>
+      <h2>The L8EntSpace Citation Probe</h2>
       <p>
-        To solve this, we built the <strong>Auspexi Citation Probe</strong>. It measures how AI engines actually talk about your brand, using live queries rather than estimates.
+        To solve this, we built the <strong>L8EntSpace Citation Probe</strong>. It measures how AI engines actually talk about your brand, using live queries rather than estimates.
       </p>
       <p>
         Here is how it works:
       </p>
       <ol>
-        <li><strong>Query Generation:</strong> You input your brand, domain, and core industry keywords. Auspexi builds a set of natural-language queries that real users are likely to ask (e.g., "Compare X and Y," "What are the top tools for Z?").</li>
+        <li><strong>Query Generation:</strong> You input your brand, domain, and core industry keywords. L8EntSpace builds a set of natural-language queries that real users are likely to ask (e.g., "Compare X and Y," "What are the top tools for Z?").</li>
         <li><strong>Multi-Engine Execution:</strong> The probe fires these queries across the major engines — ChatGPT, Perplexity, Claude, and Gemini — and records each response.</li>
-        <li><strong>Citation Detection:</strong> Auspexi checks each response for mentions of your brand and domain, reporting which queries cite you, which cite a competitor, and which cite no one — along with a per-engine breakdown.</li>
+        <li><strong>Citation Detection:</strong> L8EntSpace checks each response for mentions of your brand and domain, reporting which queries cite you, which cite a competitor, and which cite no one — along with a per-engine breakdown.</li>
       </ol>
 
       <blockquote>
-        "You cannot optimize what you cannot measure. The Auspexi Citation Probe pulls the black box of LLM generation into the light, giving marketing teams a concrete baseline to track over time." <br/><strong>— Auspexi Product Team</strong>
+        "You cannot optimize what you cannot measure. The L8EntSpace Citation Probe pulls the black box of LLM generation into the light, giving marketing teams a concrete baseline to track over time." <br/><strong>— L8EntSpace Product Team</strong>
       </blockquote>
 
       <h2>Closing the Loop with Cite-Magnets</h2>
       <p>
-        The true power of the Citation Probe is unlocked when paired with the Auspexi Fact-Vault.
+        The true power of the Citation Probe is unlocked when paired with the L8EntSpace Fact-Vault.
       </p>
       <p>
         When the probe surfaces a "Citation Gap"—a high-value query where your competitor is mentioned but you are not—that query becomes a content target. You add the relevant High-Entropy Fact to your Fact-Vault, publish content built around it, and re-run the probe after the engines have had a chance to index the new material to see whether your citation rate moved.
       </p>
       <p>
-        Stop tracking links. Start tracking citations. Dominate your AI Share of Voice with Auspexi.
+        Stop tracking links. Start tracking citations. Dominate your AI Share of Voice with L8EntSpace.
       </p>
     `,
   },
@@ -1334,7 +1334,7 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
     image:
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
     excerpt:
-      "Writing for humans and writing for AI are two different disciplines. Discover how Auspexi's Content Scorer bridges the gap with Dual-Optimization, ensuring your copy converts readers while feeding LLMs the dense facts they crave.",
+      "Writing for humans and writing for AI are two different disciplines. Discover how L8EntSpace's Content Scorer bridges the gap with Dual-Optimization, ensuring your copy converts readers while feeding LLMs the dense facts they crave.",
     content: `
       <h2>The Copywriter's Paradox in the AI Era</h2>
       <p>
@@ -1355,9 +1355,9 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
         You can no longer guess if your content achieves this balance. You need to measure it.
       </p>
 
-      <h2>The Auspexi Content Scorer</h2>
+      <h2>The L8EntSpace Content Scorer</h2>
       <p>
-        The <strong>Auspexi Content Scorer</strong> is a proprietary dashboard feature designed to eliminate the guesswork of GEO. Before you publish a blog post, landing page, or press release, our scorer analyzes the text through the exact same semantic lenses used by modern LLMs.
+        The <strong>L8EntSpace Content Scorer</strong> is a proprietary dashboard feature designed to eliminate the guesswork of GEO. Before you publish a blog post, landing page, or press release, our scorer analyzes the text through the exact same semantic lenses used by modern LLMs.
       </p>
       <p>
         It evaluates your content across three critical vectors:
@@ -1369,7 +1369,7 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
       </ul>
 
       <blockquote>
-        "The Auspexi Content Scorer is designed to help teams raise the entity density and statistical anchoring of their content without sacrificing readability — proving that data density does not have to destroy narrative flow." <br/><strong>— Auspexi Engineering Team</strong>
+        "The L8EntSpace Content Scorer is designed to help teams raise the entity density and statistical anchoring of their content without sacrificing readability — proving that data density does not have to destroy narrative flow." <br/><strong>— L8EntSpace Engineering Team</strong>
       </blockquote>
 
       <h2>The Inverted Pyramid of Synthesis in Action</h2>
@@ -1385,7 +1385,7 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
         Writing for the AI era doesn't mean firing your copywriters. It means giving them the tools to ensure their brilliant narratives are actually visible to the machines that now control internet traffic. 
       </p>
       <p>
-        With the Auspexi Content Scorer, you can finally bridge the gap between human emotion and machine logic, securing your Share of Voice without sacrificing your conversion rate.
+        With the L8EntSpace Content Scorer, you can finally bridge the gap between human emotion and machine logic, securing your Share of Voice without sacrificing your conversion rate.
       </p>
     `,
   },
@@ -1398,7 +1398,7 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
     image:
       "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80",
     excerpt:
-      "Traditional SEO is dead. LLMs don't want your narrative; they want structured, extractable facts. Discover how Auspexi's Fact-Vault forces AI models to cite your brand accurately.",
+      "Traditional SEO is dead. LLMs don't want your narrative; they want structured, extractable facts. Discover how L8EntSpace's Fact-Vault forces AI models to cite your brand accurately.",
     content: `
       <h2>The Death of the \"About Us\" Page</h2>
       <p>
@@ -1421,25 +1421,25 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
 
       <h2>The Solution: High-Entropy Fact Vaults</h2>
       <p>
-        To dominate Generative Engine Optimization (GEO), you must transition from narrative storytelling to <strong>Fact-Maxing</strong>. This is where the <strong>Auspexi Fact-Vault</strong> comes in.
+        To dominate Generative Engine Optimization (GEO), you must transition from narrative storytelling to <strong>Fact-Maxing</strong>. This is where the <strong>L8EntSpace Fact-Vault</strong> comes in.
       </p>
       <p>
         A Fact-Vault is a centralized, highly structured repository of "High-Entropy Facts" about your brand. These are dense, specific, and statistically irresistible data points designed specifically for LLM ingestion.
       </p>
       <p>
-        <em>Example of a High-Entropy Fact:</em> "Auspexi's Citation Probe runs live queries across ChatGPT, Perplexity, Claude, and Gemini, then reports exactly which queries cite your brand and which cite a competitor."
+        <em>Example of a High-Entropy Fact:</em> "L8EntSpace's Citation Probe runs live queries across ChatGPT, Perplexity, Claude, and Gemini, then reports exactly which queries cite your brand and which cite a competitor."
       </p>
       <p>
-        This sentence is a <strong>Cite-Magnet</strong>. It contains specific entities (Auspexi, Citation Probe, ChatGPT, Perplexity, Claude, Gemini) and a concrete, verifiable capability. When an LLM is synthesizing an answer about AI visibility tools, it is drawn to this kind of specificity.
+        This sentence is a <strong>Cite-Magnet</strong>. It contains specific entities (L8EntSpace, Citation Probe, ChatGPT, Perplexity, Claude, Gemini) and a concrete, verifiable capability. When an LLM is synthesizing an answer about AI visibility tools, it is drawn to this kind of specificity.
       </p>
 
       <blockquote>
-        "Ranking #1 on Google means less than ever if an AI answer appears above your link without citing your brand. The new primary KPI is AI Share of Voice (SOV), and the only way to capture it is by feeding the models exactly what they want: structured, high-entropy facts." <br/><strong>— Auspexi Data Science Team</strong>
+        "Ranking #1 on Google means less than ever if an AI answer appears above your link without citing your brand. The new primary KPI is AI Share of Voice (SOV), and the only way to capture it is by feeding the models exactly what they want: structured, high-entropy facts." <br/><strong>— L8EntSpace Data Science Team</strong>
       </blockquote>
 
       <h2>The Inverted Pyramid of Synthesis</h2>
       <p>
-        Using the Auspexi Fact-Vault allows you to implement the <strong>Inverted Pyramid of Synthesis</strong> across your entire digital presence. 
+        Using the L8EntSpace Fact-Vault allows you to implement the <strong>Inverted Pyramid of Synthesis</strong> across your entire digital presence. 
       </p>
       <ol>
         <li><strong>The Base (For the AI):</strong> You start with the raw, structured data from your Fact-Vault. This is injected into your site's JSON-LD schema and placed at the very top of your content.</li>
@@ -1448,7 +1448,7 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
 
       <h2>Stop Guessing. Start Grounding.</h2>
       <p>
-        You can no longer afford to hope that an AI model understands your brand. You must explicitly ground the model in your reality. By utilizing Auspexi's Fact-Vault, you ensure that every time ChatGPT, Gemini, or Perplexity speaks about your industry, they are using <em>your</em> facts, <em>your</em> statistics, and citing <em>your</em> brand.
+        You can no longer afford to hope that an AI model understands your brand. You must explicitly ground the model in your reality. By utilizing L8EntSpace's Fact-Vault, you ensure that every time ChatGPT, Gemini, or Perplexity speaks about your industry, they are using <em>your</em> facts, <em>your</em> statistics, and citing <em>your</em> brand.
       </p>
       <p>
         Welcome to the new era of search.
@@ -1458,24 +1458,24 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
   {
     slug: "beyond-the-hype-defense-in-depth",
     title:
-      "Beyond the Hype: Auspexi's Defense-in-Depth Architecture for Enterprise GEO",
+      "Beyond the Hype: L8EntSpace's Defense-in-Depth Architecture for Enterprise GEO",
     category: "Security & Architecture",
     date: "Mar 31, 2026",
     image:
       "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80",
     excerpt:
-      "The integration of LLMs into enterprise workflows has created a paradigm shift. Discover how Auspexi leverages a Defense-in-Depth strategy and aligns with the OWASP Top 10 for LLMs.",
+      "The integration of LLMs into enterprise workflows has created a paradigm shift. Discover how L8EntSpace leverages a Defense-in-Depth strategy and aligns with the OWASP Top 10 for LLMs.",
     content: `
       <p>
-        The integration of Large Language Models (LLMs) into enterprise workflows has created a paradigm shift in digital marketing. But with new technology comes a novel threat landscape. At Auspexi, we recognize that securing Generative Engine Optimization (GEO) requires moving beyond legacy web security models and addressing the unique vulnerabilities of the AI era.
+        The integration of Large Language Models (LLMs) into enterprise workflows has created a paradigm shift in digital marketing. But with new technology comes a novel threat landscape. At L8EntSpace, we recognize that securing Generative Engine Optimization (GEO) requires moving beyond legacy web security models and addressing the unique vulnerabilities of the AI era.
       </p>
       <p>
-        We don't just bolt security on at the end; we build it into the DNA of our platform. Here is how Auspexi leverages a <strong>Defense-in-Depth</strong> strategy and aligns with the <strong>OWASP Top 10 for LLMs</strong> to protect your brand's Fact-Vault and Share of Voice.
+        We don't just bolt security on at the end; we build it into the DNA of our platform. Here is how L8EntSpace leverages a <strong>Defense-in-Depth</strong> strategy and aligns with the <strong>OWASP Top 10 for LLMs</strong> to protect your brand's Fact-Vault and Share of Voice.
       </p>
 
       <h3>1. Edge-Level Protection and Rate Limiting</h3>
       <p>
-        Security starts at the perimeter. To protect against automated botnets, credential stuffing, and Denial of Wallet (DoW) attacks on our AI endpoints, Auspexi implements strict, IP-based and user-based <strong>Rate Limiting</strong>. By throttling excessive requests at the edge, we ensure high availability (HA) and mitigate the risk of resource exhaustion, keeping our infrastructure resilient under load.
+        Security starts at the perimeter. To protect against automated botnets, credential stuffing, and Denial of Wallet (DoW) attacks on our AI endpoints, L8EntSpace implements strict, IP-based and user-based <strong>Rate Limiting</strong>. By throttling excessive requests at the edge, we ensure high availability (HA) and mitigate the risk of resource exhaustion, keeping our infrastructure resilient under load.
       </p>
 
       <h3>2. Strict Input Validation (Zero Trust Data Entry)</h3>
@@ -1485,7 +1485,7 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
 
       <h3>3. Defending Against Prompt Injection (OWASP LLM01)</h3>
       <p>
-        Prompt Injection is the most critical vulnerability in modern AI applications (OWASP LLM01:2023). Malicious actors can attempt to hijack LLM instructions to exfiltrate data or generate unauthorized content. Auspexi utilizes a multi-layered defense against prompt injection:
+        Prompt Injection is the most critical vulnerability in modern AI applications (OWASP LLM01:2023). Malicious actors can attempt to hijack LLM instructions to exfiltrate data or generate unauthorized content. L8EntSpace utilizes a multi-layered defense against prompt injection:
       </p>
       <ul>
         <li><strong>System Prompt Isolation:</strong> User inputs are strictly delineated from system instructions.</li>
@@ -1495,20 +1495,20 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
 
       <h3>4. Output Sanitization and XSS Prevention</h3>
       <p>
-        The threat doesn't end when the LLM generates a response. AI hallucinations or manipulated outputs can introduce Cross-Site Scripting (XSS) vulnerabilities if rendered directly in the browser. Auspexi treats all LLM output as untrusted. We utilize robust HTML sanitization libraries (like DOMPurify) to strip out malicious scripts, iframes, and dangerous attributes before they ever reach the DOM, neutralizing OWASP LLM02 (Insecure Output Handling).
+        The threat doesn't end when the LLM generates a response. AI hallucinations or manipulated outputs can introduce Cross-Site Scripting (XSS) vulnerabilities if rendered directly in the browser. L8EntSpace treats all LLM output as untrusted. We utilize robust HTML sanitization libraries (like DOMPurify) to strip out malicious scripts, iframes, and dangerous attributes before they ever reach the DOM, neutralizing OWASP LLM02 (Insecure Output Handling).
       </p>
 
       <h3>5. Audit Trails and Access Control</h3>
       <p>
-        Visibility is the cornerstone of enterprise security. Auspexi employs <strong>Role-Based Access Control (RBAC)</strong> to ensure the Principle of Least Privilege (PoLP)—users only have access to the data they need. Every critical action — from fact extraction to content generation — is recorded in an <strong>audit log</strong> capturing the user, the action, and a timestamp. This accelerates incident response and gives your team a clear record of activity across the platform.
+        Visibility is the cornerstone of enterprise security. L8EntSpace employs <strong>Role-Based Access Control (RBAC)</strong> to ensure the Principle of Least Privilege (PoLP)—users only have access to the data they need. Every critical action — from fact extraction to content generation — is recorded in an <strong>audit log</strong> capturing the user, the action, and a timestamp. This accelerates incident response and gives your team a clear record of activity across the platform.
       </p>
 
       <h2>Security as an Enabler</h2>
       <p>
-        In the race to dominate AI search, security shouldn't slow you down—it should give you the confidence to move faster. By adhering to OWASP standards and implementing a rigorous Defense-in-Depth architecture, Auspexi ensures that your enterprise can scale its GEO efforts without compromising on data integrity or compliance.
+        In the race to dominate AI search, security shouldn't slow you down—it should give you the confidence to move faster. By adhering to OWASP standards and implementing a rigorous Defense-in-Depth architecture, L8EntSpace ensures that your enterprise can scale its GEO efforts without compromising on data integrity or compliance.
       </p>
       <p>
-        Secure your Share of Voice. Build your Fact-Vault with Auspexi today.
+        Secure your Share of Voice. Build your Fact-Vault with L8EntSpace today.
       </p>
     `,
   },
@@ -1521,7 +1521,7 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
     image:
       "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&q=80",
     excerpt:
-      "As Generative Engine Optimization becomes mission-critical, accountability cannot be an afterthought. Here's how Auspexi's audit logging gives your team a clear record of every action taken in your workspace.",
+      "As Generative Engine Optimization becomes mission-critical, accountability cannot be an afterthought. Here's how L8EntSpace's audit logging gives your team a clear record of every action taken in your workspace.",
     content: `
       <h2>The Enterprise Shift to GEO</h2>
       <p>
@@ -1544,17 +1544,17 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
         <li><strong>Faster incident response:</strong> When something looks off (a sudden drop in citations, an unexpected change to a fact), the log lets you trace it back to a specific action or session.</li>
       </ul>
 
-      <h2>Auspexi's Audit Logging</h2>
+      <h2>L8EntSpace's Audit Logging</h2>
       <p>
-        Auspexi automatically tracks and records significant actions taken within your workspace. Whether a user is extracting facts, running a Citation Probe, scoring content, or generating an article, the action is logged to your account's history. Every entry captures the authenticated user ID, the action performed, a timestamp, and the relevant details.
+        L8EntSpace automatically tracks and records significant actions taken within your workspace. Whether a user is extracting facts, running a Citation Probe, scoring content, or generating an article, the action is logged to your account's history. Every entry captures the authenticated user ID, the action performed, a timestamp, and the relevant details.
       </p>
 
       <h3>Where This Is Heading</h3>
       <p>
-        Audit logging is one part of a broader approach to platform security that also includes input validation, output sanitisation, and role-based access control. We're being deliberately honest about our posture: Auspexi is not currently SOC 2 certified, and we don't claim to be. What we do offer today is transparent, per-user activity tracking that gives your team real visibility into what happens in your workspace.
+        Audit logging is one part of a broader approach to platform security that also includes input validation, output sanitisation, and role-based access control. We're being deliberately honest about our posture: L8EntSpace is not currently SOC 2 certified, and we don't claim to be. What we do offer today is transparent, per-user activity tracking that gives your team real visibility into what happens in your workspace.
       </p>
       <p>
-        By choosing Auspexi, you're partnering with a platform that takes your data seriously and is straightforward about what it does and doesn't do.
+        By choosing L8EntSpace, you're partnering with a platform that takes your data seriously and is straightforward about what it does and doesn't do.
       </p>
       <p>
         <strong>Ready to get started?</strong><br/>
@@ -1627,7 +1627,7 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
         A Cite-Magnet is a highly structured, dense piece of information specifically designed to be ingested, understood, and cited by an AI. It strips away the unnecessary narrative and presents facts in a way that minimizes ambiguity. A Cite-Magnet is built on the principle of High-Entropy—meaning it contains a high density of specific entities, statistics, strong relational links, and unambiguous claims.
       </p>
       <p>
-        For example, instead of writing: "Our software is the fastest in the market and saves our customers a lot of time," a Cite-Magnet approach would be: "Auspexi tests brand citation rates across four AI engines — ChatGPT, Perplexity, Claude, and Gemini — in a single Citation Probe run." The latter provides the AI with specific entities (Auspexi, Citation Probe, the four named engines) and a concrete, verifiable capability rather than a vague claim.
+        For example, instead of writing: "Our software is the fastest in the market and saves our customers a lot of time," a Cite-Magnet approach would be: "L8EntSpace tests brand citation rates across four AI engines — ChatGPT, Perplexity, Claude, and Gemini — in a single Citation Probe run." The latter provides the AI with specific entities (L8EntSpace, Citation Probe, the four named engines) and a concrete, verifiable capability rather than a vague claim.
       </p>
       <h2>The Structure of an Effective Cite-Magnet</h2>
       <p>
@@ -1715,7 +1715,7 @@ Scaling an AI strategy shouldn't lead to unpredictable overhead. Our platform is
       </p>
       <h2>Architecting the Hook</h2>
       <p>
-        The deployment of an Information Cliffhanger requires careful dual-optimization. Using a tool like Auspexi's Fact-Vault, you classify certain entities as public and others as gated. 
+        The deployment of an Information Cliffhanger requires careful dual-optimization. Using a tool like L8EntSpace's Fact-Vault, you classify certain entities as public and others as gated. 
       </p>
       <p>
         At the top of your content, you provide dense, structured JSON-LD data outlining the surface-level facts. For example: "The Acme Protocol reduces server load by 50% by restructuring data sequences." This gives the AI the concrete statistic and the brand association it needs to confidently cite you if a user asks about server load reduction.
@@ -1758,7 +1758,7 @@ The biggest change is that Citacious now reads your live account data before she
 - Whether you've generated any GEO articles yet
 - Your latest Share of Voice metrics
 
-She uses all of that to decide what you actually need help with right now. Not what a hypothetical Auspexi user might need — *you*, specifically.
+She uses all of that to decide what you actually need help with right now. Not what a hypothetical L8EntSpace user might need — *you*, specifically.
 
 ## The Quest Stage System
 
@@ -1799,7 +1799,7 @@ We think you'll notice the difference immediately.
     category: "Product Updates",
     date: "May 26, 2026",
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop",
-    excerpt: "A busy few weeks at Auspexi. We've shipped four major new features: a live Citation Probe that tests your brand against real AI queries, a four-agent content crew, full cost tracking, and article email delivery for when you don't have a CMS yet.",
+    excerpt: "A busy few weeks at L8EntSpace. We've shipped four major new features: a live Citation Probe that tests your brand against real AI queries, a four-agent content crew, full cost tracking, and article email delivery for when you don't have a CMS yet.",
     content: `
 ## A Busy Sprint
 
@@ -1857,16 +1857,16 @@ More soon.
 `,
   },
   {
-    slug: "why-we-rebuilt-auspexi-on-nextjs-for-ai-search",
-    title: "Why We Rebuilt the Entire Auspexi Website on Next.js — And What It Means for Your AI Visibility",
+    slug: "why-we-rebuilt-l8entspace-on-nextjs-for-ai-search",
+    title: "Why We Rebuilt the Entire L8EntSpace Website on Next.js — And What It Means for Your AI Visibility",
     category: "Platform & Infrastructure",
     date: "May 26, 2026",
     image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1200&auto=format&fit=crop",
-    excerpt: "We moved off our old Vite/React setup and rebuilt auspexi.com on Next.js from the ground up. The reason? A single-page app is invisible to AI crawlers. If we're an AI visibility platform, our own site needs to be a demonstration of what we're selling.",
+    excerpt: "We moved off our old Vite/React setup and rebuilt l8entspace.com on Next.js from the ground up. The reason? A single-page app is invisible to AI crawlers. If we're an AI visibility platform, our own site needs to be a demonstration of what we're selling.",
     content: `
 ## The Awkward Truth About Our Old Website
 
-Here's an honest admission: until recently, auspexi.com was a single-page React app built with Vite. It looked good, it worked well as a product, and our dashboard was solid. But from the perspective of AI crawlers and search engines, it had a fundamental problem.
+Here's an honest admission: until recently, l8entspace.com was a single-page React app built with Vite. It looked good, it worked well as a product, and our dashboard was solid. But from the perspective of AI crawlers and search engines, it had a fundamental problem.
 
 Single-page apps render in the browser using JavaScript. When a crawler — whether that's Googlebot, GPTBot, or ClaudeBot — visits a JavaScript-rendered page, they often see a near-empty HTML shell. The actual content is invisible to them because they don't run JavaScript the same way a browser does. The result: all our blog posts, all our product copy, all the detailed content that should be helping us rank and get cited — none of it was being indexed properly.
 
@@ -1876,7 +1876,7 @@ So we rebuilt everything on Next.js, and we want to explain why that decision ma
 
 ## What Next.js Actually Changes
 
-Next.js uses server-side rendering (SSR) and static site generation (SSG). When a crawler visits any page on the new auspexi.com, the server sends back fully rendered HTML — no JavaScript execution required, no waiting for hydration, no content missing. The crawler sees exactly what a browser would see.
+Next.js uses server-side rendering (SSR) and static site generation (SSG). When a crawler visits any page on the new l8entspace.com, the server sends back fully rendered HTML — no JavaScript execution required, no waiting for hydration, no content missing. The crawler sees exactly what a browser would see.
 
 That matters for two reasons.
 
@@ -1912,7 +1912,7 @@ For people building on similar stacks, the key lessons from our migration:
 
 ## We're Building on What We Preach
 
-The core of Auspexi's value proposition is that your brand's digital presence should be structured, machine-readable, and explicitly optimised for AI engines. The infrastructure changes we've made to our own site are a direct application of that philosophy.
+The core of L8EntSpace's value proposition is that your brand's digital presence should be structured, machine-readable, and explicitly optimised for AI engines. The infrastructure changes we've made to our own site are a direct application of that philosophy.
 
 We moved to Next.js because it was the right call for our AI visibility, not because it was the trendy framework. The sitemap, the robots.txt permissions, the server rendering — these are exactly the kinds of technical GEO decisions we help our customers make. Now our own site is built on the same foundation.
 

@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        event: 'auspexi.shadow_link_sync',
+        event: 'l8entspace.shadow_link_sync',
         timestamp: new Date().toISOString(),
         data: payload,
       }),

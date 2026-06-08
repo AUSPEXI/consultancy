@@ -22,8 +22,8 @@ export async function POST(request: Request) {
     if (!geminiKey && !openaiKey) return NextResponse.json({ success: true, extracted: 0 });
 
     const conversationText = transcript.map((t: any) => `${t.role}: ${t.text}`).join('\n');
-    const extractionPrompt = `Analyze the following conversation between a user and an Auspexi AI agent.
-Extract any NEW, USEFUL facts, frequently asked questions, or insights about the user's needs or Auspexi's services that the agent should remember for future conversations.
+    const extractionPrompt = `Analyze the following conversation between a user and an L8EntSpace AI agent.
+Extract any NEW, USEFUL facts, frequently asked questions, or insights about the user's needs or L8EntSpace's services that the agent should remember for future conversations.
 Do not extract personal information (like names or emails).
 Format the output as a JSON array of objects with 'topic' and 'fact' string properties. If there is nothing useful to extract, return an empty array [].
 

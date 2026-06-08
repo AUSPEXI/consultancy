@@ -48,7 +48,7 @@ function AuraPanel({ onClose }: { onClose: () => void }) {
         <p className="text-xs text-zinc-400 text-center h-8">
           {isConnected
             ? isSpeaking ? 'Aura is speaking...' : 'Listening...'
-            : 'Ask anything about GEO, pricing, or Auspexi.'}
+            : 'Ask anything about GEO, pricing, or L8EntSpace.'}
         </p>
 
         {error && (

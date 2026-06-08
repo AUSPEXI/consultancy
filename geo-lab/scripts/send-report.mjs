@@ -126,7 +126,7 @@ const html = `
   <div style="padding:16px 32px;border-top:1px solid #27272a;background:#0d0d10">
     <p style="margin:0;font-size:12px;color:#52525b">
       Full experiment: <code style="color:#a1a1aa">${expSlug}/</code> — commit to git = pre-registration record ·
-      <a href="https://auspexi.com" style="color:#a78bfa;text-decoration:none">auspexi.com</a>
+      <a href="https://l8entspace.com" style="color:#a78bfa;text-decoration:none">l8entspace.com</a>
     </p>
   </div>
 </div>`;

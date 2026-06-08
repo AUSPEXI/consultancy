@@ -17,6 +17,6 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: 'Googlebot',       allow: '/' },
       { userAgent: 'Google-Extended', allow: '/' },
     ],
-    sitemap: 'https://auspexi.com/sitemap.xml',
+    sitemap: 'https://l8entspace.com/sitemap.xml',
   };
 }

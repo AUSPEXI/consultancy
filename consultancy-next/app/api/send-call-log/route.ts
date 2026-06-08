@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       });
 
       await transporter.sendMail({
-        from: `"Auspexi Voice Agent" <${emailUser}>`,
+        from: `"L8EntSpace Voice Agent" <${emailUser}>`,
         to: emailUser,
         subject: `New Voice Agent Lead: ${name}`,
         text: `You have a new lead from the Voice Agent!\n\nName: ${name}\nEmail: ${email || 'Not provided'}\n\nConversation Summary:\n${summary}\n\nPlease follow up if required.`,

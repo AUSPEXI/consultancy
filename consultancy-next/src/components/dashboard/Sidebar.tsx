@@ -121,8 +121,8 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       )}>
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/auspexi-logo.png" alt="Auspexi Logo" className="w-14 h-14 object-contain shrink-0" />
-            <span className="text-2xl font-semibold text-white tracking-tight">Auspexi</span>
+            <img src="/l8entspace-logo.svg" alt="L8EntSpace Logo" className="w-14 h-14 object-contain shrink-0" />
+            <span className="text-2xl font-semibold text-white tracking-tight">L8<span className="text-pink-500">Ent</span>Space</span>
           </div>
           <button
             onClick={() => setIsOpen(false)}

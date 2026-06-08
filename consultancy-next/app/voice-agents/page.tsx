@@ -9,19 +9,19 @@ import { Sparkles, Mic, Zap, Brain, MessageSquare, Shield } from 'lucide-react';
 const voiceJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'Aura by Auspexi',
-  alternateName: 'Auspexi Voice Agent',
+  name: 'Aura by L8EntSpace',
+  alternateName: 'L8EntSpace Voice Agent',
   applicationCategory: 'BusinessApplication',
-  description: 'Aura is a real-time AI voice assistant for Generative Engine Optimization, powered by Gemini Live. Ask about GEO strategy and navigate Auspexi hands-free.',
-  url: 'https://auspexi.com/voice-agents',
+  description: 'Aura is a real-time AI voice assistant for Generative Engine Optimization, powered by Gemini Live. Ask about GEO strategy and navigate L8EntSpace hands-free.',
+  url: 'https://l8entspace.com/voice-agents',
   operatingSystem: 'Web',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-  provider: { '@type': 'Organization', name: 'Auspexi' },
+  provider: { '@type': 'Organization', name: 'L8EntSpace' },
 };
 
 const features = [
   { icon: Zap, title: "Ultra-Low Latency", description: "Sub-500ms response times powered by Gemini Live API for natural, real-time conversation." },
-  { icon: Brain, title: "GEO Expert Knowledge", description: "Aura knows everything about Generative Engine Optimization — what it is, how it works, and whether Auspexi is right for you." },
+  { icon: Brain, title: "GEO Expert Knowledge", description: "Aura knows everything about Generative Engine Optimization — what it is, how it works, and whether L8EntSpace is right for you." },
   { icon: MessageSquare, title: "Instant Navigation", description: "Ask Aura to take you anywhere on the site and she'll navigate on your behalf — no clicking required." },
   { icon: Shield, title: "Echo Cancellation", description: "Advanced audio processing eliminates feedback so the agent only hears you, not itself." },
 ];
@@ -46,7 +46,7 @@ export default function VoiceAgentsPage() {
                 Meet <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-pink-600">Aura</span>
               </h1>
               <p className="text-xl text-zinc-400 leading-relaxed">
-                Auspexi&apos;s voice brand guide. Ask anything about GEO, what Auspexi does, pricing, or where to go next — and get an instant, intelligent answer.
+                L8EntSpace&apos;s voice brand guide. Ask anything about GEO, what L8EntSpace does, pricing, or where to go next — and get an instant, intelligent answer.
               </p>
             </div>
 
@@ -78,7 +78,7 @@ export default function VoiceAgentsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 text-left">
                   {[
                     { step: "01", title: "Connect", desc: "Click Start Call. Your browser requests mic access and establishes a secure real-time session with Gemini Live. No account needed." },
-                    { step: "02", title: "Ask Anything", desc: "Ask about GEO strategy, what Auspexi does, how pricing works, or have Aura navigate you to the right page on the site." },
+                    { step: "02", title: "Ask Anything", desc: "Ask about GEO strategy, what L8EntSpace does, how pricing works, or have Aura navigate you to the right page on the site." },
                     { step: "03", title: "Get Started", desc: "Ready to go deeper? Aura will guide you to sign up for the dashboard where Citacious — our dedicated GEO strategist AI — takes over." },
                   ].map((item) => (
                     <div key={item.step} className="flex gap-4">

@@ -32,7 +32,7 @@ You will generate EXACTLY 7 semantic anchors structured by the TEO framework:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 AXIS 1 — ONTOLOGICAL  (What this brand fundamentally IS in AI minds)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Generate 2 × "Systemic Anchor"  (color: #ec4899)
+Generate 2 × "Systemic Anchor"  (color: #ff1493)
 These are the load-bearing identity concepts AI engines co-activate when reasoning
 about this brand. They are stable across all query types and model versions.
 Everything else in the latent space orbits around them.
@@ -72,7 +72,7 @@ Return ONLY a JSON array of exactly 7 objects. No markdown. No explanation. No w
 Schema for each object:
 {
   "label": "2–4 word concept, specific to THIS brand — not generic marketing language",
-  "color": "#ec4899 | #06b6d4 | #8b5cf6 | #f59e0b",
+  "color": "#ff1493 | #06b6d4 | #8b5cf6 | #f59e0b",
   "baseType": "Systemic Anchor | Signal Point | Emergent Trend | Risk Vector",
   "axisAlignment": 1 | 2 | 3,
   "description": "One sentence: what this anchor means for this brand's specific GEO strategy."

@@ -67,7 +67,7 @@ export function ImageZoom({ src, alt, zoomLevel = 2.5 }: ImageZoomProps) {
           ref={imgRef}
           src={src}
           alt={alt}
-          className="w-full h-auto block rounded-xl shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(190,24,93,1)]"
+          className="w-full h-auto block rounded-xl shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]"
         />
         <div
           ref={lensRef}

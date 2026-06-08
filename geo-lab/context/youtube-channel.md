@@ -6,7 +6,7 @@ through-line: **"I tested it so you don't have to — here's the data."**
 ## Why this works
 Nobody else is running controlled, statistical A/B tests on LLM citation and
 showing the raw numbers. That is a defensible content moat and it directly
-demonstrates the expertise Auspexi sells.
+demonstrates the expertise L8EntSpace sells.
 
 ## Video format (8–14 min)
 1. **Hook (0:00–0:20)** — the question + a teaser of the surprising result.
@@ -17,7 +17,7 @@ demonstrates the expertise Auspexi sells.
 4. **The run (3:00–5:00)** — watch probes execute, raw responses on screen.
 5. **The result (5:00–8:00)** — rates, the chart, the p-value, plain conclusion.
 6. **Threats to validity (8:00–9:30)** — what could be wrong. Builds authority.
-7. **What it means for you (9:30–end)** — the practical takeaway + soft Auspexi CTA.
+7. **What it means for you (9:30–end)** — the practical takeaway + soft L8EntSpace CTA.
 
 ## Series ideas (each = a playlist)
 - **"GEO A/B"** — the core weekly experiment series.
