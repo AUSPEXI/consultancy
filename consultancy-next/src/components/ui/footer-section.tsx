@@ -42,7 +42,7 @@ export function Footerdemo() {
           <div className="relative">
             <div className="flex items-center gap-3 mb-3">
               <img src="/l8entspace-logo.svg" alt="L8EntSpace" className="w-8 h-8 object-contain" />
-              <span className="font-heading text-xl font-bold text-white tracking-widest">L8<span className="text-pink-500">ENT</span>SPACE</span>
+              <span className="font-heading text-xl font-bold text-white tracking-widest">L8<span className="text-pink-500">ENT</span>SPACE<span className="text-pink-500 font-mono text-xs tracking-normal align-top">.COM</span></span>
             </div>
             <p className="mb-6 text-sm text-zinc-400">Master Brand Visibility in the Era of AI Search.</p>
             <form className="relative" onSubmit={handleSubscribe}>
