@@ -1,0 +1,85 @@
+name: Daily Brand Probe
+
+on:
+  schedule:
+    # 07:00 UTC every day — one hour after the autopilot so they don't overlap
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-brand-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Resolve and validate config
+        id: config
+        run: |
+          SITE="${{ secrets.APP_URL }}"
+          if [ -z "$SITE" ]; then
+            SITE="${{ secrets.SITE_URL }}"
+          fi
+          SITE="${SITE%/}"
+
+          SECRET="${{ secrets.CRON_SECRET }}"
+
+          missing=()
+          [ -z "$SITE" ]   && missing+=("APP_URL (or SITE_URL)")
+          [ -z "$SECRET" ] && missing+=("CRON_SECRET")
+
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "❌ Missing GitHub Secrets: ${missing[*]}"
+            echo "Fix: repo → Settings → Secrets and variables → Actions"
+            echo "  APP_URL      = https://auspexi.com"
+            echo "  CRON_SECRET  = copy the CRON_SECRET value from Netlify env vars"
+            exit 1
+          fi
+
+          echo "✓ Config valid — endpoint: ${SITE}/api/cron/brand-probe"
+          echo "site=$SITE" >> "$GITHUB_OUTPUT"
+          echo "secret=$SECRET" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger daily brand probe
+        run: |
+          echo "Triggering daily brand probe at $(date -u)"
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -X POST "${{ steps.config.outputs.site }}/api/cron/brand-probe" \
+            -H "Authorization: Bearer ${{ steps.config.outputs.secret }}" \
+            -H "Content-Type: application/json" \
+            --connect-timeout 15 \
+            --max-time 1080)
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response: $BODY"
+
+          case "$HTTP_CODE" in
+            200)
+              echo "✓ Brand probe completed (see response for budget + per-user status)"
+              ;;
+            000)
+              echo "❌ Could not connect — check APP_URL and that the site is live"
+              exit 1
+              ;;
+            401)
+              echo "❌ Unauthorized (401) — CRON_SECRET in GitHub != CRON_SECRET in Netlify env"
+              exit 1
+              ;;
+            404)
+              echo "❌ Not found (404) — /api/cron/brand-probe missing. Check Netlify deploy is current."
+              exit 1
+              ;;
+            500)
+              echo "❌ Server error (500) — check Netlify function logs"
+              echo "Response body: $BODY"
+              exit 1
+              ;;
+            *)
+              echo "❌ Unexpected HTTP status $HTTP_CODE"
+              echo "Response body: $BODY"
+              exit 1
+              ;;
+          esac
