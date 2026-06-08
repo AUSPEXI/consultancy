@@ -34,7 +34,13 @@ const DECAY_BADGE: Record<string, string> = {
 
 type Tab = 'sov' | 'competitors' | 'platforms' | 'drift' | 'content';
 
-export function SyntheticDataPanel() {
+interface Props {
+  realPlatformRates?: Record<string, number | null> | null;
+  realArticles?: { id: string; topic?: string; geoScore?: number; timestamp?: string }[];
+  userBrand?: string;
+}
+
+export function SyntheticDataPanel({ realPlatformRates, realArticles = [], userBrand = 'Your Brand' }: Props) {
   const { data, loading, error } = useGeoData();
   const [activeTab, setActiveTab] = useState<Tab>('sov');
   const [selectedBrand, setSelectedBrand] = useState<string>('All');
@@ -173,10 +179,36 @@ export function SyntheticDataPanel() {
             {/* Platform Scores */}
             {activeTab === 'platforms' && (
               <div className="space-y-6">
+                {/* Real data callout when available */}
+                {realPlatformRates && (
+                  <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
+                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-3">Your Brand — Real Citation Rates</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {[
+                        { key: 'chatgpt', label: 'ChatGPT', color: ENGINE_COLORS['ChatGPT'] },
+                        { key: 'perplexity', label: 'Perplexity', color: ENGINE_COLORS['Perplexity'] },
+                        { key: 'gemini', label: 'Google AI', color: ENGINE_COLORS['Google AI'] },
+                        { key: 'claude', label: 'Claude', color: ENGINE_COLORS['Claude'] },
+                      ].map(({ key, label, color }) => {
+                        const rate = realPlatformRates[key];
+                        const pct = rate !== null && rate !== undefined ? Math.round(rate * 100) : null;
+                        return (
+                          <div key={key} className="flex flex-col items-center gap-1 p-2 bg-zinc-900/60 rounded-lg border border-zinc-800">
+                            <span className="text-lg font-black" style={{ color: pct !== null ? color : '#3f3f46' }}>
+                              {pct !== null ? `${pct}%` : '—'}
+                            </span>
+                            <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{label}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <p className="text-[9px] text-zinc-600 mt-2">From your most recent Citation Probe run · benchmark against synthetic industry data below</p>
+                  </div>
+                )}
                 <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
                   <div>
                     <h4 className="text-sm font-semibold text-white">Platform SOV by Brand</h4>
-                    <p className="text-xs text-zinc-500 mt-0.5">ChatGPT / Perplexity / Claude / Google AI share per brand</p>
+                    <p className="text-xs text-zinc-500 mt-0.5">ChatGPT / Perplexity / Claude / Google AI share per brand · synthetic benchmark</p>
                   </div>
                   <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5">
                     <select
@@ -354,9 +386,40 @@ export function SyntheticDataPanel() {
             {/* Content Scoring */}
             {activeTab === 'content' && (
               <div className="space-y-4">
+                {/* Real scored articles when available */}
+                {realArticles.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Your Scored Articles — Real GEO Scores</p>
+                    {realArticles.filter(a => a.geoScore != null).slice(0, 5).map(a => (
+                      <div key={a.id} className="flex items-center gap-3 p-3 bg-zinc-950 border border-zinc-800/50 rounded-xl">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-white truncate">{a.topic || 'Untitled'}</p>
+                          {a.timestamp && <p className="text-[9px] text-zinc-600 mt-0.5">{new Date(a.timestamp).toLocaleDateString()}</p>}
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <div className="w-20 h-1.5 bg-zinc-800 rounded-full">
+                            <div
+                              className={`h-full rounded-full ${(a.geoScore ?? 0) >= 80 ? 'bg-emerald-500' : (a.geoScore ?? 0) >= 60 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                              style={{ width: `${a.geoScore ?? 0}%` }}
+                            />
+                          </div>
+                          <span className={`text-xs font-mono font-bold w-8 text-right ${(a.geoScore ?? 0) >= 80 ? 'text-emerald-400' : (a.geoScore ?? 0) >= 60 ? 'text-amber-400' : 'text-rose-400'}`}>
+                            {a.geoScore}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                    {realArticles.filter(a => a.geoScore != null).length === 0 && (
+                      <p className="text-xs text-zinc-500 py-2">Run content scorer on your autopilot articles to see real scores here.</p>
+                    )}
+                    <div className="border-t border-zinc-800 pt-4">
+                      <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Industry Benchmark — Synthetic Reference</p>
+                    </div>
+                  </div>
+                )}
                 <div>
                   <h4 className="text-sm font-semibold text-white">Content Score Breakdown by Brand</h4>
-                  <p className="text-xs text-zinc-500 mt-0.5">5 dimensions · averaged across all content types</p>
+                  <p className="text-xs text-zinc-500 mt-0.5">5 dimensions · averaged across all content types · synthetic benchmark</p>
                 </div>
                 <div className="h-[240px]">
                   <ResponsiveContainer width="100%" height="100%" minWidth={0}>

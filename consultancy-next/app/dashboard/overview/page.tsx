@@ -88,6 +88,7 @@ export default function OverviewPage() {
 
   const [metrics, setMetrics] = useState<any[]>([]);
   const [citationData, setCitationData] = useState<any>(null);
+  const [recentArticles, setRecentArticles] = useState<any[]>([]);
   const [isAuditing, setIsAuditing] = useState(false);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const [shadowUrl, setShadowUrl] = useState('');
@@ -142,6 +143,21 @@ export default function OverviewPage() {
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       if (!snapshot.empty) setCitationData({ id: snapshot.docs[0].id, ...snapshot.docs[0].data() });
+    }, () => {});
+    return () => unsubscribe();
+  }, [user, tier]);
+
+  // Recent articles — used by Content Scoring tab in SyntheticDataPanel
+  useEffect(() => {
+    if (!user || !checkTierAccess(tier, 'Starter')) return;
+    const q = query(
+      collection(db, 'articles'),
+      where('userId', '==', user.uid),
+      orderBy('timestamp', 'desc'),
+      limit(10)
+    );
+    const unsubscribe = onSnapshot(q, (snap) => {
+      setRecentArticles(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     }, () => {});
     return () => unsubscribe();
   }, [user, tier]);
@@ -628,7 +644,11 @@ export default function OverviewPage() {
       </div>
 
       {/* Synthetic Dataset Analytics */}
-      <SyntheticDataPanel />
+      <SyntheticDataPanel
+        realPlatformRates={citationData?.platformRates ?? null}
+        realArticles={recentArticles}
+        userBrand={userData?.brand || ''}
+      />
     </div>
   );
 }
