@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { dbAdmin } from '@/lib/firebase-admin';
+
+export const maxDuration = 800;
 import {
   buildQueries, runCitationProbe, probeBrandRate, estimateProbeCost,
   ALL_ENGINES, type PlatformKey,

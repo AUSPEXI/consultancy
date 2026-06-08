@@ -6,6 +6,8 @@
   # Use the Next.js app's own (empty) functions dir so Netlify does NOT bundle
   # the legacy Vite/Express server at repo-root netlify/functions/api.ts.
   directory = "consultancy-next/netlify/functions"
+  # Allow cron-style API routes up to 15 minutes (background function ceiling).
+  timeout = 900
 
 [build.environment]
   NODE_VERSION = "20"

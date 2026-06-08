@@ -4,6 +4,8 @@ import { getExa } from '@/lib/exa';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
 import nodemailer from 'nodemailer';
 
+export const maxDuration = 800;
+
 // Only run if CRON_SECRET matches — set this in Netlify env vars
 function authorised(request: Request): boolean {
   const auth = request.headers.get('authorization') || '';
@@ -190,21 +192,26 @@ export async function POST(request: Request) {
       const email: string = userData.email || '';
 
       for (const keyword of keywords) {
-        // Skip if we already ran this keyword in the last 6 days (avoid duplicate runs)
+        // Skip if we already ran this keyword in the last 6 days (avoid duplicate runs).
+        // Equality-only query avoids the composite index that orderBy would require.
         const recentRun = await dbAdmin.collection('autopilot_runs')
           .where('userId', '==', userDoc.id)
           .where('keyword', '==', keyword)
           .where('status', '==', 'complete')
-          .orderBy('createdAt', 'desc')
-          .limit(1)
           .get();
 
         if (!recentRun.empty) {
-          const lastRun = recentRun.docs[0].data();
-          const daysSinceLast = (Date.now() - new Date(lastRun.createdAt).getTime()) / (1000 * 60 * 60 * 24);
-          if (daysSinceLast < 6) {
-            processed.push({ userId: userDoc.id, keyword, status: 'ok', error: 'skipped — ran within 6 days' });
-            continue;
+          const lastCreatedAt = recentRun.docs
+            .map(d => d.data().createdAt as string)
+            .filter(Boolean)
+            .sort()
+            .pop();
+          if (lastCreatedAt) {
+            const daysSinceLast = (Date.now() - new Date(lastCreatedAt).getTime()) / (1000 * 60 * 60 * 24);
+            if (daysSinceLast < 6) {
+              processed.push({ userId: userDoc.id, keyword, status: 'ok', error: 'skipped — ran within 6 days' });
+              continue;
+            }
           }
         }
 
