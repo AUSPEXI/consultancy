@@ -1,5 +1,643 @@
 export const blogPosts = [
   {
+    slug: "why-im-building-auspexi-in-public",
+    title: "Why I'm Building Auspexi in Public (And What That Actually Means)",
+    excerpt: "I'm a solo founder building a GEO platform out in the open — sharing the experiments, the wins, and the things that don't work. Here's why I decided to do it this way, and what you can expect from this blog.",
+    date: "June 8, 2026",
+    category: "Building in Public",
+    author: "Gwylym Pryce-Owen",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## Let Me Start With Something Honest
+
+Most company blogs are written to make the company look finished. Polished case studies. Big round numbers. The impression that everything was planned and everything works.
+
+That's not how building a product actually feels. It's messy. You try things that fail. You change direction. You spend weeks on something nobody needed.
+
+I've decided to do the opposite of the polished-blog thing. I'm building Auspexi **in public** — sharing the real journey, including the parts that don't make a tidy story.
+
+This post explains what that means and why I think it's the right call.
+
+---
+
+## What "Building in Public" Actually Means
+
+It's a simple idea: instead of hiding the work until it's perfect, you share it as you go.
+
+For Auspexi, that means three things:
+
+**I'll show you the experiments.** We run real tests on what makes AI engines like ChatGPT and Gemini cite a brand. When a test works, I'll tell you. When it doesn't, I'll tell you that too — a result that says "this doesn't matter" is just as useful as one that says it does.
+
+**I'll explain the decisions.** Why we built a feature a certain way. Why we dropped an idea. What we learned. The reasoning, not just the outcome.
+
+**I won't oversell.** If a feature isn't built yet, I'll say "we're building it" or I won't mention it. If I don't have data to back up a claim, I won't make the claim. That sounds obvious, but a surprising amount of marketing breaks this rule.
+
+---
+
+## Why I'm Doing It This Way
+
+### Because trust is the whole game
+
+Auspexi helps brands get recognised by AI. That only works if people trust what we say. I can't ask you to trust the product while hiding how it's made. Building in public is me showing my working.
+
+### Because I'm one person
+
+I'm a solo founder. I don't have a marketing department writing careful press releases. What I have is a real point of view and real experiments. Sharing them honestly is the most useful thing I can offer — and frankly, the only thing I have time to do.
+
+### Because the field is brand new
+
+Generative Engine Optimization — getting cited by AI instead of ranking on Google — is only a couple of years old. Nobody has it fully figured out, including me. The honest thing is to explore it openly and bring you along, rather than pretend I have all the answers.
+
+---
+
+## What You Can Expect From This Blog
+
+Going forward, you'll see a few kinds of posts:
+
+- **Plain-English explainers** — short pieces that explain a GEO idea simply, no jargon, for anyone trying to understand this shift.
+- **Lab experiments** — real tests with real results from our GEO Lab, including the ones that flop.
+- **Feature updates** — honest write-ups of what we've built and how it works.
+- **Founder notes** — like this one. The thinking, the direction, the lessons.
+
+There's also a YouTube channel coming, where I'll show some of this work on camera. More on that soon.
+
+---
+
+## Key Takeaways
+
+- Auspexi is being built **in public** by a solo founder — the experiments, decisions, and lessons are all shared openly.
+- We only claim what the product actually does. No invented statistics, no features that don't exist.
+- Expect plain-English explainers, real lab experiments (including null results), feature updates, and founder notes.
+- The goal is simple: earn trust by showing the work, not hiding it.
+
+---
+
+## Come Along
+
+If you're trying to figure out how to stay visible as search moves from Google to AI, this is the place to follow along. You'll see what works as we discover it.
+
+The best way to start is to run a Citation Probe on your own brand — it shows you how the four big AI engines currently talk about you. That's usually the moment this stops being abstract and starts being personal.
+    `.trim(),
+  },
+  {
+    slug: "what-i-got-wrong-about-ai-search-year-one",
+    title: "What I Got Wrong About AI Search in Year One",
+    excerpt: "Building a GEO platform meant chasing a few ideas that turned out to be dead ends. Here's an honest account of the wrong turns, what they taught me, and where Auspexi landed as a result.",
+    date: "June 6, 2026",
+    category: "Building in Public",
+    author: "Gwylym Pryce-Owen",
+    readTime: "6 min read",
+    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## The Version Nobody Usually Tells
+
+When a product finally clicks, it's tempting to tell the story as if it was obvious from the start. It almost never is.
+
+Building Auspexi over the past year involved several wrong turns — ideas I was sure about that turned out to be dead ends. This post is an honest account of them, because the mistakes are more useful than a tidy success story.
+
+---
+
+## Wrong Turn #1: Over-Engineering Before I Understood the Problem
+
+Early on, I got excited about building sophisticated machinery — complex data pipelines and clever infrastructure — before I'd properly answered the basic question: *does this actually help a brand get cited by AI?*
+
+I had the order backwards. I was building impressive plumbing for a house nobody had designed yet.
+
+**What it taught me:** Start with the simplest thing that tests the real question. For GEO, the real question is "when someone asks an AI about your topic, does your brand come up?" Everything should serve answering that. So we built the Citation Probe first — a straightforward tool that asks the four big AI engines real questions and records whether your brand gets mentioned. Simple, and it answers the question that matters.
+
+---
+
+## Wrong Turn #2: Chasing Features That Sounded Impressive
+
+There was a stretch where I sketched out features that sounded amazing in a pitch but didn't hold up. Automatic posting across every social channel. Voice agents that routed leads. A whole list of things that were either too complex for a solo founder to do well, or didn't actually move the needle on AI visibility.
+
+I'm glad I caught myself before shipping most of them. A few of these ideas even made it into early marketing copy before I pulled them — claiming something the product couldn't really do.
+
+**What it taught me:** A focused product that does a few things genuinely well beats a sprawling one that does many things badly. I cut the feature list down to what actually helps: probe AI engines, store your real facts, score your content, generate grounded articles, and deploy schema. Each one earns its place.
+
+---
+
+## Wrong Turn #3: Writing for Experts Instead of People
+
+My early blog posts were dense. Lots of technical detail, lots of jargon. I was writing to impress other people who already understood GEO, not to help the business owner who'd just realised their company doesn't show up in ChatGPT.
+
+That's backwards. The people who most need to understand this shift are often the least technical.
+
+**What it taught me:** Write so a smart person with no background can follow it. Keep the technical depth available for those who want it, but never make plain understanding the price of entry. (We even wrote ourselves a set of blog guidelines to enforce this.)
+
+---
+
+## Wrong Turn #4: Claiming More Than I Could Prove
+
+This is the one I'm least proud of. In the rush to sound credible, some early content included specific statistics and claims that I couldn't actually back up with real data. Impressive-sounding numbers with no source behind them.
+
+I've since gone through the entire blog and cut anything I can't stand behind. If you see a number on this site now, it comes from something real.
+
+**What it taught me:** In a field built on trust, one invented statistic costs more than it ever gains. Honest and modest beats impressive and unverifiable. Every time.
+
+---
+
+## Where This Left Us
+
+Each wrong turn pushed Auspexi toward the same place: **simpler, more honest, more focused.**
+
+The product today does a handful of things, and does them for real:
+
+- **Citation Probe** — tests how the four major AI engines talk about your brand.
+- **Fact Vault** — stores the true, specific facts about your business that AI should be citing.
+- **Content Scorer** — rates how citable a piece of content is.
+- **Agent Pipeline** — researches a topic and drafts grounded content with schema.
+- **GEO Lab** — runs real experiments on what actually changes AI citations.
+
+No magic. No invented certainty. Just tools that do what they say.
+
+---
+
+## Key Takeaways
+
+- I over-built before understanding the problem — the fix was starting with the simplest test of the real question.
+- I chased impressive-sounding features and cut most of them; focus beat sprawl.
+- I wrote for experts when I should have written for everyone.
+- I made claims I couldn't prove, then cleaned house — every number on this site now traces to something real.
+- The result is a smaller, more honest, more focused product.
+
+---
+
+## The Honest Pitch
+
+If you want to see where all this landed, run a Citation Probe on your own brand. It's the tool I wish I'd built first — and it'll show you, in plain terms, how AI engines currently see your business.
+    `.trim(),
+  },
+  {
+    slug: "what-the-geo-lab-is-and-how-it-works",
+    title: "What the GEO Lab Is and How It Works",
+    excerpt: "We run real A/B experiments on what makes AI engines cite a brand — and we publish the results, including the ones that fail. Here's what the GEO Lab is, why it exists, and how it keeps us honest.",
+    date: "June 5, 2026",
+    category: "GEO Lab",
+    author: "Auspexi Team",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## Most GEO Advice Is a Guess
+
+Search the web for "how to get cited by ChatGPT" and you'll find a lot of confident advice. Add schema. Use headers. Include statistics. Some of it is probably right. But almost none of it comes with evidence. It's people guessing, then stating the guess as fact.
+
+We didn't want to be another voice guessing. So we built the **GEO Lab** — a place to actually test these ideas and find out what's true.
+
+This post explains what it is, in plain terms.
+
+---
+
+## What the GEO Lab Actually Does
+
+The GEO Lab runs controlled experiments. The idea is borrowed from science, and it's simple:
+
+1. **Make a guess (a hypothesis).** For example: "Adding a Key Takeaways section to an article makes AI engines more likely to cite it."
+2. **Create two versions.** Version A has the Key Takeaways section. Version B is identical except it doesn't. **Only one thing changes between them** — that's the rule that makes the test fair.
+3. **Ask the AI engines.** We run the same set of real questions across ChatGPT, Gemini, Claude, and Perplexity, and record which version gets cited more.
+4. **Do the maths.** We check whether the difference is real or just luck, using a proper statistical test.
+5. **Publish the result — whatever it is.**
+
+That last step is the important one.
+
+---
+
+## Why We Publish the Failures Too
+
+Here's something most companies would never do: when an experiment shows that an idea **doesn't** work, we publish that too.
+
+That's not us being noble. A "this doesn't matter" result is genuinely valuable. It saves you from wasting time on something that sounds clever but changes nothing. In science, this is called a *null result*, and a good one is worth as much as a positive finding.
+
+If we only ever published the experiments that made GEO look easy and our product look magic, you'd have no reason to believe any of it. Publishing the failures is what makes the wins believable.
+
+---
+
+## The Rules That Keep It Honest
+
+The Lab runs on a few strict rules:
+
+- **One change per experiment.** If two things change at once, you can't tell which one mattered.
+- **Write the guess down first.** We record the hypothesis and what would count as success *before* running anything — so we can't move the goalposts after seeing the data.
+- **Show the raw data.** Every claim traces back to an actual file of recorded AI responses.
+- **Enough trials to be sure.** We don't claim a result from three lucky answers. We run enough trials for the maths to mean something.
+
+These rules are boring. That's the point. Boring process is what separates real findings from marketing.
+
+---
+
+## How This Connects to the Product
+
+When the Lab proves something works, that finding flows into Auspexi. The content-generation pipeline can apply the tactics that experiments have actually validated — not folk wisdom, but tested levers.
+
+So the Lab isn't a side project. It's the research engine that keeps the product grounded in reality.
+
+---
+
+## Key Takeaways
+
+- The **GEO Lab** runs controlled A/B experiments to find out what actually makes AI engines cite a brand.
+- Each experiment changes **only one thing**, writes the hypothesis down first, and shows its raw data.
+- We publish **null results** — the experiments that fail — because that's what makes the successes trustworthy.
+- Validated findings flow into the Auspexi product as real, tested tactics.
+
+---
+
+## What's Next
+
+We're running our first batch of experiments now, and we'll publish each result here as it comes in — wins and nulls alike. There's also a YouTube channel coming where we'll walk through the experiments on camera.
+
+Follow along, and you'll learn what works at the same time we do.
+    `.trim(),
+  },
+  {
+    slug: "what-happens-when-you-ask-chatgpt-about-your-brand",
+    title: "What Actually Happens When You Ask ChatGPT About Your Brand",
+    excerpt: "When someone asks an AI about your industry, a lot happens in the background that decides whether your business gets mentioned. Here's a plain-English look at what's going on — and why it matters for you.",
+    date: "June 4, 2026",
+    category: "Explainer",
+    author: "Auspexi Team",
+    readTime: "4 min read",
+    image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## A Simple Question With a Big Answer
+
+Imagine a potential customer opens ChatGPT and types:
+
+> "Who's the best company for [the thing you do]?"
+
+In a couple of seconds, they get a confident answer naming a few businesses. Maybe yours is one of them. Maybe it isn't.
+
+That moment decides a lot. So it's worth understanding what actually happens in those couple of seconds.
+
+---
+
+## Step One: The AI Understands the Question
+
+The AI reads the question and works out what's really being asked. "Best company for X" means it needs to recommend businesses — specific, named ones — that are known for X.
+
+It's not searching a list of links like Google does. It's reaching for what it *knows*.
+
+---
+
+## Step Two: The AI Pulls From What It "Knows"
+
+This is the key part. An AI builds its answer from two sources:
+
+**What it learned during training.** AI models are trained on huge amounts of text from across the internet. If your business appeared often, clearly, and in a credible way across that text, the model has effectively "learned" that you exist and what you're known for.
+
+**What it can look up right now.** Many AI tools can also fetch fresh information from the web while answering. If your site is clear, well-structured, and easy to read, it's more likely to be pulled in and used.
+
+If your business is missing from both — barely mentioned online, and with a website AI struggles to read — then as far as the AI is concerned, **you're not in the running.**
+
+---
+
+## Step Three: The AI Writes a Confident Answer
+
+The AI assembles its answer in plain, confident language. It names the businesses it's most sure about. It doesn't show a ranked list of ten options with sources — it gives a short, decisive reply.
+
+That confidence is exactly why this matters. The customer doesn't see the businesses that got left out. There's no "page two." If you're not in the answer, you're simply invisible to that person.
+
+---
+
+## Why This Is Different From Google
+
+With Google, you could check your ranking. Position 4, position 11 — you knew where you stood, and you could work your way up.
+
+With AI, there's no position number. You're either in the answer or you're not. And you can't tell which, unless you actually ask the AI and look.
+
+That's the uncomfortable shift: a whole channel of customers is forming opinions about your industry, and you have no visibility into whether you're part of the conversation.
+
+---
+
+## What You Can Actually Do
+
+The good news is that this isn't random. AI engines mention businesses that are:
+
+- **Clearly described online** — a website that states plainly who you are, what you do, and what makes you specific.
+- **Backed by concrete facts** — not "we're the best," but "we've served 400 clients since 2019" or "our onboarding takes 48 hours."
+- **Recognised as a real entity** — properly listed in the structured places AI models trust, like business directories and knowledge databases.
+
+None of that is a trick. It's just making your business legible to a machine that's now recommending companies to your customers.
+
+---
+
+## Key Takeaways
+
+- When someone asks an AI about your industry, it builds the answer from what it learned in training and what it can look up live.
+- If your business is weakly represented in both, you won't appear — and the customer never sees that you were left out.
+- Unlike Google, there's no ranking position. You're in the answer or invisible.
+- You influence it by being clearly described, backed by specific facts, and recognised as a real entity.
+
+---
+
+## See It For Yourself
+
+The fastest way to make this real is to actually ask. A Citation Probe runs real questions across ChatGPT, Gemini, Claude, and Perplexity and shows you, plainly, whether your brand comes up. Most people are surprised by the result — in both directions.
+    `.trim(),
+  },
+  {
+    slug: "why-your-website-might-be-invisible-to-ai",
+    title: "Why Your Website Might Be Invisible to AI — And How to Fix It",
+    excerpt: "Your website can look perfect to human visitors and still be nearly invisible to the AI engines recommending businesses to your customers. Here's why that happens, in plain English, and what to do about it.",
+    date: "June 3, 2026",
+    category: "Explainer",
+    author: "Auspexi Team",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## Looks Great to Humans, Invisible to Machines
+
+Your website might look fantastic. Nice design, smooth animations, clear photos. To a human visitor, it works perfectly.
+
+But the machines that now recommend businesses to your customers — the AI engines behind ChatGPT, Gemini, and the rest — don't see your site the way a human does. And it's entirely possible for a site that looks perfect to people to be nearly invisible to them.
+
+Here's why that happens, and what to do about it.
+
+---
+
+## Reason 1: Your Content Is Hidden Behind Code
+
+Some websites are built so that the actual words don't appear until your browser runs a bunch of code first. A human doesn't notice — the page loads in a second and everything's there.
+
+But many of the crawlers that feed AI engines don't wait around to run all that code. They look at the page, see an almost-empty shell, and move on. All your carefully written content? They never saw it.
+
+**The fix:** Your site should deliver its real content straight away, in the page itself, without requiring code to run first. (In technical terms, this is "server-side rendering." Your developer will know what you mean.)
+
+---
+
+## Reason 2: You're Telling Stories Instead of Stating Facts
+
+Marketing copy loves vague, emotional language. "We deliver world-class solutions that delight our customers." It sounds nice. It says almost nothing.
+
+AI engines work best with **specific, concrete facts**. "We've helped 400 small businesses since 2019." "Our average response time is under two hours." "We're based in Hampshire and serve the South of England." Those are the kinds of statements an AI can pick up and repeat.
+
+Vague claims get ignored. Specific facts get cited.
+
+**The fix:** Go through your site and turn fuzzy claims into concrete facts. Numbers, dates, locations, specifics. The more precise, the better.
+
+---
+
+## Reason 3: The AI Doesn't Know You're a Real "Thing"
+
+AI models keep a kind of internal map of the businesses, people, and concepts they know about. If your business has a clear entry on that map, you're a real entity to the AI. If you don't, you're a vague blur it isn't confident enough to recommend.
+
+This is why being properly listed in the structured places AI trusts — business directories, knowledge databases like Wikidata, your Google Business Profile, LinkedIn — matters so much. It's how you go from "a blur" to "a thing the AI recognises."
+
+**The fix:** Make sure your business is clearly and consistently listed across these structured sources. Getting established as a recognised entity is largely a one-time effort with a lasting payoff.
+
+---
+
+## Reason 4: You're Not Telling AI What Your Content Is
+
+There's a behind-the-scenes way to label your web pages so machines understand them — a kind of tag that says "this is an article, written by this person, on this date, about this topic." It's called structured data, or schema.
+
+Without it, an AI has to guess what your page is. With it, you're handing the AI a clear summary it can trust and use.
+
+**The fix:** Add structured data to your important pages. This is technical, but it's a well-understood, one-time setup — and tools (including ours) can generate it for you.
+
+---
+
+## The Pattern Behind All Four
+
+Notice the theme: every one of these is about making your business **legible to a machine.** Not flashier. Not more clever. Just clearer, more factual, and more structured.
+
+Humans are good at reading between the lines. Machines aren't. They reward businesses that state things plainly and structure them well.
+
+---
+
+## Key Takeaways
+
+- A site that looks perfect to humans can still be nearly invisible to AI crawlers.
+- The four common causes: content hidden behind code, vague copy instead of facts, no recognised entity, and missing structured data.
+- Every fix comes down to the same idea — make your business **legible to a machine**.
+- Most of these are one-time setups with lasting benefits.
+
+---
+
+## Find Out Where You Stand
+
+Not sure which of these is affecting you? Start with a Citation Probe — it shows whether AI engines currently mention your brand. From there, you can work through these fixes one at a time and watch the picture change.
+    `.trim(),
+  },
+  {
+    slug: "citation-probe-in-plain-english",
+    title: "Citation Probe in Plain English: What It Measures and Why It Matters",
+    excerpt: "Citation Probe is the simplest way to find out whether AI engines mention your brand. Here's what it does, what the results mean, and how to act on them — no jargon.",
+    date: "June 2, 2026",
+    category: "Explainer",
+    author: "Auspexi Team",
+    readTime: "4 min read",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## The Question Everyone Should Be Asking
+
+"When people ask an AI about my industry, does my business come up?"
+
+It's a simple question with real money attached to the answer. Citation Probe exists to answer it. This post explains, in plain terms, what it does and how to read the results.
+
+---
+
+## What Citation Probe Does
+
+Citation Probe asks the four biggest AI engines — **ChatGPT, Gemini, Claude, and Perplexity** — real questions that your customers might ask. Things like "what's the best tool for X?" or "who should I hire for Y?"
+
+Then it reads each AI's answer and checks one thing: **did your brand get mentioned?**
+
+It does this across all four engines, across a set of questions, and gives you a clear picture: here's where you show up, and here's where you don't.
+
+That's it. No guessing. It just asks the AIs the way your customers do, and reports back.
+
+---
+
+## Why Four Engines, Not One
+
+Different people use different AI tools. Someone might live in ChatGPT; someone else swears by Perplexity for research; another has Gemini built into their phone.
+
+These engines don't all give the same answers. You might be well-known to one and completely absent from another. Checking only one would give you a misleading picture. Probing all four shows you the full landscape.
+
+---
+
+## What the Results Tell You
+
+After a probe, you get a few useful things:
+
+**Your citation rate.** Out of all the questions asked, how often did your brand come up? If you appear in 2 out of 10 answers, that's a 20% citation rate. It's a simple, honest number you can track over time.
+
+**Which engines mention you.** Maybe ChatGPT knows you but Claude doesn't. That tells you where the gaps are.
+
+**Which questions you're missing.** This is the gold. If there's a question your customers ask all the time and you never appear in the answer, that's a clear, specific thing to fix — usually by creating content that addresses it directly.
+
+---
+
+## How to Actually Use It
+
+The probe isn't the end — it's the starting map. Here's the simple loop:
+
+1. **Probe** to see where you stand today.
+2. **Spot the gaps** — the questions and engines where you're missing.
+3. **Create content** that targets those gaps, grounded in your real facts.
+4. **Probe again** in a few weeks to see if the picture improved.
+
+That loop — measure, fix, measure again — is the whole game. The probe just makes the invisible visible so you have something concrete to work on.
+
+---
+
+## Key Takeaways
+
+- **Citation Probe** asks ChatGPT, Gemini, Claude, and Perplexity real questions and checks whether your brand gets mentioned.
+- It gives you a **citation rate**, shows which engines mention you, and reveals which questions you're missing.
+- Probing all four engines matters because they don't give the same answers.
+- Use it as a loop: probe, fix the gaps with targeted content, then probe again to measure progress.
+
+---
+
+## Try It
+
+The hardest part of GEO is that it feels invisible — you can't see whether you're winning or losing. Citation Probe is the tool that makes it visible. Run one on your brand and you'll have a concrete number to work with, probably for the first time.
+    `.trim(),
+  },
+  {
+    slug: "introducing-the-brand-probe-pipeline",
+    title: "Introducing the Brand Probe Pipeline: Automated AI Health Checks for Your Brand",
+    excerpt: "Checking how AI engines talk about your brand shouldn't be a manual chore. The new Brand Probe Pipeline runs the check for you on a schedule and emails you the results. Here's how it works.",
+    date: "June 7, 2026",
+    category: "Product Update",
+    author: "Auspexi Team",
+    readTime: "4 min read",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## The Problem With Checking Manually
+
+Knowing how AI engines talk about your brand is valuable. But running that check by hand, over and over, is a chore — and like all chores, it's the first thing to get forgotten.
+
+The thing is, AI engines change. A new model rolls out, the web data refreshes, a competitor publishes a big piece of content — and suddenly the way you're talked about shifts. If you only check occasionally, you find out late.
+
+So we built the **Brand Probe Pipeline** to do the checking for you, automatically.
+
+---
+
+## What It Does
+
+The Brand Probe Pipeline runs a Citation Probe on your brand on a regular schedule, without you lifting a finger. Each run:
+
+1. **Asks the four AI engines** — ChatGPT, Gemini, Claude, and Perplexity — the questions that matter for your brand.
+2. **Records the results** — who mentioned you, how often, and where the gaps are.
+3. **Emails you a summary** so the findings come to you instead of you having to go and look.
+
+It's the same probe you'd run by hand — just on autopilot, on a schedule, with the results delivered to your inbox.
+
+---
+
+## Why Automatic Beats Manual
+
+**You catch changes early.** Because it runs regularly, you see shifts as they happen rather than stumbling on them months later.
+
+**You build a history.** One probe is a snapshot. A series of probes is a trend line. Over time you can see whether your AI visibility is climbing, flat, or slipping — and tie those changes to the content work you've been doing.
+
+**You don't have to remember.** The most valuable monitoring is the kind that happens whether or not you think about it. Set it once, and it keeps working.
+
+---
+
+## Built to Be Affordable
+
+Probing four AI engines costs real money in API calls, so we designed the pipeline to be sensible about it — running a focused set of questions on a schedule that gives you a reliable signal without running up a big bill. The goal is steady, affordable monitoring, not an expensive firehose.
+
+---
+
+## How to Turn It On
+
+The Brand Probe Pipeline lives in your dashboard. You set the brand and the keywords that matter to you, and it handles the rest — running on schedule and emailing you each summary.
+
+---
+
+## Key Takeaways
+
+- The **Brand Probe Pipeline** runs Citation Probes on your brand automatically, on a schedule.
+- Each run checks all four major AI engines and emails you a summary.
+- Automatic monitoring means you catch changes early, build a trend line over time, and never have to remember to check.
+- It's designed to be affordable — a steady signal, not a costly firehose.
+
+---
+
+## Set It and Forget It
+
+If you've run a manual probe before and thought "I should do this regularly," this is the feature that does it for you. Head to your dashboard to switch it on.
+    `.trim(),
+  },
+  {
+    slug: "bulk-agent-pipeline-probe-to-published",
+    title: "The Bulk Agent Pipeline: From Probe to Published in One Run",
+    excerpt: "Turning a list of AI visibility gaps into finished, scored, published content used to mean clicking through each article one at a time. The new bulk pipeline does the whole batch in one flow. Here's how it works.",
+    date: "June 1, 2026",
+    category: "Product Update",
+    author: "Auspexi Team",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## The Tedious Part We Just Removed
+
+Here's how making GEO content used to go in Auspexi: you'd find a batch of topics where your brand was missing from AI answers, queue them up, and the agents would research and draft each one. Good so far.
+
+Then came the slog. For *each* article, one at a time, you'd score it, improve it if needed, generate its schema, and publish it. Six articles meant doing that whole dance six times. Lots of clicks, lots of waiting, lots of "wait, which one was I on?"
+
+We fixed it. The **Bulk Agent Pipeline** takes the entire batch through every stage in one flow.
+
+---
+
+## What the Pipeline Does
+
+Once the agents finish drafting your batch of articles, the pipeline runs the rest as a chain — across all of them at once:
+
+**1. Bulk Score.** Every article in the batch gets scored for how citable it is — graded across several dimensions so you can see, at a glance, which pieces are strong and which need work.
+
+**2. Bulk Improve.** Articles that score below a quality threshold get automatically sent back through the writer with the specific feedback baked in — "this needs more concrete facts," "tighten the opening," and so on. The weak ones get a second pass without you babysitting each one.
+
+**3. Bulk Publish.** The finished batch gets saved and pushed out together — stored in your library, and sent to your content management system if you've connected one.
+
+And alongside all that, you can **download a schema pack** — all the structured-data markup for the whole batch in one labelled file, ready to deploy.
+
+---
+
+## Why This Matters
+
+**It removes the clicks.** What used to take dozens of individual actions now takes a few. For anyone publishing content regularly, that's the difference between a quick session and an afternoon lost to repetitive clicking.
+
+**It keeps quality consistent.** Because scoring and improvement run on every article automatically, nothing slips through at a lower standard just because you were tired by article number five.
+
+**It makes a real cadence possible.** The honest truth about GEO is that it rewards consistency. A pipeline that turns gaps into published content in one flow is what makes a steady publishing rhythm actually achievable for a small team — or a team of one.
+
+---
+
+## The Whole Loop, End to End
+
+Put together with the Citation Probe and the Brand Probe Pipeline, the workflow now reads as one clean loop:
+
+1. **Probe** to find where AI engines don't mention you.
+2. **Queue** those gaps as topics.
+3. **Generate, score, improve, and publish** the whole batch in one pipeline.
+4. **Deploy the schema** for the batch.
+5. **Probe again** to measure whether the picture improved.
+
+Find the gaps, fill them at scale, measure the result. That's the loop GEO has always needed — now without the manual grind in the middle.
+
+---
+
+## Key Takeaways
+
+- The **Bulk Agent Pipeline** takes a whole batch of articles through scoring, improvement, and publishing in one flow.
+- Weak articles are automatically sent back for a second pass with specific feedback.
+- You can download all the structured-data schema for the batch as a single labelled pack.
+- It removes the click-by-click grind, keeps quality consistent, and makes a real publishing cadence achievable for small teams.
+
+---
+
+## Give It a Run
+
+If you've got a list of topics where your brand is missing from AI answers, this is the feature that turns that list into published content without the manual slog. It lives in the Agents area of your dashboard.
+    `.trim(),
+  },
+  {
     slug: "google-killed-faq-schema-what-it-means-for-your-business",
     title: "Google Just Killed FAQ Schema. Here's What It Really Means for Your Business.",
     excerpt: "Google quietly removed support for FAQ rich results. Most businesses barely noticed. But it's one of the clearest signals yet that the rules of being found online have fundamentally changed — and the businesses adapting now will own the next decade.",
