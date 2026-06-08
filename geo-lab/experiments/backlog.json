@@ -265,7 +265,17 @@
       "n_per_variant": 30,
       "priority": 21,
       "status": "queued",
-      "note": "Live-mode only — fast in-context probes cannot distinguish where the JSON-LD appeared. Requires two comparable indexed sites (or a before/after on auspexi.com with a 4-week re-probe window). Builds directly on experiment 018 (JSON-LD presence vs absence) and 020 (live-mode baseline). Run after both are complete. Also tests the counterfactual that Google's crawler-duplication concern about site-wide FAQPage is real vs theoretical."
+      "primary_metric": "AI citation rate on Perplexity + Gemini (the upside)",
+      "guardrail_metrics": [
+        "Google Search Console: structured-data error/warning count for FAQPage items (must not increase)",
+        "GSC manual actions report: must remain clean (a 'structured data' manual action is an immediate fail + rollback)",
+        "GSC Performance: organic impressions, clicks, and average position for the site's top 20 tracked queries (must not regress beyond noise)",
+        "Rich-result eligibility for /faq (page-scoped variant is the legitimate home for FAQ rich results; site-wide must not cannibalise or disqualify it)",
+        "Crawl stats: Googlebot crawl-budget shift from the extra per-page payload"
+      ],
+      "decision_rule": "Site-wide (B) only 'wins' if it lifts AI citation rate AND holds all guardrails flat. If citation rate rises but any SEO guardrail regresses, the finding is a TRADE-OFF, not a win — report both sides and recommend the page-scoped variant unless the citation lift is large enough to justify the SEO cost.",
+      "rollback_trigger": "Any GSC structured-data manual action, or a sustained (>2 week) organic-position regression on tracked queries, triggers immediate revert to page-scoped schema.",
+      "note": "Live-mode only — fast in-context probes cannot distinguish where the JSON-LD appeared, nor can they observe SEO side-effects. Requires GSC access on the test property and a 4-week+ re-probe/observation window. Builds on experiment 018 (JSON-LD presence vs absence) and 020 (live-mode baseline); run after both. NOTE: Google has restricted FAQ rich results to authoritative gov/health sites since 2023, so the Google-side upside is largely gone and this experiment is mostly about the AI-crawler upside vs the SEO-policy downside. This two-sided framing is the whole point — a citation win that costs organic traffic is not a win."
     }
   ]
 }
