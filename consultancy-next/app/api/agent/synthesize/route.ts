@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   if (auth instanceof NextResponse) return auth;
   const { userId } = auth;
   try {
-    const { topic, facts, brandName, negativeStatements = [] } = await request.json();
+    const { topic, facts, brandName, negativeStatements = [], improvementFeedback = '' } = await request.json();
     if (!topic?.trim() || !facts?.trim()) {
       return NextResponse.json({ error: 'topic and facts are required' }, { status: 400 });
     }
@@ -38,10 +38,14 @@ export async function POST(request: Request) {
       ? `\n\nKnown Misinformation to Correct (LLMs have stated these false claims — the article must implicitly or explicitly counter them by establishing the truth):\n${negativeStatements.map((s: string) => `- FALSE: "${s}"`).join('\n')}`
       : '';
 
+    const improvementInstruction = improvementFeedback
+      ? `\n\nIMPROVEMENT REQUIRED (a prior version of this article scored below the quality threshold — you MUST address all of these issues in your rewrite):\n${improvementFeedback}`
+      : '';
+
     const prompt = `You are a Synthesis Agent specializing in Generative Engine Optimization (GEO) content. Your articles are written to be cited by AI engines like ChatGPT, Perplexity, Claude, and Gemini.
 
 Topic: "${topic}"
-${brandInstruction}${correctionInstruction}${labLeverSection}
+${brandInstruction}${correctionInstruction}${improvementInstruction}${labLeverSection}
 
 Verified Facts (ground truth — do not hallucinate beyond these):
 """

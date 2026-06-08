@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, FileText, Code2, PenTool, CheckCircle2, Loader2, Play, ArrowRight, X, BrainCircuit, Layers, Copy, Download, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
+import { Search, FileText, Code2, PenTool, CheckCircle2, Loader2, Play, ArrowRight, X, BrainCircuit, Layers, Copy, Download, ChevronDown, ChevronUp, AlertTriangle, Zap, SendHorizonal, Star, RefreshCw } from 'lucide-react';
 import { WorkflowProgress, markStepComplete } from '@/components/dashboard/WorkflowProgress';
 import { useAuth } from '@/contexts/AuthContext';
 import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
@@ -15,8 +15,20 @@ import { authFetch } from '@/lib/auth-fetch';
 
 type AgentStatus = 'idle' | 'running' | 'completed' | 'error';
 type BulkStatus = 'pending' | 'running' | 'done' | 'error';
+type PipelineStage = 'idle' | 'running' | 'done' | 'error';
 
 interface PermutationItem { query: string; format: string; intent: string; }
+
+interface BulkResult {
+  topic: string;
+  article: string;
+  schema: string;
+  facts: string;
+  geoScore?: number;
+  scoreFeedback?: string[];
+  improved?: boolean;
+  published?: boolean;
+}
 
 export default function AgentsPage() {
   const { tier, userData, user, role } = useAuth();
@@ -47,7 +59,12 @@ export default function AgentsPage() {
   const [bulkQueue, setBulkQueue] = useState<{ topic: string; status: BulkStatus }[]>([]);
   const [isBulkRunning, setIsBulkRunning] = useState(false);
   const [bulkDoneCount, setBulkDoneCount] = useState(0);
-  const [bulkResults, setBulkResults] = useState<{ topic: string; article: string; schema: string; facts: string }[]>(() => {
+  const [scoreStage, setScoreStage] = useState<PipelineStage>('idle');
+  const [improveStage, setImproveStage] = useState<PipelineStage>('idle');
+  const [publishStage, setPublishStage] = useState<PipelineStage>('idle');
+  const [pipelineMsg, setPipelineMsg] = useState('');
+
+  const [bulkResults, setBulkResults] = useState<BulkResult[]>(() => {
     if (typeof window !== 'undefined') {
       try { return JSON.parse(localStorage.getItem('agents_bulk_results') || '[]'); } catch { return []; }
     }
@@ -289,6 +306,109 @@ export default function AgentsPage() {
     setIsBulkRunning(false);
   };
 
+  const IMPROVE_THRESHOLD = 70;
+
+  const runBulkScore = async () => {
+    setScoreStage('running');
+    setPipelineMsg('');
+    try {
+      const updated = [...bulkResults];
+      for (let i = 0; i < updated.length; i++) {
+        if (updated[i].geoScore != null) continue;
+        try {
+          const res = await authFetch('/api/content-scorer', {
+            method: 'POST',
+            body: JSON.stringify({ content: updated[i].article, contentType: 'blog' }),
+          });
+          const data = await res.json();
+          if (data.success && data.result) {
+            updated[i] = { ...updated[i], geoScore: data.result.overallScore ?? 0, scoreFeedback: data.result.feedback || [] };
+            setBulkResults([...updated]);
+          }
+        } catch (_) { /* skip individual failure */ }
+        await new Promise(r => setTimeout(r, 1200));
+      }
+      setScoreStage('done');
+      const weak = updated.filter(r => (r.geoScore ?? 0) < IMPROVE_THRESHOLD).length;
+      setPipelineMsg(`Scored ${updated.length} articles · ${weak} scored below ${IMPROVE_THRESHOLD} and can be improved`);
+    } catch (_) {
+      setScoreStage('error');
+    }
+  };
+
+  const runBulkImprove = async () => {
+    setImproveStage('running');
+    setPipelineMsg('');
+    try {
+      const updated = [...bulkResults];
+      const toImprove = updated.filter(r => !r.improved && (r.geoScore ?? 100) < IMPROVE_THRESHOLD);
+      for (let i = 0; i < updated.length; i++) {
+        const item = updated[i];
+        if (item.improved || (item.geoScore ?? 100) >= IMPROVE_THRESHOLD) continue;
+        try {
+          const feedback = item.scoreFeedback?.join('. ') || 'Improve entity density and add more verifiable statistics.';
+          const res = await authFetch('/api/agent/synthesize', {
+            method: 'POST',
+            body: JSON.stringify({ topic: item.topic, facts: item.facts, brandName: userData?.brand || '', negativeStatements: userData?.negativeStatements || [], improvementFeedback: feedback }),
+          });
+          const data = await res.json();
+          if (data.success && data.result) {
+            updated[i] = { ...updated[i], article: data.result, improved: true, geoScore: undefined, scoreFeedback: undefined };
+            setBulkResults([...updated]);
+          }
+        } catch (_) { /* skip */ }
+        await new Promise(r => setTimeout(r, 3000));
+      }
+      setImproveStage('done');
+      setPipelineMsg(`Rewrote ${toImprove.length} weak article${toImprove.length !== 1 ? 's' : ''} · run Score All again to re-check quality`);
+    } catch (_) {
+      setImproveStage('error');
+    }
+  };
+
+  const runBulkPublish = async () => {
+    setPublishStage('running');
+    setPipelineMsg('');
+    let published = 0;
+    try {
+      const updated = [...bulkResults];
+      for (let i = 0; i < updated.length; i++) {
+        if (updated[i].published) { published++; continue; }
+        try {
+          const payload = {
+            userId: user?.uid || 'anonymous', topic: updated[i].topic, article: updated[i].article,
+            facts: updated[i].facts, schema: updated[i].schema,
+            geoScore: updated[i].geoScore ?? 0, brand: userData?.brand || '',
+            timestamp: new Date().toISOString(), source: 'bulk_pipeline',
+          };
+          if (user) await addDoc(collection(db, 'articles'), payload);
+          if (userData?.cmsWebhookUrl) {
+            await fetch(userData.cmsWebhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(() => {});
+          }
+          updated[i] = { ...updated[i], published: true };
+          setBulkResults([...updated]);
+          published++;
+        } catch (_) { /* skip */ }
+      }
+      setPublishStage('done');
+      setPipelineMsg(`Published ${published} article${published !== 1 ? 's' : ''}${userData?.cmsWebhookUrl ? ' to your CMS' : ' to Auspexi'}`);
+      if (user) logAuditAction(user.uid, 'Bulk Pipeline Published', { count: published }).catch(() => {});
+    } catch (_) {
+      setPublishStage('error');
+    }
+  };
+
+  const downloadSchemaPack = () => {
+    const lines = bulkResults.map(r =>
+      `<!-- ${r.topic} -->\n<script type="application/ld+json">\n${r.schema}\n</script>`
+    ).join('\n\n');
+    const blob = new Blob([lines], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'schema-pack.html'; a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handlePublishToCms = async () => {
     setIsPublishing(true);
     setPublishMsg('');
@@ -458,6 +578,93 @@ export default function AgentsPage() {
         </div>
       )}
 
+      {/* Post-generation pipeline — appears once all items are done */}
+      {bulkQueue.length > 0 && bulkQueue.every(q => q.status === 'done') && bulkResults.length > 0 && (
+        <div className="bg-zinc-900/60 border border-zinc-700 rounded-xl p-5 space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-lg bg-pink-500/10 flex items-center justify-center">
+              <Zap className="w-3.5 h-3.5 text-pink-400" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-white">Post-Generation Pipeline</h3>
+              <p className="text-xs text-zinc-500">{bulkResults.length} articles ready · complete the workflow without leaving this page</p>
+            </div>
+          </div>
+
+          {/* Pipeline steps */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Step 1: Score All */}
+            <div className={`p-4 rounded-xl border ${scoreStage === 'done' ? 'border-emerald-500/30 bg-emerald-500/5' : scoreStage === 'running' ? 'border-amber-500/30 bg-amber-500/5' : 'border-zinc-800 bg-zinc-950'}`}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  {scoreStage === 'done' ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : scoreStage === 'running' ? <Loader2 className="w-4 h-4 text-amber-400 animate-spin" /> : <Star className="w-4 h-4 text-zinc-500" />}
+                  <span className="text-xs font-bold text-white">Score All</span>
+                </div>
+                {scoreStage !== 'done' && (
+                  <button onClick={runBulkScore} disabled={scoreStage === 'running'} className="text-[10px] font-bold px-2.5 py-1 bg-pink-600 hover:bg-pink-500 disabled:opacity-50 text-white rounded-md transition-colors">
+                    {scoreStage === 'running' ? 'Scoring…' : 'Run'}
+                  </button>
+                )}
+              </div>
+              <p className="text-[10px] text-zinc-500 leading-relaxed">Score every article for entity density, structure, and citation likelihood.</p>
+              {scoreStage === 'done' && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {bulkResults.map((r, i) => r.geoScore != null && (
+                    <span key={i} className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${r.geoScore >= 70 ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}`}>{r.geoScore}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Step 2: Improve Weak */}
+            <div className={`p-4 rounded-xl border ${improveStage === 'done' ? 'border-emerald-500/30 bg-emerald-500/5' : improveStage === 'running' ? 'border-amber-500/30 bg-amber-500/5' : 'border-zinc-800 bg-zinc-950'}`}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  {improveStage === 'done' ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : improveStage === 'running' ? <Loader2 className="w-4 h-4 text-amber-400 animate-spin" /> : <RefreshCw className="w-4 h-4 text-zinc-500" />}
+                  <span className="text-xs font-bold text-white">Improve Weak</span>
+                </div>
+                {improveStage !== 'done' && (
+                  <button onClick={runBulkImprove} disabled={improveStage === 'running' || scoreStage !== 'done'} className="text-[10px] font-bold px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-30 text-white rounded-md transition-colors" title={scoreStage !== 'done' ? 'Score first' : ''}>
+                    {improveStage === 'running' ? 'Improving…' : 'Run'}
+                  </button>
+                )}
+              </div>
+              <p className="text-[10px] text-zinc-500 leading-relaxed">Re-synthesise articles scoring below {IMPROVE_THRESHOLD} using scorer feedback as instructions.</p>
+              {scoreStage === 'done' && (
+                <p className="text-[10px] text-amber-400 mt-1 font-medium">
+                  {bulkResults.filter(r => (r.geoScore ?? 100) < IMPROVE_THRESHOLD && !r.improved).length} article{bulkResults.filter(r => (r.geoScore ?? 100) < IMPROVE_THRESHOLD && !r.improved).length !== 1 ? 's' : ''} below threshold
+                </p>
+              )}
+            </div>
+
+            {/* Step 3: Publish + Schema */}
+            <div className={`p-4 rounded-xl border ${publishStage === 'done' ? 'border-emerald-500/30 bg-emerald-500/5' : publishStage === 'running' ? 'border-amber-500/30 bg-amber-500/5' : 'border-zinc-800 bg-zinc-950'}`}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  {publishStage === 'done' ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : publishStage === 'running' ? <Loader2 className="w-4 h-4 text-amber-400 animate-spin" /> : <SendHorizonal className="w-4 h-4 text-zinc-500" />}
+                  <span className="text-xs font-bold text-white">Publish + Schema</span>
+                </div>
+                <div className="flex gap-1">
+                  <button onClick={downloadSchemaPack} className="text-[10px] font-bold px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-md transition-colors" title="Download all schemas as HTML">
+                    <Download className="w-3 h-3" />
+                  </button>
+                  {publishStage !== 'done' && (
+                    <button onClick={runBulkPublish} disabled={publishStage === 'running'} className="text-[10px] font-bold px-2.5 py-1 bg-white hover:bg-zinc-200 disabled:opacity-50 text-black rounded-md transition-colors">
+                      {publishStage === 'running' ? 'Publishing…' : 'Run'}
+                    </button>
+                  )}
+                </div>
+              </div>
+              <p className="text-[10px] text-zinc-500 leading-relaxed">Save all articles to Auspexi{userData?.cmsWebhookUrl ? ' and push to your CMS' : ''}. Download schema pack for site-wide JSON-LD deployment.</p>
+            </div>
+          </div>
+
+          {pipelineMsg && (
+            <p className="text-xs text-emerald-400 bg-emerald-500/5 border border-emerald-500/20 rounded-lg px-3 py-2">{pipelineMsg}</p>
+          )}
+        </div>
+      )}
+
       {/* Bulk results — one card per generated article */}
       {bulkResults.length > 0 && (
         <div className="space-y-3">
@@ -504,15 +711,22 @@ export default function AgentsPage() {
                   >
                     <Download className="w-3 h-3" /> .md
                   </button>
-                  <button
-                    onClick={() => {
-                      localStorage.setItem('contentScorer_draft', JSON.stringify({ content: r.article, type: 'blog' }));
-                      router.push('/dashboard/content-scorer');
-                    }}
-                    className="flex items-center gap-1 text-xs px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md font-medium transition-colors"
-                  >
-                    Score →
-                  </button>
+                  {r.geoScore != null ? (
+                    <span className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-md font-bold ${r.geoScore >= 70 ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}`}>
+                      <Star className="w-3 h-3" />{r.geoScore}
+                      {r.improved && <span className="text-[9px] ml-0.5 opacity-70">↑</span>}
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        localStorage.setItem('contentScorer_draft', JSON.stringify({ content: r.article, type: 'blog' }));
+                        router.push('/dashboard/content-scorer');
+                      }}
+                      className="flex items-center gap-1 text-xs px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md font-medium transition-colors"
+                    >
+                      Score →
+                    </button>
+                  )}
                   <button
                     onClick={() => setExpandedBulkIdx(expandedBulkIdx === idx ? null : idx)}
                     className="flex items-center gap-1 text-xs px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 rounded-md transition-colors"
