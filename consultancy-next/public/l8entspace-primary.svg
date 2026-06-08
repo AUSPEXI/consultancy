@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" fill="none">
+  <!-- Latent Space orbit rings embracing the L8 mechanical key cluster -->
+  <g fill="none" stroke-linecap="round">
+    <ellipse cx="210" cy="120" rx="160" ry="78" transform="rotate(28 210 120)" stroke="#ffffff" stroke-width="3" opacity="0.55"/>
+    <ellipse cx="210" cy="120" rx="160" ry="78" transform="rotate(-28 210 120)" stroke="#ff1493" stroke-width="4"/>
+    <circle cx="55" cy="78" r="6" fill="#ff1493" stroke="none"/>
+    <circle cx="368" cy="168" r="6" fill="#ffffff" stroke="none"/>
+  </g>
+
+  <!-- L8 wordmark -->
+  <text x="118" y="156" text-anchor="middle" font-family="'Outfit','Plus Jakarta Sans',sans-serif" font-size="104" font-weight="800" fill="#ffffff" letter-spacing="-4">L8</text>
+
+  <!-- Ent key -->
+  <g>
+    <rect x="196" y="86" width="86" height="38" rx="8" fill="#ff1493"/>
+    <text x="208" y="112" font-family="'JetBrains Mono',monospace" font-size="19" font-weight="700" fill="#000000">Ent</text>
+    <text x="258" y="113" font-family="'JetBrains Mono',monospace" font-size="18" font-weight="700" fill="#000000">&#8629;</text>
+  </g>
+
+  <!-- Space bar key -->
+  <g>
+    <rect x="196" y="130" width="86" height="32" rx="8" fill="none" stroke="#ff1493" stroke-width="2.5"/>
+    <text x="210" y="152" font-family="'JetBrains Mono',monospace" font-size="15" font-weight="700" fill="#ff1493" letter-spacing="3">SPACE</text>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="210" y="258" text-anchor="middle" font-family="'Outfit','Plus Jakarta Sans',sans-serif" font-size="30" font-weight="800" letter-spacing="2">
+    <tspan fill="#ffffff">L8</tspan><tspan fill="#ff1493">ENT</tspan><tspan fill="#ffffff">SPACE</tspan><tspan fill="#ff1493" font-size="20">.COM</tspan>
+  </text>
+</svg>
