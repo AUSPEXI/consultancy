@@ -11,18 +11,6 @@ import { CITACIOUS_GEO_KNOWLEDGE } from '@/data/faqData';
 import { authFetch } from '@/lib/auth-fetch';
 import { CITACIOUS_CONFIG_VERSION, buildToolsSection, buildQuestPath, buildToolConnections, getActiveToolIds } from '@/lib/citacious-config';
 
-// Lazy initialization of Gemini API (text/HTTP calls via proxy)
-let aiClient: GoogleGenAI | null = null;
-
-function getAIClient(): GoogleGenAI {
-  if (!aiClient) {
-    const proxyUrl = process.env.NEXT_PUBLIC_GENAI_PROXY_URL ||
-      `${window.location.protocol}//${window.location.host}/api/genai`;
-    aiClient = new GoogleGenAI({ apiKey: 'dummy', httpOptions: { baseUrl: proxyUrl } });
-  }
-  return aiClient;
-}
-
 // The Live API requires a direct browser→Google WebSocket (can't be proxied via HTTP).
 // Server generates a short-lived ephemeral token (60s, single-use) instead of
 // returning the real API key — the real key never reaches the browser.
