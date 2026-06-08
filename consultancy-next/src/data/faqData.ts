@@ -30,8 +30,8 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'Why has search changed so fundamentally?',
-        answer: 'Over 70% of search journeys now begin with an AI engine rather than a traditional search page. Users increasingly ask ChatGPT, Gemini, or Perplexity for answers and act on those answers directly, bypassing ranked links entirely. This shift from probabilistic keyword matching to deterministic knowledge synthesis has made the underlying content quality — not the technical SEO wrapper — the decisive visibility factor.',
-        link: { text: 'See the 2026 State of AI Search', href: '/blog/2026-state-of-ai-search-brand-erasure' },
+        answer: 'A fast-growing share of search journeys now begins with an AI engine rather than a traditional search page. Users increasingly ask ChatGPT, Gemini, or Perplexity for answers and act on those answers directly, bypassing ranked links entirely. This shift from keyword matching to knowledge synthesis has made the underlying content quality — not the technical SEO wrapper — the decisive visibility factor.',
+        link: { text: 'Why the blue link is dying', href: '/blog/death-of-blue-link' },
       },
       {
         question: 'What is a "zero-click search" and why does it matter for brands?',
@@ -39,11 +39,11 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'What is AI Share of Voice (A-SoV)?',
-        answer: 'AI Share of Voice (A-SoV) is the percentage of relevant AI-generated responses that mention or recommend your brand. Auspexi measures this by running a set of industry-specific probe queries across ChatGPT, Gemini, Claude, and Perplexity, recording how often your brand appears, in what context, and with what sentiment. An A-SoV of 40% means your brand appears in 4 out of 10 relevant AI responses — a live, deterministic metric, not a modelled estimate.',
+        answer: 'AI Share of Voice (A-SoV) is the percentage of relevant AI-generated responses that mention or recommend your brand. Auspexi measures this by running a set of industry-specific probe queries across ChatGPT, Gemini, Claude, and Perplexity, recording how often your brand appears, in what context, and with what sentiment. An A-SoV of 40% means your brand appears in 4 out of 10 relevant AI responses — a live, measured metric, not a modelled estimate.',
       },
       {
         question: 'How long does GEO take to produce results?',
-        answer: 'For AI engines using real-time retrieval (RAG) — primarily Perplexity and ChatGPT browsing mode — fresh, authoritative content can begin influencing citations within 1–2 weeks of publication. For training-based knowledge embedded in model weights, structural improvements typically show within 6–12 weeks. Semantic positioning changes in Auspexi\'s 768-D Moat Score are detectable within 2–4 weeks of a sustained content campaign.',
+        answer: 'For AI engines using real-time retrieval (RAG) — primarily Perplexity and ChatGPT browsing mode — fresh, authoritative content can begin influencing citations within 1–2 weeks of publication. For training-based knowledge embedded in model weights, structural improvements typically show within 6–12 weeks. Changes in your Citation Probe rate across a sustained content campaign are typically detectable within 2–4 weeks.',
       },
       {
         question: 'Can GEO and SEO work together?',
