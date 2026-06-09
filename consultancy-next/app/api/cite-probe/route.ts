@@ -150,7 +150,8 @@ export async function POST(request: Request) {
           (platformRates.perplexity !== null ? testQueries.length * 0.005 : 0) +
           (platformRates.claude !== null ? (testQueries.length * 800 / 1_000_000) * 4.00 : 0) +
           (platformRates.grok != null ? (testQueries.length * 800 / 1_000_000) * 2.00 : 0) +
-          (platformRates.deepseek != null ? (testQueries.length * 800 / 1_000_000) * 0.28 : 0);
+          (platformRates.deepseek != null ? (testQueries.length * 800 / 1_000_000) * 0.28 : 0) +
+          (platformRates.google_aio != null ? testQueries.length * 0.013 : 0);
         dbAdmin.collection('cost_audit').add({
           userId, feature: 'cite-probe-multi', timestamp,
           platforms: Object.keys(platformRates).filter(p => platformRates[p] !== null),

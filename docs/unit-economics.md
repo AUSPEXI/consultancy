@@ -23,12 +23,16 @@ _Last reviewed: 2026-06-09._
 | Claude | comparable token rate | ~$0.0005 | |
 | DeepSeek | $0.28 / 1M | $0.0001 | |
 | Grok (xAI) | $2.00 / 1M | $0.0016 | |
-| **Perplexity** | flat per-request | **$0.005** | **dominates — ~10–25× the others** |
+| **Perplexity** | flat per-request | **$0.005** | web-grounded; throttled |
+| **Google AI Overviews** | SerpAPI per-search | **$0.013** | **most expensive — no chat API** |
 
-**Key fact:** Perplexity alone costs more than the other five engines combined.
-This is why `brand-probe` only runs Perplexity Mon & Thu, and why the Citability
-Lab defaults Perplexity *off*. The future Google AI Overviews integration will
-need a SERP API (~$0.001–$0.005/query) and becomes the *second* engine to throttle.
+**Key fact:** the two per-request-priced engines — Perplexity and Google AI
+Overviews — dominate cost; the five token-billed engines combined are cheaper than
+a single Google AIO search. This is why the `brand-probe` cron throttles both:
+Perplexity runs Mon & Thu, Google AIO runs Wednesdays only, and both default *off*
+in manual / Citability-Lab runs. Google AIO is per-search priced (SerpAPI $50/5k ≈
+$0.01, ~1.3× to cover the occasional page_token redemption) because it has no public
+API — it's the rendered Search surface read through SerpAPI.
 
 ## Per-user monthly variable cost
 

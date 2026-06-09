@@ -69,7 +69,7 @@ The defensible wedge is the **full loop + experimentation**, not raw tracking
 
 | Gap | Who has it | How hard to bridge | Priority |
 |-----|-----------|--------------------|----------|
-| **Engine coverage (4 vs 8–10)** — missing Google AI Overviews/AI Mode, Copilot, Grok, DeepSeek | Profound, Peec, AthenaHQ | **Easy** — add engine callers in `cite-probe-core` (Copilot/Grok via API; AI Overviews needs scraping) | **High** |
+| ~~**Engine coverage (4 vs 8–10)**~~ ✅ CLOSED — now 7 engines: Gemini, ChatGPT, Perplexity, Claude, Grok, DeepSeek, **Google AI Overviews** (via SerpAPI). Copilot deliberately skipped (no public consumer API — would just be GPT-4o relabeled) | Profound, Peec, AthenaHQ | Done | — |
 | **ROI / revenue attribution** (GA4, Shopify) | AthenaHQ | **Medium** — read-only GA4 referral integration | **High** (enterprise dealbreaker) |
 | **Server-side agent analytics** (track GPTBot/ChatGPT-User hitting your site) | Profound, AthenaHQ | **Medium–Hard** — log ingestion / Cloudflare worker | Medium |
 | **Position + sentiment over time** | Peec, Brandi | **Easy–Medium** — extend probe to score sentiment + rank, store trend | **High** (cheap, expected) |
@@ -94,12 +94,13 @@ fight on engine count, funding, and dataset scale.
 
 ## Suggested roadmap order (bridging gaps without losing the wedge)
 
-1. **Sentiment + position tracking** on the existing probe (cheap, expected, closes
-   a visible gap vs Peec). *High ROI, low effort.*
-2. **Add Copilot + Grok engines** to the probe (engine-count parity step 1). *Easy.*
-3. **GA4 referral attribution** (read-only) — unlocks the enterprise ROI conversation.
-4. **Google AI Overviews / AI Mode** coverage (harder; scraping) — the biggest
-   single visibility surface, worth the effort once 1–3 land.
+1. ✅ **Sentiment + position tracking** on the existing probe — *shipped.*
+2. ✅ **Add Grok + DeepSeek engines** to the probe — *shipped* (Copilot skipped, see above).
+3. ✅ **GA4 referral attribution** (read-only, multi-tenant OAuth) — *shipped.*
+4. ✅ **Google AI Overviews** coverage via SerpAPI — *shipped.* The biggest single
+   visibility surface. Throttled to Wednesdays in the brand-probe cron (per-search
+   pricing), off by default in manual runs. AI Mode (full conversational search)
+   still pending — newer, less stable DOM, revisit when SerpAPI support matures.
 5. Revisit SOC 2 / agent-log analytics only when chasing enterprise deals.
 
 ---

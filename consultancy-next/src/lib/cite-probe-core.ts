@@ -5,8 +5,8 @@ import OpenAI from 'openai';
 // /api/cite-probe route and the scheduled /api/cron/brand-probe route, so the
 // probe logic never drifts between manual and automated runs.
 
-export type PlatformKey = 'gemini' | 'chatgpt' | 'perplexity' | 'claude' | 'grok' | 'deepseek';
-export const ALL_ENGINES: PlatformKey[] = ['gemini', 'chatgpt', 'perplexity', 'claude', 'grok', 'deepseek'];
+export type PlatformKey = 'gemini' | 'chatgpt' | 'perplexity' | 'claude' | 'grok' | 'deepseek' | 'google_aio';
+export const ALL_ENGINES: PlatformKey[] = ['gemini', 'chatgpt', 'perplexity', 'claude', 'grok', 'deepseek', 'google_aio'];
 
 export type Sentiment = 'positive' | 'neutral' | 'negative';
 
@@ -306,20 +306,85 @@ async function probeDeepSeek(query: string, brand: string, domain: string, known
   }
 }
 
+// Google AI Overviews — the highest-volume AI answer surface, but it has no chat
+// API. We read it via SerpAPI, which runs the actual Google search and returns the
+// rendered AI Overview as structured text blocks + reference links. A brand counts
+// as "cited" if it appears in the overview text OR in the cited reference list.
+//
+// SerpAPI sometimes returns the overview inline; other times it returns only a
+// page_token that must be redeemed with a second `engine=google_ai_overview` call.
+// We handle both. When there is no AI Overview for a query at all, that's a real
+// signal (Google chose not to show one) — we return cited:false, not skipped.
+function flattenAioText(aio: any): string {
+  if (!aio) return '';
+  const parts: string[] = [];
+  const walkBlocks = (blocks: any[]) => {
+    for (const b of blocks || []) {
+      if (typeof b?.snippet === 'string') parts.push(b.snippet);
+      if (Array.isArray(b?.list)) {
+        for (const item of b.list) {
+          if (typeof item?.snippet === 'string') parts.push(item.snippet);
+          if (typeof item?.title === 'string') parts.push(item.title);
+        }
+      }
+      if (Array.isArray(b?.text_blocks)) walkBlocks(b.text_blocks);
+    }
+  };
+  walkBlocks(aio.text_blocks);
+  // Reference links count as citations too — fold in titles + source domains.
+  for (const ref of aio.references || []) {
+    if (typeof ref?.title === 'string') parts.push(ref.title);
+    if (typeof ref?.link === 'string') parts.push(ref.link);
+    if (typeof ref?.source === 'string') parts.push(ref.source);
+    if (typeof ref?.snippet === 'string') parts.push(ref.snippet);
+  }
+  return parts.join('\n');
+}
+
+async function probeGoogleAIO(query: string, brand: string, domain: string, knownFalses: string[]): Promise<PlatformResult> {
+  const apiKey = process.env.SERPAPI_KEY || process.env.SERPAPI_API_KEY || '';
+  if (!apiKey) return SKIPPED;
+  try {
+    const url = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(query)}&api_key=${apiKey}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    let aio = data.ai_overview;
+
+    // If only a page_token came back, redeem it for the full overview.
+    if (aio?.page_token && !aio?.text_blocks) {
+      const tokenUrl = `https://serpapi.com/search.json?engine=google_ai_overview&page_token=${encodeURIComponent(aio.page_token)}&api_key=${apiKey}`;
+      const tokenRes = await fetch(tokenUrl);
+      const tokenData = await tokenRes.json();
+      aio = tokenData.ai_overview || aio;
+    }
+
+    // No AI Overview shown for this query — a genuine "not cited" result.
+    if (!aio || (!aio.text_blocks && !aio.references)) {
+      return { cited: false, accurate: true, misinformation: null, excerpt: null, sentiment: null, position: null, positionPct: null };
+    }
+
+    const text = flattenAioText(aio);
+    return checkCitation(text, brand, domain, knownFalses);
+  } catch (e: any) {
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
+  }
+}
+
 // Probe one query across the requested engines. Engines not in `engines` are
 // returned as skipped without making (or paying for) an API call.
 async function probeQuery(
   query: string, brand: string, domain: string, knownFalses: string[], engines: Set<PlatformKey>,
 ): Promise<Record<PlatformKey, PlatformResult>> {
-  const [gemini, chatgpt, perplexity, claude, grok, deepseek] = await Promise.all([
+  const [gemini, chatgpt, perplexity, claude, grok, deepseek, google_aio] = await Promise.all([
     engines.has('gemini') ? probeGemini(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
     engines.has('chatgpt') ? probeChatGPT(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
     engines.has('perplexity') ? probePerplexity(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
     engines.has('claude') ? probeClaude(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
     engines.has('grok') ? probeGrok(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
     engines.has('deepseek') ? probeDeepSeek(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
+    engines.has('google_aio') ? probeGoogleAIO(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
   ]);
-  return { gemini, chatgpt, perplexity, claude, grok, deepseek };
+  return { gemini, chatgpt, perplexity, claude, grok, deepseek, google_aio };
 }
 
 export interface ProbeAggregate {
@@ -432,6 +497,9 @@ export function estimateProbeCost(numQueries: number, engines: Set<PlatformKey>,
     (engines.has('perplexity') ? numQueries * 0.005 : 0) +
     (engines.has('claude') ? (numQueries * 800 / 1_000_000) * 4.00 : 0) +
     (engines.has('grok') ? (numQueries * 800 / 1_000_000) * 2.00 : 0) +
-    (engines.has('deepseek') ? (numQueries * 800 / 1_000_000) * 0.28 : 0);
+    (engines.has('deepseek') ? (numQueries * 800 / 1_000_000) * 0.28 : 0) +
+    // SerpAPI bills per search (~$0.01 on the $50/5k plan); ~1.3× to cover the
+    // occasional page_token redemption that needs a second search call.
+    (engines.has('google_aio') ? numQueries * 0.013 : 0);
   return perPass * passes;
 }

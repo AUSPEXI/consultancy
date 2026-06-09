@@ -27,13 +27,21 @@ function authorised(request: Request): boolean {
   return auth === `Bearer ${secret}`;
 }
 
-// Engines to run today. Perplexity charges per-request (~63% of probe cost) and
-// is web-grounded so it barely moves day-to-day — run it only Mon (1) & Thu (4).
+// Engines to run today. The two per-request-priced engines are throttled because
+// they dominate cost and barely move day-to-day:
+//   • Perplexity (~$0.005/query) — web-grounded — runs Mon (1) & Thu (4).
+//   • Google AI Overviews via SerpAPI (~$0.013/query) — the most expensive and the
+//     slowest-moving surface (authority-weighted) — runs Wed (3) only.
 function enginesForToday(date = new Date()): Set<PlatformKey> {
   const day = date.getUTCDay();
   const includePerplexity = day === 1 || day === 4;
+  const includeGoogleAio = day === 3;
   return new Set<PlatformKey>(
-    ALL_ENGINES.filter(e => e !== 'perplexity' || includePerplexity)
+    ALL_ENGINES.filter(e => {
+      if (e === 'perplexity') return includePerplexity;
+      if (e === 'google_aio') return includeGoogleAio;
+      return true;
+    })
   );
 }
 

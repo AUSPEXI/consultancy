@@ -92,6 +92,7 @@ const PLATFORM_META = {
   claude:     { label: 'Claude',        color: '#d97757', bg: 'bg-orange-500/10',  border: 'border-orange-500/20',  text: 'text-orange-400'  },
   grok:       { label: 'Grok (xAI)',    color: '#e5e7eb', bg: 'bg-zinc-500/10',    border: 'border-zinc-500/20',    text: 'text-zinc-300'    },
   deepseek:   { label: 'DeepSeek',      color: '#8b5cf6', bg: 'bg-violet-500/10',  border: 'border-violet-500/20',  text: 'text-violet-400'  },
+  google_aio: { label: 'Google AI Overviews', color: '#fbbc05', bg: 'bg-amber-500/10', border: 'border-amber-500/20', text: 'text-amber-400' },
 } as const;
 
 type PlatformKey = keyof typeof PLATFORM_META;
