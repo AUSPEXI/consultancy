@@ -37,14 +37,16 @@ def _b64(svg_path, width, height, viewbox=None):
     png = cairosvg.svg2png(bytestring=svg, output_width=width, output_height=height)
     return base64.b64encode(png).decode('ascii')
 
-# Primary lockup: the wordmark "L8ENTSPACE.COM" overhangs the original 420-wide
-# viewBox once cairosvg substitutes a wider fallback font, so .COM clips. Widen
-# the viewBox symmetrically (-60 .. 480 = 540 wide, orbit stays centred) to give
-# the wordmark room. Aspect becomes 540:300 = 1.8:1.
-PRIM_VB = "-60 0 540 300"
+# Primary lockup renders at its native 420:300 viewBox. This REQUIRES the real
+# logo fonts (Outfit, JetBrains Mono, Plus Jakarta Sans) to be installed — with
+# fallback fonts the wider glyph metrics cause L8/Ent/Space to overlap and .COM
+# to clip. Install with:
+#   curl -sfL -o /usr/share/fonts/truetype/l8/Outfit.ttf \
+#     'https://github.com/google/fonts/raw/main/ofl/outfit/Outfit%5Bwght%5D.ttf'
+#   (+ jetbrainsmono + plusjakartasans), then `fc-cache -f`.
 def prim(width):
-    h = round(width * 300 / 540)
-    return (_b64(PRIMARY_PATH, width, h, viewbox=PRIM_VB), width, h)
+    h = round(width * 300 / 420)
+    return (_b64(PRIMARY_PATH, width, h), width, h)
 
 # Square orbit mark.
 def logo(side):
