@@ -29,15 +29,22 @@ PRIMARY_PATH = os.path.join(PUBLIC, 'l8entspace-primary.svg')
 
 # ── Render SVG logos to base64 PNGs at exact aspect ratios ───────────────────
 
-def _b64(svg_path, width, height):
+def _b64(svg_path, width, height, viewbox=None):
     with open(svg_path, 'rb') as f:
-        png = cairosvg.svg2png(bytestring=f.read(), output_width=width, output_height=height)
+        svg = f.read()
+    if viewbox:
+        svg = svg.replace(b'viewBox="0 0 420 300"', f'viewBox="{viewbox}"'.encode())
+    png = cairosvg.svg2png(bytestring=svg, output_width=width, output_height=height)
     return base64.b64encode(png).decode('ascii')
 
-# Primary lockup: height = width * 300/420.  (w, h) cached so img() can match exactly.
+# Primary lockup: the wordmark "L8ENTSPACE.COM" overhangs the original 420-wide
+# viewBox once cairosvg substitutes a wider fallback font, so .COM clips. Widen
+# the viewBox symmetrically (-60 .. 480 = 540 wide, orbit stays centred) to give
+# the wordmark room. Aspect becomes 540:300 = 1.8:1.
+PRIM_VB = "-60 0 540 300"
 def prim(width):
-    h = round(width * 300 / 420)
-    return (_b64(PRIMARY_PATH, width, h), width, h)
+    h = round(width * 300 / 540)
+    return (_b64(PRIMARY_PATH, width, h, viewbox=PRIM_VB), width, h)
 
 # Square orbit mark.
 def logo(side):
