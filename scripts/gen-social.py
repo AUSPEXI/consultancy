@@ -26,24 +26,70 @@ MONO = "DejaVu Sans Mono"
 
 LOGO_PATH    = os.path.join(PUBLIC, 'l8entspace-logo.svg')
 PRIMARY_PATH = os.path.join(PUBLIC, 'l8entspace-primary.svg')
+OUTFIT_TTF   = '/usr/share/fonts/truetype/l8/Outfit-800.ttf'
+
+# ── Wordmark fix ─────────────────────────────────────────────────────────────
+# The primary SVG draws its "L8ENTSPACE.COM" wordmark as a single <text> with
+# four child <tspan>s and no per-tspan x. cairosvg mis-lays-out that pattern:
+# every tspan inherits the parent x="210" and stacks on the same spot (L8/ENT/
+# SPACE collapse) while .COM overruns the viewBox. We rebuild that one line with
+# an explicit x on each colour segment, computed from the real Outfit-800 glyph
+# advances so the lockup is perfectly centred at x=210 and fits inside 0..420.
+
+def _build_wordmark():
+    from fontTools.ttLib import TTFont
+    f = TTFont(OUTFIT_TTF)
+    upm = f['head'].unitsPerEm
+    cmap = f.getBestCmap()
+    hmtx = f['hmtx']
+    LS = 2  # letter-spacing from the source SVG
+    def adv(ch, size):
+        g = cmap.get(ord(ch))
+        return (hmtx[g][0] if g else upm * 0.5) * size / upm
+    segs = [("L8", 30, "#ffffff"), ("ENT", 30, "#ff1493"),
+            ("SPACE", 30, "#ffffff"), (".COM", 20, "#ff1493")]
+    total = sum(adv(ch, sz) + LS for s, sz, _ in segs for ch in s)
+    x = 210 - total / 2
+    tspans = []
+    for s, sz, col in segs:
+        szattr = f' font-size="{sz}"' if sz != 30 else ''
+        tspans.append(f'<tspan x="{x:.1f}" fill="{col}"{szattr}>{s}</tspan>')
+        x += sum(adv(ch, sz) + LS for ch in s)
+    return ('<text y="258" font-family="\'Outfit\',sans-serif" font-size="30" '
+            'font-weight="800" letter-spacing="2">' + ''.join(tspans) + '</text>')
+
+# The original wordmark block, matched verbatim for replacement.
+_ORIG_WORDMARK = b'''<text x="210" y="258" text-anchor="middle" font-family="'Outfit','Plus Jakarta Sans',sans-serif" font-size="30" font-weight="800" letter-spacing="2">
+    <tspan fill="#ffffff">L8</tspan><tspan fill="#ff1493">ENT</tspan><tspan fill="#ffffff">SPACE</tspan><tspan fill="#ff1493" font-size="20">.COM</tspan>
+  </text>'''
+
+_FIXED_WORDMARK = _build_wordmark().encode()
 
 # ── Render SVG logos to base64 PNGs at exact aspect ratios ───────────────────
 
 def _b64(svg_path, width, height, viewbox=None):
     with open(svg_path, 'rb') as f:
         svg = f.read()
+    if svg_path == PRIMARY_PATH and _ORIG_WORDMARK in svg:
+        svg = svg.replace(_ORIG_WORDMARK, _FIXED_WORDMARK)
+        # The ↵ (U+21B5) on the Ent key renders as tofu because the static
+        # JetBrains Mono instance lacks that glyph. Swap it for a drawn arrow.
+        svg = svg.replace(
+            b'<text x="258" y="113" font-family="\'JetBrains Mono\',monospace" font-size="18" font-weight="700" fill="#000000">&#8629;</text>',
+            b'<path d="M270 99 L270 109 L256 109 M261 104 L256 109 L261 114" '
+            b'fill="none" stroke="#000000" stroke-width="2.4" '
+            b'stroke-linecap="round" stroke-linejoin="round"/>')
     if viewbox:
         svg = svg.replace(b'viewBox="0 0 420 300"', f'viewBox="{viewbox}"'.encode())
     png = cairosvg.svg2png(bytestring=svg, output_width=width, output_height=height)
     return base64.b64encode(png).decode('ascii')
 
 # Primary lockup renders at its native 420:300 viewBox. This REQUIRES the real
-# logo fonts (Outfit, JetBrains Mono, Plus Jakarta Sans) to be installed — with
-# fallback fonts the wider glyph metrics cause L8/Ent/Space to overlap and .COM
-# to clip. Install with:
-#   curl -sfL -o /usr/share/fonts/truetype/l8/Outfit.ttf \
-#     'https://github.com/google/fonts/raw/main/ofl/outfit/Outfit%5Bwght%5D.ttf'
-#   (+ jetbrainsmono + plusjakartasans), then `fc-cache -f`.
+# logo fonts (Outfit, JetBrains Mono, Plus Jakarta Sans) installed as STATIC
+# weight instances (variable defaults render Thin). Install with fonttools:
+#   fonttools varLib.instancer Outfit[wght].ttf wght=800 -o Outfit-800.ttf
+#   (+ JetBrainsMono wght=700, PlusJakartaSans wght=800), copy to
+#   /usr/share/fonts/truetype/l8/ and run `fc-cache -f`.
 def prim(width):
     h = round(width * 300 / 420)
     return (_b64(PRIMARY_PATH, width, h), width, h)
