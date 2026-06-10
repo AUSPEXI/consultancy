@@ -100,34 +100,76 @@ ${brandContext}
 
 ---
 
-Produce all five outputs, each delimited exactly as shown:
+Produce all seven outputs, each delimited exactly as shown:
 
 <SCRIPT_MD>
-[Full spoken script in 7-part format: Hook → Hypothesis → Method → The Run → The Result → Threats to Validity → What it means for you + CTA]
-Include [ON SCREEN:] cues for any data, charts, or variant comparisons.
+Full spoken script in 7-part format:
+1. Hook (0:00–0:20) — open on the surprising result, then rewind to the question
+2. Hypothesis (0:20–1:00) — what we tested and why it might matter
+3. Method (1:00–3:00) — variants on screen, the probe, n, the four engines. Show DESIGN.md timestamp as pre-registration proof.
+4. The Run (3:00–5:00) — describe watching probes execute, raw responses
+5. The Result (5:00–8:00) — rates, the chart, the p-value, plain conclusion
+6. Threats to Validity (8:00–9:30) — what could be wrong. This builds authority.
+7. What it means for you (9:30–end) — practical takeaway + soft Auspexi CTA (approved language only)
+
+Include [ON SCREEN:] cues for charts, variant comparisons, terminal output, and data tables.
 Include [B-ROLL:] notes for visual suggestions.
-Target 1,200–1,800 words.
+Target 1,200–1,800 words (8–12 min at speaking pace).
 </SCRIPT_MD>
 
+<SHORTS_HOOK_MD>
+A self-contained 45–60 second vertical Shorts script.
+Format:
+- Line 1: The hook (the result as a provocative statement — first 3 words must stop the scroll)
+- Lines 2–8: Rapid context (what was tested, one-line method)
+- Lines 9–12: The result stated plainly with the real number
+- Lines 13–15: The implication + CTA ("Full experiment linked in bio" or "Watch the full breakdown")
+Include [ON SCREEN:] cues — Shorts lives or dies on the visual, so be specific (text overlays, split-screen A/B, result card animation).
+Include [CAPTION:] for the auto-caption hook (first 5 words viewers see in feed).
+Write for re-read velocity — each line should work standalone if someone scrolls past mid-video.
+No Auspexi pitch in Shorts — channel authority comes first.
+</SHORTS_HOOK_MD>
+
 <TITLES_MD>
-[5 title options, ranked 1–5, each ≤ 60 characters, each with a one-line rationale]
-Include real numbers from the finding.
+5 title options for the long-form video, ranked 1–5, each ≤ 60 characters, each with a one-line rationale.
+Include the real number from the finding.
+At least one title must lead with the result, not the question.
+Include 2 bonus Shorts title options (≤ 40 chars, front-loaded with the result number).
 </TITLES_MD>
 
 <THUMBNAIL_MD>
-[Visual concept brief: the key number, A vs B comparison, arrow showing direction, colour palette]
+Visual concept brief for the long-form thumbnail (not the image itself).
+Must include:
+- The key number (large, high-contrast)
+- A/B split showing the two variants (left = control, right = treatment)
+- An arrow showing direction of effect
+- Gwylym's face position and expression suggestion
+- Colour palette: dark background (#09090b), high-contrast white text, single accent colour
+- Text overlays: max 6 words total across the whole thumbnail
+Also include a separate Shorts thumbnail brief (square crop, single bold stat, no face required).
 </THUMBNAIL_MD>
 
 <DESCRIPTION_MD>
 [150-word SEO description with finding in first sentence]
 [5–7 chapter timestamps matching the script]
 [Links section: L8EntSpace website, experiment folder placeholder, related videos placeholder]
+[3–5 relevant hashtags]
 [L8EntSpace™ on first mention]
 </DESCRIPTION_MD>
 
 <PINNED_COMMENT_MD>
-[2–3 sentences: where to find the raw data + step-by-step reproduction instructions]
-</PINNED_COMMENT_MD>`;
+2–3 sentences: where to find the raw data + step-by-step reproduction instructions (model, prompt structure, n, command to run).
+</PINNED_COMMENT_MD>
+
+<CONTENT_CALENDAR_MD>
+A brief repurposing plan for this experiment's content:
+- Shorts (post day 1 — the hook)
+- Long-form (post day 2–3)
+- LinkedIn post (1 paragraph, the finding as a provocative claim + link)
+- X/Twitter thread (5 tweets: hook → method → result → implication → CTA)
+- Community post / pinned comment (raw data availability)
+Keep each item to 2–3 sentences max. This is a production checklist, not copy.
+</CONTENT_CALENDAR_MD>`;
 
 console.log('Generating video package via Claude...');
 const response = await callClaude(systemPrompt, userPrompt);
@@ -140,10 +182,12 @@ function extractBlock(tag, text) {
 
 const outputs = {
   'video/script.md': extractBlock('SCRIPT_MD', response),
+  'video/shorts-hook.md': extractBlock('SHORTS_HOOK_MD', response),
   'video/titles.md': extractBlock('TITLES_MD', response),
   'video/thumbnail.md': extractBlock('THUMBNAIL_MD', response),
   'video/description.md': extractBlock('DESCRIPTION_MD', response),
   'video/pinned-comment.md': extractBlock('PINNED_COMMENT_MD', response),
+  'video/content-calendar.md': extractBlock('CONTENT_CALENDAR_MD', response),
 };
 
 const videoDir = path.join(experimentDir, 'video');
