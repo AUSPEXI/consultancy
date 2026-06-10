@@ -1,0 +1,48 @@
+name: Verify Dashboard Tools
+
+# Phase 0 verification harness (docs/automation-roadmap.md).
+# Runs entirely on GitHub's runners — no local machine needed.
+# Trigger manually: Actions tab → "Verify Dashboard Tools" → Run workflow.
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Site to test (deployed). Leave blank for https://l8entspace.com'
+        required: false
+        default: ''
+      checks:
+        description: 'Space-separated check names to run (blank = all). e.g. "daily-audit cite-probe"'
+        required: false
+        default: ''
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run verification harness
+        env:
+          HARNESS_BASE_URL: ${{ github.event.inputs.base_url }}
+          # Public web API key (same value as NEXT_PUBLIC_FIREBASE_API_KEY).
+          FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          # Dedicated test account + its configured brand context.
+          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+          TEST_BRAND: ${{ secrets.TEST_BRAND }}
+          TEST_DOMAIN: ${{ secrets.TEST_DOMAIN }}
+          TEST_KEYWORDS: ${{ secrets.TEST_KEYWORDS }}
+          TEST_COMPETITORS: ${{ secrets.TEST_COMPETITORS }}
+          TEST_QUERY: ${{ secrets.TEST_QUERY }}
+        run: node scripts/verify-harness.mjs ${{ github.event.inputs.checks }}
