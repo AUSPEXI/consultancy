@@ -661,7 +661,8 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      <div className="sticky bottom-0 z-20 -mx-4 mt-4 flex items-center justify-end gap-3 border-t border-zinc-800 bg-zinc-950/90 px-4 py-3 backdrop-blur">
+      {/* pr-20/pr-28 keeps the button clear of the fixed Citacious copilot bubble (bottom-right, z-50) */}
+      <div className="sticky bottom-0 z-20 -mx-4 mt-4 flex items-center justify-end gap-3 border-t border-zinc-800 bg-zinc-950/90 pl-4 pr-20 sm:pr-28 py-3 backdrop-blur">
         {saveMsg && (
           <span className={`text-sm ${saveMsg.type === 'success' ? 'text-emerald-400' : 'text-red-400'}`}>
             {saveMsg.text}
