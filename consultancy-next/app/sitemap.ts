@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/resources`,          lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.7 },
     { url: `${base}/roadmap`,            lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${base}/voice-agents`,       lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${base}/investors`,          lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${base}/privacy`,            lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3 },
     { url: `${base}/terms`,             lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3 },
     { url: `${base}/acceptable-use`,    lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3 },
