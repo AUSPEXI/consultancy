@@ -4,6 +4,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import { NavigationProgress } from '@/components/ui/NavigationProgress'
 import { CookieConsent } from '@/components/ui/cookie-consent'
 import { buildOrganizationSchema } from '@/lib/site-schema'
+import { GoogleAnalytics } from '@/components/GoogleAnalytics'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -100,8 +101,11 @@ export default function RootLayout({
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', 'G-41B8G8N5V1');
+          // send_page_view:false — GoogleAnalytics fires page_view on every route
+          // change (incl. the first load) so SPA navigations aren't missed.
+          gtag('config', 'G-41B8G8N5V1', { send_page_view: false });
         `}</Script>
+        <GoogleAnalytics />
       </body>
     </html>
   )
