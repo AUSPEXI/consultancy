@@ -1,0 +1,57 @@
+name: Deploy Firestore Rules
+
+# Publishes firestore.rules to the app's NAMED Firestore database
+# (ai-studio-2cf48d01-... — see firebase.json), so the repo is the single
+# source of truth instead of hand-pasting into the Firebase Console.
+#
+# Auth: the service account in FIREBASE_SERVICE_ACCOUNT_BASE64 must have the
+# "Firebase Rules Admin" role (roles/firebaserules.admin) or Editor/Owner.
+
+on:
+  # Auto-deploy when the rules change on the default branch.
+  push:
+    branches: [main, master]
+    paths:
+      - 'firestore.rules'
+      - 'firebase.json'
+      - '.github/workflows/deploy-firestore-rules.yml'
+  # Manual trigger from the Actions tab (use this to publish from any branch).
+  workflow_dispatch:
+
+jobs:
+  deploy-rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Write service account credentials
+        env:
+          SA_B64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
+        run: |
+          if [ -z "$SA_B64" ]; then
+            echo "❌ FIREBASE_SERVICE_ACCOUNT_BASE64 secret is not set"
+            exit 1
+          fi
+          echo "$SA_B64" | base64 -d > "$RUNNER_TEMP/sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
+
+      - name: Deploy Firestore rules
+        run: |
+          npx -y firebase-tools@latest deploy \
+            --only firestore:rules \
+            --project gen-lang-client-0693543960 \
+            --non-interactive
+
+      - name: Clean up credentials
+        if: always()
+        run: rm -f "$RUNNER_TEMP/sa.json"
