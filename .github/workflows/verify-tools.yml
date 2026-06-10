@@ -37,9 +37,13 @@ jobs:
           HARNESS_BASE_URL: ${{ github.event.inputs.base_url }}
           # Public web API key (same value as NEXT_PUBLIC_FIREBASE_API_KEY).
           FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
-          # Dedicated test account + its configured brand context.
+          # Auth method A — custom token for Google sign-in accounts (no password).
+          TEST_UID: ${{ secrets.TEST_UID }}
+          FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
+          # Auth method B — email/password (used only if TEST_UID is unset).
           TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+          # Test account's configured brand context.
           TEST_BRAND: ${{ secrets.TEST_BRAND }}
           TEST_DOMAIN: ${{ secrets.TEST_DOMAIN }}
           TEST_KEYWORDS: ${{ secrets.TEST_KEYWORDS }}

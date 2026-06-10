@@ -33,24 +33,80 @@ const cfg = {
   keywords:   (process.env.TEST_KEYWORDS || '').split(',').map(s => s.trim()).filter(Boolean),
   competitors:(process.env.TEST_COMPETITORS || '').split(',').map(s => s.trim()).filter(Boolean),
   query:      process.env.TEST_QUERY || '',
+  // Custom-token auth (for Google-OAuth accounts that have no password):
+  uid:            process.env.TEST_UID,
+  serviceAccount: process.env.FIREBASE_SERVICE_ACCOUNT_BASE64,
 };
+
+import crypto from 'node:crypto';
 
 const PASS = 'PASS', WARN = 'WARN', FAIL = 'FAIL', SKIP = 'SKIP';
 
 // ── small helpers ──────────────────────────────────────────────────────────
 function requireEnv() {
-  const missing = ['apiKey', 'email', 'password', 'brand', 'domain'].filter(k => !cfg[k]);
-  if (missing.length) {
-    console.error(`Missing required env: ${missing.map(k => ({
-      apiKey: 'FIREBASE_API_KEY', email: 'TEST_EMAIL', password: 'TEST_PASSWORD',
-      brand: 'TEST_BRAND', domain: 'TEST_DOMAIN',
-    }[k])).join(', ')}`);
+  // Always need these.
+  const base = ['apiKey', 'brand', 'domain'].filter(k => !cfg[k]);
+  // Plus ONE auth method: custom-token (uid + service account) OR email/password.
+  const hasCustom = cfg.uid && cfg.serviceAccount;
+  const hasPassword = cfg.email && cfg.password;
+  const labels = {
+    apiKey: 'FIREBASE_API_KEY', brand: 'TEST_BRAND', domain: 'TEST_DOMAIN',
+  };
+  if (base.length || (!hasCustom && !hasPassword)) {
+    if (base.length) console.error(`Missing required env: ${base.map(k => labels[k]).join(', ')}`);
+    if (!hasCustom && !hasPassword) {
+      console.error('Missing auth: provide EITHER');
+      console.error('  • TEST_UID + FIREBASE_SERVICE_ACCOUNT_BASE64  (for Google sign-in accounts), OR');
+      console.error('  • TEST_EMAIL + TEST_PASSWORD                  (for email/password accounts)');
+    }
     console.error('See scripts/verify-harness.env.example');
     process.exit(2);
   }
 }
 
-async function signIn() {
+const b64url = buf =>
+  Buffer.from(buf).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+
+// Build a Firebase custom token (a JWT signed by the service account key) and
+// exchange it for an ID token. No firebase-admin dependency — just Node crypto.
+function mintCustomToken(sa, uid) {
+  const now = Math.floor(Date.now() / 1000);
+  const header = { alg: 'RS256', typ: 'JWT' };
+  const payload = {
+    iss: sa.client_email,
+    sub: sa.client_email,
+    aud: 'https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit',
+    iat: now,
+    exp: now + 3600,
+    uid,
+  };
+  const input = `${b64url(JSON.stringify(header))}.${b64url(JSON.stringify(payload))}`;
+  const signature = crypto.sign('RSA-SHA256', Buffer.from(input), sa.private_key);
+  return `${input}.${b64url(signature)}`;
+}
+
+async function signInWithCustomToken() {
+  let sa;
+  try {
+    sa = JSON.parse(Buffer.from(cfg.serviceAccount, 'base64').toString('utf8'));
+  } catch {
+    throw new Error('FIREBASE_SERVICE_ACCOUNT_BASE64 is not valid base64 JSON');
+  }
+  const customToken = mintCustomToken(sa, cfg.uid);
+  const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${cfg.apiKey}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: customToken, returnSecureToken: true }),
+  });
+  const data = await res.json();
+  if (!res.ok || !data.idToken) {
+    throw new Error(`custom-token exchange failed: ${data.error?.message || res.status}`);
+  }
+  return data.idToken;
+}
+
+async function signInWithPassword() {
   const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${cfg.apiKey}`;
   const res = await fetch(url, {
     method: 'POST',
@@ -59,9 +115,15 @@ async function signIn() {
   });
   const data = await res.json();
   if (!res.ok || !data.idToken) {
-    throw new Error(`Firebase sign-in failed: ${data.error?.message || res.status}`);
+    throw new Error(`password sign-in failed: ${data.error?.message || res.status}`);
   }
   return data.idToken;
+}
+
+async function signIn() {
+  // Prefer custom-token (works for Google-OAuth accounts) when available.
+  if (cfg.uid && cfg.serviceAccount) return signInWithCustomToken();
+  return signInWithPassword();
 }
 
 async function call(token, method, path, body) {
@@ -184,7 +246,8 @@ async function main() {
   let token;
   try {
     token = await signIn();
-    console.log(`✓ Signed in as ${cfg.email}\n`);
+    const who = cfg.uid && cfg.serviceAccount ? `uid ${cfg.uid} (custom token)` : cfg.email;
+    console.log(`✓ Signed in as ${who}\n`);
   } catch (e) {
     console.error(`✗ ${e.message}`);
     process.exit(2);
