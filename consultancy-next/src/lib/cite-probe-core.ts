@@ -1,9 +1,8 @@
 import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
 
-// Shared citation-probe engine. Single source of truth for both the user-facing
-// /api/cite-probe route and the scheduled /api/cron/brand-probe route, so the
-// probe logic never drifts between manual and automated runs.
+// Shared citation-probe engine. Single source of truth for the user-facing
+// /api/cite-probe route so the probe logic stays consistent across callers.
 
 export type PlatformKey = 'gemini' | 'chatgpt' | 'perplexity' | 'claude' | 'grok' | 'deepseek' | 'google_aio';
 export const ALL_ENGINES: PlatformKey[] = ['gemini', 'chatgpt', 'perplexity', 'claude', 'grok', 'deepseek', 'google_aio'];
