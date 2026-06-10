@@ -661,7 +661,12 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      <div className="flex justify-end pt-4">
+      <div className="sticky bottom-0 z-20 -mx-4 mt-4 flex items-center justify-end gap-3 border-t border-zinc-800 bg-zinc-950/90 px-4 py-3 backdrop-blur">
+        {saveMsg && (
+          <span className={`text-sm ${saveMsg.type === 'success' ? 'text-emerald-400' : 'text-red-400'}`}>
+            {saveMsg.text}
+          </span>
+        )}
         <Button onClick={handleSave} disabled={isSaving} className="bg-white text-zinc-900 hover:bg-zinc-200 px-8">
           {isSaving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving...</> : 'Save Settings'}
         </Button>
