@@ -183,7 +183,8 @@ render('linkedin-personal-1584x396.png', 1584, 396,
     grid(1584, 396, 0.05)
     + img(LOGO_360, 36, 18)
     + f'<text x="440" y="118" font-family="{HEAD}" font-size="50" font-weight="bold" fill="#fff">MASTER BRAND VISIBILITY</text>'
-    + f'<text x="440" y="174" font-family="{HEAD}" font-size="50" font-weight="bold" fill="#fff">IN THE ERA OF <tspan fill="{PINK}">AI SEARCH</tspan></text>'
+    + f'<text x="440" y="174" font-family="{HEAD}" font-size="50" font-weight="bold" fill="#fff">IN THE ERA OF </text>'
+    + f'<text x="821" y="174" font-family="{HEAD}" font-size="50" font-weight="bold" fill="{PINK}">AI SEARCH</text>'
     + f'<text x="442" y="226" font-family="{HEAD}" font-size="22" fill="#b0b0ba">Get cited by ChatGPT, Gemini, Claude, Perplexity, Grok &amp; more.</text>'
     + f'<text x="442" y="268" font-family="{MONO}" font-size="20" fill="{PINK}" letter-spacing="2">www.l8entspace.com</text>'
     + img(PRIM_360, 1184, 70, opacity=0.9))
@@ -224,7 +225,8 @@ render('instagram-square-1080x1080.png', 1080, 1080,
     grid(1080, 1080, 0.045)
     + radar_rings(540, 340, 245)
     + img(LOGO_400, 340, 140)
-    + f'<text x="540" y="800" text-anchor="middle" font-family="{HEAD}" font-size="70" font-weight="bold" fill="#fff">GET CITED BY <tspan fill="{PINK}">AI</tspan></text>'
+    + f'<text x="250" y="800" font-family="{HEAD}" font-size="70" font-weight="bold" fill="#fff">GET CITED BY </text>'
+    + f'<text x="760" y="800" font-family="{HEAD}" font-size="70" font-weight="bold" fill="{PINK}">AI</text>'
     + f'<text x="540" y="866" text-anchor="middle" font-family="{HEAD}" font-size="30" fill="#b0b0ba">Generative Engine Optimization</text>'
     + f'<text x="540" y="970" text-anchor="middle" font-family="{MONO}" font-size="26" fill="{PINK}" letter-spacing="3">www.l8entspace.com</text>')
 
@@ -234,7 +236,8 @@ render('reddit-banner-1920x384.png', 1920, 384,
     grid(1920, 384, 0.05)
     + img(PRIM_500, 20, 14)
     + f'<text x="600" y="140" font-family="{HEAD}" font-size="48" font-weight="bold" fill="#fff">MASTER YOUR AI SHARE OF VOICE</text>'
-    + f'<text x="602" y="200" font-family="{HEAD}" font-size="27" fill="#cfcfd6">Brand visibility in the era of generative search — <tspan fill="{PINK}">GEO</tspan></text>'
+    + f'<text x="602" y="200" font-family="{HEAD}" font-size="27" fill="#cfcfd6">Brand visibility in the era of generative search</text>'
+    + f'<text x="602" y="234" font-family="{HEAD}" font-size="27" fill="{PINK}">Generative Engine Optimization (GEO)</text>'
     + f'<text x="602" y="252" font-family="{MONO}" font-size="20" fill="#7a7a85" letter-spacing="1">l8entspace.com</text>'
     + img(LOGO_360, 1524, 12, opacity=0.8))
 
@@ -252,7 +255,8 @@ render('tiktok-cover-1080x1920.png', 1080, 1920,
 render('facebook-cover-820x312.png', 820, 312,
     grid(820, 312, 0.05)
     + img(PRIM_400, 16, 13)
-    + f'<text x="440" y="118" font-family="{HEAD}" font-size="40" font-weight="bold" fill="#fff">GET CITED BY <tspan fill="{PINK}">AI</tspan></text>'
+    + f'<text x="440" y="118" font-family="{HEAD}" font-size="40" font-weight="bold" fill="#fff">GET CITED BY </text>'
+    + f'<text x="731" y="118" font-family="{HEAD}" font-size="40" font-weight="bold" fill="{PINK}">AI</text>'
     + f'<text x="442" y="164" font-family="{HEAD}" font-size="22" fill="#cfcfd6">Generative Engine Optimization</text>'
     + f'<text x="442" y="216" font-family="{MONO}" font-size="19" fill="{PINK}" letter-spacing="2">www.l8entspace.com</text>')
 
