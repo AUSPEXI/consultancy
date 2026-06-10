@@ -42,14 +42,11 @@ jobs:
             echo "❌ FIREBASE_SERVICE_ACCOUNT_BASE64 secret is not set"
             exit 1
           fi
-          # Strip any whitespace/newlines GitHub may have introduced — GNU base64 -d
-          # is strict and rejects them (Node's decoder is lenient, which is why the
-          # app works with the same secret). -w0 keeps decode tolerant.
-          printf '%s' "$SA_B64" | tr -d '[:space:]' | base64 -d > "$RUNNER_TEMP/sa.json"
-          if ! head -c1 "$RUNNER_TEMP/sa.json" | grep -q '{'; then
-            echo "❌ Decoded credentials are not JSON — check the secret is base64-encoded service account JSON"
-            exit 1
-          fi
+          # Decode tolerantly: GNU `base64 -d` is strict and rejects whitespace or
+          # base64url chars (Node's lenient decoder is why the app works with the
+          # same secret). Strip whitespace, normalise base64url, fix padding, then
+          # confirm it parsed as service-account JSON.
+          OUT="$RUNNER_TEMP/sa.json" python3 -c "import base64,json,os; s=''.join(os.environ['SA_B64'].split()).replace('-','+').replace('_','/'); s+='='*(-len(s)%4); d=base64.b64decode(s); o=json.loads(d); open(os.environ['OUT'],'wb').write(d); print('OK service account:', o['client_email'])"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
 
       - name: Deploy Firestore rules

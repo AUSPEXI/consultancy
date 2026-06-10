@@ -668,7 +668,7 @@ export default function SettingsPage() {
             {saveMsg.text}
           </span>
         )}
-        <Button onClick={handleSave} disabled={isSaving} className="bg-white text-zinc-900 hover:bg-zinc-200 px-8">
+        <Button onClick={handleSave} disabled={isSaving} className="!bg-pink-600 hover:!bg-pink-500 !text-white font-semibold px-8">
           {isSaving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving...</> : 'Save Settings'}
         </Button>
       </div>

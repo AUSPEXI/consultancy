@@ -79,7 +79,7 @@ export function Copilot({ setActiveTab }: CopilotProps) {
   const pathname = usePathname();
   const activeTab = pathname?.split('/dashboard/')[1]?.split('/')[0] || 'overview';
 
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMinimized, setIsMinimized] = useState(true);
   const [messages, setMessages] = useState<Message[]>(() => {
