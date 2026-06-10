@@ -94,13 +94,13 @@ export default function RootLayout({
         <NavigationProgress />
         <AuthProvider>{children}</AuthProvider>
         <CookieConsent />
-        {/* GA4 */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-W1C3XBTET3" strategy="afterInteractive" />
+        {/* GA4 — l8entspace.com property */}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-41B8G8N5V1" strategy="afterInteractive" />
         <Script id="ga4-init" strategy="afterInteractive">{`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', 'G-W1C3XBTET3');
+          gtag('config', 'G-41B8G8N5V1');
         `}</Script>
       </body>
     </html>
