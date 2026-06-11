@@ -33,7 +33,8 @@
       "pValue": 0.007
     }
   ],
-  "verdict": "significant",
+  "verdict": "preliminary",
+  "preliminaryReason": "n=8 per variant per platform, below pre-registered n>=30; effect on Claude not the pre-registered primary platform (Perplexity); Gemini 8/8 null responses (API failures)",
   "bestVariant": "B",
   "topEffect": {
     "platform": "claude",

@@ -1,4 +1,11 @@
-# Experiment Finding
+# Experiment Finding — ⚠ PRELIMINARY (n=8 per variant, below pre-registered n≥30)
+
+> This finding does not yet meet the lab's own significance bar. The Claude
+> result (p=0.007) survives a Bonferroni correction across the 4 uncorrected
+> platform comparisons, but the effect was found on Claude, not the
+> pre-registered primary platform (Perplexity), and Gemini contributed 8/8
+> null responses (API failures, since fixed in probe.mjs). Do not publish as
+> a confirmed result until n≥30 per variant per platform.
 
 **Hypothesis**: If the opening sentence contains a specific number ("cut latency 43%"), then citation rate will be higher than a version with vague language ("improved latency significantly") for product-performance queries, because LLMs weight precise, citable data points as credibility signals.
 
@@ -60,8 +67,9 @@
 
 ## Conclusion
 
-**Significant effects found** in 1 comparison(s):
-- On CLAUDE: B vs A: +62.5pp (p=0.007)
+**Preliminary significant effect** in 1 of 4 uncorrected comparisons:
+- On CLAUDE: B vs A: +62.5pp (p=0.007) — survives Bonferroni (α=0.0125) but
+  is not on the pre-registered primary platform (Perplexity) and n=8 < 30.
 
 ---
 

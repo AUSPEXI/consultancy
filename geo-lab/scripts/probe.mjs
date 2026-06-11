@@ -80,7 +80,7 @@ async function callGemini(prompt) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) return null;
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -88,6 +88,9 @@ async function callGemini(prompt) {
     }
   );
   const data = await res.json();
+  // Surface API errors instead of silently returning null — null responses
+  // were corrupting n counts with no audit trail (see experiment 001).
+  if (data.error) throw new Error(`gemini: ${data.error.message ?? JSON.stringify(data.error)}`);
   return data.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
 }
 
@@ -104,6 +107,7 @@ async function callOpenAI(prompt) {
     }),
   });
   const data = await res.json();
+  if (data.error) throw new Error(`openai: ${data.error.message ?? JSON.stringify(data.error)}`);
   return data.choices?.[0]?.message?.content ?? null;
 }
 
@@ -120,6 +124,7 @@ async function callPerplexity(prompt) {
     }),
   });
   const data = await res.json();
+  if (data.error) throw new Error(`perplexity: ${data.error.message ?? JSON.stringify(data.error)}`);
   return data.choices?.[0]?.message?.content ?? null;
 }
 
@@ -140,6 +145,7 @@ async function callClaude(prompt) {
     }),
   });
   const data = await res.json();
+  if (data.error) throw new Error(`claude: ${data.error.message ?? JSON.stringify(data.error)}`);
   return data.content?.[0]?.text ?? null;
 }
 
@@ -150,7 +156,12 @@ function buildPrompt(query, variantContents) {
   // Randomise source order to counter position bias.
   // Returns both the prompt string AND the shuffle mapping so citations can be
   // attributed to the correct variant (label A/B in the prompt ≠ variant A/B).
-  const shuffled = [...variantContents].sort(() => Math.random() - 0.5);
+  // Fisher-Yates — sort(() => Math.random()-0.5) is a biased shuffle.
+  const shuffled = [...variantContents];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
   const sourceBlock = shuffled
     .map((v, i) => `[SOURCE ${String.fromCharCode(65 + i)}]\n${v.content}`)
     .join('\n\n---\n\n');

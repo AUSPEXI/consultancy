@@ -96,16 +96,8 @@ async function countN(experimentDir) {
     const raw = await readJson(rawPath);
     if (!raw.results || !raw.meta?.variants) return 0;
     const variants = raw.meta.variants;
-    // Count minimum n across all variants
-    const counts = {};
-    for (const v of variants) counts[v] = 0;
-    for (const r of raw.results) {
-      if (counts[r.citations] !== undefined) {/* noop */}
-      for (const v of variants) {
-        if (r.citations !== undefined) counts[v]++;
-      }
-    }
-    // Actually count per variant
+    // n per variant = scored trials (a trial with a null/failed response has an
+    // empty citations object and must NOT count toward n).
     const perVariant = {};
     for (const v of variants) perVariant[v] = 0;
     for (const r of raw.results) {
