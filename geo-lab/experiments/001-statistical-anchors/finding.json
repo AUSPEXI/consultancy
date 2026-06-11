@@ -1,0 +1,44 @@
+{
+  "runAt": "2026-06-10T12:17:03.476Z",
+  "variants": [
+    "A",
+    "B"
+  ],
+  "platforms": [
+    "gemini",
+    "openai",
+    "perplexity",
+    "claude"
+  ],
+  "trialsPerVariant": 2,
+  "hypothesis": "If the opening sentence contains a specific number (\"cut latency 43%\"), then citation rate will be higher than a version with vague language (\"improved latency significantly\") for product-performance queries, because LLMs weight precise, citable data points as credibility signals.",
+  "aggregate": {
+    "A": {
+      "cited": 7,
+      "total": 32,
+      "rate": 21.9
+    },
+    "B": {
+      "cited": 16,
+      "total": 32,
+      "rate": 50
+    }
+  },
+  "significant": [
+    {
+      "platform": "claude",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 62.5,
+      "pValue": 0.007
+    }
+  ],
+  "verdict": "significant",
+  "bestVariant": "B",
+  "topEffect": {
+    "platform": "claude",
+    "treatment": "B",
+    "diffPp": 62.5,
+    "pValue": 0.007
+  }
+}

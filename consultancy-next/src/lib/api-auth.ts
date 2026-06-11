@@ -1,5 +1,6 @@
-import { adminAuth } from '@/lib/firebase-admin';
+import { adminAuth, dbAdmin } from '@/lib/firebase-admin';
 import { NextResponse } from 'next/server';
+import { normalizeTier, checkTierAccess, type UserTier } from '@/constants/tiers';
 
 /**
  * Verify the Firebase ID token from the Authorization header.
@@ -50,5 +51,37 @@ export async function requireAuth(
     return { userId: decoded.uid };
   } catch {
     return NextResponse.json({ error: 'Invalid or expired auth token' }, { status: 401 });
+  }
+}
+
+/**
+ * Verify auth AND check the caller's tier meets the minimum required.
+ * Admins bypass the tier check.
+ * Returns { userId } on success, or a 401/403 NextResponse.
+ */
+export async function requireTier(
+  request: Request,
+  minTier: UserTier,
+): Promise<{ userId: string } | NextResponse> {
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
+
+  if (!dbAdmin) return { userId }; // can't verify tier without DB — allow in dev
+
+  try {
+    const snap = await dbAdmin.collection('users').doc(userId).get();
+    const data = snap.data() ?? {};
+    if (data.role === 'admin') return { userId };
+    const tier = normalizeTier(data.tier) as UserTier;
+    if (!checkTierAccess(tier, minTier)) {
+      return NextResponse.json(
+        { error: 'upgrade_required', upgradeTo: minTier },
+        { status: 403 },
+      );
+    }
+    return { userId };
+  } catch {
+    return NextResponse.json({ error: 'Could not verify tier' }, { status: 500 });
   }
 }

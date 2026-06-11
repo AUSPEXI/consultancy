@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getExa } from '@/lib/exa';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
-import { requireAuth } from '@/lib/api-auth';
+import { requireTier } from '@/lib/api-auth';
 import { dbAdmin } from '@/lib/firebase-admin';
 
 // The LLM classifies real Exa results by index — it NEVER emits URLs or titles,
@@ -80,7 +80,7 @@ async function searchConsensus(brand: string): Promise<ExaThread[]> {
 }
 
 export async function POST(request: Request) {
-  const authResult = await requireAuth(request);
+  const authResult = await requireTier(request, 'Business');
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 

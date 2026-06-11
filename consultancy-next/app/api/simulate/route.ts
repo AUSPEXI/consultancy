@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/api-auth';
+import { requireTier } from '@/lib/api-auth';
 import { dbAdmin } from '@/lib/firebase-admin';
 import { queryAllEngines, type EngineId } from '@/lib/engine-query';
 
@@ -15,7 +15,7 @@ import { queryAllEngines, type EngineId } from '@/lib/engine-query';
 const ENGINE_IDS: EngineId[] = ['chatgpt', 'claude', 'gemini', 'perplexity'];
 
 export async function POST(request: Request) {
-  const authResult = await requireAuth(request);
+  const authResult = await requireTier(request, 'Pro');
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 

@@ -4,8 +4,8 @@ import { llmOrchestrator } from '@/lib/llm-orchestrator';
 import { ContentScorerSchema } from '@/lib/output-validation';
 
 export async function POST(request: Request) {
-  const { requireAuth } = await import('@/lib/api-auth');
-  const authResult = await requireAuth(request);
+  const { requireTier } = await import('@/lib/api-auth');
+  const authResult = await requireTier(request, 'Starter');
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 

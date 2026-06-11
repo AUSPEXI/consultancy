@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
-import { requireAuth } from '@/lib/api-auth';
+import { requireTier } from '@/lib/api-auth';
 import { dbAdmin } from '@/lib/firebase-admin';
 
 // "Dark AI" Shadow Link generator.
@@ -25,7 +25,7 @@ interface ShadowLinkDoc {
 }
 
 export async function POST(request: Request) {
-  const authResult = await requireAuth(request);
+  const authResult = await requireTier(request, 'Pro');
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
 
 // History of a user's generated shadow links (most recent first).
 export async function GET(request: Request) {
-  const authResult = await requireAuth(request);
+  const authResult = await requireTier(request, 'Pro');
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 

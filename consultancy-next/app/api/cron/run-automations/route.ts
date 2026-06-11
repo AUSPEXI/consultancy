@@ -4,11 +4,24 @@ import { normalizeTier, checkTierAccess, UserTier } from '@/constants/tiers';
 
 // Daily cost caps per tier (USD). Free is excluded from automation entirely
 // (see toolsForTier), so its cap is 0.
+// Costs are real: cite-probe ~$0.17/pass, brand-monitor ~$0.025.
 const DAILY_COST_CAPS: Record<UserTier, number> = {
   Free:     0.00,
-  Starter:  0.25,
-  Pro:      0.75,
-  Business: 2.50,
+  Starter:  0.25,  // 1 cite-probe pass (brand only) + brand-monitor
+  Pro:      0.75,  // brand + 2 competitor passes
+  Business: 2.75,  // brand + up to 14 competitor passes
+};
+
+// Max competitors to probe in automated runs per tier.
+// Keeps each automated cite-probe within the daily cost cap:
+//   Starter: 0 extras → ~$0.17/run
+//   Pro: 2 extras → ~$0.50/run
+//   Business: 14 extras → ~$2.49/run
+const AUTO_MAX_COMPETITORS: Record<UserTier, number> = {
+  Free:     0,
+  Starter:  0,
+  Pro:      2,
+  Business: 14,
 };
 
 // Each automated tool requires the SAME tier as its manual dashboard version —
@@ -84,10 +97,12 @@ async function callTool(
   userData: Record<string, any>,
   baseUrl: string,
   idToken: string,
+  tier: UserTier,
 ): Promise<{ cost: number; success: boolean; summary: string }> {
   const { brand, domain, keywords = [], competitors: primaryComps = [], watchlistCompetitors: watchlistComps = [] } = userData;
-  // Merge primary + watchlist; route applies the per-tier cap.
-  const competitors = [...new Set([...primaryComps, ...watchlistComps].filter(Boolean))];
+  // Merge primary + watchlist; clamp to per-tier automation cap to stay within daily cost budget.
+  const allCompetitors = [...new Set([...primaryComps, ...watchlistComps].filter(Boolean))];
+  const competitors = allCompetitors.slice(0, AUTO_MAX_COMPETITORS[tier]);
   if (!brand || !domain) return { cost: 0, success: false, summary: 'no brand/domain configured' };
 
   const headers = {
@@ -123,10 +138,12 @@ async function callTool(
       });
       const d = await r.json();
       if (!r.ok) return { cost: 0, success: false, summary: d.error ?? `HTTP ${r.status}` };
+      // Real cost: ~$0.166 per pass (brand + each competitor).
+      const passes = 1 + (d.competitors?.length ?? 0);
       return {
-        cost: 0.03,
+        cost: parseFloat((passes * 0.166).toFixed(3)),
         success: true,
-        summary: `Citation rate ${d.citationRate ?? '?'}% · ${Object.keys(d.platformRates ?? {}).length} engines`,
+        summary: `Citation rate ${d.citationRate ?? '?'}% · ${Object.keys(d.platformRates ?? {}).length} engines · ${passes} passes`,
       };
     }
 
@@ -244,7 +261,7 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
-      const result = await callTool(tool, userId, userData, baseUrl, internalToken);
+      const result = await callTool(tool, userId, userData, baseUrl, internalToken, tier);
       const ranAt = new Date().toISOString();
 
       runResults[tool] = { ...result, ranAt };
