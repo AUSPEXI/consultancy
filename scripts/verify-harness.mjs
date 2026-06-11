@@ -143,20 +143,27 @@ async function signIn() {
   return signInWithPassword();
 }
 
-async function call(token, method, path, body) {
+async function call(token, method, path, body, timeoutMs = 90_000) {
   const started = Date.now();
-  const res = await fetch(`${cfg.baseUrl}${path}`, {
-    method,
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      ...(body ? { 'Content-Type': 'application/json' } : {}),
-    },
-    ...(body ? { body: JSON.stringify(body) } : {}),
-  });
-  const ms = Date.now() - started;
-  let json = null, text = null;
-  try { json = await res.json(); } catch { try { text = await res.text(); } catch {} }
-  return { status: res.status, ok: res.ok, ms, json, text };
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(`${cfg.baseUrl}${path}`, {
+      method,
+      signal: controller.signal,
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        ...(body ? { 'Content-Type': 'application/json' } : {}),
+      },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+    const ms = Date.now() - started;
+    let json = null, text = null;
+    try { json = await res.json(); } catch { try { text = await res.text(); } catch {} }
+    return { status: res.status, ok: res.ok, ms, json, text };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 const num = v => (typeof v === 'number' && Number.isFinite(v));
@@ -170,9 +177,12 @@ const checks = [
     name: 'daily-audit',
     matrix: 'Daily Audit (SOV refresh)',
     async run(token) {
+      // Route requires keywords.length > 0 — fall back to brand name if TEST_KEYWORDS unset.
+      const keywords = cfg.keywords.length > 0 ? cfg.keywords : [cfg.brand];
+      const competitors = cfg.competitors.length > 0 ? cfg.competitors : ['Competitor A', 'Competitor B'];
       const r = await call(token, 'POST', '/api/run-daily-audit', {
         userId: 'harness', brand: cfg.brand, domain: cfg.domain,
-        competitors: cfg.competitors, keywords: cfg.keywords,
+        competitors, keywords,
       });
       if (!r.ok) return ok(FAIL, `HTTP ${r.status}: ${JSON.stringify(r.json || r.text).slice(0, 300)}`);
       const m = r.json?.metrics || r.json;
@@ -231,7 +241,12 @@ const checks = [
     matrix: 'Brand Monitor',
     async run(token) {
       const r = await call(token, 'POST', '/api/brand-monitor', { brand: cfg.brand });
-      if (!r.ok) return ok(FAIL, `HTTP ${r.status}: ${JSON.stringify(r.json || r.text).slice(0, 300)}`);
+      if (!r.ok) {
+        const detail = r.json || r.text;
+        const validErrs = r.json?.validationErrors ? ` | validationErrors: ${JSON.stringify(r.json.validationErrors)}` : '';
+        const raw = r.json?.rawOutput ? ` | rawOutput: ${String(r.json.rawOutput).slice(0, 200)}` : '';
+        return ok(FAIL, `HTTP ${r.status}: ${JSON.stringify(detail?.error || detail).slice(0, 200)}${validErrs}${raw}`);
+      }
       return ok(PASS, `responded ${r.ms}ms: ${JSON.stringify(r.json).slice(0, 200)}`);
     },
   },
