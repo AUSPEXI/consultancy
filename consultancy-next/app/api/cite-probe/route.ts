@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { dbAdmin } from '@/lib/firebase-admin';
 import { computeAttribution } from '@/lib/attribution';
 import { requireAuth } from '@/lib/api-auth';
-import { buildQueries, runCitationProbe, probeBrandRate } from '@/lib/cite-probe-core';
+import { buildQueries, runCitationProbe, probeBrandRate, ENGINE_MODEL_VERSIONS } from '@/lib/cite-probe-core';
 import { normalizeTier, checkTierAccess } from '@/constants/tiers';
 
 // Mine real questions from Reddit/Quora threads stored by the Brand Monitor.
@@ -157,23 +157,34 @@ export async function POST(request: Request) {
     const meterBlock = await enforceFreeProbeMeter(userId);
     if (meterBlock) return meterBlock;
 
-    // Load known-false statements + tier (single Firestore read).
+    // Load known-false statements + tier + tracking panel (single Firestore read).
     let knownFalses: string[] = clientFalses;
     let userTier = 'Free';
+    let trackingPanel: string[] = [];
     if (dbAdmin && userId !== 'anonymous') {
       try {
         const userDoc = await dbAdmin.collection('users').doc(userId).get();
         const ud = userDoc.data() ?? {};
         if (knownFalses.length === 0) knownFalses = ud.negativeStatements || [];
         userTier = ud.tier || 'Free';
+        if (Array.isArray(ud.trackingQueries)) trackingPanel = ud.trackingQueries.filter((q: any) => typeof q === 'string');
       } catch (_) {}
     }
 
-    // Build queries: prefer caller-supplied, then enrich with real Reddit/PAA questions
-    // from Brand Monitor results, then fall back to keyword-specific templates.
+    // Query selection, in priority order:
+    //   1. Caller-supplied queries → exploratory run (charted separately).
+    //   2. The user's pinned tracking panel → the fixed query set probed on every
+    //      auto run, so citation-rate deltas across time compare like with like.
+    //   3. First auto run: blend real Reddit/Quora questions (from Brand Monitor)
+    //      with keyword templates, then PIN the result as the tracking panel.
     let testQueries: string[];
+    let queriesSource: 'caller' | 'tracking-panel' | 'tracking-panel-created';
     if (queries?.length > 0) {
       testQueries = queries;
+      queriesSource = 'caller';
+    } else if (trackingPanel.length > 0) {
+      testQueries = trackingPanel;
+      queriesSource = 'tracking-panel';
     } else {
       const realQuestions = await buildQueriesFromBrandMonitor(userId);
       const templateQueries = buildQueries(brand, domain, keywords);
@@ -187,6 +198,10 @@ export async function POST(request: Request) {
         seen.add(k);
         return true;
       }).slice(0, 10);
+      queriesSource = 'tracking-panel-created';
+      if (dbAdmin && userId !== 'anonymous') {
+        dbAdmin.collection('users').doc(userId).set({ trackingQueries: testQueries }, { merge: true }).catch(() => {});
+      }
     }
     const timestamp = new Date().toISOString();
 
@@ -268,6 +283,8 @@ export async function POST(request: Request) {
       activePlatforms, platformRates,
       sentimentBreakdown, avgPositionPct,
       results: queryResults,
+      queriesSource,
+      engineVersions: ENGINE_MODEL_VERSIONS,
       attribution,
       mode: isCompetitorMode ? 'competitor' : 'standard',
       competitorDomain: competitor?.domain ?? null,

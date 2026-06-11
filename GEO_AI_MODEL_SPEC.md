@@ -17,12 +17,32 @@ The deliverable is not a generic AI — it is a narrow, high-confidence recommen
 
 ## 2. Prediction Targets
 
+### Modelling grain (decided June 2026)
+
+The default grain is **(interval, query, engine)** with a **binary** label, not the
+probe-interval rate delta. Rationale: at 7 queries a citation rate carries a 95% CI
+of roughly ±35pp (Wilson), and `citation_rate_delta` is the difference of two such
+noisy rates — label variance swamps the signal at current data volumes. The
+query-engine grain yields ~49 rows per probe pair instead of 1, and binary labels
+do not inherit the rate-CI problem. Rate-level predictions are recovered by
+aggregating per-row probabilities.
+
+Supporting mechanisms (both live in production):
+- **Tracking panel** — the first auto probe pins its query set to `users.trackingQueries`;
+  subsequent auto runs reuse it, so (query, engine) pairs match across intervals.
+  Caller-supplied query runs are tagged `queriesSource: 'caller'` and excluded from
+  longitudinal pairing by default.
+- **Engine version logging** — every probe stores `engineVersions` (exact model id
+  per engine). Rows where the model changed mid-interval carry
+  `engine_model_changed: true` so provider swaps are separable from content effects.
+
 ### Primary
-| Target | Type | Description |
-|---|---|---|
-| `citation_rate_at_next_probe` | Regression (0–100) | Predicted citation rate at the next probe run |
-| `citation_rate_delta` | Regression (-100 to +100) | Predicted change from current rate |
-| `days_to_first_citation` | Regression | For brands at 0%, when will the first citation appear |
+| Target | Type | Grain | Description |
+|---|---|---|---|
+| `cited_at_next_probe` | Binary classification | query-engine (default) | Will this engine cite the brand for this query at the next probe |
+| `citation_rate_at_next_probe` | Regression (0–100) | probe (`--grain probe`) | Predicted citation rate at the next probe run |
+| `citation_rate_delta` | Regression (-100 to +100) | probe (`--grain probe`) | Predicted change from current rate — high label noise, see above |
+| `days_to_first_citation` | Regression | probe | For brands at 0%, when will the first citation appear |
 
 ### Secondary
 | Target | Type | Description |
@@ -141,7 +161,9 @@ Each training row is a `(userId, time_window)` snapshot. One row per probe-to-pr
 
 ### Already being collected (Firestore)
 - ✅ `facts` — statements, entropyScore, category, timestamps
-- ✅ `citation_tests` — full probe results per query per platform (all 7 engines), citationRate, sentimentBreakdown, avgPositionPct, timestamps
+- ✅ `citation_tests` — full probe results per query per platform (all 7 engines), citationRate, ci95, sentimentBreakdown, avgPositionPct, timestamps; since 2026-06-11 also `rawResponse` per platform result (retro re-scoring + offline embedding), `engineVersions` (exact model id per engine), and `queriesSource` (tracking-panel vs caller)
+- ✅ `users.trackingQueries` — pinned per-user query panel for longitudinal comparability (auto-created on first auto probe)
+- ✅ `bing_index_checks` / `indexnow_pushes` / `entity_audits` — GEO Health diagnostics (Bing indexation, IndexNow submissions, entity grounding scores) — candidate features for §3
 - ✅ `sovMetrics` — aSov, err, compGap, aiTraffic over time
 - ✅ `audit_logs` — all user actions with timestamps and metadata
 - ✅ `competitors` — decay scores, trojan horse opportunities
@@ -158,11 +180,13 @@ Each training row is a `(userId, time_window)` snapshot. One row per probe-to-pr
 
 ### Requires joining
 - ✅ Feature matrix assembly script — `scripts/assemble-training-set.mjs` (2026-06-11).
-  Builds one row per (userId, probe-to-probe interval) with the
-  `(actions_between_probes → citation_delta)` training pair, joining facts,
-  citation_tests, audit_logs, competitors, articles, and geo_experiments.
-  Engine columns are read dynamically from `platformRates` keys. Outputs
-  JSONL or CSV; nulls for missing values (GBT-native).
+  Default grain is **query-engine** (one row per interval × query × engine, binary
+  `cited_at_next_probe` label, plus `engine_model` / `engine_model_changed`);
+  `--grain probe` emits the legacy interval rows with
+  `(actions_between_probes → citation_delta)`. Joins facts, citation_tests,
+  audit_logs, competitors, articles, and geo_experiments. Engine columns are read
+  dynamically from `platformRates` keys. Outputs JSONL or CSV; nulls for missing
+  values (GBT-native).
   Run: `GOOGLE_APPLICATION_CREDENTIALS=sa.json node scripts/assemble-training-set.mjs --format csv`
 
 ### Gaps to fill

@@ -31,6 +31,18 @@ function argVal(flag, fallback) {
 const OUT = argVal('--out', 'results/training-set.jsonl');
 const FORMAT = argVal('--format', OUT.endsWith('.csv') ? 'csv' : 'jsonl');
 const ONLY_USER = argVal('--user', null);
+// Modelling grain (spec §2):
+//   probe        — one row per probe-to-probe interval; label = citation_rate_delta.
+//                  Noisy: at 7 queries each rate carries ±~35pp of CI, and the
+//                  delta of two noisy rates is noisier still.
+//   query-engine — one row per (interval, query, engine); label = binary
+//                  cited_at_next_probe for the SAME query on the SAME engine.
+//                  ~49× more rows per probe pair, binary labels don't inherit
+//                  the rate-CI problem. Default and recommended.
+const GRAIN = argVal('--grain', 'query-engine');
+if (!['probe', 'query-engine'].includes(GRAIN)) {
+  console.error(`Unknown --grain "${GRAIN}" (expected probe|query-engine)`); process.exit(1);
+}
 
 // ── Firestore init ───────────────────────────────────────────────────────────
 if (!admin.apps.length) {
@@ -192,16 +204,12 @@ async function buildRowsForUser(userId, userData) {
     }
     const topLever = Object.entries(leverCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 
-    rows.push({
+    const intervalFeatures = {
       // Row identity
       userId,
       interval_start: t0,
       interval_end: t1,
       interval_days: round2(daysBetween(t0, t1)),
-
-      // ── Labels (spec §2) ──
-      citation_rate_at_next_probe: end.citationRate,
-      citation_rate_delta: round2(end.citationRate - start.citationRate),
 
       // 3a semantic
       avg_cosine_dist_to_probe_queries: round2(avgCosDist),
@@ -261,7 +269,47 @@ async function buildRowsForUser(userId, userData) {
       avg_experiment_win_rate: round2(mean(winRates)),
       most_effective_lever: topLever,
       lever_diversity: Object.keys(leverCounts).length,
-    });
+    };
+
+    if (GRAIN === 'probe') {
+      rows.push({
+        ...intervalFeatures,
+        // ── Labels (spec §2, probe grain) ──
+        citation_rate_at_next_probe: end.citationRate,
+        citation_rate_delta: round2(end.citationRate - start.citationRate),
+      });
+      continue;
+    }
+
+    // ── query-engine grain: one row per (query, engine) pair present in BOTH
+    // probes. Binary label. Requires comparable query sets — the tracking-panel
+    // change pins queries between auto runs, so matches are the common case.
+    const endByQuery = new Map((end.results ?? []).map(r => [String(r.query).toLowerCase(), r]));
+    for (const startR of start.results ?? []) {
+      const endR = endByQuery.get(String(startR.query).toLowerCase());
+      if (!endR) continue; // query not re-probed — no label available
+      const engines = Object.keys(startR.platforms ?? {});
+      for (const engine of engines) {
+        const sP = startR.platforms?.[engine];
+        const eP = endR.platforms?.[engine];
+        // Both ends must be real observations (not skipped, not errored).
+        if (!sP || !eP || sP.skipped || eP.skipped || sP.error || eP.error) continue;
+        rows.push({
+          ...intervalFeatures,
+          query: startR.query,
+          engine,
+          engine_model: (start.engineVersions ?? {})[engine] ?? null,
+          engine_model_changed: start.engineVersions && end.engineVersions
+            ? start.engineVersions[engine] !== end.engineVersions[engine]
+            : null,
+          cited_now: sP.cited === true,
+          sentiment_now: sP.sentiment ?? null,
+          position_pct_now: typeof sP.positionPct === 'number' ? sP.positionPct : null,
+          // ── Label (spec §2, query-engine grain) ──
+          cited_at_next_probe: eP.cited === true,
+        });
+      }
+    }
   }
   return rows;
 }
@@ -276,7 +324,7 @@ async function main() {
   for (const userDoc of usersSnap.docs) {
     const rows = await buildRowsForUser(userDoc.id, userDoc.data());
     allRows.push(...rows);
-    if (rows.length) console.log(`  ${userDoc.id}: ${rows.length} interval rows`);
+    if (rows.length) console.log(`  ${userDoc.id}: ${rows.length} rows (${GRAIN} grain)`);
   }
 
   if (allRows.length === 0) {

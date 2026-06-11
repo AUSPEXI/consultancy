@@ -9,6 +9,20 @@ export const ALL_ENGINES: PlatformKey[] = ['gemini', 'chatgpt', 'perplexity', 'c
 
 export type Sentiment = 'positive' | 'neutral' | 'negative';
 
+// The exact model identifier each engine probe calls. Logged with every probe so
+// that citation-behaviour shifts caused by provider model swaps are separable
+// from real content-driven movement in longitudinal analysis. Keep in sync with
+// the model strings inside each probe function below.
+export const ENGINE_MODEL_VERSIONS: Record<PlatformKey, string> = {
+  gemini: 'gemini-2.5-flash',
+  chatgpt: 'gpt-4o-mini',
+  perplexity: 'sonar',
+  claude: 'claude-haiku-4-5-20251001',
+  grok: 'grok-2-latest',
+  deepseek: 'deepseek-chat',
+  google_aio: 'serpapi-google-ai-overview',
+};
+
 export interface PlatformResult {
   cited: boolean;
   accurate: boolean;

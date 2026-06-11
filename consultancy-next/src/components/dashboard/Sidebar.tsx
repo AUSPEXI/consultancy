@@ -62,6 +62,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     {
       label: 'COMMAND CENTRE',
       items: [
+        { id: 'geo-audit', label: 'Full GEO Audit', icon: Zap,            requiredTier: 'Starter' as UserTier, path: '/dashboard/geo-audit' },
         { id: 'overview',  label: 'SOV Overview',  icon: LayoutDashboard, requiredTier: 'Starter' as UserTier, path: '/dashboard/overview' },
         { id: 'geo-pulse', label: 'GEO Pulse',     icon: Activity,        requiredTier: 'Pro'     as UserTier, path: '/dashboard/geo-pulse' },
         { id: 'autopilot', label: 'GEO Autopilot', icon: RefreshCw,       requiredTier: 'Pro'     as UserTier, path: '/dashboard/autopilot' },
