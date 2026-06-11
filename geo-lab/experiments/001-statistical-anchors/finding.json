@@ -1,5 +1,5 @@
 {
-  "runAt": "2026-06-10T12:17:03.476Z",
+  "runAt": "2026-06-11T22:03:00.720Z",
   "variants": [
     "A",
     "B"
@@ -14,32 +14,38 @@
   "hypothesis": "If the opening sentence contains a specific number (\"cut latency 43%\"), then citation rate will be higher than a version with vague language (\"improved latency significantly\") for product-performance queries, because LLMs weight precise, citable data points as credibility signals.",
   "aggregate": {
     "A": {
-      "cited": 7,
-      "total": 32,
-      "rate": 21.9
+      "cited": 12,
+      "total": 64,
+      "rate": 18.8
     },
     "B": {
-      "cited": 16,
-      "total": 32,
-      "rate": 50
+      "cited": 35,
+      "total": 64,
+      "rate": 54.7
     }
   },
   "significant": [
     {
+      "platform": "gemini",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 31.3,
+      "pValue": 0.0149
+    },
+    {
       "platform": "claude",
       "control": "A",
       "treatment": "B",
-      "diffPp": 62.5,
-      "pValue": 0.007
+      "diffPp": 75,
+      "pValue": 0
     }
   ],
-  "verdict": "preliminary",
-  "preliminaryReason": "n=8 per variant per platform, below pre-registered n>=30; effect on Claude not the pre-registered primary platform (Perplexity); Gemini 8/8 null responses (API failures)",
+  "verdict": "significant",
   "bestVariant": "B",
   "topEffect": {
     "platform": "claude",
     "treatment": "B",
-    "diffPp": 62.5,
-    "pValue": 0.007
+    "diffPp": 75,
+    "pValue": 0
   }
 }

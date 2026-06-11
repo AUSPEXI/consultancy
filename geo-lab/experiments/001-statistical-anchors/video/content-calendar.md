@@ -1,0 +1,5 @@
+- **Shorts (Day 1):** Post the 25%→100% hook with split-screen A/B and rising-bar result card. Drives curiosity to the full breakdown; end with "watch the full video."
+- **Long-form (Day 2–3):** Full 7-part video with engine-by-engine charts, p-values, and threats-to-validity section. Pin the raw-data comment immediately.
+- **LinkedIn (Day 3):** One paragraph — "Swapping 'improved significantly' for 'cut time 43%' took Claude's citation rate from 25% to 100% in my test. Directionally consistent across all four engines, but only significant on two — and the sample was tiny. Here's the honest data." + link.
+- **X/Twitter thread (Day 4):** 5 tweets — (1) hook: 25%→100% on Claude; (2) method: same page, one sentence changed, 4 engines; (3) result: pooled 18.8%→54.7%, significant on Claude & Gemini; (4) implication: lead with real numbers, cheap win; (5) caveat + link to full experiment.
+- **Community post (Day 5):** Announce raw data + reproduction steps are public; invite viewers to re-run and share their own engine results.

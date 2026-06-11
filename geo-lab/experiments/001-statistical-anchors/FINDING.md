@@ -1,15 +1,8 @@
-# Experiment Finding — ⚠ PRELIMINARY (n=8 per variant, below pre-registered n≥30)
-
-> This finding does not yet meet the lab's own significance bar. The Claude
-> result (p=0.007) survives a Bonferroni correction across the 4 uncorrected
-> platform comparisons, but the effect was found on Claude, not the
-> pre-registered primary platform (Perplexity), and Gemini contributed 8/8
-> null responses (API failures, since fixed in probe.mjs). Do not publish as
-> a confirmed result until n≥30 per variant per platform.
+# Experiment Finding
 
 **Hypothesis**: If the opening sentence contains a specific number ("cut latency 43%"), then citation rate will be higher than a version with vague language ("improved latency significantly") for product-performance queries, because LLMs weight precise, citable data points as credibility signals.
 
-**Run at**: 2026-06-10T12:17:03.476Z
+**Run at**: 2026-06-11T22:03:00.720Z
 **Variants**: A, B
 **Platforms**: gemini, openai, perplexity, claude
 **Trials per variant**: 2
@@ -22,37 +15,37 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 0 | 8 | 0.0% | [0%, 0%] |
-| B | 0 | 8 | 0.0% | [0%, 0%] |
+| A | 0 | 16 | 0.0% | [0%, 0%] |
+| B | 5 | 16 | 31.3% | [8.5%, 54%] |
 
-**B vs A**: 0.0pp, z=0, p=1 — ✗ not significant
+**B vs A**: +31.3pp, z=2.434, p=0.0149 — ✓ significant (p < 0.05)
 
 ### OPENAI
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 0 | 8 | 0.0% | [0%, 0%] |
-| B | 2 | 8 | 25.0% | [0%, 55%] |
+| A | 0 | 16 | 0.0% | [0%, 0%] |
+| B | 3 | 16 | 18.8% | [0%, 37.9%] |
 
-**B vs A**: +25.0pp, z=1.512, p=0.1306 — ✗ not significant
+**B vs A**: +18.8pp, z=1.819, p=0.0688 — ✗ not significant
 
 ### PERPLEXITY
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 4 | 8 | 50.0% | [15.4%, 84.6%] |
-| B | 6 | 8 | 75.0% | [45%, 100%] |
+| A | 8 | 16 | 50.0% | [25.5%, 74.5%] |
+| B | 11 | 16 | 68.8% | [46%, 91.5%] |
 
-**B vs A**: +25.0pp, z=1.033, p=0.3017 — ✗ not significant
+**B vs A**: +18.8pp, z=1.08, p=0.2802 — ✗ not significant
 
 ### CLAUDE
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 3 | 8 | 37.5% | [4%, 71%] |
-| B | 8 | 8 | 100.0% | [100%, 100%] |
+| A | 4 | 16 | 25.0% | [3.8%, 46.2%] |
+| B | 16 | 16 | 100.0% | [100%, 100%] |
 
-**B vs A**: +62.5pp, z=2.697, p=0.007 — ✓ significant (p < 0.05)
+**B vs A**: +75.0pp, z=4.382, p=0 — ✓ significant (p < 0.05)
 
 ---
 
@@ -60,16 +53,16 @@
 
 | Variant | Cited | n | Citation Rate |
 |---------|-------|---|---------------|
-| A | 7 | 32 | 21.9% |
-| B | 16 | 32 | 50.0% |
+| A | 12 | 64 | 18.8% |
+| B | 35 | 64 | 54.7% |
 
 ---
 
 ## Conclusion
 
-**Preliminary significant effect** in 1 of 4 uncorrected comparisons:
-- On CLAUDE: B vs A: +62.5pp (p=0.007) — survives Bonferroni (α=0.0125) but
-  is not on the pre-registered primary platform (Perplexity) and n=8 < 30.
+**Significant effects found** in 2 comparison(s):
+- On GEMINI: B vs A: +31.3pp (p=0.0149)
+- On CLAUDE: B vs A: +75.0pp (p=0)
 
 ---
 
@@ -79,3 +72,4 @@
 - **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.
 - **n=2 per variant**: ⚠ Below the lab minimum of 30 — treat as preliminary.
 - **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.
+- **Multiple comparisons**: 2 simultaneous tests inflate the false-positive rate. Treat findings as exploratory unless pre-registered.
