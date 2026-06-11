@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { dbAdmin } from '@/lib/firebase-admin';
+import { requireAuth } from '@/lib/api-auth';
 
 /**
- * GET /api/export-training-set?userId=...&format=jsonl|csv
+ * GET /api/export-training-set?format=jsonl|csv
  *
  * Exports a supervised training set from accumulated citation tests.
  * Each row is: content variant (query text used to probe), query sent to LLM,
@@ -11,14 +12,14 @@ import { dbAdmin } from '@/lib/firebase-admin';
  * This is the ML backbone for future fine-tuning / ranking model work.
  */
 export async function GET(request: Request) {
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
+
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
     const format = searchParams.get('format') === 'csv' ? 'csv' : 'jsonl';
 
-    if (!userId || userId === 'anonymous') {
-      return NextResponse.json({ error: 'userId required' }, { status: 400 });
-    }
     if (!dbAdmin) {
       return NextResponse.json({ error: 'Server config error' }, { status: 500 });
     }

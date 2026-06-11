@@ -138,7 +138,7 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
       allow create: if isAuthenticated() && isValidUser(request.resource.data) && ((isOwner(userId) && (!('role' in request.resource.data) || request.resource.data.role == 'user')) || isAdmin());
-      allow update: if isAuthenticated() && isValidUser(request.resource.data) && ((isOwner(userId) && (!('role' in request.resource.data) || ('role' in resource.data && request.resource.data.role == resource.data.role))) || isAdmin());
+      allow update: if isAuthenticated() && isValidUser(request.resource.data) && ((isOwner(userId) && (!('role' in request.resource.data) || ('role' in resource.data && request.resource.data.role == resource.data.role)) && (!('tier' in request.resource.data) || ('tier' in resource.data && request.resource.data.tier == resource.data.tier))) || isAdmin());
       allow delete: if isAdmin();
     }
 

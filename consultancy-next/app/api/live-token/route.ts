@@ -40,9 +40,7 @@ export async function GET(req: NextRequest) {
     });
     return NextResponse.json({ token: token.name });
   } catch (err: any) {
-    // Fall back to returning the real key if ephemeral token creation fails.
-    // This keeps voice working even if the tokens API is unavailable.
-    console.error('[live-token] ephemeral token failed, falling back to key:', err?.message);
-    return NextResponse.json({ key: apiKey });
+    console.error('[live-token] ephemeral token failed:', err?.message);
+    return NextResponse.json({ error: 'Could not create ephemeral token' }, { status: 503 });
   }
 }

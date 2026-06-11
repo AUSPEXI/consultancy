@@ -1,20 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbAdmin } from '@/lib/firebase-admin';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function GET(req: NextRequest) {
-  try {
-    const { searchParams } = req.nextUrl;
-    const userId = searchParams.get('userId');
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
 
-    if (!userId || !dbAdmin) {
-      // Return empty state — no fake data
-      return NextResponse.json({
-        success: true,
-        pulse: [],
-        hasRealData: false,
-        message: 'Run a Citation Probe to start tracking your AI citation trend.',
-      });
-    }
+  if (!dbAdmin) {
+    return NextResponse.json({
+      success: true,
+      pulse: [],
+      hasRealData: false,
+      message: 'Run a Citation Probe to start tracking your AI citation trend.',
+    });
+  }
+
+  try {
 
     // Fetch last 30 citation tests for this user
     const snap = await dbAdmin

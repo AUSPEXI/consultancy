@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
 import { AmplifySchema } from '@/lib/output-validation';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
+
   try {
-    const { fact, userId = 'anonymous' } = await request.json();
+    const { fact } = await request.json();
     if (!fact) return NextResponse.json({ error: 'Fact is required' }, { status: 400 });
 
     const prompt = `

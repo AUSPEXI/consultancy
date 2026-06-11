@@ -16,10 +16,9 @@ import { dbAdmin } from '@/lib/firebase-admin';
  * }
  */
 export async function POST(req: NextRequest) {
-  // Auth check — optional if L8ENTSPACE_WEBHOOK_SECRET is set
   const secret = req.headers.get('x-l8entspace-secret') || '';
   const expectedSecret = process.env.L8ENTSPACE_WEBHOOK_SECRET;
-  if (expectedSecret && secret !== expectedSecret) {
+  if (!expectedSecret || secret !== expectedSecret) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { dbAdmin } from '@/lib/firebase-admin';
 import admin from '@/lib/firebase-admin';
 import nodemailer from 'nodemailer';
+import { requireAuth } from '@/lib/api-auth';
 
 function buildArticleEmail(topic: string, brand: string, article: string, schema: string, timestamp: string): string {
   const date = new Date(timestamp || Date.now()).toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short' });
@@ -63,11 +64,15 @@ function buildArticleEmail(topic: string, brand: string, article: string, schema
 }
 
 export async function POST(request: Request) {
-  try {
-    const { userId, topic, article, facts, schema, brand, timestamp } = await request.json();
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
 
-    if (!userId || !article) {
-      return NextResponse.json({ error: 'userId and article required' }, { status: 400 });
+  try {
+    const { topic, article, facts, schema, brand, timestamp } = await request.json();
+
+    if (!article) {
+      return NextResponse.json({ error: 'article required' }, { status: 400 });
     }
 
     // Resolve recipient email via Firebase Auth

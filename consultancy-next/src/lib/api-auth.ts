@@ -33,8 +33,10 @@ export async function requireAuth(
   }
 
   if (!adminAuth) {
-    // Firebase Admin not configured (local dev without service account).
-    // Decode token payload without verification so dev still works.
+    if (process.env.NODE_ENV === 'production') {
+      return NextResponse.json({ error: 'Server auth not configured' }, { status: 503 });
+    }
+    // Local dev without service account: decode without signature verification.
     try {
       const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
       return { userId: payload.user_id || payload.sub || 'dev-user' };

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbAdmin } from '@/lib/firebase-admin';
 import { embeddingService } from '@/lib/embeddings';
+import { requireAuth } from '@/lib/api-auth';
 
 // TEO semantic axes — the three philosophical dimensions of brand latent space
 // Axis 1 (x): Ontological     — what the brand fundamentally IS
@@ -41,9 +42,12 @@ function inferAxis(baseType: string): 1 | 2 | 3 {
 type CitationStatus = 'cited' | 'uncited' | 'untested';
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
+
   try {
     const { searchParams } = req.nextUrl;
-    const userId = searchParams.get('userId');
     const platform = searchParams.get('platform') || 'All';
     const timeframe = searchParams.get('timeframe') || 'current';
 
