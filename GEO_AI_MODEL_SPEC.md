@@ -156,10 +156,14 @@ Each training row is a `(userId, time_window)` snapshot. One row per probe-to-pr
 - ✅ `deepseek` — DeepSeek Chat, daily
 - ✅ `google_aio` — Google AI Overviews via SerpAPI, **Wednesdays only** (per-search cost; most valuable label for authority-weighted surfaces)
 
-### Requires joining (not yet assembled)
-- ⚙️ `(audit_actions_between_probes → citation_delta)` rows — the core training pair
-- ⚙️ Feature matrix assembly script (reads all collections, builds tabular dataset per user per probe interval)
-  - **IMPORTANT:** This script must read engine columns dynamically from `platformRates` keys — never hardcode the engine list, or newly-added engines will be silently dropped.
+### Requires joining
+- ✅ Feature matrix assembly script — `scripts/assemble-training-set.mjs` (2026-06-11).
+  Builds one row per (userId, probe-to-probe interval) with the
+  `(actions_between_probes → citation_delta)` training pair, joining facts,
+  citation_tests, audit_logs, competitors, articles, and geo_experiments.
+  Engine columns are read dynamically from `platformRates` keys. Outputs
+  JSONL or CSV; nulls for missing values (GBT-native).
+  Run: `GOOGLE_APPLICATION_CREDENTIALS=sa.json node scripts/assemble-training-set.mjs --format csv`
 
 ### Gaps to fill
 - ⬜ Individual manual fact additions don't log to `audit_logs` (need to add)
