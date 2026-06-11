@@ -55,7 +55,7 @@ const aboutJsonLd = {
   '@id': 'https://l8entspace.com/#org',
   name: 'L8EntSpace',
   url: 'https://l8entspace.com',
-  logo: 'https://l8entspace.com/geo-infographic.png',
+  logo: 'https://l8entspace.com/l8entspace-icon.png',
   description: 'GEO platform engineering structured knowledge for AI-era brand authority across ChatGPT, Gemini, Claude, and Perplexity.',
   foundingDate: '2025',
   sameAs: ['https://linkedin.com/company/l8entspace', 'https://x.com/l8entspace'],

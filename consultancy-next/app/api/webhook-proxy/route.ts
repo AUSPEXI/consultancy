@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/api-auth';
+import { assertSafeEgressUrl } from '@/lib/egress-guard';
 
 // Server-side proxy for outbound webhook calls.
 // Browser fetch() to external URLs fails with CORS — proxying here avoids that entirely.
@@ -13,16 +14,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'webhookUrl required' }, { status: 400 });
     }
 
-    // Only allow http/https
-    const url = new URL(webhookUrl);
-    if (!['http:', 'https:'].includes(url.protocol)) {
-      return NextResponse.json({ error: 'Invalid webhook URL protocol' }, { status: 400 });
+    const egressError = await assertSafeEgressUrl(webhookUrl);
+    if (egressError) {
+      return NextResponse.json({ error: egressError }, { status: 400 });
     }
 
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      redirect: 'error', // block redirect-based SSRF bounce
     });
 
     const responseText = await response.text();

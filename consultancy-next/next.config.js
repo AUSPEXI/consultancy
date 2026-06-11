@@ -14,6 +14,20 @@ const nextConfig = {
           { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
         ],
       },
+      {
+        // Keep the app itself out of search/AI indexes — robots.txt only blocks
+        // crawling, not indexing of already-known URLs.
+        source: '/dashboard/:path*',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+        ],
+      },
+      {
+        source: '/dashboard',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+        ],
+      },
     ];
   },
   async redirects() {

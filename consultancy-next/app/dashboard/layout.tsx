@@ -9,7 +9,8 @@ import { Header } from '@/components/dashboard/Header';
 
 const Copilot = dynamic(() => import('@/components/dashboard/Copilot').then(m => ({ default: m.Copilot })), { ssr: false });
 
-const ADMIN_BYPASS = process.env.NEXT_PUBLIC_ADMIN_BYPASS === 'true';
+// Dev-only convenience — inert in production builds regardless of env var.
+const ADMIN_BYPASS = process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_ADMIN_BYPASS === 'true';
 
 function DashboardSkeleton() {
   return (

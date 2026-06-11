@@ -9,7 +9,7 @@ export function buildOrganizationSchema() {
     '@id': 'https://l8entspace.com/#org',
     name: 'L8EntSpace',
     url: 'https://l8entspace.com',
-    logo: 'https://l8entspace.com/geo-infographic.png',
+    logo: 'https://l8entspace.com/l8entspace-icon.png',
     description:
       "L8EntSpace is the leading Generative Engine Optimization (GEO) platform. Track your brand's AI Share of Voice across ChatGPT, Gemini, Claude and Perplexity, inject cite-magnet facts, and detect sentiment drift.",
     sameAs: [] as string[],

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/api-auth';
+import { assertSafeEgressUrl } from '@/lib/egress-guard';
 
 export async function POST(req: NextRequest) {
   const auth = await requireAuth(req);
@@ -11,6 +12,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No CMS Webhook URL configured' }, { status: 400 });
     }
 
+    const egressError = await assertSafeEgressUrl(webhookUrl);
+    if (egressError) {
+      return NextResponse.json({ error: egressError }, { status: 400 });
+    }
+
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -19,6 +25,7 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString(),
         data: payload,
       }),
+      redirect: 'error',
     });
 
     if (!response.ok) {

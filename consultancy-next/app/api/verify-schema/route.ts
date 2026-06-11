@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/api-auth';
+import { assertSafeEgressUrl } from '@/lib/egress-guard';
 
 export async function POST(req: NextRequest) {
   const auth = await requireAuth(req);
@@ -9,6 +10,11 @@ export async function POST(req: NextRequest) {
     if (!domain) return NextResponse.json({ error: 'domain required' }, { status: 400 });
 
     const url = domain.startsWith('http') ? domain : `https://${domain}`;
+
+    const egressError = await assertSafeEgressUrl(url);
+    if (egressError) {
+      return NextResponse.json({ error: egressError }, { status: 400 });
+    }
 
     let html = '';
     try {

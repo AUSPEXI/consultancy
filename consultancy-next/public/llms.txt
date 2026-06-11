@@ -1,0 +1,22 @@
+# L8EntSpace
+
+> L8EntSpace is a Generative Engine Optimization (GEO) platform. It measures and improves a brand's visibility in AI answers — tracking AI Share of Voice and citation rates across ChatGPT, Gemini, Claude, Perplexity, Grok, DeepSeek, and Google AI Overviews, then recommending and automating the content actions that raise them.
+
+## What L8EntSpace does
+
+- Citation Probe: tests whether AI assistants cite your brand for the queries that matter, including head-to-head comparison against competitors
+- AI Share of Voice (A-SOV): daily measurement of how often your brand appears in AI answers versus competitors
+- Fact Vault: a verified-claims knowledge base with JSON-LD schema generation so AI systems can ground answers in your facts
+- Brand Monitor: detects negative or misleading narratives on high-crawl platforms (Reddit, Quora, Hacker News) before they reach LLM training data
+- Content Scorer: scores draft content for citation probability before publishing
+- GEO Autopilot: scheduled probes, audits, and monitoring with no manual effort
+
+## Key pages
+
+- [Home](https://l8entspace.com/): product overview and pricing
+- [Pricing](https://l8entspace.com/#pricing): Starter, Pro, and Business plans
+
+## Company
+
+- Contact: sales@auspexi.com
+- L8EntSpace is built by Auspexi.

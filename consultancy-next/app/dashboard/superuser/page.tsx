@@ -286,7 +286,8 @@ function CostAuditPanel({ userId }: { userId: string }) {
   );
 }
 
-const ADMIN_BYPASS = process.env.NEXT_PUBLIC_ADMIN_BYPASS === 'true';
+// Dev-only convenience — inert in production builds regardless of env var.
+const ADMIN_BYPASS = process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_ADMIN_BYPASS === 'true';
 const BYPASS_UID = 'l8entspace-admin-bypass';
 
 const SUPERUSER_EMAIL = 'hopiumcalculator@gmail.com';
