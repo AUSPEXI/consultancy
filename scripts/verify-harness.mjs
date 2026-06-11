@@ -85,12 +85,29 @@ function mintCustomToken(sa, uid) {
   return `${input}.${b64url(signature)}`;
 }
 
+// Decode the service-account secret tolerant of however it was stored
+// (raw JSON / base64 / double-base64) and of BOM/zero-width chars from pasting.
+function parseServiceAccount(raw) {
+  const cleaned = String(raw)
+    .replace(/^﻿/, '')
+    .replace(/[​-‍﻿­]/g, '')
+    .trim();
+  const ok = (o) => o && typeof o === 'object' && o.client_email && o.private_key;
+  const attempts = [
+    () => JSON.parse(cleaned),
+    () => JSON.parse(Buffer.from(cleaned, 'base64').toString('utf8')),
+    () => JSON.parse(Buffer.from(Buffer.from(cleaned, 'base64').toString('utf8').trim(), 'base64').toString('utf8')),
+  ];
+  for (const fn of attempts) {
+    try { const o = fn(); if (ok(o)) return o; } catch { /* next */ }
+  }
+  return null;
+}
+
 async function signInWithCustomToken() {
-  let sa;
-  try {
-    sa = JSON.parse(Buffer.from(cfg.serviceAccount, 'base64').toString('utf8'));
-  } catch {
-    throw new Error('FIREBASE_SERVICE_ACCOUNT_BASE64 is not valid base64 JSON');
+  const sa = parseServiceAccount(cfg.serviceAccount);
+  if (!sa) {
+    throw new Error('FIREBASE_SERVICE_ACCOUNT_BASE64 could not be parsed as raw JSON, base64, or double-base64');
   }
   const customToken = mintCustomToken(sa, cfg.uid);
   const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${cfg.apiKey}`;
