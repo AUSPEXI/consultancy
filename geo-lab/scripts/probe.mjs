@@ -147,13 +147,18 @@ const callers = { gemini: callGemini, openai: callOpenAI, perplexity: callPerple
 
 // ── Build probe prompt ───────────────────────────────────────────────────────
 function buildPrompt(query, variantContents) {
-  // Randomise source order to counter position bias
+  // Randomise source order to counter position bias.
+  // Returns both the prompt string AND the shuffle mapping so citations can be
+  // attributed to the correct variant (label A/B in the prompt ≠ variant A/B).
   const shuffled = [...variantContents].sort(() => Math.random() - 0.5);
   const sourceBlock = shuffled
     .map((v, i) => `[SOURCE ${String.fromCharCode(65 + i)}]\n${v.content}`)
     .join('\n\n---\n\n');
 
-  return `You are answering a question using the provided sources. Cite any source you draw on by its label (e.g. "According to Source A…").
+  // shuffleMap[i] = variant id at prompt position i (so SOURCE A = shuffleMap[0])
+  const shuffleMap = shuffled.map(v => v.id);
+
+  const prompt = `You are answering a question using the provided sources. Cite any source you draw on by its label (e.g. "According to Source A…").
 
 Question: ${query}
 
@@ -161,16 +166,21 @@ Sources:
 ${sourceBlock}
 
 Answer concisely (2–4 sentences), citing the sources you used.`;
+
+  return { prompt, shuffleMap };
 }
 
 // ── Check which sources were cited ──────────────────────────────────────────
-function parseCitations(response, variantIds) {
-  // Check each variant by its label position (A, B, C…) and by distinctive phrases
+// shuffleMap[i] is the variant id that was placed at prompt position i (SOURCE A, B, …).
+// We check which prompt labels appear in the response, then translate back to variant ids.
+function parseCitations(response, shuffleMap) {
   const cited = {};
+  // Initialise all variants to false
+  shuffleMap.forEach(id => { cited[id] = false; });
   const lower = response.toLowerCase();
-  variantIds.forEach((id, i) => {
+  shuffleMap.forEach((variantId, i) => {
     const label = `source ${String.fromCharCode(65 + i)}`;
-    cited[id] = lower.includes(label);
+    if (lower.includes(label)) cited[variantId] = true;
   });
   return cited;
 }
@@ -182,7 +192,8 @@ const total = trialsPerVariant * queries.length * platforms.length;
 
 for (let t = 0; t < trialsPerVariant; t++) {
   for (const query of queries) {
-    const prompt = buildPrompt(query, variants);
+    // Build a fresh shuffled prompt per query (each query gets its own random order).
+    const { prompt, shuffleMap } = buildPrompt(query, variants);
     for (const platform of platforms) {
       const caller = callers[platform];
       if (!caller) continue;
@@ -198,7 +209,7 @@ for (let t = 0; t < trialsPerVariant; t++) {
         error = e.message;
       }
 
-      const citations = response ? parseCitations(response, variants.map(v => v.id)) : {};
+      const citations = response ? parseCitations(response, shuffleMap) : {};
 
       results.push({
         trial: t + 1,
@@ -207,6 +218,7 @@ for (let t = 0; t < trialsPerVariant; t++) {
         response: response?.slice(0, 500) ?? null,
         error,
         citations,
+        shuffleMap, // stored so results can be audited / re-scored later
         timestamp: new Date().toISOString(),
       });
 

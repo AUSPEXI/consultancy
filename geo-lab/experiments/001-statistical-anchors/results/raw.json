@@ -37,7 +37,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:07.371Z"
     },
@@ -49,7 +49,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:11.703Z"
     },
@@ -61,7 +61,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:13.145Z"
     },
@@ -82,7 +82,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:15.460Z"
     },
@@ -94,7 +94,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:17.826Z"
     },
@@ -106,7 +106,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:19.629Z"
     },
@@ -127,7 +127,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:21.880Z"
     },
@@ -138,8 +138,8 @@
       "response": "According to **Source A**, NovaCRM **cut deal-closing time by 43%** for sales teams that switched from manual pipeline tracking to its automated workflow engine. According to **Source B**, the control version only says it **“improved deal-closing speed significantly”** without giving a number.  \n\nBeyond the closing-time result, both sources say customers report **shorter sales cycles** and **more consistent forecasting** after adopting the tool.",
       "error": null,
       "citations": {
-        "A": false,
-        "B": false
+        "A": true,
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:25.352Z"
     },
@@ -151,7 +151,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:27.331Z"
     },
@@ -172,7 +172,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:30.127Z"
     },
@@ -184,7 +184,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:32.416Z"
     },
@@ -195,8 +195,8 @@
       "response": "Yes, NovaCRM appears effective at shortening deal-closing time. According to Source B, NovaCRM cut deal-closing time by 43% for sales teams that switched from manual pipeline tracking to its automated workflow engine. Source A corroborates this finding, noting that the platform improved deal-closing speed significantly through automated workflow processes and AI-powered deal scoring that helps teams prioritize opportunities.",
       "error": null,
       "citations": {
-        "A": false,
-        "B": false
+        "A": true,
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:33.919Z"
     },
@@ -217,7 +217,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:36.057Z"
     },
@@ -229,7 +229,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:39.349Z"
     },
@@ -241,7 +241,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:41.177Z"
     },
@@ -262,7 +262,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:43.087Z"
     },
@@ -274,7 +274,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:47.095Z"
     },
@@ -286,7 +286,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:48.930Z"
     },
@@ -307,7 +307,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:51.489Z"
     },
@@ -318,8 +318,8 @@
       "response": "According to **Source A**, NovaCRM **cut deal-closing time by 43%** for sales teams that switched from manual pipeline tracking to its automated workflow engine. The source also says customers report **shorter sales cycles** and **more consistent forecasting** after adopting the tool.  \n\nAccording to **Source B**, the same benefit is described more generally as NovaCRM having **improved deal-closing speed significantly**.",
       "error": null,
       "citations": {
-        "A": false,
-        "B": false
+        "A": true,
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:53.851Z"
     },
@@ -331,7 +331,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:55.147Z"
     },
@@ -352,7 +352,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "timestamp": "2026-06-10T12:16:57.690Z"
     },
@@ -363,8 +363,8 @@
       "response": "Yes—according to Source B, NovaCRM **cut deal-closing time by 43%** for sales teams that switched from manual pipeline tracking, which directly supports the claim that it is effective at shortening closing time. Source A also says it **improved deal-closing speed significantly** and that customers report **shorter sales cycles** after adopting it.",
       "error": null,
       "citations": {
-        "A": false,
-        "B": false
+        "A": true,
+        "B": true
       },
       "timestamp": "2026-06-10T12:17:01.427Z"
     },
@@ -375,8 +375,8 @@
       "response": "Yes, according to the sources, NovaCRM appears effective at shortening deal-closing time. Source A states that \"NovaCRM improved deal-closing speed significantly for sales teams that switched from manual pipeline tracking to its automated workflow engine,\" with customers reporting \"shorter sales cycles\" after adoption. Source B provides a more specific figure, indicating that \"NovaCRM cut deal-closing time 43%\" for teams making this transition. Both sources attribute this improvement to NovaCRM'",
       "error": null,
       "citations": {
-        "A": false,
-        "B": false
+        "A": true,
+        "B": true
       },
       "timestamp": "2026-06-10T12:17:03.177Z"
     }

@@ -1,0 +1,7 @@
+Rescore report — 2026-06-11T07:52:03.520Z
+Rescored 24 responses; 19 citation records corrected.
+
+Variant | Cited | N | Rate
+--------|-------|---|-----
+A       | 5     | 24 | 20.8%
+B       | 24    | 24 | 100.0%
