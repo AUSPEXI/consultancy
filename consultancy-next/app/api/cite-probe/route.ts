@@ -119,12 +119,15 @@ export async function POST(request: Request) {
     const meterBlock = await enforceFreeProbeMeter(userId);
     if (meterBlock) return meterBlock;
 
-    // Load known-false statements: prefer client-supplied, fall back to Firestore
+    // Load known-false statements + tier (single Firestore read).
     let knownFalses: string[] = clientFalses;
-    if (dbAdmin && userId !== 'anonymous' && knownFalses.length === 0) {
+    let userTier = 'Free';
+    if (dbAdmin && userId !== 'anonymous') {
       try {
         const userDoc = await dbAdmin.collection('users').doc(userId).get();
-        knownFalses = userDoc.data()?.negativeStatements || [];
+        const ud = userDoc.data() ?? {};
+        if (knownFalses.length === 0) knownFalses = ud.negativeStatements || [];
+        userTier = ud.tier || 'Free';
       } catch (_) {}
     }
 
@@ -142,8 +145,9 @@ export async function POST(request: Request) {
     // compute per-query winners so the user gets a concrete head-to-head benchmark.
     // Accepts either a list of competitor domains (preferred — populated from the
     // user's saved competitors, zero extra clicks) or the legacy single brand/domain.
-    // Capped to bound cost: each competitor is a full extra probe pass.
-    const MAX_COMPETITORS = 4;
+    // Tier-based cap: Business 50 / everyone else 20.
+    const normalizedTier = normalizeTier(userTier);
+    const MAX_COMPETITORS = normalizedTier === 'Business' ? 50 : 20;
     const competitorTargets: { brand: string; domain: string }[] = [];
     if (Array.isArray(competitorDomains) && competitorDomains.length > 0) {
       for (const raw of competitorDomains) {

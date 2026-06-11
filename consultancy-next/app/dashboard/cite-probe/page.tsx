@@ -146,8 +146,12 @@ export default function CiteProbePage() {
 
   const brand = userData?.brand || '';
   const domain = userData?.domain || '';
-  // Saved competitors (domains) drive the head-to-head by default — no manual entry.
-  const savedCompetitors: string[] = (userData?.competitors || []).filter(Boolean);
+  // Merge primary + watchlist competitors — all feed into head-to-head, up to the
+  // server-side tier cap (20 standard / 50 Business). Primary ones listed first.
+  const savedCompetitors: string[] = [
+    ...(userData?.competitors || []),
+    ...(userData?.watchlistCompetitors || []),
+  ].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
 
   // Load negativeStatements from userData on mount
   useEffect(() => {
@@ -399,9 +403,6 @@ export default function CiteProbePage() {
                   ))}
                 </div>
                 <p className="text-[11px] text-zinc-600">
-                  {savedCompetitors.length > 4
-                    ? `Probing the first 4 of your ${savedCompetitors.length} saved competitors to keep cost bounded. `
-                    : ''}
                   Each competitor adds one extra probe pass across all engines. Edit your list in{' '}
                   <a href="/dashboard/settings" className="text-pink-400 hover:underline">Settings</a>.
                 </p>

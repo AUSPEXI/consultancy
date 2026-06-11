@@ -85,7 +85,9 @@ async function callTool(
   baseUrl: string,
   idToken: string,
 ): Promise<{ cost: number; success: boolean; summary: string }> {
-  const { brand, domain, keywords = [], competitors = [] } = userData;
+  const { brand, domain, keywords = [], competitors: primaryComps = [], watchlistCompetitors: watchlistComps = [] } = userData;
+  // Merge primary + watchlist; route applies the per-tier cap.
+  const competitors = [...new Set([...primaryComps, ...watchlistComps].filter(Boolean))];
   if (!brand || !domain) return { cost: 0, success: false, summary: 'no brand/domain configured' };
 
   const headers = {
@@ -115,7 +117,8 @@ async function callTool(
         method: 'POST',
         headers,
         // Include saved competitors so the automated probe also refreshes the
-        // Overview head-to-head card with zero user interaction.
+        // Overview head-to-head card with zero user interaction. The route
+        // applies the per-tier cap (20 / 50 for Business) server-side.
         body: JSON.stringify({ brand, domain, keywords, competitors }),
       });
       const d = await r.json();
