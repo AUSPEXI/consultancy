@@ -1,5 +1,88 @@
 export const blogPosts = [
   {
+    slug: "build-update-honest-numbers-bing-and-the-knowledge-graph",
+    title: "Build Update: Honest Numbers, Bing, and Teaching AI Who You Are",
+    excerpt: "This week's shipment: confidence intervals that admit when our own numbers are noisy, a Bing indexation check (because ChatGPT search runs on Bing), and an entity audit that checks whether AI's knowledge sources know your brand exists.",
+    date: "June 11, 2026",
+    category: "Building in Public",
+    author: "Gwylym Pryce-Owen",
+    readTime: "6 min read",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## What Shipped This Week
+
+Building in public means showing the unglamorous middle, not just launches. This week was a batch of improvements that came out of asking one hard question about our own product: *which of these numbers would survive a sceptical data scientist looking over my shoulder?*
+
+Some did. Some didn't. Here's what changed as a result — and a couple of genuinely new tools that came out of the same review.
+
+---
+
+## 1. Our Citation Rates Now Admit Their Own Uncertainty
+
+The Citation Probe asks AI engines a set of real questions and reports how often your brand gets mentioned. Simple and useful.
+
+But there's a catch I wasn't being upfront enough about. If you ask seven questions and get cited in three, the dashboard says "43%". That sounds precise. It isn't. With only seven questions, the honest answer is somewhere between roughly 16% and 75% — a huge range. Run the same probe tomorrow with no changes to your website and you might get 29% or 57% purely by chance.
+
+In statistics this range is called a *confidence interval*, and from this week the probe shows it right under the headline number. If the range is wide, you'll see a warning — a nudge that says "run more queries before reading anything into this."
+
+Why ship something that makes our own numbers look less impressive? Because the alternative is customers celebrating (or panicking over) movements that are just noise. A tool that helps you make decisions has to tell you when the data isn't strong enough to decide anything yet.
+
+---
+
+## 2. The Probe Now Asks Questions Real People Asked
+
+Until now, the Citation Probe built its questions from templates — sensible ones, based on your keywords, but still templates.
+
+The thing is, we already had a better source sitting in the product. Our Brand Monitor finds real discussions about your space on Reddit and Quora. Those threads are full of actual questions actual people typed. So now the probe mines those first and uses them, topping up with templates only when needed.
+
+This matters because AI engines get asked messy human questions, not tidy marketing ones. Testing your visibility against the questions people genuinely ask is a much more honest measure than testing against the questions we guessed they might.
+
+---
+
+## 3. New: A Bing Check (Because ChatGPT Search Runs on Bing)
+
+Here's a fact that surprises almost everyone: **when ChatGPT searches the web, it searches Bing.**
+
+Most businesses obsess over Google and never give Bing a second thought. But if your site isn't in Bing's index, ChatGPT-with-search simply cannot find you — no matter how good your content is. It's like having a brilliant shopfront on a street the delivery driver's map doesn't include.
+
+So we built a check for it. The new **GEO Health** page in the dashboard tells you whether your domain is indexed on Bing, and roughly how many pages. If you're missing, it tells you how to fix it — including a one-click push using **IndexNow**, an open protocol that tells Bing directly "here are my pages, come crawl them," instead of waiting weeks to be discovered.
+
+---
+
+## 4. New: An Entity Audit (Does the AI Even Know You Exist?)
+
+AI models don't just read websites. They lean on structured knowledge sources — Wikidata, Wikipedia, Crunchbase — to understand *what things are*. Who founded this company? What does it do? Is it real?
+
+If your brand appears in none of those sources, you're a stranger to the model. It might still quote a page of yours, but it can't confidently say who you are — and uncertain models cite less.
+
+The new entity audit checks all three sources for your brand, then reads your own website's structured data to see whether you've linked yourself to the profiles that do exist (the technical name is a "sameAs" link — literally telling machines "this website and that Wikidata entry are the same thing"). You get a score, the gaps, and a plain list of what to fix first.
+
+---
+
+## 5. Behind the Scenes: We Stopped Throwing Data Away
+
+One quieter change. When the probe asks an AI engine a question, we used to keep only the verdict — cited or not, plus a snippet. The full answer was discarded.
+
+Now we keep the whole response. That means we can go back and re-analyse old probes as our scoring improves, without re-running (and re-paying for) them. It's also the raw material for something we're building towards: a model trained on real evidence about what makes AI engines cite one page over another. More on that when there's something real to show — per our own rules, we don't pitch features that don't exist yet.
+
+---
+
+## Key Takeaways
+
+- Citation rates now ship with **confidence intervals** — the dashboard tells you when a number is too noisy to act on, instead of letting precision-looking figures mislead you.
+- The probe now tests against **real questions mined from Reddit and Quora**, not just templates.
+- **ChatGPT search runs on Bing.** The new GEO Health page checks your Bing indexation and can push your pages directly via IndexNow.
+- The **entity audit** checks whether Wikidata, Wikipedia, and Crunchbase know your brand exists — and whether your site links itself to them properly.
+- We now keep full AI responses from every probe, so analysis can improve retroactively.
+
+---
+
+## See Where You Stand
+
+The fastest way to put this to work: open the dashboard, run the GEO Health check, and find out whether Bing — and the knowledge sources AI relies on — actually know you exist. For a lot of brands, that's the cheapest visibility win available right now.
+    `.trim(),
+  },
+  {
     slug: "latent-space-explorer-see-where-your-brand-lives-in-ai",
     title: "The Latent Space Explorer: See Where Your Brand Actually Lives Inside an AI",
     excerpt: "AI models hold a kind of internal map of meaning, and your brand sits somewhere on it. The Latent Space Explorer turns that invisible map into an interactive 3D picture — so you can see what's near your brand, where the citation gaps are, and what to fix.",
@@ -183,7 +266,9 @@ The best way to start is to run a Citation Probe on your own brand — it shows 
 
 When a product finally clicks, it's tempting to tell the story as if it was obvious from the start. It almost never is.
 
-Building L8EntSpace over the past year involved several wrong turns — ideas I was sure about that turned out to be dead ends. This post is an honest account of them, because the mistakes are more useful than a tidy success story.
+Some context first: I've been building AI systems for four years now, and L8EntSpace itself has been two years in the making. So "year one" here means the first year of turning this project into a real product — not my first year working with AI. That matters, because the mistakes below weren't beginner mistakes. They were the kind you make *despite* experience, when a field is so new that experience only half-applies.
+
+That first year involved several wrong turns — ideas I was sure about that turned out to be dead ends. This post is an honest account of them, because the mistakes are more useful than a tidy success story.
 
 ---
 

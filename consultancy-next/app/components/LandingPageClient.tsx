@@ -210,7 +210,7 @@ export function LandingPageClient() {
     {
       Icon: Building2,
       name: "Entity Intelligence Hub",
-      description: "AI models can only cite what they recognise as a discrete entity. Entity Hub generates your complete Wikidata profile, Knowledge Panel triggers, and sameAs link set — turning your brand from invisible to institutionally real.",
+      description: "AI models can only cite what they recognise as a discrete entity. Entity Hub generates your Wikidata profile, Knowledge Panel triggers, and sameAs link set — and the GEO Health audit live-checks your presence on Wikidata, Wikipedia, and Crunchbase, plus your Bing indexation (the index ChatGPT search runs on) with one-click IndexNow push.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-purple-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-3 lg:row-start-3 lg:row-end-4",
     },
@@ -614,6 +614,7 @@ export function LandingPageClient() {
                 { text: "Fact-Vault (50 facts)", checked: true },
                 { text: "Content Scorer", checked: true },
                 { text: "Citacious AI Strategist", checked: true },
+                { text: "GEO Health: Bing Index Check + Entity Audit", checked: true },
                 { text: "Audit Logs & Activity History", checked: true },
                 { text: "LLM Inference & Embedding Costs Inc.", checked: true },
                 { text: "Competitor Radar & Brand Monitor", checked: false },
@@ -637,6 +638,7 @@ export function LandingPageClient() {
                 { text: "Schema Deploy (live JSON-LD API)", checked: true },
                 { text: "Multi-Agent Crawler", checked: true },
                 { text: "GEO Autopilot Loop", checked: true },
+                { text: "Citability Lab (A/B citation experiments)", checked: true },
                 { text: "768-D Latent Space Map", checked: true },
                 { text: "Autonomous Social Seeding", checked: false },
               ]}

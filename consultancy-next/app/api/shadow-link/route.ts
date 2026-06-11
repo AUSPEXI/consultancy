@@ -25,7 +25,7 @@ interface ShadowLinkDoc {
 }
 
 export async function POST(request: Request) {
-  const authResult = await requireTier(request, 'Pro');
+  const authResult = await requireTier(request, 'Starter');
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
 
 // History of a user's generated shadow links (most recent first).
 export async function GET(request: Request) {
-  const authResult = await requireTier(request, 'Pro');
+  const authResult = await requireTier(request, 'Starter');
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 

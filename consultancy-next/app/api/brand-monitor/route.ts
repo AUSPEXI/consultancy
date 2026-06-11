@@ -80,7 +80,7 @@ async function searchConsensus(brand: string): Promise<ExaThread[]> {
 }
 
 export async function POST(request: Request) {
-  const authResult = await requireTier(request, 'Business');
+  const authResult = await requireTier(request, 'Pro');
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 

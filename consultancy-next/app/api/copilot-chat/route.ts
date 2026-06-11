@@ -217,7 +217,7 @@ ${dataBlock}`;
 
 export async function POST(req: NextRequest) {
   const { requireTier } = await import('@/lib/api-auth');
-  const authResult = await requireTier(req, 'Pro');
+  const authResult = await requireTier(req, 'Starter');
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
