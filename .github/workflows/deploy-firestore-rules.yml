@@ -42,11 +42,9 @@ jobs:
             echo "❌ FIREBASE_SERVICE_ACCOUNT_BASE64 secret is not set"
             exit 1
           fi
-          # Decode with Node's Buffer (lenient base64) so the workflow accepts EXACTLY
-          # what src/lib/firebase-admin.ts accepts. The secret has a stray character
-          # that strict decoders (GNU base64, Python binascii) reject but Node drops —
-          # decoding here the same way the app does guarantees parity.
-          OUT="$RUNNER_TEMP/sa.json" node -e "const fs=require('fs');const b=Buffer.from(process.env.SA_B64,'base64');const o=JSON.parse(b.toString('utf8'));if(!o.client_email||!o.private_key)throw new Error('missing service-account fields');fs.writeFileSync(process.env.OUT,b);console.log('OK service account:',o.client_email)"
+          # Auto-detect the secret's format (raw JSON / base64 / double-base64) and
+          # write the service-account file. See scripts/ci-decode-sa.mjs.
+          OUT="$RUNNER_TEMP/sa.json" node scripts/ci-decode-sa.mjs
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
 
       - name: Deploy Firestore rules
