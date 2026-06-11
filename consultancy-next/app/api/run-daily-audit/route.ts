@@ -149,8 +149,9 @@ Search Context:
 ${combinedContext.substring(0, 30000)}
 
 Return ONLY a JSON object.
-IMPORTANT: Your estimates for 'platforms' SHOULD NEVER BE ZERO. Base them on the citation frequency in the context.
-If the context is sparse, use a baseline of 5-15% for the brand if it's mentioned at all.
+IMPORTANT: Base every estimate strictly on citation frequency in the context above.
+If the brand is NOT mentioned in the context, return 0 for its scores — never invent
+a baseline. Honest zeros are required; this data feeds an ML training pipeline.
 
 {
   "aSov": <integer percentage for ${brand}>,
@@ -209,27 +210,24 @@ If the context is sparse, use a baseline of 5-15% for the brand if it's mentione
       success: true,
       providerUsed: result.providerUsed || 'gemini',
       perplexityFactsSynced: perplexityFacts,
+      // Honest zeros — no invented floors or random jitter. Missing model output
+      // means "no signal", not "make something up".
       metrics: {
-        aSov: parsedData.aSov || 12,
-        err: parsedData.err || 20,
-        compA: parsedData.compA || 40,
-        compB: parsedData.compB || 30,
-        compC: parsedData.compC || 0,
-        compD: parsedData.compD || 0,
-        compGap:
-          parsedData.compGap || (parsedData.aSov || 12) - (parsedData.compA || 40),
-        aiTraffic:
-          parsedData.aiTraffic ||
-          (parsedData.aiCitations || 2) * 15 + Math.floor(Math.random() * 50),
-        platforms: parsedData.platforms || {
-          chatgpt: 15,
-          perplexity: 10,
-          claude: 12,
-          gemini: 20,
-        },
+        aSov: parsedData.aSov ?? 0,
+        err: parsedData.err ?? 0,
+        compA: parsedData.compA ?? 0,
+        compB: parsedData.compB ?? 0,
+        compC: parsedData.compC ?? 0,
+        compD: parsedData.compD ?? 0,
+        compGap: parsedData.compGap ?? ((parsedData.aSov ?? 0) - (parsedData.compA ?? 0)),
+        aiTraffic: parsedData.aiTraffic ?? 0,
+        platforms: parsedData.platforms ?? { chatgpt: 0, perplexity: 0, claude: 0, gemini: 0 },
         radar: parsedData.radar || [],
         sentiment: parsedData.sentiment || [],
         topUrls: parsedData.topUrls || [],
+        // LLM-estimated from search context, not directly measured.
+        synthetic: true,
+        estimationMethod: 'llm-context-estimate',
       },
     });
   } catch (error: any) {

@@ -308,7 +308,13 @@ export default function OverviewPage() {
     : { id: 'placeholder', aSov: 12, platforms: { chatgpt: 20, claude: 15, gemini: 25, perplexity: 10 } };
   const safeLatest = { aSov: latest.aSov ?? 0, platforms: latest.platforms || {} };
   const lp = safeLatest.platforms || {};
-  const safePlatforms = { chatgpt: lp.chatgpt || (safeLatest.aSov > 0 ? safeLatest.aSov + 15 : 20), perplexity: lp.perplexity || (safeLatest.aSov > 0 ? Math.max(2, safeLatest.aSov - 25) : 10), claude: lp.claude || (safeLatest.aSov > 0 ? safeLatest.aSov + 5 : 15), gemini: lp.gemini || (safeLatest.aSov > 0 ? safeLatest.aSov + 25 : 30) };
+  // When real metrics exist, missing per-platform values render as 0 — never
+  // derived/fabricated offsets. Demo placeholders only when there is no data
+  // at all (labeled SIMULATED below).
+  const hasRealMetrics = metrics.length > 0 || realTrend.length > 0;
+  const safePlatforms = hasRealMetrics
+    ? { chatgpt: lp.chatgpt ?? 0, perplexity: lp.perplexity ?? 0, claude: lp.claude ?? 0, gemini: lp.gemini ?? 0 }
+    : { chatgpt: 20, perplexity: 10, claude: 15, gemini: 30 };
   const finalPlatformSync = Math.round((safePlatforms.chatgpt + safePlatforms.claude + safePlatforms.gemini) / 3);
 
   // Citation Probe data — real measurements from actual LLM queries

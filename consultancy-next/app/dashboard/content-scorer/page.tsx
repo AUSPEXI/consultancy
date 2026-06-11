@@ -158,7 +158,8 @@ export default function ContentScorerPage() {
         const payload: Record<string, any> = {
           userId: user.uid,
           statement,
-          entropyScore: Math.floor(Math.random() * 40) + 60,
+          // Real content score from the scorer run — never a random placeholder.
+          entropyScore: result?.overallScore ?? null,
           cliffhangerActive: false,
           category: contentType,
           createdAt: dateStr,
