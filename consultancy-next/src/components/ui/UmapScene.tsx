@@ -328,26 +328,24 @@ export default function UmapScene({
           className="pointer-events-none absolute z-30 transition-opacity duration-75"
           style={{ left: tipPos.x + 14, top: tipPos.y - 10 }}
         >
-          <div
-            className="px-3 py-2.5 bg-black/95 border rounded-lg shadow-2xl min-w-[160px] max-w-[220px]"
-            style={{ borderColor: `${TYPE_COLORS[hoveredPoint.groupType ?? ''] ?? '#6366f1'}55` }}
-          >
-            <p
-              className="text-[9px] font-black uppercase tracking-widest mb-1"
-              style={{ color: TYPE_COLORS[hoveredPoint.groupType ?? ''] ?? '#6366f1' }}
-            >
+          <div className="px-3 py-2.5 bg-zinc-950 border border-zinc-700 rounded-lg shadow-2xl min-w-[170px] max-w-[230px] select-none">
+            <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider mb-1 text-zinc-400">
+              <span
+                className="w-2 h-2 rounded-full shrink-0"
+                style={{ background: TYPE_COLORS[hoveredPoint.groupType ?? ''] ?? '#6366f1' }}
+              />
               {hoveredPoint.groupType ?? 'Unknown'} · {hoveredPoint.citationStatus ?? 'untested'}
             </p>
-            <p className="text-sm font-bold text-white leading-snug border-b border-white/10 pb-1.5 mb-1.5">
+            <p className="text-sm font-semibold text-zinc-100 leading-snug border-b border-zinc-800 pb-1.5 mb-1.5">
               {hoveredPoint.label}
             </p>
-            <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[9px] font-mono">
-              <span className="text-zinc-600">PROXIMITY</span>
-              <span className="text-zinc-300">{Math.round((1 - (hoveredPoint.distance ?? 0.5)) * 100)}%</span>
-              <span className="text-zinc-600">X (Onto)</span>
-              <span className="text-zinc-300">{hoveredPoint.x.toFixed(1)}</span>
-              <span className="text-zinc-600">Y (Epist)</span>
-              <span className="text-zinc-300">{hoveredPoint.y.toFixed(1)}</span>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[10px] font-mono">
+              <span className="text-zinc-500">PROXIMITY</span>
+              <span className="text-zinc-200">{Math.round((1 - (hoveredPoint.distance ?? 0.5)) * 100)}%</span>
+              <span className="text-zinc-500">X (Onto)</span>
+              <span className="text-zinc-200">{hoveredPoint.x.toFixed(1)}</span>
+              <span className="text-zinc-500">Y (Epist)</span>
+              <span className="text-zinc-200">{hoveredPoint.y.toFixed(1)}</span>
             </div>
           </div>
         </div>
