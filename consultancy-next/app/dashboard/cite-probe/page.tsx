@@ -295,7 +295,9 @@ export default function CiteProbePage() {
         </button>
       </div>
 
-      {/* Brand Truth Control */}
+      {/* Brand Truth Control — pre-enter known falsehoods so every probe can
+          detect them. New falsehoods can also be added directly from a result
+          card via the inline "Flag" button. */}
       <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl overflow-hidden">
         <button
           onClick={() => setShowTruthPanel(p => !p)}
@@ -313,38 +315,25 @@ export default function CiteProbePage() {
           <span className="text-xs text-zinc-500">{showTruthPanel ? 'collapse ▲' : 'expand ▼'}</span>
         </button>
         {showTruthPanel && (
-          <div className="px-5 pb-5 space-y-4 border-t border-zinc-800">
-            <p className="text-xs text-zinc-500 pt-4">
-              Enter known-false statements that LLMs say about {brand}. The probe will detect and flag these as <span className="text-amber-400 font-medium">misinformation citations</span> rather than valid citations — and feed corrections into every article the agent pipeline generates.
-            </p>
-
-            {/* Existing statements */}
+          <div className="px-5 pb-5 space-y-3 border-t border-zinc-800 pt-4">
             {negativeStatements.length > 0 && (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {negativeStatements.map((stmt, i) => (
                   <div key={i} className="flex items-start gap-2 bg-amber-500/5 border border-amber-500/20 rounded-lg px-3 py-2">
                     <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
                     <span className="text-xs text-zinc-300 flex-1">{stmt}</span>
-                    <button
-                      onClick={() => removeFalseStatement(stmt)}
-                      className="text-zinc-600 hover:text-zinc-400 transition-colors shrink-0"
-                      title="Remove"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
+                    <button onClick={() => removeFalseStatement(stmt)} className="text-zinc-600 hover:text-zinc-400 transition-colors shrink-0"><X className="w-3.5 h-3.5" /></button>
                   </div>
                 ))}
               </div>
             )}
-
-            {/* Add new */}
             <div className="flex gap-2">
               <input
                 type="text"
                 value={newFalseStatement}
                 onChange={e => setNewFalseStatement(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && addFalseStatement()}
-                placeholder={`e.g. "${brand} is an Australian data analytics firm" or "${brand} was founded in 2010"`}
+                placeholder={`False claim an LLM makes about ${brand}…`}
                 className="flex-1 bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500"
               />
               <button
@@ -355,16 +344,6 @@ export default function CiteProbePage() {
                 {isSavingFalses ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
                 Add
               </button>
-            </div>
-
-            <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-3 space-y-1">
-              <p className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wide">How to counter misinformation in LLMs</p>
-              <p className="text-xs text-zinc-500">
-                1. <strong className="text-zinc-400">Add corrections above</strong> — these flag bad citations in the probe and inject counter-narrative into articles.<br />
-                2. <strong className="text-zinc-400">Run Agent Orchestration</strong> with queries that directly answer the false claim.<br />
-                3. <strong className="text-zinc-400">Publish with JSON-LD schema</strong> including <code className="text-pink-400">correctionsOf</code> or <code className="text-pink-400">description</code> that explicitly states what {brand} is not.<br />
-                4. <strong className="text-zinc-400">Build authoritative backlinks</strong> to the corrective content so LLMs weight it above the false sources.
-              </p>
             </div>
           </div>
         )}
@@ -550,9 +529,9 @@ export default function CiteProbePage() {
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 sm:col-span-2">
               <p className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-3">What to do next</p>
               {(probeData.misinformationCount ?? 0) > 0 && (
-                <div className="mb-3 p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg">
-                  <p className="text-sm text-amber-300 font-semibold mb-1">⚠ Misinformation detected</p>
-                  <p className="text-xs text-zinc-400">LLMs are citing {brand} with incorrect information. Use the <strong className="text-white">Flag as Misinformation</strong> button on the result below to save it, then run Agent Orchestration to publish authoritative content that counters it.</p>
+                <div className="mb-3 flex items-center gap-2 text-xs text-amber-300 bg-amber-500/5 border border-amber-500/20 rounded-lg px-3 py-2">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  {probeData.misinformationCount} false claim{probeData.misinformationCount > 1 ? 's' : ''} detected below — use the inline actions on each flagged result.
                 </div>
               )}
               {probeData.citationRate === 0 && (
@@ -827,45 +806,41 @@ export default function CiteProbePage() {
                           </p>
                         )}
 
-                        {/* Misinformation block */}
+                        {/* Misinformation block — inline actions, no copy-paste required */}
                         {isMisinfo && !dismissedIndices.has(i) && (
-                          <div className="mt-2 space-y-2">
-                            {r.misinformation && (
-                              <div className="bg-amber-500/10 border border-amber-500/30 rounded-md px-3 py-2">
-                                <p className="text-[10px] font-semibold text-amber-400 mb-1 flex items-center gap-1">
-                                  <AlertTriangle className="w-3 h-3" /> MISINFORMATION DETECTED
-                                </p>
-                                <p className="text-xs text-amber-200 italic">"{r.misinformation}"</p>
-                              </div>
-                            )}
-                            <div className="flex items-center gap-2 flex-wrap">
+                          <div className="mt-2 bg-amber-500/8 border border-amber-500/25 rounded-lg overflow-hidden">
+                            <div className="px-3 py-2.5">
+                              <p className="text-xs text-amber-200 leading-relaxed">
+                                <span className="font-semibold text-amber-400">⚠ AI said: </span>
+                                {r.misinformation ?? 'Cited with inaccurate information'}
+                              </p>
+                            </div>
+                            <div className="flex items-center border-t border-amber-500/15">
                               <button
                                 onClick={() => r.misinformation && flagMisinformation(r.misinformation)}
-                                className="flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/30 rounded-md transition-colors"
+                                disabled={negativeStatements.includes(r.misinformation ?? '')}
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-semibold text-amber-400 hover:bg-amber-500/10 disabled:opacity-40 disabled:cursor-default transition-colors border-r border-amber-500/15"
                               >
-                                <Plus className="w-3 h-3" /> Add to Corrections
-                              </button>
-                              <button
-                                onClick={() => dismissMisinformation(i)}
-                                className="flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 bg-zinc-700/50 hover:bg-zinc-700 text-zinc-400 border border-zinc-600/50 rounded-md transition-colors"
-                                title="This information is actually correct — dismiss the alert"
-                              >
-                                ✓ Actually Correct
+                                <Plus className="w-3 h-3" />
+                                {negativeStatements.includes(r.misinformation ?? '') ? 'Saved to corrections' : 'Flag & save correction'}
                               </button>
                               <button
                                 onClick={() => {
-                                  const correctionTopic = `Correct AI misinformation about ${brand}: "${r.query}"`;
-                                  localStorage.setItem('agents_topic', correctionTopic);
+                                  if (r.misinformation) localStorage.setItem('agents_misinfo_snippets', JSON.stringify([r.misinformation]));
+                                  localStorage.setItem('agents_topic', `Counter misinformation about ${brand}: "${r.query}"`);
                                   localStorage.removeItem('agents_last_result');
-                                  // Pass the specific misinformation snippet so the synthesis prompt explicitly counters it
-                                  if (r.misinformation) {
-                                    localStorage.setItem('agents_misinfo_snippets', JSON.stringify([r.misinformation]));
-                                  }
                                   router.push('/dashboard/agents');
                                 }}
-                                className="flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 bg-pink-600/20 hover:bg-pink-600/30 text-pink-400 border border-pink-500/30 rounded-md transition-colors"
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-semibold text-pink-400 hover:bg-pink-500/10 transition-colors border-r border-amber-500/15"
                               >
-                                <BookOpen className="w-3 h-3" /> Generate corrective article
+                                <BookOpen className="w-3 h-3" /> Write counter-article
+                              </button>
+                              <button
+                                onClick={() => dismissMisinformation(i)}
+                                className="px-3 py-2 text-[11px] text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 transition-colors"
+                                title="This is actually correct — dismiss"
+                              >
+                                Not wrong
                               </button>
                             </div>
                           </div>
