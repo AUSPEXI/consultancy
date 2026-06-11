@@ -1,21 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbAdmin } from '@/lib/firebase-admin';
-import { normalizeTier, UserTier } from '@/constants/tiers';
+import { normalizeTier, checkTierAccess, UserTier } from '@/constants/tiers';
 
-// Daily cost caps per tier (USD). Kept conservative — automation should feel
-// like a free background service, not a bill surprise.
+// Daily cost caps per tier (USD). Free is excluded from automation entirely
+// (see toolsForTier), so its cap is 0.
 const DAILY_COST_CAPS: Record<UserTier, number> = {
-  Free:     0.10,
+  Free:     0.00,
   Starter:  0.25,
   Pro:      0.75,
   Business: 2.50,
 };
 
-// Tools run on each cadence. Brand Monitor and Cite-Probe are the only verified
-// tools (Phase 0 ☑) safe to schedule. Daily Audit is wired but only runs once
-// the user's SOV data has moved off the synthetic floor (checked below).
-const WEEKLY_TOOLS   = ['brand-monitor', 'cite-probe'];
-const DAILY_TOOLS    = ['brand-monitor', 'cite-probe', 'daily-audit'];
+// Each automated tool requires the SAME tier as its manual dashboard version —
+// automation never gives away a tool the user couldn't run by hand. This keeps
+// the pricing ladder intact:
+//   cite-probe   → Starter  (matches dashboard/cite-probe)
+//   daily-audit  → Starter  (matches dashboard/overview SOV)
+//   brand-monitor→ Business (matches dashboard/brand-monitor)
+const TOOL_REQUIRED_TIER: Record<string, UserTier> = {
+  'cite-probe':    'Starter',
+  'daily-audit':   'Starter',
+  'brand-monitor': 'Business',
+};
+
+// All schedulable tools (verified in Phase 0). Cadence is decided per tier below.
+const ALL_TOOLS = ['cite-probe', 'daily-audit', 'brand-monitor'];
 
 // Minimum interval between runs per tool (ms) — prevents double-firing on
 // retries or mis-timed cron overlaps.
@@ -25,15 +34,26 @@ const TOOL_COOLDOWN: Record<string, number> = {
   'daily-audit':   20 * 60 * 60 * 1000,        // 20 hours
 };
 
+// Returns the tools a user's tier is ENTITLED to automate. Free → none.
+// Cadence (how often) is enforced separately via TOOL_COOLDOWN: Starter gets a
+// weekly cooldown, Pro/Business get the shorter (daily) cooldown.
 function toolsForTier(tier: UserTier): string[] {
-  // Pro and Business get daily cadence; Free and Starter get weekly.
-  return tier === 'Pro' || tier === 'Business' ? DAILY_TOOLS : WEEKLY_TOOLS;
+  if (tier === 'Free') return []; // Free has no automation — it's a paid accelerator.
+  return ALL_TOOLS.filter(tool => checkTierAccess(tier, TOOL_REQUIRED_TIER[tool]));
 }
 
-function isOnCooldown(lastRun: string | undefined, toolName: string): boolean {
+// Starter runs weekly; Pro/Business run daily. We implement this by lengthening
+// the cooldown for Starter so a daily cron only actually fires weekly for them.
+function cooldownFor(tool: string, tier: UserTier): number {
+  const base = TOOL_COOLDOWN[tool] ?? 0;
+  if (tier === 'Starter') return Math.max(base, 6 * 24 * 60 * 60 * 1000); // weekly floor
+  return base;
+}
+
+function isOnCooldown(lastRun: string | undefined, toolName: string, tier: UserTier): boolean {
   if (!lastRun) return false;
   const elapsed = Date.now() - new Date(lastRun).getTime();
-  return elapsed < (TOOL_COOLDOWN[toolName] ?? 0);
+  return elapsed < cooldownFor(toolName, tier);
 }
 
 // Check whether daily-audit output has moved off the synthetic floor.
@@ -155,6 +175,10 @@ export async function POST(req: NextRequest) {
     // Respect explicit opt-out (default is opted-in).
     if (automation.enabled === false) continue;
 
+    // Tier entitlement: Free has no automation; each tool requires its manual tier.
+    const tools = toolsForTier(tier);
+    if (tools.length === 0) continue; // nothing this tier may automate
+
     totalUsers++;
     const dailyCap = DAILY_COST_CAPS[tier];
     let spentToday = automation.spentToday ?? 0;
@@ -167,7 +191,6 @@ export async function POST(req: NextRequest) {
       spentToday = 0;
     }
 
-    const tools = toolsForTier(tier);
     const lastRuns: Record<string, string> = automation.lastRuns ?? {};
     const runResults: Record<string, { success: boolean; summary: string; ranAt: string }> = {};
     let sessionCost = 0;
@@ -193,7 +216,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Cooldown check.
-      if (isOnCooldown(lastRuns[tool], tool)) {
+      if (isOnCooldown(lastRuns[tool], tool, tier)) {
         log.push({ userId, tool, result: 'on cooldown' });
         totalSkipped++;
         continue;

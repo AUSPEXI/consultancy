@@ -25,7 +25,8 @@ function timeAgo(iso: string): string {
 function nextRunLabel(tier: string): string {
   const t = normalizeTier(tier);
   if (t === 'Pro' || t === 'Business') return 'tomorrow 07:00 UTC';
-  return 'next week';
+  if (t === 'Starter') return 'next week';
+  return 'upgrade to enable';
 }
 
 export function AutomationStatus() {
@@ -43,6 +44,26 @@ export function AutomationStatus() {
   }, [user]);
 
   if (!user) return null;
+
+  // Free tier has no automation — it's a paid accelerator. Show an upsell.
+  if (normalizeTier(tier) === 'Free') {
+    return (
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 min-w-0">
+          <Zap className="w-4 h-4 shrink-0 text-zinc-600" />
+          <span className="text-sm text-zinc-400 truncate">
+            Autopilot runs your monitoring in the background — <span className="text-zinc-200">upgrade to Starter</span> to switch it on.
+          </span>
+        </div>
+        <a
+          href="/#pricing"
+          className="text-[11px] font-bold px-2.5 py-1 rounded bg-pink-500/20 text-pink-400 hover:bg-pink-500/30 transition-colors shrink-0"
+        >
+          Upgrade
+        </a>
+      </div>
+    );
+  }
 
   const enabled = automation.enabled !== false; // default on
   const lastRunAt = automation.lastRunAt;
