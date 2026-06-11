@@ -8,7 +8,7 @@ import { dbAdmin } from '@/lib/firebase-admin';
 // The LLM classifies real Exa results by index — it NEVER emits URLs or titles,
 // so every link surfaced to the user is a genuine, crawlable source.
 const ClassificationSchema = z.object({
-  overallSentiment: z.enum(['Positive', 'Neutral', 'Negative']),
+  overallSentiment: z.enum(['Positive', 'Neutral', 'Negative', 'Mixed']),
   riskScore: z.number().min(0).max(100),
   actionPlan: z.string().min(10),
   threads: z
