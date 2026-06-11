@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Globe, Sparkles, Loader2, Copy, CheckCircle2, ExternalLink, AlertCircle, Building2, BookOpen, Link2, Pencil } from 'lucide-react';
+import { Globe, Sparkles, Loader2, Copy, CheckCircle2, ExternalLink, AlertCircle, BookOpen, Link2, Pencil } from 'lucide-react';
 import { checkTierAccess } from '@/constants/tiers';
 import { logAuditAction } from '@/lib/audit';
 import { authFetch } from '@/lib/auth-fetch';
@@ -42,7 +42,7 @@ export default function EntityHubPage() {
   const [extraContext, setExtraContext] = useState('');
 
   const isAdmin = user?.email === 'hopiumcalculator@gmail.com';
-  const hasAccess = isAdmin || checkTierAccess(tier, 'Pro');
+  const isReadOnly = !(isAdmin || checkTierAccess(tier, 'Pro'));
 
   const copy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
@@ -102,7 +102,7 @@ export default function EntityHubPage() {
   };
 
   const generateProfile = async () => {
-    if (!user || !userData?.brand) return;
+    if (isReadOnly || !user || !userData?.brand) return;
     setIsGenerating(true);
     setError(null);
     try {
@@ -127,19 +127,18 @@ export default function EntityHubPage() {
     }
   };
 
-  if (!hasAccess) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <Building2 className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-          <p className="text-zinc-400 font-medium">Entity Hub requires Pro tier</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6 max-w-4xl">
+      {isReadOnly && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-amber-200">
+            You&apos;re viewing <strong>read-only mode</strong>. Upgrade to <strong>Pro</strong> to use the Entity Hub.
+          </p>
+          <a href="/#pricing" className="text-[11px] font-bold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0">
+            Upgrade
+          </a>
+        </div>
+      )}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Entity Intelligence Hub</h1>
@@ -220,7 +219,8 @@ export default function EntityHubPage() {
             </p>
             <Button
               onClick={generateProfile}
-              disabled={isGenerating || !userData?.brand || !country.trim()}
+              disabled={isReadOnly || isGenerating || !userData?.brand || !country.trim()}
+              title={isReadOnly ? 'Upgrade to Pro to generate entity profiles' : undefined}
               className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white"
             >
               {isGenerating ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Generating...</> : <><Sparkles className="w-4 h-4 mr-2" />{profile ? 'Regenerate' : 'Generate Profile'}</>}

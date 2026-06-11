@@ -11,7 +11,6 @@ import { checkTierAccess } from '@/constants/tiers';
 import { authFetch } from '@/lib/auth-fetch';
 import { db } from '@/firebase';
 import { collection, setDoc, doc, onSnapshot, query, where, orderBy, limit } from 'firebase/firestore';
-import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
 import { useGeoAnalytics } from '@/hooks/useGeoAnalytics';
@@ -174,23 +173,11 @@ export default function OverviewPage() {
       .catch(() => {});
   }, [user?.uid]);
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Starter')) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold font-heading mb-2">Dashboard Overview</h1>
-          <p className="text-zinc-400">Track your Prove-It-Works Metrics.</p>
-        </div>
-        <UpgradePrompt
-          title="Dashboard Locked"
-          description="Upgrade to the Starter tier to unlock the Overview Dashboard, track your AI Share of Voice, and generate Shadow Links."
-          requiredTier="Starter"
-        />
-      </div>
-    );
-  }
+  const canAct = role === 'admin' || checkTierAccess(tier, 'Starter');
+  const isReadOnly = !canAct;
 
   const runAudit = async () => {
+    if (isReadOnly) { setToastMessage({ text: 'Upgrade to Starter to run a live audit.', type: 'info' }); return; }
     if (!user) return;
     setIsAuditing(true);
     setAuditSuccess(false);
@@ -237,6 +224,7 @@ export default function OverviewPage() {
   };
 
   const generateShadowLink = async () => {
+    if (isReadOnly) { setToastMessage({ text: 'Upgrade to Starter to generate Shadow Links.', type: 'info' }); return; }
     if (!shadowUrl.trim()) return;
     setIsGeneratingLink(true);
     try {
@@ -254,6 +242,7 @@ export default function OverviewPage() {
   };
 
   const handleSyncCMS = async () => {
+    if (isReadOnly) { setToastMessage({ text: 'Upgrade to Starter to sync your CMS.', type: 'info' }); return; }
     if (!user || !userData?.cmsWebhookUrl) { setToastMessage({ text: 'Configure an Outbound Webhook in Settings first.', type: 'info' }); return; }
     setIsSyncingCMS(true);
     try {
@@ -356,6 +345,16 @@ export default function OverviewPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-20 relative">
+      {isReadOnly && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-amber-200">
+            You&apos;re viewing your dashboard in <strong>read-only mode</strong>. Upgrade to <strong>Starter</strong> to run live audits, generate Shadow Links, and sync your CMS.
+          </p>
+          <a href="/#pricing" className="text-[11px] font-bold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0">
+            Upgrade
+          </a>
+        </div>
+      )}
       {toastMessage && (
         <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-[10000] px-6 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${toastMessage.type === 'success' ? 'bg-emerald-500/90 border-emerald-400 text-white' : toastMessage.type === 'error' ? 'bg-rose-500/90 border-rose-400 text-white' : 'bg-zinc-900/90 border-zinc-700 text-zinc-300 shadow-black/40'}`}>
           {toastMessage.type === 'success' && <Activity className="w-5 h-5 animate-pulse" />}
@@ -389,7 +388,7 @@ export default function OverviewPage() {
               </span>
             );
           })()}
-          <button onClick={runAudit} disabled={isAuditing} className={`${auditSuccess ? 'bg-emerald-600' : 'bg-pink-600 hover:bg-pink-700'} disabled:opacity-50 text-white px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 shadow-lg ${auditSuccess ? 'shadow-emerald-500/20' : 'shadow-pink-500/20'}`}>
+          <button onClick={runAudit} disabled={isReadOnly || isAuditing} title={isReadOnly ? 'Upgrade to Starter to run a live audit' : undefined} className={`${auditSuccess ? 'bg-emerald-600' : 'bg-pink-600 hover:bg-pink-700'} disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 shadow-lg ${auditSuccess ? 'shadow-emerald-500/20' : 'shadow-pink-500/20'}`}>
             {isAuditing ? <Loader2 className="w-4 h-4 animate-spin" /> : auditSuccess ? <div className="flex items-center gap-2">✓ Updated</div> : <Activity className="w-4 h-4" />}
             {!isAuditing && !auditSuccess && "Refresh SOV Metrics"}
           </button>
@@ -419,7 +418,7 @@ export default function OverviewPage() {
               </div>
             </div>
             <div className="flex items-center gap-4 relative z-10">
-              <button onClick={runAudit} disabled={isAuditing} className="px-8 py-3 bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-rose-500/20 active:scale-95 transition-all flex items-center gap-3">
+              <button onClick={runAudit} disabled={isReadOnly || isAuditing} title={isReadOnly ? 'Upgrade to Starter to run a live audit' : undefined} className="px-8 py-3 bg-rose-500 hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-rose-500/20 active:scale-95 transition-all flex items-center gap-3">
                 {isAuditing ? <Loader2 className="w-4 h-4 animate-spin" /> : <BrainCircuit className="w-4 h-4" />}
                 {isAuditing ? "Auditing..." : "Run Deep Audit"}
               </button>
@@ -618,7 +617,7 @@ export default function OverviewPage() {
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
             <input type="text" value={shadowUrl} onChange={(e) => setShadowUrl(e.target.value)} placeholder="e.g., l8entspace.com/latency-report" className="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50 text-sm" />
-            <button onClick={generateShadowLink} disabled={isGeneratingLink || !shadowUrl.trim()} className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-2">
+            <button onClick={generateShadowLink} disabled={isReadOnly || isGeneratingLink || !shadowUrl.trim()} title={isReadOnly ? 'Upgrade to Starter to generate Shadow Links' : undefined} className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-2">
               {isGeneratingLink ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
               {isGeneratingLink ? 'Generating...' : 'Generate UTM parameters'}
             </button>
@@ -629,7 +628,7 @@ export default function OverviewPage() {
                 <code className="text-emerald-400 text-sm break-all">{generatedShadowLink}</code>
                 <div className="flex gap-2 ml-4">
                   <button onClick={handleCopy} className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-md text-xs font-medium transition-colors whitespace-nowrap">{copied ? 'Copied!' : 'Copy URL'}</button>
-                  <button onClick={handleSyncCMS} disabled={isSyncingCMS} className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-md text-xs font-medium transition-colors whitespace-nowrap flex items-center gap-1.5">
+                  <button onClick={handleSyncCMS} disabled={isReadOnly || isSyncingCMS} title={isReadOnly ? 'Upgrade to Starter to sync your CMS' : undefined} className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-300 rounded-md text-xs font-medium transition-colors whitespace-nowrap flex items-center gap-1.5">
                     {isSyncingCMS ? <Loader2 className="w-3 h-3 animate-spin" /> : <Activity className="w-3 h-3" />}Sync to CMS
                   </button>
                 </div>

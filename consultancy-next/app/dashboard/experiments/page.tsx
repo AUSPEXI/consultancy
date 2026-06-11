@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { authFetch } from '@/lib/auth-fetch';
 import { checkTierAccess } from '@/constants/tiers';
-import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import {
   EXPERIMENT_LEVERS, EXPERIMENT_ENGINES, ENGINE_LABELS, type PlatformKey,
 } from '@/lib/geo-experiment-levers';
@@ -33,7 +32,7 @@ function Bar({ rate, color }: { rate: number; color: string }) {
 export default function ExperimentsPage() {
   const { tier, role } = useAuth();
   const router = useRouter();
-  const hasAccess = role === 'admin' || checkTierAccess(tier, 'Pro');
+  const isReadOnly = role !== 'admin' && !checkTierAccess(tier, 'Pro');
 
   const sendToPipeline = (winner: string) => {
     // The Content Scorer (publish gateway) hydrates from this key on mount.
@@ -56,6 +55,7 @@ export default function ExperimentsPage() {
     setEngines(prev => prev.includes(e) ? prev.filter(x => x !== e) : [...prev, e]);
 
   const run = async () => {
+    if (isReadOnly) return;
     setError(''); setData(null);
     if (content.trim().length < 120) { setError('Paste a draft of at least ~120 characters.'); return; }
     if (!topic.trim()) { setError('Enter the topic your draft targets.'); return; }
@@ -77,22 +77,20 @@ export default function ExperimentsPage() {
     }
   };
 
-  if (!hasAccess) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold font-heading mb-2">Citability Lab</h1>
-          <p className="text-zinc-400">Test which version of your content AI engines prefer to cite.</p>
-        </div>
-        <UpgradePrompt title="Citability Lab Locked" description="Upgrade to Pro to run head-to-head citability experiments on your own content." requiredTier="Pro" />
-      </div>
-    );
-  }
-
   const pooled = data?.result.pooled;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+      {isReadOnly && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-amber-200">
+            You&apos;re viewing <strong>read-only mode</strong>. Upgrade to <strong>Pro</strong> to use this feature.
+          </p>
+          <a href="/#pricing" className="text-[11px] font-bold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0">
+            Upgrade
+          </a>
+        </div>
+      )}
       <div>
         <h1 className="text-3xl font-bold font-heading mb-2 flex items-center gap-3">
           <FlaskConical className="w-7 h-7 text-pink-400" />
@@ -160,7 +158,8 @@ export default function ExperimentsPage() {
               onChange={e => setTrialsPerQuery(Number(e.target.value))} className="w-40 accent-pink-500" />
           </div>
           <button
-            onClick={run} disabled={running}
+            onClick={run} disabled={isReadOnly || running}
+            title={isReadOnly ? 'Upgrade to Pro to use this feature' : undefined}
             className="ml-auto flex items-center gap-2 px-5 py-2.5 bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white rounded-lg text-sm font-semibold transition-colors"
           >
             {running ? <><Loader2 className="w-4 h-4 animate-spin" /> Running…</> : <><FlaskConical className="w-4 h-4" /> Run experiment</>}

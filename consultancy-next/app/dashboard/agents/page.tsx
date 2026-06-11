@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Search, FileText, Code2, PenTool, CheckCircle2, Loader2, Play, ArrowRight, X, BrainCircuit, Layers, Copy, Download, ChevronDown, ChevronUp, AlertTriangle, Zap, SendHorizonal, Star, RefreshCw } from 'lucide-react';
 import { WorkflowProgress, markStepComplete } from '@/components/dashboard/WorkflowProgress';
 import { useAuth } from '@/contexts/AuthContext';
-import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import ReactMarkdown from 'react-markdown';
 import { db } from '@/firebase';
 import { collection, addDoc } from 'firebase/firestore';
@@ -141,17 +140,7 @@ export default function AgentsPage() {
     }
   }, [showResults, finalArticle]);
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Pro')) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold font-heading mb-2">Multi-Agent Orchestration</h1>
-          <p className="text-zinc-400">Deploy specialized AI agents to crawl, extract, structure, and synthesize GEO-optimized content.</p>
-        </div>
-        <UpgradePrompt title="Multi-Agent Orchestration Locked" description="Upgrade to the Pro tier to access the full Prompt-to-Conversion Pipeline and deploy specialized AI agents for automated content generation." requiredTier="Pro" />
-      </div>
-    );
-  }
+  const isReadOnly = role !== 'admin' && !checkTierAccess(tier, 'Pro');
 
   const resetState = () => {
     setCrawlerStatus('idle'); setExtractionStatus('idle'); setSchemaStatus('idle'); setSynthesisStatus('idle');
@@ -443,6 +432,17 @@ export default function AgentsPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <WorkflowProgress currentStep={3} />
+
+      {isReadOnly && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-amber-200">
+            You&apos;re viewing <strong>read-only mode</strong>. Upgrade to <strong>Pro</strong> to use this feature.
+          </p>
+          <a href="/#pricing" className="text-[11px] font-bold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0">
+            Upgrade
+          </a>
+        </div>
+      )}
 
       <div>
         <h1 className="text-2xl font-bold text-white tracking-tight">Agent Orchestration</h1>
@@ -813,7 +813,7 @@ export default function AgentsPage() {
             <h3 className="text-base font-semibold text-white mb-4">Initialize GEO Content Run</h3>
             <div className="flex gap-3">
               <input type="text" value={topic} onChange={e => setTopic(e.target.value)} placeholder="Enter a topic (e.g., 'Serverless Edge Computing Latency')" className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50" disabled={isOrchestrating || isBulkRunning} />
-              <button onClick={handleRunOrchestration} disabled={isOrchestrating || isBulkRunning || !topic.trim()} className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+              <button onClick={handleRunOrchestration} disabled={isOrchestrating || isBulkRunning || !topic.trim() || isReadOnly} title={isReadOnly ? 'Upgrade to Pro to use this feature' : undefined} className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
                 {isOrchestrating ? <><Loader2 className="w-4 h-4 animate-spin" />Running Crew...</> : <><Play className="w-4 h-4 fill-current" />Start Workflow</>}
               </button>
             </div>

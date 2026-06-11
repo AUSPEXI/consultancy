@@ -9,7 +9,6 @@ import { checkTierAccess, normalizeTier } from '@/constants/tiers';
 import { db } from '@/firebase';
 import { collection, addDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { GoogleGenAI, Type } from '@google/genai';
-import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { AmplifyModal } from '@/components/ui/AmplifyModal';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
@@ -80,21 +79,7 @@ export default function FactVault() {
   const currentLimit = getFactLimit();
   const isAtLimit = facts.length >= currentLimit;
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Starter')) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold font-heading mb-2">The Fact-Vault</h1>
-          <p className="text-zinc-400">Store and manage your high-entropy data points designed for AI extraction.</p>
-        </div>
-        <UpgradePrompt
-          title="Fact-Vault Locked"
-          description="Upgrade to the Starter tier to start extracting and storing high-entropy facts that AI models love to cite."
-          requiredTier="Starter"
-        />
-      </div>
-    );
-  }
+  const isReadOnly = role !== 'admin' && !checkTierAccess(tier, 'Starter');
 
   const handleExtractFacts = async () => {
     if (!inputText.trim() || !user) return;
@@ -233,6 +218,16 @@ export default function FactVault() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+      {isReadOnly && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-amber-200">
+            You&apos;re viewing <strong>read-only mode</strong>. Upgrade to <strong>Starter</strong> to use this feature.
+          </p>
+          <a href="/#pricing" className="text-[11px] font-bold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0">
+            Upgrade
+          </a>
+        </div>
+      )}
       {toast && (
         <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-[10000] px-6 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${toast.type === 'success' ? 'bg-emerald-500/90 border-emerald-400 text-white' : toast.type === 'error' ? 'bg-rose-500/90 border-rose-400 text-white' : 'bg-zinc-900/90 border-zinc-700 text-zinc-300'}`}>
           <span className="text-sm font-bold tracking-tight">{toast.text}</span>
@@ -251,26 +246,30 @@ export default function FactVault() {
           </div>
           <button
             onClick={() => {
-              if (isAtLimit) {
-                showToast(`Fact limit reached (${currentLimit} for ${tier} tier). Upgrade to add more.`, 'info');
+              if (isReadOnly || isAtLimit) {
+                showToast(isReadOnly ? 'Upgrade to Starter to use this feature.' : `Fact limit reached (${currentLimit} for ${tier} tier). Upgrade to add more.`, 'info');
               } else {
                 setIsResearchModalOpen(true);
               }
             }}
-            className={`${isAtLimit ? 'bg-zinc-700 cursor-not-allowed' : 'bg-pink-600/20 text-pink-400 hover:bg-pink-600/30'} px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2`}
+            disabled={isReadOnly}
+            title={isReadOnly ? 'Upgrade to Starter to use this feature' : undefined}
+            className={`${isAtLimit || isReadOnly ? 'bg-zinc-700 cursor-not-allowed' : 'bg-pink-600/20 text-pink-400 hover:bg-pink-600/30'} px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2`}
           >
             <Sparkles className="w-4 h-4" />
             Auto-Research
           </button>
           <button
             onClick={() => {
-              if (isAtLimit) {
-                showToast(`Fact limit reached (${currentLimit} for ${tier} tier). Upgrade to add more.`, 'info');
+              if (isReadOnly || isAtLimit) {
+                showToast(isReadOnly ? 'Upgrade to Starter to use this feature.' : `Fact limit reached (${currentLimit} for ${tier} tier). Upgrade to add more.`, 'info');
               } else {
                 setIsModalOpen(true);
               }
             }}
-            className={`${isAtLimit ? 'bg-zinc-700 cursor-not-allowed' : 'bg-pink-600 hover:bg-pink-700 text-white'} px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2`}
+            disabled={isReadOnly}
+            title={isReadOnly ? 'Upgrade to Starter to use this feature' : undefined}
+            className={`${isAtLimit || isReadOnly ? 'bg-zinc-700 cursor-not-allowed' : 'bg-pink-600 hover:bg-pink-700 text-white'} px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2`}
           >
             <Database className="w-4 h-4" />
             Add New Fact
@@ -477,7 +476,8 @@ export default function FactVault() {
               </button>
               <button
                 onClick={handleExtractFacts}
-                disabled={isExtracting || !inputText.trim()}
+                disabled={isExtracting || !inputText.trim() || isReadOnly}
+                title={isReadOnly ? 'Upgrade to Starter to use this feature' : undefined}
                 className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
               >
                 {isExtracting ? (

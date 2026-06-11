@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Code2, Copy, CheckCircle2, RefreshCw, Globe, Zap, Shield, Layers } from 'lucide-react';
+import { Code2, Copy, CheckCircle2, RefreshCw, Globe, Zap, Shield } from 'lucide-react';
 import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
@@ -19,7 +19,7 @@ export default function SchemaDeployPage() {
   useEffect(() => { setOrigin(window.location.origin); }, []);
 
   const isAdmin = user?.email === 'hopiumcalculator@gmail.com';
-  const hasAccess = isAdmin || checkTierAccess(tier, 'Pro');
+  const isReadOnly = !(isAdmin || checkTierAccess(tier, 'Pro'));
 
   const publicSchemaUrl = user ? `${origin}/api/schema-public/${user.uid}` : '';
 
@@ -47,6 +47,7 @@ add_action('wp_head', function() {
 });`;
 
   const copy = (text: string, key: string) => {
+    if (isReadOnly) return;
     navigator.clipboard.writeText(text);
     setCopied(key);
     setTimeout(() => setCopied(null), 2000);
@@ -58,6 +59,7 @@ add_action('wp_head', function() {
   };
 
   const loadPreview = async () => {
+    if (isReadOnly) return;
     if (!user) return;
     setIsLoading(true);
     try {
@@ -67,20 +69,18 @@ add_action('wp_head', function() {
     } catch { } finally { setIsLoading(false); }
   };
 
-  if (!hasAccess) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <Layers className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-          <p className="text-zinc-400 font-medium">Schema Deploy requires Pro tier</p>
-          <p className="text-zinc-600 text-sm mt-1">Upgrade your plan to access dynamic structured data deployment.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6 max-w-4xl">
+      {isReadOnly && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-amber-200">
+            You&apos;re viewing <strong>read-only mode</strong>. Upgrade to <strong>Pro</strong> to use this feature.
+          </p>
+          <a href="/#pricing" className="text-[11px] font-bold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0">
+            Upgrade
+          </a>
+        </div>
+      )}
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Schema Deploy</h1>
         <p className="text-zinc-400">One snippet on your website. Your structured data stays in sync with your Fact-Vault automatically — no developer required after day one.</p>
@@ -110,11 +110,11 @@ add_action('wp_head', function() {
         <CardContent className="space-y-3">
           <div className="flex gap-2">
             <code className="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-pink-300 font-mono overflow-x-auto">{publicSchemaUrl}</code>
-            <Button variant="outline" size="sm" onClick={() => copy(publicSchemaUrl, 'url')}>
+            <Button variant="outline" size="sm" onClick={() => copy(publicSchemaUrl, 'url')} disabled={isReadOnly} title={isReadOnly ? 'Upgrade to Pro to use this feature' : undefined}>
               {copied === 'url' ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
             </Button>
           </div>
-          <Button variant="outline" size="sm" onClick={loadPreview} disabled={isLoading}>
+          <Button variant="outline" size="sm" onClick={loadPreview} disabled={isReadOnly || isLoading} title={isReadOnly ? 'Upgrade to Pro to use this feature' : undefined}>
             {isLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : <Code2 className="w-4 h-4 mr-2" />}
             Preview Current Schema
           </Button>
@@ -137,7 +137,9 @@ add_action('wp_head', function() {
             <pre className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-xs text-zinc-300 overflow-x-auto font-mono leading-relaxed">{snippet}</pre>
             <button
               onClick={() => copy(snippet, 'js')}
-              className="absolute top-3 right-3 p-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
+              disabled={isReadOnly}
+              title={isReadOnly ? 'Upgrade to Pro to use this feature' : undefined}
+              className="absolute top-3 right-3 p-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors disabled:opacity-50"
             >
               {copied === 'js' ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-zinc-400" />}
             </button>
@@ -156,7 +158,9 @@ add_action('wp_head', function() {
             <pre className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-xs text-zinc-300 overflow-x-auto font-mono leading-relaxed">{wordpressSnippet}</pre>
             <button
               onClick={() => copy(wordpressSnippet, 'wp')}
-              className="absolute top-3 right-3 p-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
+              disabled={isReadOnly}
+              title={isReadOnly ? 'Upgrade to Pro to use this feature' : undefined}
+              className="absolute top-3 right-3 p-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors disabled:opacity-50"
             >
               {copied === 'wp' ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-zinc-400" />}
             </button>

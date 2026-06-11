@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { Activity, Loader2, Target, BarChart3, TrendingUp, Cpu, Network, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { checkTierAccess } from '@/constants/tiers';
 import { authFetch } from '@/lib/auth-fetch';
 
@@ -18,24 +17,7 @@ export default function GeoPulsePage() {
 
   const savedKeywords: string[] = userData?.keywords ?? [];
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Pro')) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold font-heading">GEO Pulse Index</h1>
-            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30">Beta Test</span>
-          </div>
-          <p className="text-zinc-400">First-Party Data Analytics. Aggregates Search Intent, Public Data, and User Behavior to extract legal "Share of Voice" (SoV).</p>
-        </div>
-        <UpgradePrompt
-          title="GEO Pulse Index Locked"
-          description="Upgrade to the Pro tier to access real-time brand sentiment benchmarking using our proprietary, compliant data lake."
-          requiredTier="Pro"
-        />
-      </div>
-    );
-  }
+  const isReadOnly = role !== 'admin' && !checkTierAccess(tier, 'Pro');
 
   const probeSteps = [
     "Accessing Proprietary Data Lake...",
@@ -111,6 +93,16 @@ export default function GeoPulsePage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+      {isReadOnly && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-amber-200">
+            You&apos;re viewing <strong>read-only mode</strong>. Upgrade to <strong>Pro</strong> to run GEO Pulse probes.
+          </p>
+          <a href="/#pricing" className="text-[11px] font-bold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0">
+            Upgrade
+          </a>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -137,7 +129,8 @@ export default function GeoPulsePage() {
             />
             <button
               onClick={runProbe}
-              disabled={isProbing || isBatchScanning || !keyword.trim()}
+              disabled={isReadOnly || isProbing || isBatchScanning || !keyword.trim()}
+              title={isReadOnly ? 'Upgrade to Pro to run probes' : undefined}
               className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
             >
               {isProbing ? (
@@ -170,7 +163,8 @@ export default function GeoPulsePage() {
               ))}
               <button
                 onClick={runBatchScan}
-                disabled={isProbing || isBatchScanning}
+                disabled={isReadOnly || isProbing || isBatchScanning}
+                title={isReadOnly ? 'Upgrade to Pro to run probes' : undefined}
                 className="ml-auto px-3 py-1 rounded-full text-xs font-semibold bg-pink-600/20 hover:bg-pink-600/40 text-pink-400 border border-pink-500/30 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
               >
                 {isBatchScanning ? <Loader2 className="w-3 h-3 animate-spin" /> : <ChevronRight className="w-3 h-3" />}
