@@ -1,0 +1,34 @@
+name: Run Scheduled Automations
+
+on:
+  schedule:
+    # 07:00 UTC daily — early enough that digest emails arrive at the start of
+    # the user's working day (UK morning, US late-night).
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+jobs:
+  automate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Trigger automation cron
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ secrets.DASHBOARD_URL }}
+        run: |
+          URL="${SITE_URL:-https://l8entspace.com}/api/cron/run-automations"
+          echo "POST $URL"
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
+            -X POST "$URL" \
+            -H "Content-Type: application/json" \
+            -H "x-cron-secret: $CRON_SECRET")
+          BODY=$(echo "$RESPONSE" | sed -n '1,/HTTP_STATUS/p' | head -n -1)
+          STATUS=$(echo "$RESPONSE" | grep -o 'HTTP_STATUS:[0-9]*' | cut -d: -f2)
+          echo "Status: $STATUS"
+          echo "Response: $BODY"
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ Automation cron failed with status $STATUS"
+            exit 1
+          fi
+          echo "✅ Automations complete"

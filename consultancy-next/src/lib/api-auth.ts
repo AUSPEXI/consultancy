@@ -4,10 +4,12 @@ import { NextResponse } from 'next/server';
 /**
  * Verify the Firebase ID token from the Authorization header.
  * Returns { userId } on success, or a 401 NextResponse on failure.
- * Usage:
- *   const auth = await requireAuth(request);
- *   if (auth instanceof NextResponse) return auth;
- *   const { userId } = auth;
+ *
+ * Internal automation calls (from /api/cron/run-automations) pass a synthetic
+ * token of the form `automation:<userId>` plus the X-Automation-Run header and
+ * a valid X-Cron-Secret. This path skips Firebase token verification because the
+ * cron entrypoint has already authenticated with CRON_SECRET and is acting on
+ * behalf of the user, not impersonating them externally.
  */
 export async function requireAuth(
   request: Request,
@@ -16,6 +18,17 @@ export async function requireAuth(
   const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
   if (!token) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Internal automation path: cron entrypoint passes automation:<userId>.
+  // Only trusted when X-Automation-Run is set AND the CRON_SECRET matches.
+  if (token.startsWith('automation:')) {
+    const cronSecret = request.headers.get('x-cron-secret');
+    const isAutomation = request.headers.get('x-automation-run') === '1';
+    if (isAutomation && cronSecret && cronSecret === process.env.CRON_SECRET) {
+      return { userId: token.slice('automation:'.length) };
+    }
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

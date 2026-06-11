@@ -6,6 +6,7 @@ import { TrendingUp, Users, Target, Link as LinkIcon, Plus, Loader2, Activity, B
 import { SyntheticDataPanel } from '@/components/dashboard/SyntheticDataPanel';
 import { Ga4AttributionPanel } from '@/components/dashboard/Ga4AttributionPanel';
 import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist';
+import { AutomationStatus } from '@/components/dashboard/AutomationStatus';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
 import { authFetch } from '@/lib/auth-fetch';
@@ -372,6 +373,8 @@ export default function OverviewPage() {
           hasProbed={citationHistory.length > 0}
         />
       )}
+
+      <AutomationStatus />
 
       <SemanticAnchorsModal isOpen={isEditingAnchors} onClose={() => setIsEditingAnchors(false)} userId={user?.uid || ''} brand={userData?.brand || ''} domain={userData?.domain || ''} keywords={userData?.keywords || []} initialAnchors={userAnchors} onSaved={refetchGeo} showToast={(text, type) => setToastMessage({ text, type })} />
 

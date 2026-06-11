@@ -104,6 +104,13 @@ export default function SettingsPage() {
   // S7.2: industry benchmark opt-in
   const [industry, setIndustry] = useState('');
   const [benchmarkOptIn, setBenchmarkOptIn] = useState(false);
+  // Automation preferences
+  const [automationEnabled, setAutomationEnabled] = useState(true);
+  const [automationTools, setAutomationTools] = useState<Record<string, boolean>>({
+    'brand-monitor': true,
+    'cite-probe':    true,
+    'daily-audit':   true,
+  });
   const [formData, setFormData] = useState({
     brand: '', domain: '', cmsWebhookUrl: '',
     keyword1: '', keyword2: '', keyword3: '', keyword4: '', keyword5: '',
@@ -121,6 +128,10 @@ export default function SettingsPage() {
       setWatchlistCompetitors(userData.watchlistCompetitors || []);
       setIndustry(userData.industry || '');
       setBenchmarkOptIn(!!userData.benchmarkOptIn);
+      if (userData.automation) {
+        setAutomationEnabled(userData.automation.enabled !== false);
+        setAutomationTools(prev => ({ ...prev, ...(userData.automation.tools ?? {}) }));
+      }
       setFormData({
         brand: userData.brand || '',
         domain: userData.domain || '',
@@ -286,6 +297,8 @@ export default function SettingsPage() {
         keywords,
         industry: industry.trim(),
         benchmarkOptIn,
+        'automation.enabled': automationEnabled,
+        'automation.tools': automationTools,
       }, { merge: true });
       await logAuditAction(user.uid, 'Saved Settings', { brand: formData.brand, domain: formData.domain, keywordCount: keywords.length, competitorCount: competitors.length, watchlistCount: watchlistCompetitors.length });
       setSaveMsg({ type: 'success', text: 'Settings saved. Citacious will pick up your brand data on next message.' });
@@ -657,6 +670,60 @@ export default function SettingsPage() {
           </button>
           <p className="text-xs text-zinc-600">
             We only ever share aggregated averages across at least 3 opted-in brands — never your brand name, your domain, or your individual rate. You can opt out anytime.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Autopilot */}
+      <Card className="bg-zinc-900 border-zinc-800">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            ⚡ Autopilot
+          </CardTitle>
+          <CardDescription className="text-zinc-400">
+            L8EntSpace monitors your brand in the background and alerts you to what changed — no manual clicks required. Toggle individual tools or pause everything here.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Master toggle */}
+          <button
+            onClick={() => setAutomationEnabled(v => !v)}
+            className="flex items-center gap-3 text-left"
+          >
+            <span className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${automationEnabled ? 'bg-pink-500' : 'bg-zinc-700'}`}>
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${automationEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+            </span>
+            <span className="text-sm text-zinc-300">
+              {automationEnabled ? 'Autopilot active — running in the background' : 'Autopilot paused'}
+            </span>
+          </button>
+
+          {/* Per-tool toggles */}
+          {automationEnabled && (
+            <div className="space-y-2 pl-2 border-l-2 border-zinc-800">
+              {[
+                { key: 'brand-monitor', label: 'Brand Monitor', desc: 'Weekly — Reddit/Quora/HN threat scan' },
+                { key: 'cite-probe',    label: 'Citation Tracker', desc: 'Weekly — track how often AI cites you' },
+                { key: 'daily-audit',   label: 'SOV Audit', desc: 'Daily (once your brand has real web presence)' },
+              ].map(({ key, label, desc }) => (
+                <button
+                  key={key}
+                  onClick={() => setAutomationTools(prev => ({ ...prev, [key]: !prev[key] }))}
+                  className="flex items-center gap-3 text-left w-full"
+                >
+                  <span className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${automationTools[key] !== false ? 'bg-pink-500/70' : 'bg-zinc-700'}`}>
+                    <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${automationTools[key] !== false ? 'translate-x-5' : 'translate-x-1'}`} />
+                  </span>
+                  <div>
+                    <p className="text-sm text-zinc-300">{label}</p>
+                    <p className="text-xs text-zinc-600">{desc}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+          <p className="text-xs text-zinc-600">
+            Automation runs on our servers — no browser tab needed. Results appear on your Overview the next time you log in.
           </p>
         </CardContent>
       </Card>
