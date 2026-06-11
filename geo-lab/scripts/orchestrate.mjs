@@ -279,6 +279,11 @@ async function analyzePhase(state, backlog) {
   const exp = state.active_experiment;
   const experimentDir = path.join(ROOT, exp.dir);
 
+  // Canonically re-score all stored responses by content fingerprint BEFORE stats,
+  // so every record (across all daily batches) is scored by one consistent method.
+  log('Canonically re-scoring citations from stored responses...');
+  await runScript(path.join(__dir, 'rescore.mjs'), [experimentDir]);
+
   // Run statistical analysis
   log('Running statistical analysis...');
   await runScript(path.join(__dir, 'analyze.mjs'), [experimentDir]);

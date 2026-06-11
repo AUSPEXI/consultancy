@@ -1,7 +1,8 @@
-Rescore report — 2026-06-11T07:52:03.520Z
-Rescored 24 responses; 19 citation records corrected.
+Canonical rescore — 2026-06-11T07:58:59.789Z
+Scored 24 responses; 10 citation records changed.
+Method: content-fingerprint (auto-derived unique phrases per variant)
 
 Variant | Cited | N | Rate
 --------|-------|---|-----
-A       | 5     | 24 | 20.8%
-B       | 24    | 24 | 100.0%
+A       | 7     | 24 | 29.2%
+B       | 16    | 24 | 66.7%

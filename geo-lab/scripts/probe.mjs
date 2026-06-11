@@ -231,10 +231,36 @@ for (let t = 0; t < trialsPerVariant; t++) {
 console.log('\n\nProbe complete.\n');
 
 // ── Save results ─────────────────────────────────────────────────────────────
+// APPEND to any existing raw.json so trials accumulate across daily runs toward n.
+// (Each daily run is a small batch; the orchestrator caps batches via --trials.)
 const resultsDir = path.join(experimentDir, 'results');
 await fs.mkdir(resultsDir, { recursive: true });
 const outPath = path.join(resultsDir, 'raw.json');
-await fs.writeFile(outPath, JSON.stringify({ meta: { variants: variants.map(v => v.id), queries, platforms, trialsPerVariant, runAt: new Date().toISOString() }, results }, null, 2));
 
-console.log(`Results saved to ${outPath}`);
+let priorResults = [];
+let firstRunAt = null;
+try {
+  const existing = JSON.parse(await fs.readFile(outPath, 'utf8'));
+  if (Array.isArray(existing.results)) priorResults = existing.results;
+  firstRunAt = existing.meta?.firstRunAt ?? existing.meta?.runAt ?? null;
+} catch {
+  // No existing file — this is the first batch.
+}
+
+const combinedResults = [...priorResults, ...results];
+
+await fs.writeFile(outPath, JSON.stringify({
+  meta: {
+    variants: variants.map(v => v.id),
+    queries,
+    platforms,
+    trialsPerVariant,
+    firstRunAt: firstRunAt ?? new Date().toISOString(),
+    runAt: new Date().toISOString(),
+    batches: (priorResults.length > 0 ? 1 : 0) + 1, // informational
+  },
+  results: combinedResults,
+}, null, 2));
+
+console.log(`Appended ${results.length} new trials (total ${combinedResults.length}) → ${outPath}`);
 console.log('Run: node scripts/analyze.mjs ' + experimentDir);

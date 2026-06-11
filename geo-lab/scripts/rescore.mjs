@@ -1,22 +1,24 @@
 #!/usr/bin/env node
 /**
- * GEO Lab — Rescore existing raw.json using content fingerprints.
+ * GEO Lab — Canonical citation scorer.
  *
- * The original probe.mjs had two bugs:
- *   1. parseCitations used fixed-position labels (source a → variantIds[0]) but
- *      buildPrompt shuffled sources, so labels and variants were mismatched.
- *   2. shuffleMap was not stored, making label-based re-scoring impossible.
+ * Scores every stored response in raw.json by CONTENT FINGERPRINT: did the
+ * response reproduce text that is UNIQUE to a given variant? This is the robust
+ * way to attribute citations because:
+ *   - Models mislabel sources (they'll quote variant B's stat but call it
+ *     "Source A"), so label-based detection is noisy.
+ *   - It needs no shuffleMap, so old and new records score identically.
+ *   - It directly measures the experimental question: did the variant's
+ *     distinctive content surface in the answer?
  *
- * This script recovers correct citations by matching CONTENT FINGERPRINTS —
- * unique phrases from each variant — against the stored response text.
- * It also patches any trial that has a stored shuffleMap to use it directly.
+ * Fingerprints are AUTO-DERIVED by diffing the variants — phrases present in one
+ * variant but in no other. No per-experiment hardcoding.
  *
- * Usage:
- *   node scripts/rescore.mjs <experiment-dir>
+ * Run this BEFORE analyze.mjs so all records are scored consistently.
  *
- * Writes:
- *   <experiment-dir>/results/raw.json   (citations field corrected in-place)
- *   <experiment-dir>/results/rescore-report.txt
+ * Usage:  node scripts/rescore.mjs <experiment-dir>
+ * Writes: <experiment-dir>/results/raw.json   (citations corrected in-place)
+ *         <experiment-dir>/results/rescore-report.txt
  */
 
 import fs from 'node:fs/promises';
@@ -31,7 +33,7 @@ if (!experimentDir) {
 const rawPath = path.join(experimentDir, 'results', 'raw.json');
 const raw = JSON.parse(await fs.readFile(rawPath, 'utf8'));
 
-// Load variant files to extract fingerprints
+// ── Load variants ────────────────────────────────────────────────────────────
 const variantsDir = path.join(experimentDir, 'variants');
 const variantFiles = (await fs.readdir(variantsDir)).filter(f => f.endsWith('.md'));
 const variants = await Promise.all(
@@ -41,85 +43,82 @@ const variants = await Promise.all(
   }))
 );
 
-// Build fingerprints: short unique phrases that identify each variant.
-// We use the first meaningful sentence (after stripping markdown) — the key
-// differentiating sentence for this experiment.
-function extractFingerprints(content) {
-  // Strip markdown headers and HTML comments, split into sentences
-  const stripped = content
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/^#+\s.*$/gm, '')
+// ── Auto-derive unique fingerprints by diffing variants ──────────────────────
+// Normalise text, break into overlapping word-windows, keep windows that occur
+// in exactly one variant.
+function normalise(text) {
+  return text
+    .replace(/<!--[\s\S]*?-->/g, ' ')   // strip HTML comments
+    .replace(/^#+\s.*$/gm, ' ')          // strip markdown headers
+    .toLowerCase()
+    .replace(/[^\w\s%]/g, ' ')           // keep word chars, spaces, %
+    .replace(/\s+/g, ' ')
     .trim();
-  const sentences = stripped.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(s => s.length > 20);
-  // Return up to 3 short unique-ish phrases from the first two sentences
-  return sentences.slice(0, 2).flatMap(s => {
-    // Take a 6-10 word window from the sentence as a fingerprint
-    const words = s.split(/\s+/);
-    const snippets = [];
-    for (let i = 0; i <= words.length - 6; i += 3) {
-      snippets.push(words.slice(i, i + 8).join(' ').toLowerCase().replace(/[^\w\s%]/g, ''));
-    }
-    return snippets;
-  });
 }
 
-const fingerprints = variants.map(v => ({
-  id: v.id,
-  phrases: extractFingerprints(v.content),
-}));
-
-console.log('\nFingerprints extracted:');
-for (const { id, phrases } of fingerprints) {
-  console.log(`  ${id}: ${phrases.slice(0, 3).join(' | ')}`);
+function windows(text, size = 5) {
+  const words = text.split(' ');
+  const out = [];
+  for (let i = 0; i <= words.length - size; i++) {
+    out.push(words.slice(i, i + size).join(' '));
+  }
+  return out;
 }
 
-// Unique phrases that ONLY appear in one variant — not shared.
-// For this experiment the only fully unique markers are the opening sentences.
-const uniqueFingerprints = {
-  A: [
-    'improved deal-closing speed significantly',
-    'improved dealclosing speed significantly',
-  ],
-  B: [
-    '43%',
-    'cut deal-closing time',
-    'cut dealclosing time',
-  ],
-};
+const normalised = variants.map(v => ({ id: v.id, norm: normalise(v.content) }));
 
-// Score a response: did it surface content unique to variant A or B?
-// This captures the real experimental question: does the stat appear in the answer?
-function rescoreResponse(response) {
+// Count window occurrences across all variants
+const fingerprints = {};
+for (const { id, norm } of normalised) {
+  const myWindows = new Set(windows(norm));
+  const unique = [];
+  for (const w of myWindows) {
+    // Skip windows that are mostly stopwords / too short on signal
+    const otherHasIt = normalised.some(o => o.id !== id && o.norm.includes(w));
+    if (!otherHasIt) unique.push(w);
+  }
+  fingerprints[id] = unique;
+}
+
+console.log('\nAuto-derived unique fingerprints per variant:');
+for (const v of variants) {
+  console.log(`  ${v.id}: ${fingerprints[v.id].length} unique phrases` +
+    (fingerprints[v.id][0] ? ` (e.g. "${fingerprints[v.id][0]}")` : ' — WARNING: none found'));
+}
+
+// Guard: if any variant has no unique fingerprint, scoring is impossible.
+const variantsWithoutFingerprint = variants.filter(v => fingerprints[v.id].length === 0);
+if (variantsWithoutFingerprint.length > 0) {
+  console.error(`\n❌ No unique fingerprint for: ${variantsWithoutFingerprint.map(v => v.id).join(', ')}`);
+  console.error('   Variants are too similar to score by content. Aborting (citations unchanged).');
+  process.exit(1);
+}
+
+// ── Score each response ──────────────────────────────────────────────────────
+function score(response) {
   const cited = {};
   variants.forEach(v => { cited[v.id] = false; });
   if (!response) return cited;
-  const lower = response.toLowerCase();
-  for (const [id, phrases] of Object.entries(uniqueFingerprints)) {
-    for (const phrase of phrases) {
-      if (lower.includes(phrase)) { cited[id] = true; break; }
-    }
+  const norm = normalise(response);
+  for (const v of variants) {
+    cited[v.id] = fingerprints[v.id].some(fp => norm.includes(fp));
   }
   return cited;
 }
 
-// Rescore all records
-let changed = 0;
-let total = 0;
+let total = 0, changed = 0;
 const results = raw.results.map(r => {
   if (!r.response) return r;
   total++;
-  const newCitations = rescoreResponse(r.response);
-  const oldCitations = r.citations || {};
-  const diff = Object.keys(newCitations).some(k => newCitations[k] !== oldCitations[k]);
-  if (diff) changed++;
+  const newCitations = score(r.response);
+  const old = r.citations || {};
+  if (variants.some(v => newCitations[v.id] !== old[v.id])) changed++;
   return { ...r, citations: newCitations };
 });
 
-// Write corrected raw.json
 await fs.writeFile(rawPath, JSON.stringify({ ...raw, results }, null, 2));
-console.log(`\nRescored ${total} responses, ${changed} citations changed.`);
 
-// Summary tally
+// ── Report ───────────────────────────────────────────────────────────────────
 const tally = {};
 variants.forEach(v => { tally[v.id] = { cited: 0, n: 0 }; });
 for (const r of results) {
@@ -130,16 +129,14 @@ for (const r of results) {
   }
 }
 
-let report = `Rescore report — ${new Date().toISOString()}\n`;
-report += `Rescored ${total} responses; ${changed} citation records corrected.\n\n`;
-report += `Variant | Cited | N | Rate\n`;
-report += `--------|-------|---|-----\n`;
+let report = `Canonical rescore — ${new Date().toISOString()}\n`;
+report += `Scored ${total} responses; ${changed} citation records changed.\n`;
+report += `Method: content-fingerprint (auto-derived unique phrases per variant)\n\n`;
+report += `Variant | Cited | N | Rate\n--------|-------|---|-----\n`;
 for (const v of variants) {
   const { cited, n } = tally[v.id];
-  report += `${v.id.padEnd(7)} | ${cited.toString().padEnd(5)} | ${n} | ${n > 0 ? (100 * cited / n).toFixed(1) + '%' : 'n/a'}\n`;
+  report += `${v.id.padEnd(7)} | ${String(cited).padEnd(5)} | ${n} | ${n ? (100 * cited / n).toFixed(1) + '%' : 'n/a'}\n`;
 }
 
-const reportPath = path.join(experimentDir, 'results', 'rescore-report.txt');
-await fs.writeFile(reportPath, report);
-console.log('\n' + report);
-console.log(`Report saved to ${reportPath}`);
+await fs.writeFile(path.join(experimentDir, 'results', 'rescore-report.txt'), report);
+console.log(`\nScored ${total} responses, ${changed} changed.\n\n${report}`);

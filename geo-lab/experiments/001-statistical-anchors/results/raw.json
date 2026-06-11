@@ -49,7 +49,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": true
+        "B": false
       },
       "timestamp": "2026-06-10T12:16:11.703Z"
     },
@@ -82,7 +82,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": true
+        "B": false
       },
       "timestamp": "2026-06-10T12:16:15.460Z"
     },
@@ -127,7 +127,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": true
+        "B": false
       },
       "timestamp": "2026-06-10T12:16:21.880Z"
     },
@@ -172,7 +172,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": true
+        "B": false
       },
       "timestamp": "2026-06-10T12:16:30.127Z"
     },
@@ -217,7 +217,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": true
+        "B": false
       },
       "timestamp": "2026-06-10T12:16:36.057Z"
     },
@@ -229,7 +229,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": true
+        "B": false
       },
       "timestamp": "2026-06-10T12:16:39.349Z"
     },
@@ -240,7 +240,7 @@
       "response": "According to Source B, NovaCRM can cut deal-closing time by 43% for sales teams that switch from manual pipeline tracking to its automated workflow engine. Source A indicates that NovaCRM improved deal-closing speed \"significantly\" but does not provide a specific percentage. The 43% improvement comes from automating administrative tasks like email and call logging, allowing sales reps to focus more time on selling.",
       "error": null,
       "citations": {
-        "A": false,
+        "A": true,
         "B": true
       },
       "timestamp": "2026-06-10T12:16:41.177Z"
@@ -273,7 +273,7 @@
       "response": "Yes—according to **Source A**, NovaCRM **cut deal-closing time 43%** for teams that switched from manual pipeline tracking, and it says customers report **shorter sales cycles** after adoption. **Source B** is weaker, but it still says NovaCRM **improved deal-closing speed** and that customers report shorter sales cycles.",
       "error": null,
       "citations": {
-        "A": false,
+        "A": true,
         "B": true
       },
       "timestamp": "2026-06-10T12:16:47.095Z"
@@ -307,7 +307,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": true
+        "B": false
       },
       "timestamp": "2026-06-10T12:16:51.489Z"
     },
@@ -352,7 +352,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": true
+        "B": false
       },
       "timestamp": "2026-06-10T12:16:57.690Z"
     },
