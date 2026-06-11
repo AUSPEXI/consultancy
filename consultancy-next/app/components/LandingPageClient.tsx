@@ -129,6 +129,13 @@ export function LandingPageClient() {
   }, []);
 
   const handleCheckout = async (tier: string) => {
+    // Free is the no-charge on-ramp — straight to the dashboard (signup/onboarding),
+    // never Stripe. New accounts already default to the Free tier.
+    if (tier === 'Free') {
+      router.push('/dashboard');
+      return;
+    }
+
     if (!user) {
       router.push('/dashboard');
       return;
@@ -569,6 +576,27 @@ export function LandingPageClient() {
                 <span className={cn("inline-block h-4 w-4 transform rounded-full bg-pink-500 transition-transform", currency === 'GBP' ? "translate-x-6" : "translate-x-1")} />
               </button>
               <span className={cn("text-sm font-medium", currency === 'GBP' ? "text-white" : "text-zinc-500")}>GBP</span>
+            </div>
+          </div>
+
+          {/* Free taster — the on-ramp. No card clutter; a slim banner above the paid grid. */}
+          <div className="max-w-6xl mx-auto mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-900/40 px-6 py-5">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm font-bold text-white uppercase tracking-wider">Free</span>
+                  <span className="text-xs text-zinc-500">— no card required</span>
+                </div>
+                <p className="text-sm text-zinc-400">
+                  See your AI Share-of-Voice dashboard read-only and run <strong className="text-zinc-300">1 live Citation Probe / month</strong>. Upgrade to Starter to unlock unlimited probes and background Autopilot.
+                </p>
+              </div>
+              <button
+                onClick={() => handleCheckout('Free')}
+                className="shrink-0 rounded-lg border border-zinc-700 px-5 py-2.5 text-sm font-semibold text-zinc-200 hover:bg-zinc-800 transition-colors"
+              >
+                Start Free
+              </button>
             </div>
           </div>
 

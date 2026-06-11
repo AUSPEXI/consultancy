@@ -3,6 +3,44 @@ import { dbAdmin } from '@/lib/firebase-admin';
 import { computeAttribution } from '@/lib/attribution';
 import { requireAuth } from '@/lib/api-auth';
 import { buildQueries, runCitationProbe, probeBrandRate } from '@/lib/cite-probe-core';
+import { normalizeTier, checkTierAccess } from '@/constants/tiers';
+
+// Free tier may run a limited number of live probes per calendar month — it's a
+// taster, not the product. Paid tiers (Starter+) are unmetered here.
+const FREE_MONTHLY_PROBE_LIMIT = 1;
+
+/**
+ * Enforces the Free-tier monthly probe meter. Returns a NextResponse (402) if
+ * the user is out of free runs, or null if they may proceed. Increments the
+ * counter as a side effect when allowed.
+ */
+async function enforceFreeProbeMeter(userId: string): Promise<NextResponse | null> {
+  if (!dbAdmin || userId === 'anonymous') return null;
+  const ref = dbAdmin.collection('users').doc(userId);
+  const snap = await ref.get();
+  const data = snap.data() ?? {};
+  // Admins and paid tiers are never metered.
+  if (data.role === 'admin' || checkTierAccess(data.tier, 'Starter')) return null;
+
+  const month = new Date().toISOString().slice(0, 7); // YYYY-MM
+  const usage = data.citeProbeUsage ?? {};
+  const usedThisMonth = usage.month === month ? (usage.count ?? 0) : 0;
+
+  if (usedThisMonth >= FREE_MONTHLY_PROBE_LIMIT) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'free_limit_reached',
+        message: `Free plan includes ${FREE_MONTHLY_PROBE_LIMIT} live Citation Probe per month. Upgrade to Starter for unlimited probes.`,
+        upgradeTo: 'Starter',
+      },
+      { status: 402 },
+    );
+  }
+
+  await ref.update({ citeProbeUsage: { month, count: usedThisMonth + 1 } });
+  return null;
+}
 
 
 // GET /api/cite-probe?userId=...  → persistent citation-rate history for charting.
@@ -60,6 +98,10 @@ export async function POST(request: Request) {
     if (!brand || !domain) {
       return NextResponse.json({ error: 'brand and domain are required' }, { status: 400 });
     }
+
+    // Free-tier monthly meter (paid tiers + admins pass through).
+    const meterBlock = await enforceFreeProbeMeter(userId);
+    if (meterBlock) return meterBlock;
 
     // Load known-false statements: prefer client-supplied, fall back to Firestore
     let knownFalses: string[] = clientFalses;
