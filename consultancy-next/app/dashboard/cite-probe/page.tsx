@@ -50,6 +50,7 @@ interface ProbeRun {
   mode?: 'standard' | 'competitor';
   competitorDomain?: string | null;
   competitor?: CompetitorComparison | null;
+  competitors?: CompetitorComparison[];
 }
 
 interface CompetitorComparison {
@@ -145,6 +146,8 @@ export default function CiteProbePage() {
 
   const brand = userData?.brand || '';
   const domain = userData?.domain || '';
+  // Saved competitors (domains) drive the head-to-head by default — no manual entry.
+  const savedCompetitors: string[] = (userData?.competitors || []).filter(Boolean);
 
   // Load negativeStatements from userData on mount
   useEffect(() => {
@@ -222,6 +225,9 @@ export default function CiteProbePage() {
           brand, domain,
           keywords: userData?.keywords || [],
           negativeStatements,
+          // Head-to-head against ALL saved competitors by default — zero extra
+          // clicks. The legacy single-competitor fields remain as a manual override.
+          competitors: showCompetitorPanel ? savedCompetitors : [],
           competitorBrand: showCompetitorPanel ? competitorBrand.trim() : '',
           competitorDomain: showCompetitorPanel ? competitorDomain.trim() : '',
         }),
@@ -369,9 +375,9 @@ export default function CiteProbePage() {
           <div className="flex items-center gap-3">
             <GitBranch className="w-4 h-4 text-pink-400" />
             <span className="text-sm font-semibold text-white">Competitor Comparison</span>
-            {showCompetitorPanel && competitorBrand && (
+            {showCompetitorPanel && savedCompetitors.length > 0 && (
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-pink-500/10 border border-pink-500/20 text-pink-400 font-bold">
-                vs {competitorBrand}
+                vs {savedCompetitors.length} competitor{savedCompetitors.length > 1 ? 's' : ''}
               </span>
             )}
           </div>
@@ -381,27 +387,32 @@ export default function CiteProbePage() {
         {showCompetitorPanel && (
           <div className="px-5 pb-5 border-t border-zinc-800 pt-4 space-y-3">
             <p className="text-xs text-zinc-500">
-              Run the same {activePlatformsCount > 1 ? 'queries' : 'questions'} for a competitor and see who wins each one. Their citation rate is measured live — no fabricated data.
+              Runs the same {activePlatformsCount > 1 ? 'queries' : 'questions'} for each of your saved competitors and shows who wins each one. Rates are measured live — no fabricated data. This also populates the Head-to-Head card on your Overview.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input
-                type="text"
-                value={competitorBrand}
-                onChange={e => setCompetitorBrand(e.target.value)}
-                placeholder="Competitor brand name"
-                className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/40"
-              />
-              <input
-                type="text"
-                value={competitorDomain}
-                onChange={e => setCompetitorDomain(e.target.value)}
-                placeholder="competitor.com"
-                className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/40"
-              />
-            </div>
-            <p className="text-[11px] text-zinc-600">
-              Both fields required. Enabling this roughly doubles the probe cost (two brands probed across all engines).
-            </p>
+            {savedCompetitors.length > 0 ? (
+              <>
+                <div className="flex flex-wrap gap-2">
+                  {savedCompetitors.slice(0, 4).map(c => (
+                    <span key={c} className="text-xs px-2.5 py-1 rounded-full bg-zinc-950 border border-zinc-800 text-zinc-300">
+                      {c}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-[11px] text-zinc-600">
+                  {savedCompetitors.length > 4
+                    ? `Probing the first 4 of your ${savedCompetitors.length} saved competitors to keep cost bounded. `
+                    : ''}
+                  Each competitor adds one extra probe pass across all engines. Edit your list in{' '}
+                  <a href="/dashboard/settings" className="text-pink-400 hover:underline">Settings</a>.
+                </p>
+              </>
+            ) : (
+              <p className="text-[11px] text-amber-400/80">
+                No saved competitors yet. Add them in{' '}
+                <a href="/dashboard/settings" className="text-pink-400 hover:underline">Settings → Competitors</a>{' '}
+                (or use AI Discover) and they&apos;ll be compared automatically here.
+              </p>
+            )}
           </div>
         )}
       </div>
@@ -438,12 +449,16 @@ export default function CiteProbePage() {
       {probeData && !isRunning && (
         <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
 
-          {/* S7.1: Competitor head-to-head */}
-          {probeData.competitor && (
-            <div className="bg-gradient-to-br from-pink-950/20 to-zinc-900/40 border border-pink-900/40 rounded-xl p-6">
+          {/* S7.1: Competitor head-to-head — one card per saved competitor */}
+          {(probeData.competitors && probeData.competitors.length > 0
+            ? probeData.competitors
+            : probeData.competitor ? [probeData.competitor] : []
+          ).map((cmp, ci) => (
+            <div key={cmp.domain || ci} className="bg-gradient-to-br from-pink-950/20 to-zinc-900/40 border border-pink-900/40 rounded-xl p-6">
               <div className="flex items-center gap-2 mb-4">
                 <GitBranch className="w-5 h-5 text-pink-400" />
-                <h3 className="text-base font-semibold text-white">You vs {probeData.competitor.brand}</h3>
+                <h3 className="text-base font-semibold text-white">You vs {cmp.brand}</h3>
+                <span className="text-[10px] text-zinc-500 ml-1">{cmp.domain}</span>
               </div>
               <div className="grid grid-cols-3 gap-4 mb-5 text-center">
                 <div>
@@ -453,20 +468,20 @@ export default function CiteProbePage() {
                 <div className="flex flex-col items-center justify-center">
                   <p className="text-xs text-zinc-500 mb-1">Head-to-head</p>
                   <p className="text-lg font-bold text-white">
-                    <span className="text-emerald-400">{probeData.competitor.wins}W</span>
+                    <span className="text-emerald-400">{cmp.wins}W</span>
                     {' · '}
-                    <span className="text-rose-400">{probeData.competitor.losses}L</span>
+                    <span className="text-rose-400">{cmp.losses}L</span>
                     {' · '}
-                    <span className="text-zinc-400">{probeData.competitor.ties}T</span>
+                    <span className="text-zinc-400">{cmp.ties}T</span>
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-zinc-500 uppercase tracking-widest mb-1">{probeData.competitor.brand}</p>
-                  <p className={`text-4xl font-black ${rateColor(probeData.competitor.citationRate)}`}>{probeData.competitor.citationRate}%</p>
+                  <p className="text-xs text-zinc-500 uppercase tracking-widest mb-1">{cmp.brand}</p>
+                  <p className={`text-4xl font-black ${rateColor(cmp.citationRate)}`}>{cmp.citationRate}%</p>
                 </div>
               </div>
               <div className="space-y-1.5">
-                {probeData.competitor.comparison.map((c, i) => (
+                {cmp.comparison.map((c, i) => (
                   <div key={i} className="flex items-center gap-3 bg-zinc-950/60 border border-zinc-800 rounded-lg px-3 py-2">
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded shrink-0 ${
                       c.winner === 'you' ? 'bg-emerald-500/10 text-emerald-400' :
@@ -483,7 +498,7 @@ export default function CiteProbePage() {
                 ))}
               </div>
             </div>
-          )}
+          ))}
 
           {/* Overall score + misinformation alert + next steps */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

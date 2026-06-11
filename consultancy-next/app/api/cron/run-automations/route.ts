@@ -114,7 +114,9 @@ async function callTool(
       const r = await fetch(`${baseUrl}/api/cite-probe`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ brand, domain, keywords }),
+        // Include saved competitors so the automated probe also refreshes the
+        // Overview head-to-head card with zero user interaction.
+        body: JSON.stringify({ brand, domain, keywords, competitors }),
       });
       const d = await r.json();
       if (!r.ok) return { cost: 0, success: false, summary: d.error ?? `HTTP ${r.status}` };

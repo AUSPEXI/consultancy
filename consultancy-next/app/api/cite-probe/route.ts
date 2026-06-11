@@ -10,6 +10,21 @@ import { normalizeTier, checkTierAccess } from '@/constants/tiers';
 const FREE_MONTHLY_PROBE_LIMIT = 1;
 
 /**
+ * Derives a human brand label from a bare domain so saved competitor domains
+ * (e.g. "acme-photos.com") render as a readable name ("Acme-photos") in the
+ * head-to-head UI. Strips protocol, www, and TLD.
+ */
+function brandFromDomain(domain: string): string {
+  const host = String(domain)
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .replace(/^www\./i, '')
+    .split('/')[0];
+  const label = host.split('.')[0] || host;
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+/**
  * Enforces the Free-tier monthly probe meter. Returns a NextResponse (402) if
  * the user is out of free runs, or null if they may proceed. Increments the
  * counter as a side effect when allowed.
@@ -93,6 +108,7 @@ export async function POST(request: Request) {
       brand, domain, queries, keywords = [],
       negativeStatements: clientFalses = [],
       competitorBrand = '', competitorDomain = '',
+      competitors: competitorDomains = [],
     } = await request.json();
 
     if (!brand || !domain) {
@@ -122,29 +138,51 @@ export async function POST(request: Request) {
       sentimentBreakdown, avgPositionPct,
     } = await runCitationProbe({ brand, domain, queries: testQueries, knownFalses });
 
-    // S7.1: optional competitor comparison — run the SAME queries for a competitor
-    // and compute per-query winners so the user gets a concrete head-to-head benchmark.
-    let competitor: any = null;
-    const isCompetitorMode = Boolean(competitorBrand && competitorDomain);
-    if (isCompetitorMode) {
-      const compProbe = await probeBrandRate(testQueries, competitorBrand, competitorDomain);
-      const compByQuery = new Map(compProbe.perQuery.map(r => [r.query, r.cited]));
-      const comparison = queryResults.map(r => {
-        const youCited = r.cited;
-        const themCited = compByQuery.get(r.query) ?? false;
-        const winner = youCited === themCited ? 'tie' : youCited ? 'you' : 'them';
-        return { query: r.query, youCited, themCited, winner };
-      });
-      competitor = {
-        brand: competitorBrand,
-        domain: competitorDomain,
-        citationRate: compProbe.rate,
-        wins: comparison.filter(c => c.winner === 'you').length,
-        losses: comparison.filter(c => c.winner === 'them').length,
-        ties: comparison.filter(c => c.winner === 'tie').length,
-        comparison,
-      };
+    // S7.1: competitor comparison — run the SAME queries for each competitor and
+    // compute per-query winners so the user gets a concrete head-to-head benchmark.
+    // Accepts either a list of competitor domains (preferred — populated from the
+    // user's saved competitors, zero extra clicks) or the legacy single brand/domain.
+    // Capped to bound cost: each competitor is a full extra probe pass.
+    const MAX_COMPETITORS = 4;
+    const competitorTargets: { brand: string; domain: string }[] = [];
+    if (Array.isArray(competitorDomains) && competitorDomains.length > 0) {
+      for (const raw of competitorDomains) {
+        const d = String(raw || '').trim();
+        if (d) competitorTargets.push({ brand: brandFromDomain(d), domain: d });
+      }
+    } else if (competitorBrand && competitorDomain) {
+      competitorTargets.push({ brand: competitorBrand, domain: competitorDomain });
     }
+    const cappedTargets = competitorTargets.slice(0, MAX_COMPETITORS);
+
+    const competitors = await Promise.all(
+      cappedTargets.map(async ({ brand: cBrand, domain: cDomain }) => {
+        const compProbe = await probeBrandRate(testQueries, cBrand, cDomain);
+        const compByQuery = new Map(compProbe.perQuery.map(r => [r.query, r.cited]));
+        const comparison = queryResults.map(r => {
+          const youCited = r.cited;
+          const themCited = compByQuery.get(r.query) ?? false;
+          const winner = youCited === themCited ? 'tie' : youCited ? 'you' : 'them';
+          return { query: r.query, youCited, themCited, winner };
+        });
+        return {
+          brand: cBrand,
+          domain: cDomain,
+          citationRate: compProbe.rate,
+          wins: comparison.filter(c => c.winner === 'you').length,
+          losses: comparison.filter(c => c.winner === 'them').length,
+          ties: comparison.filter(c => c.winner === 'tie').length,
+          comparison,
+        };
+      })
+    );
+    const isCompetitorMode = competitors.length > 0;
+    // Primary competitor = the strongest rival (highest citation rate). Kept as a
+    // single `competitor` field for backward compatibility with the Overview
+    // head-to-head card, which reads citation_tests[].competitor.
+    const competitor = isCompetitorMode
+      ? [...competitors].sort((a, b) => b.citationRate - a.citationRate)[0]
+      : null;
 
     // Closed-loop attribution: correlate this run against the previous one and the
     // facts/articles added in between. Computed BEFORE persisting so the "previous
@@ -173,8 +211,9 @@ export async function POST(request: Request) {
       results: queryResults,
       attribution,
       mode: isCompetitorMode ? 'competitor' : 'standard',
-      competitorDomain: isCompetitorMode ? competitorDomain : null,
+      competitorDomain: competitor?.domain ?? null,
       competitor,
+      competitors,
     };
 
     if (dbAdmin && userId !== 'anonymous') {
@@ -186,18 +225,23 @@ export async function POST(request: Request) {
           details: { citationRate, citedCount, misinformationCount, totalQueries: testQueries.length, activePlatforms, platformRates },
           timestamp: new Date().toISOString(),
         }).catch(() => {});
-        const cost =
-          (platformRates.gemini !== null ? (testQueries.length * 500 / 1_000_000) * 0.40 : 0) +
-          (platformRates.chatgpt !== null ? (testQueries.length * 800 / 1_000_000) * 0.60 : 0) +
-          (platformRates.perplexity !== null ? testQueries.length * 0.005 : 0) +
-          (platformRates.claude !== null ? (testQueries.length * 800 / 1_000_000) * 4.00 : 0) +
-          (platformRates.grok != null ? (testQueries.length * 800 / 1_000_000) * 2.00 : 0) +
-          (platformRates.deepseek != null ? (testQueries.length * 800 / 1_000_000) * 0.28 : 0) +
-          (platformRates.google_aio != null ? testQueries.length * 0.013 : 0);
+        // Each competitor is a full extra probe pass over the same queries.
+        const passes = 1 + competitors.length;
+        const perPassQueries = testQueries.length;
+        const cost = passes * (
+          (platformRates.gemini !== null ? (perPassQueries * 500 / 1_000_000) * 0.40 : 0) +
+          (platformRates.chatgpt !== null ? (perPassQueries * 800 / 1_000_000) * 0.60 : 0) +
+          (platformRates.perplexity !== null ? perPassQueries * 0.005 : 0) +
+          (platformRates.claude !== null ? (perPassQueries * 800 / 1_000_000) * 4.00 : 0) +
+          (platformRates.grok != null ? (perPassQueries * 800 / 1_000_000) * 2.00 : 0) +
+          (platformRates.deepseek != null ? (perPassQueries * 800 / 1_000_000) * 0.28 : 0) +
+          (platformRates.google_aio != null ? perPassQueries * 0.013 : 0)
+        );
         dbAdmin.collection('cost_audit').add({
           userId, feature: 'cite-probe-multi', timestamp,
           platforms: Object.keys(platformRates).filter(p => platformRates[p] !== null),
-          queriesRun: testQueries.length,
+          queriesRun: perPassQueries * passes,
+          competitorsProbed: competitors.length,
           estimatedCostUsd: cost,
           totalCostUsd: cost,
         }).catch(() => {});
