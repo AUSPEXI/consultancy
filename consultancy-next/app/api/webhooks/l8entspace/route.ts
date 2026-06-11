@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbAdmin } from '@/lib/firebase-admin';
+import { secretsMatch } from '@/lib/api-auth';
 
 /**
  * Inbound webhook — receives content from the l8entspace.com internal server.
@@ -17,8 +18,7 @@ import { dbAdmin } from '@/lib/firebase-admin';
  */
 export async function POST(req: NextRequest) {
   const secret = req.headers.get('x-l8entspace-secret') || '';
-  const expectedSecret = process.env.L8ENTSPACE_WEBHOOK_SECRET;
-  if (!expectedSecret || secret !== expectedSecret) {
+  if (!secretsMatch(secret, process.env.L8ENTSPACE_WEBHOOK_SECRET)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

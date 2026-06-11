@@ -1,6 +1,16 @@
 import { adminAuth, dbAdmin } from '@/lib/firebase-admin';
 import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'node:crypto';
 import { normalizeTier, checkTierAccess, type UserTier } from '@/constants/tiers';
+
+/** Constant-time string comparison — prevents timing side-channels on secrets. */
+export function secretsMatch(a: string | null | undefined, b: string | null | undefined): boolean {
+  if (!a || !b) return false;
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return timingSafeEqual(bufA, bufB);
+}
 
 /**
  * Verify the Firebase ID token from the Authorization header.
@@ -27,7 +37,7 @@ export async function requireAuth(
   if (token.startsWith('automation:')) {
     const cronSecret = request.headers.get('x-cron-secret');
     const isAutomation = request.headers.get('x-automation-run') === '1';
-    if (isAutomation && cronSecret && cronSecret === process.env.CRON_SECRET) {
+    if (isAutomation && secretsMatch(cronSecret, process.env.CRON_SECRET)) {
       return { userId: token.slice('automation:'.length) };
     }
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
