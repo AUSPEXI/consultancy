@@ -15,7 +15,7 @@ const ClassificationSchema = z.object({
     .array(
       z.object({
         index: z.number().int().min(0),
-        sentiment: z.enum(['Positive', 'Neutral', 'Negative', 'Mixed']),
+        sentiment: z.enum(['Positive', 'Neutral', 'Negative', 'Mixed', 'Irrelevant']),
         summary: z.string().min(1),
       })
     )
@@ -31,14 +31,15 @@ interface ExaThread {
 
 async function searchConsensus(brand: string): Promise<ExaThread[]> {
   const exa = getExa();
-  const queryText = `What are people saying about ${brand}? Discussions, reviews, complaints, and opinions`;
+  // Use exact-phrase match so Exa doesn't semantically drift to similar-sounding brands.
+  const queryText = `"${brand}" site discussions reviews opinions complaints`;
 
   // Primary: restrict to the high-signal consensus platforms that feed LLM training.
   let results: any[] = [];
   try {
     const restricted = await exa.searchAndContents(queryText, {
       type: 'neural',
-      useAutoprompt: true,
+      useAutoprompt: false,
       numResults: 12,
       includeDomains: ['reddit.com', 'quora.com', 'news.ycombinator.com'],
       text: { maxCharacters: 2000 },
@@ -53,15 +54,23 @@ async function searchConsensus(brand: string): Promise<ExaThread[]> {
   if (results.length === 0) {
     const open = await exa.searchAndContents(queryText, {
       type: 'neural',
-      useAutoprompt: true,
+      useAutoprompt: false,
       numResults: 10,
       text: { maxCharacters: 2000 },
     });
     results = open.results || [];
   }
 
+  const brandLower = brand.toLowerCase();
+
   return results
     .filter((r: any) => r.url)
+    // Drop results that don't actually mention the brand — these are semantic
+    // drift false positives (e.g. a similarly-named product pulled in by Exa).
+    .filter((r: any) => {
+      const hay = `${r.title ?? ''} ${r.text ?? ''}`.toLowerCase();
+      return hay.includes(brandLower);
+    })
     .map((r: any) => ({
       url: r.url,
       title: r.title || r.url,
@@ -121,12 +130,14 @@ export async function POST(request: Request) {
 
     const prompt = `You are a brand perception analyst for Generative Engine Optimization (GEO). The brand being monitored is "${brandName}".
 
-Below are REAL search results from Reddit, Quora, and other public forums about this brand. Each is numbered. Analyse the actual text of each result.
+Below are REAL search results from Reddit, Quora, and other public forums. Each is numbered. Analyse the actual text of each result.
 
-For EACH numbered result, classify the sentiment toward "${brandName}" as Positive, Neutral, Negative, or Mixed, and write a one-sentence factual summary of what the thread actually says (grounded ONLY in the excerpt — do not invent details).
+IMPORTANT: Some results may be about a different product or company that happens to share similar words. If a result does NOT actually mention "${brandName}" by name (or a clear abbreviation/alias of it), classify it as "Irrelevant" with summary "Not about ${brandName} — discard."
 
-Then assess the OVERALL picture:
-- overallSentiment: the dominant sentiment across all results (Positive, Neutral, or Negative)
+For results that DO mention "${brandName}", classify the sentiment as Positive, Neutral, Negative, or Mixed, and write a one-sentence factual summary grounded ONLY in the excerpt.
+
+Then assess the OVERALL picture using only the relevant results:
+- overallSentiment: the dominant sentiment across relevant results (Positive, Neutral, or Negative)
 - riskScore (0-100): "context poisoning" risk — how likely negative or misleading narratives about ${brandName} are to be absorbed into future LLM training. More negative/misleading threads on high-authority platforms = higher risk.
 - actionPlan: 2-3 sentences of specific defensive GEO advice based on what you actually found.
 
@@ -138,7 +149,7 @@ Return ONLY valid JSON:
   "overallSentiment": "Positive|Neutral|Negative",
   "riskScore": 0-100,
   "actionPlan": "...",
-  "threads": [ { "index": 0, "sentiment": "Positive|Neutral|Negative|Mixed", "summary": "..." } ]
+  "threads": [ { "index": 0, "sentiment": "Positive|Neutral|Negative|Mixed|Irrelevant", "summary": "..." } ]
 }`;
 
     const result = await llmOrchestrator.executeCall<z.infer<typeof ClassificationSchema>>({
@@ -167,7 +178,7 @@ Return ONLY valid JSON:
     // Map the LLM's per-index classification back onto the REAL Exa threads.
     // The URL and title always come from Exa, never the model.
     const classified = result.data.threads
-      .filter((c) => c.index >= 0 && c.index < threads.length)
+      .filter((c) => c.index >= 0 && c.index < threads.length && c.sentiment !== 'Irrelevant')
       .map((c) => ({
         url: threads[c.index].url,
         title: threads[c.index].title,
