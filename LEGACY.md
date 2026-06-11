@@ -33,19 +33,22 @@ at the repo root is the previous version, superseded but intentionally kept.
 ## Archived (kept for history, NOT deployed)
 
 These are the original **Vite / React + Express** version of the site — the first
-generation of auspexi.com, before the Next.js rebuild. They sit at the repo root
-and are entirely outside the Netlify build scope.
+generation of auspexi.com, before the Next.js rebuild. As of June 2026 they live
+under **`_legacy/`** so the repo root only contains the live app, research lab,
+and shared config. They remain entirely outside the Netlify build scope.
 
 | Path | What it was |
 |------|-------------|
-| `server.ts` (root, ~100KB) | The original monolithic Express server — API routes, the `/api/genai` proxy, voice-key handling. Superseded by `consultancy-next/app/api/*`. |
-| `src/`, `app/`, `lib/` (root) | The original Vite/React source tree. Superseded by `consultancy-next/src` and `consultancy-next/app`. |
-| `index.html`, `vite.config.ts` | Vite entry point + config. The new app is Next.js, not Vite. |
-| `vercel.json` | Old Vercel deploy config. The live app deploys on Netlify. |
-| `netlify/functions/api.ts` (root) | Old Netlify function that wrapped `server.ts`. The live app uses `consultancy-next/netlify/functions/`. |
-| `test-genai*.cjs/js`, `test-admin.ts` | One-off dev/test scripts from the Vite era. |
-| `metadata.json` | Old app metadata. |
-| `auspexi-logo.png` (root) | Pre-rebrand logo. Live logos are SVGs in `consultancy-next/public/` and `consultancy-next/app/`. |
+| `_legacy/server.ts` (~100KB) | The original monolithic Express server — API routes, the `/api/genai` proxy, voice-key handling. Superseded by `consultancy-next/app/api/*`. |
+| `_legacy/src/`, `_legacy/app/`, `_legacy/lib/` | The original Vite/React source tree. Superseded by `consultancy-next/src` and `consultancy-next/app`. |
+| `_legacy/index.html`, `_legacy/vite.config.ts` | Vite entry point + config. The new app is Next.js, not Vite. |
+| `_legacy/next.config.ts`, `_legacy/tsconfig.json` | Root-level configs from the pre-rebuild era. The live configs are inside `consultancy-next/`. |
+| `_legacy/vercel.json` | Old Vercel deploy config. The live app deploys on Netlify. |
+| `_legacy/netlify/functions/api.ts` | Old Netlify function that wrapped `server.ts`. The live app uses `consultancy-next/netlify/functions/`. |
+| `_legacy/public/` | Old static assets (pre-rebrand logo, deck, video). Live assets are in `consultancy-next/public/`. |
+| `_legacy/test-genai*.cjs/js`, `_legacy/test-admin.ts` | One-off dev/test scripts from the Vite era. |
+| `_legacy/metadata.json` | Old app metadata. |
+| `_legacy/auspexi-logo.png` | Pre-rebrand logo. Live logos are SVGs in `consultancy-next/public/` and `consultancy-next/app/`. |
 
 Nothing in `consultancy-next/` imports any of these — verified by grep. They are
 a self-contained snapshot of the previous generation.
