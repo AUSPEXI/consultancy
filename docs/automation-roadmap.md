@@ -35,14 +35,19 @@ results can be sanity-checked by hand.
 
 Status legend: ☐ untested · ◐ partial · ☑ verified · ✗ broken
 
+**Verification method:** `scripts/verify-harness.mjs` calls each route against the
+DEPLOYED site (l8entspace.com) as a real authenticated user (custom-token auth for
+the Google sign-in test account) and runs correctness assertions. Run it via
+**Actions → Verify Dashboard Tools**. Last run: 2026-06-11 — 5 ☑ / 1 ◐ / 0 ✗.
+
 ### Core measurement engines (highest automation priority)
 
 | Tool | Route | "Correct" means | Status | Notes |
 |---|---|---|---|---|
-| Daily Audit (SOV refresh) | `POST /api/run-daily-audit` | Writes a dated `sovMetrics` doc; aSOV % is plausible vs manual check; Perplexity ground-truth lands in `knowledge_graph` | ☐ | Flagship automation candidate |
-| Cite-Probe | `POST /api/cite-probe` | Per-platform citation rates match what each engine actually returns for the query; `citation_tests` doc persists; attribution panel correlates | ☐ | Verify all 7 engines respond |
-| GEO-Pulse | `POST /api/geo-pulse` | Sentiment index + vector distribution are non-fabricated and stable across runs | ☐ | Confirm no Math.random remnants |
-| Simulator | `POST /api/simulate` | Each engine's response is real; brand-mention detection is accurate | ☐ | Cross-check mention flags by hand |
+| Daily Audit (SOV refresh) | `POST /api/run-daily-audit` | Writes a dated `sovMetrics` doc; aSOV % is plausible vs manual check; Perplexity ground-truth lands in `knowledge_graph` | ◐ | Runs correctly, but for the new L8EntSpace brand every platform sits at the 5-15% synthetic floor ("never zero" baseline). NOT evidence-based yet — gated from automation until the brand has real web presence and values move off the floor. |
+| Cite-Probe | `POST /api/cite-probe` | Per-platform citation rates match what each engine actually returns for the query; `citation_tests` doc persists; attribution panel correlates | ☑ | Verified — 7 engines respond, citationRate ~14% |
+| GEO-Pulse | `POST /api/geo-pulse` | Sentiment index + vector distribution are non-fabricated and stable across runs | ☑ | Verified — real model SOV/sentiment returned |
+| Simulator | `POST /api/simulate` | Each engine's response is real; brand-mention detection is accurate | ☑ | Verified — real per-engine responses |
 
 ### Content & knowledge pipeline
 
@@ -71,7 +76,7 @@ Status legend: ☐ untested · ◐ partial · ☑ verified · ✗ broken
 
 | Tool | Route | "Correct" means | Status | Notes |
 |---|---|---|---|---|
-| Brand Monitor | `POST /api/brand-monitor` | Reddit/Quora/HN threats surfaced; Gemini classification accurate | ☐ | |
+| Brand Monitor | `POST /api/brand-monitor` | Reddit/Quora/HN threats surfaced; Gemini classification accurate | ☑ | Verified — fixed schema to accept `Mixed` overallSentiment that Gemini correctly returns |
 | Competitor decay | `POST /api/analyze-competitor` | Decay score reflects real staleness; Trojan-Horse opps valid | ☐ | |
 | Suggest competitors | `POST /api/suggest-competitors` | Exa-discovered competitors are real + relevant | ☐ | |
 | Entity Hub | `POST /api/entity-profile` | Wikidata/QuickStatements export is valid | ☐ | |
@@ -88,6 +93,15 @@ Status legend: ☐ untested · ◐ partial · ☑ verified · ✗ broken
 **Phase 0 exit criteria:** Every row in the "core measurement" and "content
 pipeline" sections is ☑, and the cross-cutting checks pass. Tools that stay ✗/◐
 are explicitly excluded from automation until fixed.
+
+**Phase 0 result (2026-06-11):** The harnessed measurement engines are verified:
+Cite-Probe, GEO-Pulse, Simulator, Brand Monitor, and Cite-Probe history all ☑.
+Daily Audit is ◐ — it runs correctly but returns floor data for the new brand, so
+it stays gated from automation until its output is evidence-based. The content
+pipeline + delivery/integration rows below are not yet harnessed and remain ☐;
+they must be verified before Phase 1 schedules them. **Cleared to automate now:**
+none on floor/unverified data — the verified read-only engines (Cite-Probe,
+GEO-Pulse, Brand Monitor) are the safe first candidates for Phase 1 scheduling.
 
 ---
 
