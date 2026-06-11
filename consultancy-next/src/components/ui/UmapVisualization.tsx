@@ -1,9 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic';
-import { useRef, useMemo, useState, useCallback } from 'react';
 
-// Three.js / R3F can't run on the server — load client-only
 const UmapScene = dynamic(() => import('./UmapScene'), {
   ssr: false,
   loading: () => (
@@ -14,48 +12,29 @@ const UmapScene = dynamic(() => import('./UmapScene'), {
   ),
 });
 
-export function UmapVisualization({ points = [] }: { points?: any[] }) {
+export function UmapVisualization({
+  points = [],
+  userAnchors = [],
+}: {
+  points?: any[];
+  userAnchors?: { label: string; color: string; baseType: string }[];
+}) {
   return (
     <div className="w-full h-full bg-transparent relative group">
-      <UmapScene points={points} />
+      <UmapScene points={points} userAnchors={userAnchors} />
 
-      {/* Overlay — top-left info */}
-      <div className="absolute top-4 left-4 z-10 pointer-events-none">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 px-3 py-1 bg-black/40 backdrop-blur-md rounded-full border border-white/10 w-fit">
-            <div className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
-            <span className="text-[9px] font-black text-white tracking-[0.2em] uppercase">768-D Latent Explorer</span>
-          </div>
-          <p className="text-[8px] text-zinc-500 font-mono ml-2">INTERACTIVE_NEURAL_RECONSTRUCTION_MODE</p>
-
-          <div className="mt-4 flex flex-col gap-1.5 bg-black/30 backdrop-blur-sm border border-white/5 p-2 rounded-lg max-w-[150px]">
-            <p className="text-[8px] text-zinc-400 font-bold uppercase mb-0.5 border-b border-white/10 pb-1">Citation Status</p>
-            <div className="flex items-center gap-1.5 text-[7px] text-zinc-400">
-              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#eab308' }} />
-              <span>Cited territory</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-[7px] text-zinc-400">
-              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#f43f5e' }} />
-              <span>Citation gap</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-[7px] text-zinc-400">
-              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#10b981' }} />
-              <span>Untested (positive)</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-[7px] text-zinc-400">
-              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#818cf8' }} />
-              <span>Untested (neutral)</span>
-            </div>
-          </div>
+      {/* Top-left status pill */}
+      <div className="absolute top-4 left-4 z-10 pointer-events-none flex flex-col gap-1">
+        <div className="flex items-center gap-2 px-3 py-1 bg-black/50 backdrop-blur-md rounded-full border border-white/10 w-fit">
+          <div className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse" />
+          <span className="text-[9px] font-black text-white tracking-[0.2em] uppercase">TEO Latent Explorer</span>
         </div>
+        <p className="text-[8px] text-zinc-600 font-mono ml-2">Ontological · Epistemological · Teleological</p>
       </div>
 
-      {/* Overlay — bottom-right nav hint */}
-      <div className="absolute bottom-4 right-4 z-10 opacity-40 group-hover:opacity-100 transition-opacity pointer-events-none">
-        <div className="text-right">
-          <p className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">Navigation</p>
-          <p className="text-[8px] text-zinc-500 font-mono">DRAG TO ROTATE • SCROLL TO ZOOM</p>
-        </div>
+      {/* Bottom-right nav hint */}
+      <div className="absolute bottom-4 right-4 z-10 opacity-30 group-hover:opacity-80 transition-opacity pointer-events-none text-right">
+        <p className="text-[8px] text-zinc-400 font-mono uppercase tracking-wider">Drag · Scroll to zoom</p>
       </div>
     </div>
   );

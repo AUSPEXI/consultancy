@@ -52,7 +52,11 @@ export async function GET(req: NextRequest) {
     const timeframe = searchParams.get('timeframe') || 'current';
 
     let anchorLabels: { label: string; color: string; baseType: string; axisAlignment?: number }[] = DEFAULT_ANCHORS;
-    let vaultFacts: { text: string; id: string; embedding?: number[]; collection: 'facts' | 'knowledge_graph' }[] = [];
+    let vaultFacts: { text: string; id: string; embedding?: number[]; collection: 'facts' | 'knowledge_graph'; groupType?: string }[] = [];
+    // Synthetic nodes from settings (keywords, competitors, tracking queries).
+    // These share the same latent space as vault facts so the visualisation and
+    // the ML training set both see the full signal picture.
+    let extraNodes: { text: string; groupType: string; citationStatus: CitationStatus }[] = [];
 
     if (userId && dbAdmin) {
       try {
@@ -62,6 +66,21 @@ export async function GET(req: NextRequest) {
           if (data?.latentAnchors?.length > 0) {
             anchorLabels = data.latentAnchors;
           }
+          // Keywords → Signal Point nodes
+          const keywords: string[] = data?.keywords ?? [];
+          keywords.slice(0, 15).forEach(kw => {
+            if (kw.trim()) extraNodes.push({ text: kw.trim(), groupType: 'Signal Point', citationStatus: 'untested' });
+          });
+          // Competitors → Risk Vector nodes
+          const competitors: string[] = [...(data?.competitors ?? []), ...(data?.watchlistCompetitors ?? [])];
+          competitors.slice(0, 8).forEach(c => {
+            if (c.trim()) extraNodes.push({ text: `competitor: ${c.trim()}`, groupType: 'Risk Vector', citationStatus: 'untested' });
+          });
+          // Tracking queries from last cite-probe → probe query nodes with real citation status
+          const trackingQueries: string[] = data?.trackingQueries ?? [];
+          trackingQueries.slice(0, 10).forEach(q => {
+            if (q.trim()) extraNodes.push({ text: q.trim(), groupType: 'query', citationStatus: 'untested' });
+          });
         }
 
         // Primary source: facts collection (field: statement)
@@ -75,6 +94,7 @@ export async function GET(req: NextRequest) {
           text: (d.data().statement as string) || '',
           embedding: (d.data().embedding as number[] | undefined),
           collection: 'facts' as const,
+          groupType: 'Systemic Anchor',
         })).filter(f => f.text.length > 10);
 
         // Fallback: knowledge_graph (Perplexity-synced facts)
@@ -89,7 +109,29 @@ export async function GET(req: NextRequest) {
             text: (d.data().fact as string) || '',
             embedding: (d.data().embedding as number[] | undefined),
             collection: 'knowledge_graph' as const,
+            groupType: 'Systemic Anchor',
           })).filter(f => f.text.length > 10);
+        }
+
+        // Enrich tracking query nodes with citation status from the last probe
+        if (extraNodes.some(n => n.groupType === 'query')) {
+          const probeSnap = await dbAdmin
+            .collection('citation_tests')
+            .where('userId', '==', userId)
+            .orderBy('timestamp', 'desc')
+            .limit(1)
+            .get()
+            .catch(() => null);
+          if (probeSnap && !probeSnap.empty) {
+            const probeResults: { query: string; cited: boolean }[] = probeSnap.docs[0].data().results ?? [];
+            const citedQueries = new Set(probeResults.filter(r => r.cited).map(r => r.query.toLowerCase()));
+            const uncitedQueries = new Set(probeResults.filter(r => !r.cited).map(r => r.query.toLowerCase()));
+            extraNodes = extraNodes.map(n =>
+              n.groupType === 'query'
+                ? { ...n, citationStatus: citedQueries.has(n.text.toLowerCase()) ? 'cited' : uncitedQueries.has(n.text.toLowerCase()) ? 'uncited' : 'untested' }
+                : n
+            );
+          }
         }
       } catch (err) {
         console.error('Firestore fetch error in analytics/map:', err);
@@ -212,6 +254,36 @@ export async function GET(req: NextRequest) {
           sentiment: anchor.baseType === 'Risk Vector' ? 'negative' : (Math.random() > 0.3 ? 'positive' : 'negative'),
           real: false,
         }));
+      });
+    }
+
+    // Append extra nodes (keywords / competitors / probe queries) — embed them
+    // in the same space so they land in meaningful positions next to related facts.
+    if (extraNodes.length > 0) {
+      const extraTexts = extraNodes.map(n => n.text);
+      const extraEmbs  = await embeddingService.generateEmbeddings(extraTexts);
+      newlyEmbeddedCount += extraTexts.length;
+      const offset = points.length;
+      extraNodes.forEach((n, i) => {
+        const emb = extraEmbs[i];
+        const x = clamp(dotProduct(emb, axisEmbeddings[0]) * 80, -90, 90);
+        const y = clamp(dotProduct(emb, axisEmbeddings[1]) * 80, -90, 90);
+        const z = clamp(dotProduct(emb, axisEmbeddings[2]) * 80, -90, 90);
+        points.push({
+          id: offset + i,
+          x: parseFloat(x.toFixed(2)),
+          y: parseFloat(y.toFixed(2)),
+          z: parseFloat(z.toFixed(2)),
+          size: 4,
+          type: n.groupType,
+          groupType: n.groupType,
+          source: 'settings',
+          label: n.text.substring(0, 60),
+          distance: parseFloat((Math.sqrt(x * x + y * y + z * z) / (90 * Math.sqrt(3))).toFixed(4)),
+          citationStatus: n.citationStatus,
+          sentiment: n.citationStatus === 'cited' ? 'positive' : 'negative',
+          real: true,
+        });
       });
     }
 

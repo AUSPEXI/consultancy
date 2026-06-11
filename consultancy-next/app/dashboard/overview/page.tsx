@@ -21,22 +21,21 @@ import { SemanticAnchorsModal } from '@/components/dashboard/SemanticAnchorsModa
 import { NeuralTraceConfig } from '@/components/dashboard/NeuralTraceConfig';
 
 const NeuralLegend = () => (
-  <div className="flex flex-wrap gap-4 mt-4 px-4 py-3 bg-zinc-900/30 border border-zinc-800/50 rounded-xl">
-    <div className="flex items-center gap-2">
-      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-      <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">Positive Anchor</span>
-    </div>
-    <div className="flex items-center gap-2">
-      <div className="w-2.5 h-2.5 rounded-full bg-pink-500 shadow-[0_0_8px_rgba(255,20,147,0.4)]" />
-      <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">Risk / Neg. Citation</span>
-    </div>
-    <div className="flex items-center gap-2">
-      <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
-      <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">Neutral Signal</span>
-    </div>
-    <div className="ml-auto flex items-center gap-2 text-zinc-500">
-      <BrainCircuit className="w-3 h-3" />
-      <span className="text-[9px] font-mono leading-none">DISTANCE = SEMANTIC DISSIMILARITY</span>
+  <div className="flex flex-wrap gap-x-5 gap-y-2 mt-4 px-4 py-3 bg-zinc-900/30 border border-zinc-800/50 rounded-xl">
+    {[
+      { color: '#f43f5e', label: 'Systemic Anchor' },
+      { color: '#22d3ee', label: 'Signal Point / Keyword' },
+      { color: '#a78bfa', label: 'Emergent Trend' },
+      { color: '#fb923c', label: 'Risk Vector / Competitor' },
+      { color: '#eab308', label: 'Probe Query' },
+    ].map(({ color, label }) => (
+      <div key={label} className="flex items-center gap-2">
+        <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color, boxShadow: `0 0 7px ${color}60` }} />
+        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{label}</span>
+      </div>
+    ))}
+    <div className="flex items-center gap-3 ml-auto text-zinc-600 text-[9px] font-mono">
+      <span>FULL = cited</span><span>MUTED = untested</span><span>RED-SHIFT = gap</span>
     </div>
   </div>
 );
@@ -616,7 +615,7 @@ export default function OverviewPage() {
             </div>
           </div>
           <div className="h-[500px] w-full relative z-10 border border-zinc-800 rounded-3xl bg-zinc-950/20 overflow-hidden">
-            <UmapVisualization points={mapPoints} />
+            <UmapVisualization points={mapPoints} userAnchors={userAnchors} />
           </div>
           <NeuralLegend />
         </div>
