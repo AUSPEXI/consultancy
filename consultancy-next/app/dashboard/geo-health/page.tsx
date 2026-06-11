@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Shield, Globe, ExternalLink, CheckCircle2, XCircle, AlertCircle, Loader2, Send, Info } from 'lucide-react';
+import { Search, Shield, Globe, ExternalLink, CheckCircle2, XCircle, AlertCircle, Loader2, Send } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { authFetch } from '@/lib/auth-fetch';
 
@@ -76,8 +76,19 @@ export default function GeoHealthPage() {
   const [entityLoading, setEntityLoading] = useState(false);
   const [entityError, setEntityError] = useState('');
 
-  const [indexNowResult, setIndexNowResult] = useState<{ success: boolean; message: string; keyLocationNote: string; keyLocation: string } | null>(null);
+  const [indexNowResult, setIndexNowResult] = useState<{ success: boolean; message: string; keyLocation: string; indexNowKey?: string; keyFileLive?: boolean } | null>(null);
   const [indexNowLoading, setIndexNowLoading] = useState(false);
+
+  // Lets the user download the exact verification file IndexNow expects —
+  // no copy-pasting keys by hand.
+  const downloadKeyFile = (key: string) => {
+    const blob = new Blob([key], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${key}.txt`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
 
   const checkBing = async () => {
     if (!domain) return;
@@ -109,7 +120,7 @@ export default function GeoHealthPage() {
       const d = await r.json();
       setIndexNowResult(d);
     } catch (e: any) {
-      setIndexNowResult({ success: false, message: e.message, keyLocationNote: '', keyLocation: '' });
+      setIndexNowResult({ success: false, message: e.message, keyLocation: '' });
     } finally {
       setIndexNowLoading(false);
     }
@@ -254,11 +265,24 @@ export default function GeoHealthPage() {
         {indexNowResult && (
           <div className={`text-sm p-4 rounded-lg border ${indexNowResult.success ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300' : 'bg-pink-500/10 border-pink-500/20 text-pink-300'}`}>
             <p className="font-semibold">{indexNowResult.success ? '✓ ' : '✗ '}{indexNowResult.message}</p>
-            {indexNowResult.keyLocation && (
-              <p className="text-xs text-zinc-400 mt-2 flex items-start gap-1.5">
-                <Info className="w-3.5 h-3.5 shrink-0 mt-0.5 text-amber-400" />
-                <span><span className="text-amber-300 font-semibold">Key file required:</span> host a plain-text file at <code className="text-zinc-300 bg-zinc-900 px-1 rounded">{indexNowResult.keyLocation}</code> containing only your IndexNow key to verify domain ownership.</span>
-              </p>
+            {indexNowResult.keyFileLive === true && (
+              <p className="text-xs text-emerald-300 mt-2">✓ Domain ownership verified — your key file is live. Bing will process these URLs; nothing else to do.</p>
+            )}
+            {indexNowResult.keyFileLive === false && indexNowResult.indexNowKey && (
+              <div className="mt-3 bg-zinc-950 border border-amber-500/30 rounded-lg p-3 space-y-2">
+                <p className="text-xs font-semibold text-amber-300">⚠ One-time setup needed — Bing will ignore these URLs until it can verify you own {domain}:</p>
+                <ol className="text-xs text-zinc-300 space-y-1.5 list-decimal pl-4">
+                  <li>
+                    <button onClick={() => downloadKeyFile(indexNowResult.indexNowKey!)} className="text-pink-400 underline hover:text-pink-300 font-semibold">
+                      Download your key file
+                    </button>{' '}
+                    (a tiny .txt file — we&apos;ve filled it in for you)
+                  </li>
+                  <li>Upload it to the top level of your website, so it appears at <code className="text-zinc-400 bg-zinc-900 px-1 rounded break-all">{indexNowResult.keyLocation}</code></li>
+                  <li>Push again — we re-check automatically and this notice turns green</li>
+                </ol>
+                <p className="text-[11px] text-zinc-500">On WordPress use a file-manager plugin; on Netlify/Vercel drop it in your <code className="bg-zinc-900 px-1 rounded">public/</code> folder. It&apos;s safe to leave there forever.</p>
+              </div>
             )}
           </div>
         )}

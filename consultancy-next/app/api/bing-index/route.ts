@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
 
   try {
     // Load or create IndexNow key for this user/domain.
-    let indexNowKey: string | null = null;
+    let indexNowKey: string;
     if (dbAdmin) {
       const snap = await dbAdmin.collection('users').doc(userId).get();
       const stored = snap.data()?.indexNowKeys ?? {};
@@ -151,6 +151,16 @@ export async function POST(req: NextRequest) {
 
     const result = await pushIndexNow(domain, urls, indexNowKey);
 
+    // Verify the ownership key file is actually live — Bing silently ignores
+    // pushes until it is, so surface a definitive ✓/✗ instead of a vague note.
+    const host = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    const keyLocation = `https://${host}/${indexNowKey}.txt`;
+    let keyFileLive = false;
+    try {
+      const kr = await fetch(keyLocation, { signal: AbortSignal.timeout(8_000) });
+      keyFileLive = kr.ok && (await kr.text()).trim() === indexNowKey;
+    } catch { /* unreachable = not live */ }
+
     if (dbAdmin) {
       dbAdmin.collection('indexnow_pushes').add({
         userId, domain, urls, indexNowKey, ...result, timestamp: new Date().toISOString(),
@@ -161,8 +171,9 @@ export async function POST(req: NextRequest) {
       success: result.status === 200 || result.status === 202,
       ...result,
       urlsSubmitted: urls.length,
-      keyLocation: `https://${domain.replace(/^https?:\/\//, '').replace(/\/$/, '')}/${indexNowKey}.txt`,
-      keyLocationNote: 'Host a plain-text file at this URL containing only your IndexNow key to verify ownership.',
+      indexNowKey,
+      keyLocation,
+      keyFileLive,
     });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
