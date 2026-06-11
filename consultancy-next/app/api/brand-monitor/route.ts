@@ -152,7 +152,12 @@ Return ONLY valid JSON:
 
     if (!result.success || !result.data) {
       return NextResponse.json(
-        { success: false, error: result.error || 'Classification failed' },
+        {
+          success: false,
+          error: result.error || 'Classification failed',
+          validationErrors: result.validationErrors,
+          rawOutput: result.rawOutput,
+        },
         { status: 500 }
       );
     }
