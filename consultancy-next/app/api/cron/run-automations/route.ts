@@ -30,15 +30,17 @@ const AUTO_MAX_COMPETITORS: Record<UserTier, number> = {
 // the pricing ladder intact:
 //   cite-probe   → Starter  (matches dashboard/cite-probe)
 //   daily-audit  → Starter  (matches dashboard/overview SOV)
-//   brand-monitor→ Business (matches dashboard/brand-monitor)
+//   brand-monitor→ Pro      (matches dashboard/brand-monitor)
+//   indexnow-sync→ Starter  (matches dashboard/geo-health; free — no LLM calls)
 const TOOL_REQUIRED_TIER: Record<string, UserTier> = {
   'cite-probe':    'Starter',
   'daily-audit':   'Starter',
-  'brand-monitor': 'Business',
+  'brand-monitor': 'Pro',
+  'indexnow-sync': 'Starter',
 };
 
 // All schedulable tools (verified in Phase 0). Cadence is decided per tier below.
-const ALL_TOOLS = ['cite-probe', 'daily-audit', 'brand-monitor'];
+const ALL_TOOLS = ['cite-probe', 'daily-audit', 'brand-monitor', 'indexnow-sync'];
 
 // Minimum interval between runs per tool (ms) — prevents double-firing on
 // retries or mis-timed cron overlaps.
@@ -46,6 +48,7 @@ const TOOL_COOLDOWN: Record<string, number> = {
   'brand-monitor': 6 * 24 * 60 * 60 * 1000,   // 6 days
   'cite-probe':    6 * 24 * 60 * 60 * 1000,
   'daily-audit':   20 * 60 * 60 * 1000,        // 20 hours
+  'indexnow-sync': 20 * 60 * 60 * 1000,        // daily — pushes only NEW sitemap URLs
 };
 
 // Returns the tools a user's tier is ENTITLED to automate. Free → none.
@@ -90,6 +93,61 @@ async function auditHasRealData(userId: string): Promise<boolean> {
     // If ALL values are in the 5-15% synthetic floor band, it's not real data.
     return !vals.every(v => v >= 5 && v <= 15);
   } catch { return false; }
+}
+
+// Closes the publish → Bing loop with zero user action: diff the user's
+// sitemap.xml against the URLs we've already seen, and push only the new ones
+// to IndexNow via /api/bing-index. The first run records a baseline without
+// pushing (avoids blasting an entire back-catalogue and 403s on sites that
+// haven't hosted their key file yet).
+async function syncSitemapToIndexNow(
+  userId: string,
+  domain: string,
+  baseUrl: string,
+  headers: Record<string, string>,
+): Promise<{ cost: number; success: boolean; summary: string }> {
+  if (!dbAdmin) return { cost: 0, success: false, summary: 'DB unavailable' };
+  const host = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+  let xml: string;
+  try {
+    const res = await fetch(`https://${host}/sitemap.xml`, { signal: AbortSignal.timeout(15_000) });
+    if (!res.ok) return { cost: 0, success: false, summary: `sitemap.xml HTTP ${res.status} — skipped` };
+    xml = await res.text();
+  } catch (e: any) {
+    return { cost: 0, success: false, summary: `sitemap fetch failed: ${e.message}` };
+  }
+
+  const locs = [...xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/g)].map(m => m[1]);
+  if (locs.length === 0) return { cost: 0, success: false, summary: 'sitemap has no <loc> entries' };
+
+  const seenRef = dbAdmin.collection('indexnow_seen').doc(userId);
+  const seenSnap = await seenRef.get();
+  const seen: string[] = seenSnap.data()?.urls ?? [];
+  const seenSet = new Set(seen);
+  const newUrls = locs.filter(u => !seenSet.has(u));
+
+  // Persist the union (capped — Firestore doc limit) regardless of push outcome.
+  const union = [...new Set([...seen, ...locs])].slice(-5000);
+  await seenRef.set({ urls: union, lastSyncAt: new Date().toISOString(), domain: host }, { merge: true });
+
+  if (!seenSnap.exists) {
+    return { cost: 0, success: true, summary: `baseline recorded — ${locs.length} URLs; new pages will auto-push from next run` };
+  }
+  if (newUrls.length === 0) {
+    return { cost: 0, success: true, summary: 'sitemap unchanged — nothing to push' };
+  }
+
+  const r = await fetch(`${baseUrl}/api/bing-index`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ domain: host, urls: newUrls.slice(0, 100) }),
+  });
+  const d = await r.json();
+  if (!r.ok || !d.success) {
+    return { cost: 0, success: false, summary: `IndexNow push failed: ${d.error ?? d.message ?? `HTTP ${r.status}`}` };
+  }
+  return { cost: 0, success: true, summary: `${newUrls.length} new URL${newUrls.length > 1 ? 's' : ''} pushed to Bing via IndexNow` };
 }
 
 async function callTool(
@@ -165,6 +223,10 @@ async function callTool(
       };
     }
 
+    if (tool === 'indexnow-sync') {
+      return await syncSitemapToIndexNow(userId, domain, baseUrl, headers);
+    }
+
     return { cost: 0, success: false, summary: `unknown tool: ${tool}` };
   } catch (e: any) {
     return { cost: 0, success: false, summary: `threw: ${e.message}` };
@@ -178,6 +240,7 @@ const TOOL_LABELS: Record<string, string> = {
   'cite-probe': 'Citation Probe',
   'daily-audit': 'Daily SOV Audit',
   'brand-monitor': 'Brand Monitor',
+  'indexnow-sync': 'Bing IndexNow Sync',
 };
 
 async function sendDigestEmail(

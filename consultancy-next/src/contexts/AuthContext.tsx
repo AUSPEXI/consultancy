@@ -24,6 +24,14 @@ export interface UserData {
   latentAnchors?: Array<{ label: string; color: string; baseType: string }>
   cmsWebhookUrl?: string
   connectedSocials?: string[]
+  industry?: string
+  benchmarkOptIn?: boolean
+  automation?: {
+    enabled?: boolean
+    emailDigest?: boolean
+    tools?: Record<string, boolean>
+    [key: string]: unknown
+  }
 }
 
 interface AuthContextType {

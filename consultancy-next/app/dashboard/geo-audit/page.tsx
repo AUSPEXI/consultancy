@@ -7,17 +7,19 @@
 // tool were run individually.
 
 import { useState } from 'react';
-import { Zap, Search, Shield, Loader2, CheckCircle2, XCircle, AlertTriangle, ArrowRight } from 'lucide-react';
+import { Zap, Search, Shield, Loader2, CheckCircle2, XCircle, AlertTriangle, ArrowRight, Rocket } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { authFetch } from '@/lib/auth-fetch';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '@/firebase';
 
 type StepState = 'pending' | 'running' | 'done' | 'error';
 
 interface StepStatus { probe: StepState; bing: StepState; entity: StepState }
 
 export default function GeoAuditPage() {
-  const { userData } = useAuth();
+  const { user, userData } = useAuth();
 
   const [brand, setBrand] = useState(userData?.brand || '');
   const [domain, setDomain] = useState(userData?.domain || '');
@@ -27,6 +29,32 @@ export default function GeoAuditPage() {
   const [bing, setBing] = useState<any>(null);
   const [entity, setEntity] = useState<any>(null);
   const [error, setError] = useState('');
+  const [activating, setActivating] = useState(false);
+  const [activated, setActivated] = useState(false);
+
+  const autopilotAlreadyOn = userData?.automation?.enabled === true;
+
+  // One-click set-and-forget: persist brand/domain and switch on the weekly
+  // automation cron with the email digest, so the audit the user just ran
+  // keeps repeating without them ever visiting Settings.
+  const activateAutopilot = async () => {
+    if (!user || activating) return;
+    setActivating(true);
+    try {
+      await setDoc(doc(db, 'users', user.uid), {
+        brand,
+        domain,
+        'automation.enabled': true,
+        'automation.emailDigest': true,
+        'automation.tools': { 'brand-monitor': true, 'cite-probe': true, 'daily-audit': true, 'indexnow-sync': true },
+      }, { merge: true });
+      setActivated(true);
+    } catch (e: any) {
+      setError(e?.message || 'Could not activate Autopilot');
+    } finally {
+      setActivating(false);
+    }
+  };
 
   const setStep = (k: keyof StepStatus, v: StepState) => setSteps(s => ({ ...s, [k]: v }));
 
@@ -186,6 +214,33 @@ export default function GeoAuditPage() {
               <p className="text-sm text-emerald-300 flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Strong foundations across all three checks. Defend the position: keep facts fresh and re-probe monthly.</p>
             )}
           </div>
+
+          {/* Set-and-forget: the natural next step after a first audit */}
+          {!autopilotAlreadyOn && !activated && (
+            <div className="flex items-center justify-between gap-4 bg-pink-500/5 border border-pink-500/20 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <Rocket className="w-5 h-5 text-pink-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-bold text-white">Keep this running automatically</p>
+                  <p className="text-xs text-zinc-400 mt-0.5">
+                    Turn on Autopilot: weekly citation tracking on these exact queries, brand monitoring,
+                    and an email digest when anything changes. One click — adjust anytime in Settings.
+                  </p>
+                </div>
+              </div>
+              <button onClick={activateAutopilot} disabled={activating}
+                className="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white rounded-lg text-sm font-bold transition-colors">
+                {activating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Rocket className="w-4 h-4" />}
+                Activate Autopilot
+              </button>
+            </div>
+          )}
+          {(autopilotAlreadyOn || activated) && (
+            <p className="text-sm text-emerald-300 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4" /> Autopilot is on — this audit repeats automatically and you&apos;ll get an email digest when things change.
+              <Link href="/dashboard/settings" className="text-pink-400 hover:text-pink-300 font-bold">Adjust</Link>
+            </p>
+          )}
         </div>
       )}
     </div>

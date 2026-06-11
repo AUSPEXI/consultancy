@@ -111,6 +111,7 @@ export default function SettingsPage() {
     'brand-monitor': true,
     'cite-probe':    true,
     'daily-audit':   true,
+    'indexnow-sync': true,
   });
   const [formData, setFormData] = useState({
     brand: '', domain: '', cmsWebhookUrl: '',
@@ -129,10 +130,11 @@ export default function SettingsPage() {
       setWatchlistCompetitors(userData.watchlistCompetitors || []);
       setIndustry(userData.industry || '');
       setBenchmarkOptIn(!!userData.benchmarkOptIn);
-      if (userData.automation) {
-        setAutomationEnabled(userData.automation.enabled !== false);
-        setEmailDigest(userData.automation.emailDigest !== false);
-        setAutomationTools(prev => ({ ...prev, ...(userData.automation.tools ?? {}) }));
+      const auto = userData.automation;
+      if (auto) {
+        setAutomationEnabled(auto.enabled !== false);
+        setEmailDigest(auto.emailDigest !== false);
+        setAutomationTools(prev => ({ ...prev, ...(auto.tools ?? {}) }));
       }
       setFormData({
         brand: userData.brand || '',
@@ -708,6 +710,7 @@ export default function SettingsPage() {
                 { key: 'brand-monitor', label: 'Brand Monitor', desc: 'Weekly — Reddit/Quora/HN threat scan' },
                 { key: 'cite-probe',    label: 'Citation Tracker', desc: 'Weekly — track how often AI cites you' },
                 { key: 'daily-audit',   label: 'SOV Audit', desc: 'Daily (once your brand has real web presence)' },
+                { key: 'indexnow-sync', label: 'Bing IndexNow Sync', desc: 'Daily — new pages in your sitemap are auto-pushed to Bing (ChatGPT search)' },
               ].map(({ key, label, desc }) => (
                 <button
                   key={key}

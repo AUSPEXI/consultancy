@@ -1,6 +1,6 @@
 'use client'
 
-import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert, Zap, RefreshCw, Building2, Layers3, Target, CheckCircle2, FlaskConical, Beaker, Search } from 'lucide-react';
+import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert, Zap, RefreshCw, Building2, Layers3, Target, CheckCircle2, FlaskConical, Beaker, Search, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -97,6 +97,41 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     return checkTierAccess(tier as UserTier, requiredTier);
   };
 
+  // Progressive disclosure: THE QUEST and COMMAND CENTRE are always open;
+  // the specialist groups start collapsed so a new user sees a workflow,
+  // not a feature wall. Open/closed state is remembered per browser.
+  const COLLAPSIBLE = new Set(['INTELLIGENCE', 'ENTITY & SCHEMA', 'RESEARCH']);
+  const [collapsed, setCollapsed] = useState<Set<string>>(COLLAPSIBLE);
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('sidebar_collapsed_groups');
+      if (stored) setCollapsed(new Set(JSON.parse(stored)));
+    } catch {}
+  }, []);
+  const toggleGroup = (label: string) => {
+    setCollapsed(prev => {
+      const next = new Set(prev);
+      if (next.has(label)) { next.delete(label); } else { next.add(label); }
+      try { localStorage.setItem('sidebar_collapsed_groups', JSON.stringify([...next])); } catch {}
+      return next;
+    });
+  };
+
+  // Locked tools are pulled out of their groups into one upgrade block at the
+  // bottom — quest steps keep their slot so the numbered workflow stays intact.
+  const visibleGroups = navGroups
+    .map(group => ({
+      ...group,
+      items: group.label === 'THE QUEST'
+        ? group.items
+        : group.items.filter(item => hasAccess(item.requiredTier as UserTier)),
+    }))
+    .filter(group => group.items.length > 0);
+  const lockedItems = navGroups
+    .filter(g => g.label !== 'THE QUEST')
+    .flatMap(g => g.items)
+    .filter(item => !hasAccess(item.requiredTier as UserTier));
+
   const handleTestUpgrade = async (newTier: UserTier) => {
     if (!user) return;
     try {
@@ -136,12 +171,22 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         </div>
 
         <nav className="flex-1 px-4 mt-4 overflow-y-auto overflow-x-hidden space-y-4">
-          {navGroups.map((group) => (
+          {visibleGroups.map((group) => (
             <div key={group.label}>
               <div className="px-3 mb-1 flex items-center justify-between">
-                <p className="text-[9px] font-black tracking-[0.2em] text-zinc-600 uppercase">
-                  {group.label}
-                </p>
+                {COLLAPSIBLE.has(group.label) ? (
+                  <button
+                    onClick={() => toggleGroup(group.label)}
+                    className="flex items-center gap-1 text-[9px] font-black tracking-[0.2em] text-zinc-600 uppercase hover:text-zinc-400 transition-colors"
+                  >
+                    {group.label}
+                    <ChevronDown className={cn('w-3 h-3 transition-transform', collapsed.has(group.label) && '-rotate-90')} />
+                  </button>
+                ) : (
+                  <p className="text-[9px] font-black tracking-[0.2em] text-zinc-600 uppercase">
+                    {group.label}
+                  </p>
+                )}
                 {group.label === 'THE QUEST' && (
                   <span className="text-[9px] text-zinc-600">
                     {workflowDone.size}/{QUEST_STEPS}
@@ -156,7 +201,12 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                   />
                 </div>
               )}
-              <div className="space-y-0.5">
+              <div className={cn(
+                'space-y-0.5',
+                COLLAPSIBLE.has(group.label) && collapsed.has(group.label)
+                  && !group.items.some(i => pathname.startsWith(i.path))
+                  && 'hidden',
+              )}>
                 {group.items.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.path || pathname.startsWith(item.path + '/');
@@ -200,6 +250,34 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
               </div>
             </div>
           ))}
+
+          {lockedItems.length > 0 && (
+            <div>
+              <p className="px-3 mb-1 text-[9px] font-black tracking-[0.2em] text-zinc-600 uppercase">
+                Upgrade to unlock
+              </p>
+              <div className="space-y-0.5">
+                {lockedItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.id}
+                      href="/#pricing"
+                      className="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium text-zinc-600 hover:bg-zinc-800/50 hover:text-zinc-400 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon className="w-5 h-5 flex-shrink-0" />
+                        {item.label}
+                      </div>
+                      <span className="flex items-center gap-1 text-[9px] font-bold uppercase text-zinc-600">
+                        {item.requiredTier} <Lock className="w-3 h-3" />
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </nav>
 
         <div className="p-4 border-t border-zinc-800 space-y-3">

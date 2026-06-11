@@ -284,9 +284,14 @@ async function analyzePhase(state, backlog) {
   log('Generating video package...');
   await runScript(path.join(__dir, 'generate-video-package.mjs'), [experimentDir]);
 
-  // Send email report
+  // Send email report (non-fatal — a bad SMTP credential must not fail the run
+  // after results/FINDING.md are already written, or the commit step never runs)
   log('Sending report email...');
-  await runScript(path.join(__dir, 'send-report.mjs'), [experimentDir]);
+  try {
+    await runScript(path.join(__dir, 'send-report.mjs'), [experimentDir]);
+  } catch (err) {
+    log(`⚠️ Report email failed (non-fatal): ${err.message}`);
+  }
 
   // Publish the finding into the dashboard recommendation loop (non-fatal)
   log('Publishing finding to dashboard...');
