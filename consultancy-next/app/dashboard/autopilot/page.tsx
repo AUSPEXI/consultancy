@@ -46,7 +46,7 @@ export default function AutopilotPage() {
   const [isSingleRunning, setIsSingleRunning] = useState(false);
 
   const isAdmin = user?.email === 'hopiumcalculator@gmail.com' || user?.email === 'sales@l8entspace.com';
-  const hasAccess = isAdmin || checkTierAccess(tier, 'Pro');
+  const isReadOnly = !(isAdmin || checkTierAccess(tier, 'Pro'));
   const keywords = (userData?.keywords || []).filter(Boolean);
   const isRunning = isSingleRunning || isBulkRunning;
 
@@ -189,6 +189,7 @@ export default function AutopilotPage() {
   };
 
   const runSingleLoop = async () => {
+    if (isReadOnly) return;
     if (!user || !userData?.brand || !topic.trim()) return;
     setIsSingleRunning(true);
     setError(null);
@@ -218,6 +219,7 @@ export default function AutopilotPage() {
   };
 
   const runAllKeywords = async () => {
+    if (isReadOnly) return;
     if (!user || !userData?.brand || selectedKeywords.length === 0) return;
     setIsBulkRunning(true);
     setError(null);
@@ -255,22 +257,20 @@ export default function AutopilotPage() {
   const toggleKeyword = (kw: string) =>
     setSelectedKeywords(prev => prev.includes(kw) ? prev.filter(k => k !== kw) : [...prev, kw]);
 
-  if (!hasAccess) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <RefreshCw className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-          <p className="text-zinc-400 font-medium">GEO Autopilot requires Pro tier</p>
-          <p className="text-zinc-600 text-sm mt-1">The full probe-research-schema-write-email loop is our most powerful execution feature.</p>
-        </div>
-      </div>
-    );
-  }
-
   const activeStepIndex = activeStep === 'done' ? STEPS.length : activeStep ? STEPS.findIndex(s => s.id === activeStep) : -1;
 
   return (
     <div className="space-y-6 max-w-4xl">
+      {isReadOnly && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-amber-200">
+            You&apos;re viewing <strong>read-only mode</strong>. Upgrade to <strong>Pro</strong> to use this feature.
+          </p>
+          <a href="/#pricing" className="text-[11px] font-bold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0">
+            Upgrade
+          </a>
+        </div>
+      )}
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">GEO Autopilot</h1>
         <p className="text-zinc-400 max-w-2xl">
@@ -327,7 +327,8 @@ export default function AutopilotPage() {
               </div>
               <Button
                 onClick={runAllKeywords}
-                disabled={isRunning || selectedKeywords.length === 0 || !userData?.brand}
+                disabled={isReadOnly || isRunning || selectedKeywords.length === 0 || !userData?.brand}
+                title={isReadOnly ? 'Upgrade to Pro to use this feature' : undefined}
                 className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white shrink-0"
               >
                 {isBulkRunning
@@ -404,7 +405,8 @@ export default function AutopilotPage() {
             />
             <Button
               onClick={runSingleLoop}
-              disabled={isRunning || !topic.trim() || !userData?.brand}
+              disabled={isReadOnly || isRunning || !topic.trim() || !userData?.brand}
+              title={isReadOnly ? 'Upgrade to Pro to use this feature' : undefined}
               className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white px-6 shrink-0"
             >
               {isSingleRunning ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Running</> : <><Play className="w-4 h-4 mr-2" />Run</>}

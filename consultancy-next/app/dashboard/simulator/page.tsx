@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { MonitorPlay, Loader2, Bot, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
-import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
 import { logSimulatorResult } from '@/lib/metrics';
 import { authFetch } from '@/lib/auth-fetch';
@@ -22,19 +21,10 @@ export default function SimulatorPage() {
     setTimeout(() => setToast(null), 4000);
   };
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Pro')) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold font-heading mb-2">Multi-Engine SOV Simulator</h1>
-          <p className="text-zinc-400">Query live AI engines with high-intent prompts and track your real Share of Voice.</p>
-        </div>
-        <UpgradePrompt title="Simulator Locked" description="Upgrade to the Pro tier to access the Multi-Engine SOV Simulator and see exactly how leading AI engines view your brand." requiredTier="Pro" />
-      </div>
-    );
-  }
+  const isReadOnly = role !== 'admin' && !checkTierAccess(tier, 'Pro');
 
   const handleSimulate = async () => {
+    if (isReadOnly) return;
     if (!query.trim() || !brand.trim()) return;
     setIsSimulating(true);
     setResults(null);
@@ -100,6 +90,16 @@ export default function SimulatorPage() {
 
   return (
     <div className="space-y-6">
+      {isReadOnly && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-amber-200">
+            You&apos;re viewing <strong>read-only mode</strong>. Upgrade to <strong>Pro</strong> to use this feature.
+          </p>
+          <a href="/#pricing" className="text-[11px] font-bold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0">
+            Upgrade
+          </a>
+        </div>
+      )}
       {toast && (
         <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-[10000] px-6 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${toast.type === 'success' ? 'bg-emerald-500/90 border-emerald-400 text-white' : toast.type === 'error' ? 'bg-rose-500/90 border-rose-400 text-white' : 'bg-zinc-900/90 border-zinc-700 text-zinc-300'}`}>
           <span className="text-sm font-bold tracking-tight">{toast.text}</span>
@@ -124,7 +124,7 @@ export default function SimulatorPage() {
             <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="e.g., Best GEO marketing platform" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-pink-500" />
           </div>
         </div>
-        <button onClick={handleSimulate} disabled={isSimulating || !query.trim() || !brand.trim()} className="w-full py-3 bg-pink-600 hover:bg-pink-700 text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+        <button onClick={handleSimulate} disabled={isReadOnly || isSimulating || !query.trim() || !brand.trim()} title={isReadOnly ? 'Upgrade to Pro to use this feature' : undefined} className="w-full py-3 bg-pink-600 hover:bg-pink-700 text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
           {isSimulating ? <><Loader2 className="w-5 h-5 animate-spin" /> Querying Live Engines...</> : <><Sparkles className="w-5 h-5" /> Query Live Engines</>}
         </button>
       </div>

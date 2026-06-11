@@ -4,7 +4,6 @@ import { Code, Server, RefreshCw, Loader2, ArrowRight, Copy, CheckCircle2, FileJ
 import { WorkflowProgress, markStepComplete } from '@/components/dashboard/WorkflowProgress';
 import { GoogleGenAI, Type } from '@google/genai';
 import { useAuth } from '@/contexts/AuthContext';
-import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
 import { db } from '@/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
@@ -67,23 +66,10 @@ export default function TechnicalPage() {
     fetchFacts();
   }, [user]);
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Pro')) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold font-heading mb-2">Technical SEO & Edge Injection</h1>
-          <p className="text-zinc-400">Deploy server-side schema and restructure semantic HTML for AI crawlers.</p>
-        </div>
-        <UpgradePrompt
-          title="Technical SEO Locked"
-          description="Upgrade to the Pro tier to access the Edge SEO Cloudflare Worker Generator, Semantic HTML Restructuring, and JSON-LD Cite-Magnet Generator."
-          requiredTier="Pro"
-        />
-      </div>
-    );
-  }
+  const isReadOnly = role !== 'admin' && !checkTierAccess(tier, 'Pro');
 
   const handleRestructure = async () => {
+    if (isReadOnly) return;
     if (!inputText.trim()) return;
 
     setIsProcessing(true);
@@ -115,6 +101,7 @@ export default function TechnicalPage() {
   };
 
   const handleGenerateSchema = async () => {
+    if (isReadOnly) return;
     if (!factText.trim()) return;
 
     setIsGeneratingSchema(true);
@@ -141,6 +128,7 @@ export default function TechnicalPage() {
   };
 
   const generateWorker = () => {
+    if (isReadOnly) return;
     if (!domain.trim()) return;
     const script = `/**
  * L8EntSpace Edge SEO Worker for ${domain}
@@ -245,6 +233,16 @@ export default {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
+      {isReadOnly && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-amber-200">
+            You&apos;re viewing <strong>read-only mode</strong>. Upgrade to <strong>Pro</strong> to use this feature.
+          </p>
+          <a href="/#pricing" className="text-[11px] font-bold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0">
+            Upgrade
+          </a>
+        </div>
+      )}
       {toast && (
         <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-[10000] px-6 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${toast.type === 'success' ? 'bg-emerald-500/90 border-emerald-400 text-white' : toast.type === 'error' ? 'bg-rose-500/90 border-rose-400 text-white' : 'bg-zinc-900/90 border-zinc-700 text-zinc-300'}`}>
           <span className="text-sm font-bold tracking-tight">{toast.text}</span>
@@ -334,7 +332,8 @@ export default {
               />
               <button
                 onClick={generateWorker}
-                disabled={!domain.trim()}
+                disabled={isReadOnly || !domain.trim()}
+                title={isReadOnly ? 'Upgrade to Pro to use this feature' : undefined}
                 className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
               >
                 Generate Script
@@ -401,7 +400,8 @@ export default {
 
             <button
               onClick={handleRestructure}
-              disabled={isProcessing || !inputText.trim()}
+              disabled={isReadOnly || isProcessing || !inputText.trim()}
+              title={isReadOnly ? 'Upgrade to Pro to use this feature' : undefined}
               className="w-full bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
             >
               {isProcessing ? (
@@ -492,7 +492,8 @@ export default {
 
           <button
             onClick={handleGenerateSchema}
-            disabled={isGeneratingSchema || !factText.trim()}
+            disabled={isReadOnly || isGeneratingSchema || !factText.trim()}
+            title={isReadOnly ? 'Upgrade to Pro to use this feature' : undefined}
             className="w-full bg-amber-600 hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
           >
             {isGeneratingSchema ? (

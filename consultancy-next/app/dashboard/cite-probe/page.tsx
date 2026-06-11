@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Zap, Loader2, CheckCircle2, XCircle, TrendingUp, Target, RefreshCw, AlertTriangle, ShieldCheck, Plus, X, BookOpen, Layers, GitBranch, Database, FileText } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { checkTierAccess } from '@/constants/tiers';
 import { WorkflowProgress, markStepComplete } from '@/components/dashboard/WorkflowProgress';
 import { doc, setDoc } from 'firebase/firestore';
@@ -191,21 +190,7 @@ export default function CiteProbePage() {
     await saveNegativeStatements(updated);
   };
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Starter')) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold font-heading mb-2">AI Citation Probe</h1>
-          <p className="text-zinc-400">Test whether AI engines cite your brand in real responses right now.</p>
-        </div>
-        <UpgradePrompt
-          title="Citation Probe Locked"
-          description="Upgrade to the Starter tier or above to run live citation tests across AI engines and track your brand's citation rate over time."
-          requiredTier="Starter"
-        />
-      </div>
-    );
-  }
+  const isReadOnly = role !== 'admin' && !checkTierAccess(tier, 'Starter');
 
   if (!brand || !domain) {
     return (
@@ -266,6 +251,17 @@ export default function CiteProbePage() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <WorkflowProgress currentStep={1} />
 
+      {isReadOnly && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-amber-200">
+            You&apos;re viewing <strong>read-only mode</strong>. Upgrade to <strong>Starter</strong> to use this feature.
+          </p>
+          <a href="/#pricing" className="text-[11px] font-bold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0">
+            Upgrade
+          </a>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">AI Citation Probe</h1>
@@ -275,7 +271,8 @@ export default function CiteProbePage() {
         </div>
         <button
           onClick={runProbe}
-          disabled={isRunning}
+          disabled={isRunning || isReadOnly}
+          title={isReadOnly ? 'Upgrade to Starter to use this feature' : undefined}
           className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 shrink-0"
         >
           {isRunning ? (

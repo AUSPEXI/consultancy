@@ -6,7 +6,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { checkTierAccess } from '@/constants/tiers';
 import { db } from '@/firebase';
 import { collection, addDoc, deleteDoc, doc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
-import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import { logAuditAction } from '@/lib/audit';
 import { authFetch } from '@/lib/auth-fetch';
@@ -37,9 +36,11 @@ export default function Competitors() {
     setTimeout(() => setToast(null), 4000);
   };
 
+  const isReadOnly = role !== 'admin' && !checkTierAccess(tier, 'Pro');
+
   useEffect(() => {
     if (!user) return;
-    if (role !== 'admin' && !checkTierAccess(tier, 'Pro')) return;
+    if (isReadOnly) return;
 
     const q = query(
       collection(db, 'competitors'),
@@ -59,22 +60,6 @@ export default function Competitors() {
 
     return () => unsubscribe();
   }, [user, tier, role]);
-
-  if (role !== 'admin' && !checkTierAccess(tier, 'Pro')) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold font-heading mb-2">Competitor Decay Tracking</h1>
-          <p className="text-zinc-400">Monitor your rivals for outdated AI citations and inject your own 'Trojan Horse' facts.</p>
-        </div>
-        <UpgradePrompt
-          title="Competitor Tracking Locked"
-          description="Upgrade to the Pro tier to automatically monitor your competitors for signs of data decay in AI responses, alerting you to Trojan Horse opportunities."
-          requiredTier="Pro"
-        />
-      </div>
-    );
-  }
 
   const handleDeleteCompetitor = async (id: string, name: string) => {
     if (!user) return;
@@ -206,6 +191,16 @@ export default function Competitors() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+      {isReadOnly && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-amber-200">
+            You&apos;re viewing <strong>read-only mode</strong>. Upgrade to <strong>Pro</strong> to use this feature.
+          </p>
+          <a href="/#pricing" className="text-[11px] font-bold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0">
+            Upgrade
+          </a>
+        </div>
+      )}
       {toast && (
         <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-[10000] px-6 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${toast.type === 'success' ? 'bg-emerald-500/90 border-emerald-400 text-white' : toast.type === 'error' ? 'bg-rose-500/90 border-rose-400 text-white' : 'bg-zinc-900/90 border-zinc-700 text-zinc-300'}`}>
           <span className="text-sm font-bold tracking-tight">{toast.text}</span>

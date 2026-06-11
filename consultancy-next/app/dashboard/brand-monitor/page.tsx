@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { Radar, Loader2, AlertOctagon, MessageSquare, PenTool, Sprout, Copy, Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { UpgradePrompt } from '@/components/ui/upgrade-prompt';
 import { logAuditAction } from '@/lib/audit';
 import { checkTierAccess } from '@/constants/tiers';
 import { authFetch } from '@/lib/auth-fetch';
@@ -43,6 +42,7 @@ export default function BrandMonitorPage() {
   const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
   const [seedStates, setSeedStates] = useState<Record<number, ThreadSeedState>>({});
 
+  const isReadOnly = role !== 'admin' && !checkTierAccess(tier, 'Pro');
   const isBusiness = role === 'admin' || checkTierAccess(tier, 'Business');
 
   const showToast = (text: string, type: 'success' | 'error' | 'info' = 'success') => {
@@ -50,23 +50,8 @@ export default function BrandMonitorPage() {
     setTimeout(() => setToast(null), 4000);
   };
 
-  if (role !== 'admin' && !checkTierAccess(tier, 'Pro')) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold font-heading mb-2">Consensus Platform Monitor</h1>
-          <p className="text-zinc-400">Defensive GEO: Monitor Reddit, Quora, and forums to prevent AI context poisoning.</p>
-        </div>
-        <UpgradePrompt
-          title="Brand Monitor Locked"
-          description="Upgrade to the Pro tier to access the Consensus Platform Monitor and detect negative sentiment before it trains the next LLM."
-          requiredTier="Pro"
-        />
-      </div>
-    );
-  }
-
   const handleMonitor = async () => {
+    if (isReadOnly) return;
     if (!brand.trim()) return;
     setIsMonitoring(true);
     setResults(null);
@@ -94,6 +79,7 @@ export default function BrandMonitorPage() {
   };
 
   const handleSeed = async (i: number, thread: any) => {
+    if (isReadOnly) return;
     setSeedStates(prev => ({ ...prev, [i]: { loading: true, draft: null, expanded: true, copiedReddit: false, copiedLinkedIn: false } }));
     try {
       const res = await authFetch('/api/seed-content', {
@@ -133,6 +119,16 @@ export default function BrandMonitorPage() {
 
   return (
     <div className="space-y-6">
+      {isReadOnly && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-amber-200">
+            You&apos;re viewing <strong>read-only mode</strong>. Upgrade to <strong>Pro</strong> to use this feature.
+          </p>
+          <a href="/#pricing" className="text-[11px] font-bold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0">
+            Upgrade
+          </a>
+        </div>
+      )}
       {toast && (
         <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-[10000] px-6 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${toast.type === 'success' ? 'bg-emerald-500/90 border-emerald-400 text-white' : toast.type === 'error' ? 'bg-rose-500/90 border-rose-400 text-white' : 'bg-zinc-900/90 border-zinc-700 text-zinc-300'}`}>
           <span className="text-sm font-bold tracking-tight">{toast.text}</span>
@@ -159,7 +155,8 @@ export default function BrandMonitorPage() {
           </div>
           <button
             onClick={handleMonitor}
-            disabled={isMonitoring || !brand.trim()}
+            disabled={isReadOnly || isMonitoring || !brand.trim()}
+            title={isReadOnly ? 'Upgrade to Pro to use this feature' : undefined}
             className="px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
           >
             {isMonitoring ? (
@@ -253,7 +250,8 @@ export default function BrandMonitorPage() {
                             ? setSeedStates(prev => ({ ...prev, [i]: { ...prev[i], expanded: !prev[i].expanded } }))
                             : handleSeed(i, thread)
                           }
-                          disabled={seed?.loading}
+                          disabled={isReadOnly || seed?.loading}
+                          title={isReadOnly ? 'Upgrade to Pro to use this feature' : undefined}
                           className="px-4 py-2 border border-emerald-700/50 bg-emerald-950/40 hover:bg-emerald-900/40 text-emerald-400 text-xs font-medium rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50"
                         >
                           {seed?.loading ? (
