@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { dbAdmin } from '@/lib/firebase-admin';
+import admin, { dbAdmin } from '@/lib/firebase-admin';
 import { normalizeTier, checkTierAccess, UserTier } from '@/constants/tiers';
+import nodemailer from 'nodemailer';
 
 // Daily cost caps per tier (USD). Free is excluded from automation entirely
 // (see toolsForTier), so its cap is 0.
@@ -170,6 +171,84 @@ async function callTool(
   }
 }
 
+// Automation Phase 2 #6: digest email after a run that actually executed tools.
+// Starter's weekly cooldown makes this naturally weekly; Pro/Business get it on
+// run days. Users opt out with automation.emailDigest === false.
+const TOOL_LABELS: Record<string, string> = {
+  'cite-probe': 'Citation Probe',
+  'daily-audit': 'Daily SOV Audit',
+  'brand-monitor': 'Brand Monitor',
+};
+
+async function sendDigestEmail(
+  userId: string,
+  brand: string,
+  runResults: Record<string, { success: boolean; summary: string; ranAt: string }>,
+): Promise<boolean> {
+  const ran = Object.entries(runResults);
+  if (ran.length === 0) return false;
+
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_APP_PASSWORD;
+  if (!emailUser || !emailPass) return false;
+
+  let to: string | null = null;
+  try {
+    to = (await admin.auth().getUser(userId)).email || null;
+  } catch {
+    const snap = await dbAdmin?.collection('users').doc(userId).get();
+    to = snap?.data()?.email || null;
+  }
+  if (!to) return false;
+
+  const rows = ran.map(([tool, r]) => `
+    <tr>
+      <td style="padding:10px 12px;border-bottom:1px solid #27272a;color:#e4e4e7;font-weight:600;font-size:13px;">${TOOL_LABELS[tool] ?? tool}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #27272a;font-size:13px;color:${r.success ? '#4ade80' : '#f87171'};">${r.success ? '✓' : '✗'}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #27272a;color:#a1a1aa;font-size:13px;">${r.summary}</td>
+    </tr>`).join('');
+
+  const html = `
+<div style="font-family:'Inter',sans-serif;max-width:680px;margin:0 auto;background:#09090b;color:#fafafa;border-radius:8px;overflow:hidden;border:1px solid #27272a;">
+  <div style="padding:28px 32px;border-bottom:1px solid #27272a;background:linear-gradient(to right,#18181b,#09090b);">
+    <p style="margin:0;font-size:12px;font-weight:600;color:#a1a1aa;text-transform:uppercase;letter-spacing:0.1em;">L8EntSpace · GEO Autopilot</p>
+    <h1 style="margin:8px 0 4px;font-size:20px;font-weight:700;color:#fff;">Your automated GEO run for ${brand}</h1>
+    <p style="margin:0;font-size:13px;color:#71717a;">${new Date().toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short' })}</p>
+  </div>
+  <div style="padding:24px 32px;">
+    <table style="width:100%;border-collapse:collapse;">
+      <tr>
+        <th style="text-align:left;padding:8px 12px;font-size:11px;color:#71717a;text-transform:uppercase;letter-spacing:0.05em;">Tool</th>
+        <th style="text-align:left;padding:8px 12px;font-size:11px;color:#71717a;text-transform:uppercase;letter-spacing:0.05em;"></th>
+        <th style="text-align:left;padding:8px 12px;font-size:11px;color:#71717a;text-transform:uppercase;letter-spacing:0.05em;">Result</th>
+      </tr>
+      ${rows}
+    </table>
+    <p style="margin:20px 0 0;font-size:13px;color:#a1a1aa;">Full details in your <a href="https://l8entspace.com/dashboard/autopilot" style="color:#22d3ee;">Autopilot dashboard</a>. To change schedule or unsubscribe from these digests, visit Settings → Automation.</p>
+  </div>
+  <div style="padding:20px 32px;text-align:center;border-top:1px solid #27272a;color:#52525b;font-size:11px;">© ${new Date().getFullYear()} L8EntSpace. All rights reserved.</div>
+</div>`;
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: { user: emailUser, pass: emailPass },
+    });
+    await transporter.sendMail({
+      from: `"L8EntSpace Autopilot" <${emailUser}>`,
+      to,
+      subject: `GEO Autopilot ran ${ran.length} tool${ran.length > 1 ? 's' : ''} for ${brand}`,
+      html,
+    });
+    return true;
+  } catch (e) {
+    console.error('[run-automations] digest email failed:', e);
+    return false;
+  }
+}
+
 export async function POST(req: NextRequest) {
   // Guard: must be called with the CRON_SECRET to prevent unauthenticated triggers.
   const secret = req.headers.get('x-cron-secret') ?? req.nextUrl.searchParams.get('secret');
@@ -284,6 +363,11 @@ export async function POST(req: NextRequest) {
       'automation.lastRunAt': new Date().toISOString(),
       'automation.lastResults': runResults,
     });
+
+    // Digest email — only if something actually ran and the user hasn't opted out.
+    if (Object.keys(runResults).length > 0 && automation.emailDigest !== false) {
+      await sendDigestEmail(userId, userData.brand, runResults);
+    }
   }
 
   return NextResponse.json({

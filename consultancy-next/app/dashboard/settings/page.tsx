@@ -106,6 +106,7 @@ export default function SettingsPage() {
   const [benchmarkOptIn, setBenchmarkOptIn] = useState(false);
   // Automation preferences
   const [automationEnabled, setAutomationEnabled] = useState(true);
+  const [emailDigest, setEmailDigest] = useState(true);
   const [automationTools, setAutomationTools] = useState<Record<string, boolean>>({
     'brand-monitor': true,
     'cite-probe':    true,
@@ -130,6 +131,7 @@ export default function SettingsPage() {
       setBenchmarkOptIn(!!userData.benchmarkOptIn);
       if (userData.automation) {
         setAutomationEnabled(userData.automation.enabled !== false);
+        setEmailDigest(userData.automation.emailDigest !== false);
         setAutomationTools(prev => ({ ...prev, ...(userData.automation.tools ?? {}) }));
       }
       setFormData({
@@ -298,6 +300,7 @@ export default function SettingsPage() {
         industry: industry.trim(),
         benchmarkOptIn,
         'automation.enabled': automationEnabled,
+        'automation.emailDigest': emailDigest,
         'automation.tools': automationTools,
       }, { merge: true });
       await logAuditAction(user.uid, 'Saved Settings', { brand: formData.brand, domain: formData.domain, keywordCount: keywords.length, competitorCount: competitors.length, watchlistCount: watchlistCompetitors.length });
@@ -721,6 +724,22 @@ export default function SettingsPage() {
                 </button>
               ))}
             </div>
+          )}
+
+          {/* Digest email toggle */}
+          {automationEnabled && (
+            <button
+              onClick={() => setEmailDigest(v => !v)}
+              className="flex items-center gap-3 text-left"
+            >
+              <span className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${emailDigest ? 'bg-pink-500/70' : 'bg-zinc-700'}`}>
+                <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${emailDigest ? 'translate-x-5' : 'translate-x-1'}`} />
+              </span>
+              <div>
+                <p className="text-sm text-zinc-300">Email digest</p>
+                <p className="text-xs text-zinc-600">Get a summary email whenever Autopilot runs tools for you</p>
+              </div>
+            </button>
           )}
           <p className="text-xs text-zinc-600">
             Automation runs on our servers — no browser tab needed. Results appear on your Overview the next time you log in.
