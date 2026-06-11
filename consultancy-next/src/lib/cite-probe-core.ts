@@ -14,6 +14,8 @@ export interface PlatformResult {
   accurate: boolean;
   misinformation: string | null;
   excerpt: string | null;
+  // Full raw LLM response — stored so sentiment/position can be re-scored offline.
+  rawResponse?: string | null;
   // Sentiment of the brand mention (null when not cited). Heuristic — no extra API cost.
   sentiment?: Sentiment | null;
   // Rank of the brand in a recommendation list (1-based) when the answer is a
@@ -204,7 +206,7 @@ async function probeGemini(query: string, brand: string, domain: string, knownFa
       config: { temperature: 0.3, maxOutputTokens: 600 },
     });
     const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    return checkCitation(text, brand, domain, knownFalses);
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text };
   } catch (e: any) {
     return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
   }
@@ -222,7 +224,7 @@ async function probeChatGPT(query: string, brand: string, domain: string, knownF
       temperature: 0.3,
     });
     const text = response.choices[0]?.message?.content || '';
-    return checkCitation(text, brand, domain, knownFalses);
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text };
   } catch (e: any) {
     return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
   }
@@ -239,7 +241,7 @@ async function probePerplexity(query: string, brand: string, domain: string, kno
       max_tokens: 600,
     } as any);
     const text = response.choices[0]?.message?.content || '';
-    return checkCitation(text, brand, domain, knownFalses);
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text };
   } catch (e: any) {
     return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
   }
@@ -264,7 +266,7 @@ async function probeClaude(query: string, brand: string, domain: string, knownFa
     });
     const data = await res.json();
     const text = data.content?.[0]?.text || '';
-    return checkCitation(text, brand, domain, knownFalses);
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text };
   } catch (e: any) {
     return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
   }
@@ -282,7 +284,7 @@ async function probeGrok(query: string, brand: string, domain: string, knownFals
       max_tokens: 600, temperature: 0.3,
     } as any);
     const text = response.choices[0]?.message?.content || '';
-    return checkCitation(text, brand, domain, knownFalses);
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text };
   } catch (e: any) {
     return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
   }
@@ -299,7 +301,7 @@ async function probeDeepSeek(query: string, brand: string, domain: string, known
       max_tokens: 600, temperature: 0.3,
     } as any);
     const text = response.choices[0]?.message?.content || '';
-    return checkCitation(text, brand, domain, knownFalses);
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text };
   } catch (e: any) {
     return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
   }
@@ -363,7 +365,7 @@ async function probeGoogleAIO(query: string, brand: string, domain: string, know
     }
 
     const text = flattenAioText(aio);
-    return checkCitation(text, brand, domain, knownFalses);
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text };
   } catch (e: any) {
     return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
   }
@@ -386,6 +388,18 @@ async function probeQuery(
   return { gemini, chatgpt, perplexity, claude, grok, deepseek, google_aio };
 }
 
+// Wilson score 95% CI for a proportion (k successes in n trials).
+// Returns [lowerPct, upperPct] rounded to integers.
+export function wilsonCI95(k: number, n: number): [number, number] {
+  if (n === 0) return [0, 100];
+  const z = 1.96;
+  const p = k / n;
+  const denom = 1 + (z * z) / n;
+  const centre = (p + (z * z) / (2 * n)) / denom;
+  const margin = (z * Math.sqrt((p * (1 - p) + (z * z) / (4 * n)) / n)) / denom;
+  return [Math.max(0, Math.round((centre - margin) * 100)), Math.min(100, Math.round((centre + margin) * 100))];
+}
+
 export interface ProbeAggregate {
   queryResults: Array<{
     query: string; cited: boolean; accurate: boolean;
@@ -395,6 +409,10 @@ export interface ProbeAggregate {
   }>;
   platformRates: Record<string, number | null>;
   citationRate: number;
+  // 95% Wilson CI on citationRate as [lowerPct, upperPct]. Communicates statistical
+  // uncertainty — at 7 queries the interval is ±≈35pp, so movement within the band
+  // is noise, not signal.
+  ci95: [number, number];
   citedCount: number;
   misinformationCount: number;
   activePlatforms: number;
@@ -465,8 +483,10 @@ export async function runCitationProbe(opts: {
   const avgPositionPct = positions.length
     ? Math.round(positions.reduce((a, b) => a + b, 0) / positions.length) : null;
 
+  const ci95 = wilsonCI95(citedCount, queryResults.length);
+
   return {
-    queryResults, platformRates, citationRate, citedCount, misinformationCount,
+    queryResults, platformRates, citationRate, ci95, citedCount, misinformationCount,
     activePlatforms: activeRates.length, sentimentBreakdown, avgPositionPct,
   };
 }

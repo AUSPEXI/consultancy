@@ -509,6 +509,14 @@ export default function CiteProbePage() {
               <div className={`text-5xl font-black ${rateColor(probeData.citationRate)}`}>
                 {probeData.citationRate}%
               </div>
+              {probeData.ci95 && (
+                <p className="text-xs text-zinc-600 mt-1 font-mono">
+                  95% CI: {probeData.ci95[0]}%–{probeData.ci95[1]}%
+                  {(probeData.ci95[1] - probeData.ci95[0]) > 40 && (
+                    <span className="ml-1 text-amber-500" title="Wide CI — run more queries for a reliable rate">⚠</span>
+                  )}
+                </p>
+              )}
               <p className={`text-sm font-semibold mt-2 ${rateColor(probeData.citationRate)}`}>
                 {rateLabel(probeData.citationRate)}
               </p>

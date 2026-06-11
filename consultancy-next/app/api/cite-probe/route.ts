@@ -5,6 +5,44 @@ import { requireAuth } from '@/lib/api-auth';
 import { buildQueries, runCitationProbe, probeBrandRate } from '@/lib/cite-probe-core';
 import { normalizeTier, checkTierAccess } from '@/constants/tiers';
 
+// Mine real questions from Reddit/Quora threads stored by the Brand Monitor.
+// Returns up to `max` question-shaped strings, or an empty array if nothing found.
+async function buildQueriesFromBrandMonitor(userId: string, max = 5): Promise<string[]> {
+  if (!dbAdmin) return [];
+  try {
+    const snap = await dbAdmin
+      .collection('brand_monitor_results')
+      .where('userId', '==', userId)
+      .orderBy('createdAt', 'desc')
+      .limit(3)
+      .get();
+    const questions: string[] = [];
+    for (const doc of snap.docs) {
+      const threads: any[] = doc.data().threads ?? [];
+      for (const t of threads) {
+        const summary: string = t.summary ?? t.title ?? '';
+        // Extract question-shaped sentences from the summary or use the title directly.
+        const sentences = summary.split(/[.!]/);
+        for (const s of sentences) {
+          const trimmed = s.trim();
+          if (trimmed.endsWith('?') && trimmed.length > 20 && trimmed.length < 200) {
+            questions.push(trimmed);
+          }
+        }
+        // Thread titles are often questions themselves.
+        if (typeof t.title === 'string' && t.title.endsWith('?')) {
+          questions.push(t.title.trim());
+        }
+      }
+      if (questions.length >= max) break;
+    }
+    // Deduplicate and cap.
+    return [...new Set(questions)].slice(0, max);
+  } catch {
+    return [];
+  }
+}
+
 // Free tier may run a limited number of live probes per calendar month — it's a
 // taster, not the product. Paid tiers (Starter+) are unmetered here.
 const FREE_MONTHLY_PROBE_LIMIT = 1;
@@ -131,12 +169,29 @@ export async function POST(request: Request) {
       } catch (_) {}
     }
 
-    // Use caller-supplied queries, else build brand+keyword-specific ones, else generic fallback
-    const testQueries: string[] = queries?.length > 0 ? queries : buildQueries(brand, domain, keywords);
+    // Build queries: prefer caller-supplied, then enrich with real Reddit/PAA questions
+    // from Brand Monitor results, then fall back to keyword-specific templates.
+    let testQueries: string[];
+    if (queries?.length > 0) {
+      testQueries = queries;
+    } else {
+      const realQuestions = await buildQueriesFromBrandMonitor(userId);
+      const templateQueries = buildQueries(brand, domain, keywords);
+      // Blend: real questions first (up to 4), fill remaining slots from templates.
+      const combined = [...realQuestions.slice(0, 4), ...templateQueries];
+      // Deduplicate by lowercased text; cap at 10.
+      const seen = new Set<string>();
+      testQueries = combined.filter(q => {
+        const k = q.toLowerCase();
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      }).slice(0, 10);
+    }
     const timestamp = new Date().toISOString();
 
     const {
-      queryResults, platformRates, citationRate,
+      queryResults, platformRates, citationRate, ci95,
       citedCount, misinformationCount, activePlatforms,
       sentimentBreakdown, avgPositionPct,
     } = await runCitationProbe({ brand, domain, queries: testQueries, knownFalses });
@@ -208,7 +263,7 @@ export async function POST(request: Request) {
 
     const probeResult = {
       brand, domain, userId, timestamp,
-      citationRate, citedCount, misinformationCount,
+      citationRate, ci95, citedCount, misinformationCount,
       totalQueries: testQueries.length,
       activePlatforms, platformRates,
       sentimentBreakdown, avgPositionPct,
