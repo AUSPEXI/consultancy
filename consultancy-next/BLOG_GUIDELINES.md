@@ -34,6 +34,16 @@ A Tier 2 post opens with: *"New to this? Start with [Tier 1 title] →"*
 ### Good Analogy Template
 > *"Think of [technical concept] like [everyday thing]. [One sentence explaining the parallel]. That's why [implication for the reader]."*
 
+### Punctuation & Sentence Structure
+- **Ban the em dash (—).** Do not use em dashes to insert parenthetical thoughts, break up sentences, or append trailing data. They disrupt sentence flow and read as loose and conversational rather than structured.
+- **Use parentheses for secondary info.** When adding a quick aside, definition, or technical constraint within a sentence, use parentheses instead.
+  - ❌ *L8EntSpace tracks your AI Share of Voice—measuring citation frequency and sentiment—across four LLM engines.*
+  - ✅ *L8EntSpace tracks your AI Share of Voice (measuring citation frequency and sentiment) across four LLM engines.*
+- **Deploy colons for technical impact.** Use a colon when a sentence directly introduces a specific definition, list, or concrete metric.
+  - ✅ *Our platform detects sentiment drift using a precise statistical threshold: a deviation of more than two standard deviations from your baseline.*
+- **Default to the "period clean cut".** If a thought seems to need an em dash, the sentence is usually too long. Split it into two distinct, declarative statements.
+- **Why this matters for GEO:** LLMs process information in syntax trees. An em dash introduces a loose relationship between clauses; a bracket or colon introduces a structured, hierarchical one (Entity → (Attribute), Concept → : Definition). Clean punctuation makes content easier for AI engines to parse, map, and extract as a factual citation.
+
 ### Forbidden Phrases
 - "leveraging" → use "using"
 - "holistic approach" → say what you actually do
