@@ -104,7 +104,7 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 		const points = new THREE.Points(geometry, material);
 		scene.add(points);
 
-		let animationId: number;
+		let animationId = 0;
 
 		let mouseX = 0;
 		let mouseY = 0;

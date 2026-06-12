@@ -25,18 +25,16 @@ interface ProbeResult {
   accurate: boolean;
   misinformation: string | null;
   excerpt: string | null;
-  platforms?: {
-    gemini?: PlatformResult;
-    chatgpt?: PlatformResult;
-    perplexity?: PlatformResult;
-    claude?: PlatformResult;
-  };
+  // Keyed by engine id (gemini, chatgpt, perplexity, claude, grok, deepseek,
+  // google_aio, ...) — open-ended so new engines flow through without edits.
+  platforms?: Record<string, PlatformResult | undefined>;
 }
 
 interface ProbeRun {
   brand: string;
   domain: string;
   citationRate: number;
+  ci95?: [number, number];
   citedCount: number;
   misinformationCount: number;
   totalQueries: number;
@@ -121,12 +119,14 @@ export default function CiteProbePage() {
   // Content gaps — uncited queries with no vault fact semantically nearby.
   // Computed server-side from the last probe's geometry.
   const [gaps, setGaps] = useState<{ query: string; minFactDistance: number | null; factDensityNearQuery: number; nearestFact: string | null; recommendation: string }[]>([]);
+  const [closedGaps, setClosedGaps] = useState<{ query: string; wasContentGap: boolean }[]>([]);
   const loadGaps = async () => {
     if (!user?.uid) return;
     try {
       const res = await authFetch('/api/analytics/gaps');
       const json = await res.json();
       if (json.success && Array.isArray(json.gaps)) setGaps(json.gaps);
+      if (json.success && Array.isArray(json.closedGaps)) setClosedGaps(json.closedGaps);
     } catch (_) {}
   };
   useEffect(() => { loadGaps(); }, [user?.uid]);
@@ -888,6 +888,26 @@ export default function CiteProbePage() {
               })}
             </div>
           </div>
+
+          {/* Closed gaps — queries that flipped uncited → cited since the last
+              probe. This is the payoff moment for the gap workflow. */}
+          {closedGaps.length > 0 && (
+            <div className="bg-emerald-500/5 border border-emerald-500/25 rounded-xl px-6 py-4">
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <h3 className="text-sm font-semibold text-white">Gaps Closed</h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300">{closedGaps.length}</span>
+              </div>
+              <div className="space-y-1.5">
+                {closedGaps.map(c => (
+                  <p key={c.query} className="text-xs text-emerald-200/90">
+                    ✓ "{c.query}" flipped to <span className="font-bold text-emerald-400">cited</span>
+                    {c.wasContentGap && <span className="text-zinc-500"> — was a content gap; your new content worked</span>}
+                  </p>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Content gaps — uncited queries with no vault fact nearby. Ranked
               furthest-from-coverage first; each one is a concrete writing brief. */}

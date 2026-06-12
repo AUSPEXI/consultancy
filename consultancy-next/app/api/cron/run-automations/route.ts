@@ -264,6 +264,58 @@ async function sendDigestEmail(
   }
   if (!to) return false;
 
+  // Headline metrics: latest citation rate, delta vs previous probe, and
+  // content gaps (uncited queries with no vault fact within cosine 0.5 —
+  // geometry logged by the cite-probe route). All non-fatal: a digest with
+  // just the run table is still worth sending.
+  let highlightsHtml = '';
+  try {
+    const probesSnap = await dbAdmin!
+      .collection('citation_tests')
+      .where('userId', '==', userId)
+      .orderBy('timestamp', 'desc')
+      .limit(2)
+      .get();
+    if (!probesSnap.empty) {
+      const latest = probesSnap.docs[0].data();
+      const prev = probesSnap.docs[1]?.data();
+      const rate = typeof latest.citationRate === 'number' ? Math.round(latest.citationRate) : null;
+      const delta = rate !== null && typeof prev?.citationRate === 'number'
+        ? rate - Math.round(prev.citationRate)
+        : null;
+      const results: { query: string; cited: boolean; minFactDistance?: number | null }[] = latest.results ?? [];
+      const gaps = results.filter(r => !r.cited && typeof r.minFactDistance === 'number' && r.minFactDistance > 0.5);
+      const closed = prev
+        ? (latest.results ?? []).filter((r: any) =>
+            r.cited && (prev.results ?? []).some((p: any) => p.query === r.query && !p.cited)
+          )
+        : [];
+
+      const deltaBadge = delta === null ? '' : delta === 0
+        ? `<span style="color:#a1a1aa;font-size:14px;font-weight:600;"> · unchanged</span>`
+        : `<span style="color:${delta > 0 ? '#4ade80' : '#f87171'};font-size:14px;font-weight:700;"> ${delta > 0 ? '▲' : '▼'} ${Math.abs(delta)}pp since last probe</span>`;
+
+      const gapRows = gaps.slice(0, 3).map(g =>
+        `<li style="margin:4px 0;color:#a1a1aa;font-size:13px;">"${g.query}" — <span style="color:#c4b5fd;">no content nearby; write a dedicated answer</span></li>`
+      ).join('');
+
+      const closedRows = closed.slice(0, 3).map((c: any) =>
+        `<li style="margin:4px 0;color:#4ade80;font-size:13px;">✓ "${c.query}" flipped to cited</li>`
+      ).join('');
+
+      highlightsHtml = `
+  <div style="padding:24px 32px;border-bottom:1px solid #27272a;">
+    ${rate !== null ? `<p style="margin:0 0 4px;font-size:11px;color:#71717a;text-transform:uppercase;letter-spacing:0.1em;">Citation rate</p>
+    <p style="margin:0;font-size:32px;font-weight:800;color:#fff;">${rate}%${deltaBadge}</p>` : ''}
+    ${closedRows ? `<p style="margin:16px 0 4px;font-size:11px;color:#71717a;text-transform:uppercase;letter-spacing:0.1em;">Wins since last probe</p><ul style="margin:0;padding-left:18px;">${closedRows}</ul>` : ''}
+    ${gapRows ? `<p style="margin:16px 0 4px;font-size:11px;color:#71717a;text-transform:uppercase;letter-spacing:0.1em;">Content gaps to close (${gaps.length})</p><ul style="margin:0;padding-left:18px;">${gapRows}</ul>
+    <p style="margin:10px 0 0;font-size:12px;color:#71717a;">Each gap is a query AI engines answer without you. <a href="https://l8entspace.com/dashboard/cite-probe" style="color:#c4b5fd;">Open the gap list →</a></p>` : ''}
+  </div>`;
+    }
+  } catch (e) {
+    console.warn('[run-automations] digest highlights failed (non-fatal):', e);
+  }
+
   const rows = ran.map(([tool, r]) => `
     <tr>
       <td style="padding:10px 12px;border-bottom:1px solid #27272a;color:#e4e4e7;font-weight:600;font-size:13px;">${TOOL_LABELS[tool] ?? tool}</td>
@@ -278,6 +330,7 @@ async function sendDigestEmail(
     <h1 style="margin:8px 0 4px;font-size:20px;font-weight:700;color:#fff;">Your automated GEO run for ${brand}</h1>
     <p style="margin:0;font-size:13px;color:#71717a;">${new Date().toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short' })}</p>
   </div>
+  ${highlightsHtml}
   <div style="padding:24px 32px;">
     <table style="width:100%;border-collapse:collapse;">
       <tr>

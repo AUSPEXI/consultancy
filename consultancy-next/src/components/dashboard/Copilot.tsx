@@ -259,8 +259,8 @@ export function Copilot({ setActiveTab }: CopilotProps) {
             ? (latest.citationRate > citationDocs[citationDocs.length - 1].citationRate ? 'improving' : 'declining')
             : 'baseline';
 
-          const missedQueries = (latest.results || []).filter((r: any) => !r.cited).map((r: any) => r.query);
-          const citedQueries = (latest.results || []).filter((r: any) => r.cited).map((r: any) => r.query);
+          const missedQueries: string[] = (latest.results || []).filter((r: any) => !r.cited).map((r: any) => r.query);
+          const citedQueries: string[] = (latest.results || []).filter((r: any) => r.cited).map((r: any) => r.query);
 
           context += `CITATION PROBE HISTORY (${citationDocs.length} runs):\n`;
           context += `- Latest citation rate: ${latest.citationRate}% (${new Date(latest.timestamp).toLocaleDateString()})\n`;

@@ -88,7 +88,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://prod.spline.design" crossOrigin="" />
         <link rel="dns-prefetch" href="https://prod.spline.design" />
         <link rel="preconnect" href="https://unpkg.com" crossOrigin="" />
-        {/* @ts-expect-error async server component */}
         <SiteSchemas />
       </head>
       <body className="antialiased bg-[#050505] text-white">

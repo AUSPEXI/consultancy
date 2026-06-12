@@ -27,7 +27,7 @@ async function fetchUserContext(userId: string) {
     }
 
     // Build action→outcome history: show recent actions with citation rate context
-    const citations = citationsSnap ? citationsSnap.docs.map(d => ({ ...d.data(), _id: d.id })) : [];
+    const citations: Array<Record<string, any>> = citationsSnap ? citationsSnap.docs.map(d => ({ ...d.data(), _id: d.id })) : [];
     const auditActions = auditSnap ? auditSnap.docs.map(d => d.data()) : [];
 
     let actionHistory = '';

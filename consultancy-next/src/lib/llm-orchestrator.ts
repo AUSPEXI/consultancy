@@ -252,7 +252,7 @@ export class LLMOrchestrator {
               if (validationAttempt < this.maxValidationRetries - 1) {
                 console.log('[Orchestrator] Retrying with reduced temperature...');
                 const reducedTemp = Math.max(0, temperature - this.temperatureDecrement);
-                const retryPrompt = createRetryPrompt(prompt, 'Detected hallucination patterns. Please verify all numeric values are realistic.');
+                const retryPrompt = createRetryPrompt(prompt ?? '', 'Detected hallucination patterns. Please verify all numeric values are realistic.');
                 
                 try {
                   rawOutput = await this.callProvider(
@@ -286,7 +286,7 @@ export class LLMOrchestrator {
 
             const reducedTemp = Math.max(0, temperature - this.temperatureDecrement);
             const errorSummary = formatValidationErrors(validation.errors || []);
-            const retryPrompt = createRetryPrompt(prompt, errorSummary);
+            const retryPrompt = createRetryPrompt(prompt ?? '', errorSummary);
 
             try {
               rawOutput = await this.callProvider(

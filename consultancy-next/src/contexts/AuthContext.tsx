@@ -26,6 +26,8 @@ export interface UserData {
   connectedSocials?: string[]
   industry?: string
   benchmarkOptIn?: boolean
+  negativeStatements?: string[]
+  trackingQueries?: string[]
   automation?: {
     enabled?: boolean
     emailDigest?: boolean

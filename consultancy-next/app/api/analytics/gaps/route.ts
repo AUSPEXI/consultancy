@@ -31,19 +31,38 @@ export async function GET(req: NextRequest) {
       .collection('citation_tests')
       .where('userId', '==', userId)
       .orderBy('timestamp', 'desc')
-      .limit(1)
+      .limit(2)
       .get();
 
     if (probeSnap.empty) {
-      return NextResponse.json({ success: true, gaps: [], covered: [], reason: 'no_probe_yet' });
+      return NextResponse.json({ success: true, gaps: [], covered: [], closedGaps: [], reason: 'no_probe_yet' });
     }
 
     const probeDoc = probeSnap.docs[0];
+
+    // Closed gaps — queries uncited in the PREVIOUS probe that flipped to cited
+    // in the latest one. `wasContentGap` marks those that also had no nearby
+    // fact at the time (geometry logged on the previous probe), i.e. gaps the
+    // user closed by writing content. This is the celebration signal the UI
+    // shows, and the labelled outcome the ML training set learns from.
+    const prevDoc = probeSnap.docs[1];
+    let closedGaps: { query: string; wasContentGap: boolean }[] = [];
+    if (prevDoc) {
+      const latestResults: { query: string; cited: boolean }[] = probeDoc.data().results ?? [];
+      const prevResults: { query: string; cited: boolean; minFactDistance?: number | null }[] = prevDoc.data().results ?? [];
+      const citedNow = new Set(latestResults.filter(r => r.cited).map(r => r.query.toLowerCase()));
+      closedGaps = prevResults
+        .filter(p => !p.cited && citedNow.has(p.query.toLowerCase()))
+        .map(p => ({
+          query: p.query,
+          wasContentGap: typeof p.minFactDistance === 'number' && p.minFactDistance > GAP_DISTANCE,
+        }));
+    }
     const results: { query: string; cited: boolean; queryEmbedding?: number[]; minFactDistance?: number | null; factDensityNearQuery?: number }[] =
       probeDoc.data().results ?? [];
     const uncited = results.filter(r => r.cited === false);
     if (uncited.length === 0) {
-      return NextResponse.json({ success: true, gaps: [], covered: [], reason: 'all_cited' });
+      return NextResponse.json({ success: true, gaps: [], covered: [], closedGaps, reason: 'all_cited' });
     }
 
     const facts = await loadEmbeddedFacts(dbAdmin, userId);
@@ -54,6 +73,7 @@ export async function GET(req: NextRequest) {
         success: true,
         reason: 'no_facts',
         covered: [],
+        closedGaps,
         gaps: uncited.map(r => ({
           query: r.query,
           minFactDistance: null,
@@ -112,6 +132,7 @@ export async function GET(req: NextRequest) {
       threshold: GEOMETRY_SIM_THRESHOLD,
       gaps,
       covered,
+      closedGaps,
       factCount: facts.length,
     });
   } catch (err: any) {

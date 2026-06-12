@@ -63,8 +63,9 @@ export async function GET(req: NextRequest) {
         const userDoc = await dbAdmin.collection('users').doc(userId).get();
         if (userDoc.exists) {
           const data = userDoc.data();
-          if (data?.latentAnchors?.length > 0) {
-            anchorLabels = data.latentAnchors;
+          const latentAnchors = data?.latentAnchors;
+          if (Array.isArray(latentAnchors) && latentAnchors.length > 0) {
+            anchorLabels = latentAnchors;
           }
           // Keywords → Signal Point nodes
           const keywords: string[] = data?.keywords ?? [];
@@ -182,28 +183,48 @@ export async function GET(req: NextRequest) {
       hasCached.forEach(f         => embMap.set(f.id, f.embedding!));
 
       if (needsEmbedding.length > 0) {
-        // Use generateWithLocal so we get the dual-embed alignment score in the
-        // same API call — zero extra cost, just one extra local pass.
-        // alignmentScore < 0.3 → local synonym dictionary has poor coverage of
-        // this concept; those entries are surfaced in the response as synonym-gap
-        // recommendations so the user knows which synonym groups to expand.
-        const { apiEmbeddings: freshEmbeddings, localEmbeddings, alignmentScores, localSpace } = await embeddingService.generateWithLocal(needsEmbedding.map(f => f.text));
-        freshEmbeddings.forEach((emb, i) => embMap.set(needsEmbedding[i].id, emb));
+        const texts = needsEmbedding.map(f => f.text);
+        // The active engine is the local embedder when no API key is configured —
+        // generateWithLocal requires an API engine, so only use it when one exists.
+        const apiAvailable = embeddingService.getActiveEngine('auto').name !== 'local-synonym';
         newlyEmbeddedCount = needsEmbedding.length;
-        if (dbAdmin) {
-          const batch = dbAdmin.batch();
-          needsEmbedding.forEach((f, i) => {
-            batch.update(dbAdmin!.collection(f.collection).doc(f.id), {
-              embedding: freshEmbeddings[i],
-              embeddingSpace: activeSpace,
-              localEmbedding: localEmbeddings[i],
-              localEmbeddingSpace: localSpace,
-              embeddingAlignmentScore: alignmentScores[i],
+
+        if (apiAvailable) {
+          // Dual-embed: API vector for the map + local synonym vector + alignment
+          // score, all in one pass at zero extra API cost. alignmentScore < 0.3 →
+          // the local dictionary covers this concept poorly; surfaced below as
+          // synonym-gap recommendations.
+          const { apiEmbeddings: freshEmbeddings, localEmbeddings, alignmentScores, localSpace } = await embeddingService.generateWithLocal(texts);
+          freshEmbeddings.forEach((emb, i) => embMap.set(needsEmbedding[i].id, emb));
+          if (dbAdmin) {
+            const batch = dbAdmin.batch();
+            needsEmbedding.forEach((f, i) => {
+              batch.update(dbAdmin!.collection(f.collection).doc(f.id), {
+                embedding: freshEmbeddings[i],
+                embeddingSpace: activeSpace,
+                localEmbedding: localEmbeddings[i],
+                localEmbeddingSpace: localSpace,
+                embeddingAlignmentScore: alignmentScores[i],
+              });
             });
-          });
-          batch.commit().catch(() => {});
+            batch.commit().catch(() => {});
+          }
+        } else {
+          // Local-only fallback — alignment is meaningless when both vectors come
+          // from the same engine, so skip the score.
+          const freshEmbeddings = await embeddingService.generateEmbeddings(texts);
+          freshEmbeddings.forEach((emb, i) => embMap.set(needsEmbedding[i].id, emb));
+          if (dbAdmin) {
+            const batch = dbAdmin.batch();
+            needsEmbedding.forEach((f, i) => {
+              batch.update(dbAdmin!.collection(f.collection).doc(f.id), { embedding: freshEmbeddings[i], embeddingSpace: activeSpace });
+            });
+            batch.commit().catch(() => {});
+          }
         }
       }
+
+      const factEmbeddings = vaultFacts.map(f => embMap.get(f.id)!);
 
       // Compute citation status for each fact using the most recent cite-probe run
       const citationStatuses = await computeCitationStatuses(factEmbeddings, userId, dbAdmin);

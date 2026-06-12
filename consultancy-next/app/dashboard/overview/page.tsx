@@ -407,7 +407,7 @@ export default function OverviewPage() {
         </div>
         <div className="flex items-center gap-3">
           {(() => {
-            const isLive = !!(userData?.brand && userData?.domain && userData?.keywords?.length > 0);
+            const isLive = !!(userData?.brand && userData?.domain && (userData?.keywords?.length ?? 0) > 0);
             return (
               <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border ${isLive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}`}>
                 {isLive ? '● LIVE' : '◌ SIMULATED'}
