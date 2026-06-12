@@ -38,6 +38,14 @@ interface FindingPayload {
   trialsPerVariant?: number;
   runAt?: string;
   active?: boolean;
+  // Temporal/reproducibility metadata (2026-06): collection window, engine
+  // versions, and 30-day longitudinal re-test verification from the GEO Lab.
+  collectionSpanDays?: number | null;
+  modelVersions?: Record<string, string[]>;
+  modelDrift?: boolean;
+  retestCount?: number;
+  lastVerifiedAt?: string | null;
+  verificationStatus?: 'unverified' | 'verified' | 'decayed';
 }
 
 export async function POST(request: Request) {
@@ -82,7 +90,9 @@ export async function GET(request: Request) {
     const all = snap.docs.map((d) => d.data() as FindingPayload & { active?: boolean });
 
     const recommendations = all
-      .filter((f) => f.active)
+      // Decayed findings (re-test showed the effect no longer holds) are
+      // excluded from active advice even if an older publish left active=true.
+      .filter((f) => f.active && f.verificationStatus !== 'decayed')
       .map((f) => ({
         lever: f.lever,
         headline: f.headline || f.title || f.lever,
@@ -92,13 +102,20 @@ export async function GET(request: Request) {
         platforms: f.platforms || [],
         trialsPerVariant: f.trialsPerVariant ?? null,
         runAt: f.runAt || null,
+        // Freshness metadata for UI badges: '✓ re-verified <date>' beats 'tested once'.
+        verificationStatus: f.verificationStatus ?? 'unverified',
+        lastVerifiedAt: f.lastVerifiedAt ?? null,
+        retestCount: f.retestCount ?? 0,
       }))
-      // Strongest validated effect first.
-      .sort((a, b) => Math.abs(b.topEffect?.diffPp || 0) - Math.abs(a.topEffect?.diffPp || 0));
+      // Re-verified findings first, then strongest validated effect.
+      .sort((a, b) =>
+        (b.verificationStatus === 'verified' ? 1 : 0) - (a.verificationStatus === 'verified' ? 1 : 0)
+        || Math.abs(b.topEffect?.diffPp || 0) - Math.abs(a.topEffect?.diffPp || 0));
 
     const nullResultCount = all.filter((f) => f.verdict === 'null').length;
+    const decayedCount = all.filter((f) => f.verificationStatus === 'decayed').length;
 
-    return NextResponse.json({ success: true, recommendations, nullResultCount });
+    return NextResponse.json({ success: true, recommendations, nullResultCount, decayedCount });
   } catch (err: any) {
     console.error('geo-findings GET error:', err);
     return NextResponse.json({ success: false, error: err.message, recommendations: [], nullResultCount: 0 }, { status: 500 });

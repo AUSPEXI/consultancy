@@ -84,6 +84,28 @@ const recommendation = guide
   : `Experiment "${entry.title || lever}" tested: ${finding.hypothesis}`;
 const headline = guide?.headline || entry.title || lever;
 
+// Longitudinal verification status — derived from 30-day re-tests appended to
+// finding.json by the orchestrator. A finding whose winning variant no longer
+// beats the control in the latest re-test is 'decayed' and must not be served
+// as an active recommendation: stale GEO advice is worse than no advice.
+const retests = Array.isArray(finding.retests) ? finding.retests : [];
+let verificationStatus = 'unverified'; // no re-test yet
+let stillHolds = null;
+if (retests.length > 0 && finding.bestVariant) {
+  const latest = retests[retests.length - 1];
+  const agg = latest.aggregate ?? {};
+  const winnerRate = agg[finding.bestVariant]?.rate;
+  const otherRates = Object.entries(agg)
+    .filter(([v]) => v !== finding.bestVariant)
+    .map(([, s]) => s.rate)
+    .filter(r => typeof r === 'number');
+  if (typeof winnerRate === 'number' && otherRates.length > 0) {
+    stillHolds = winnerRate > Math.max(...otherRates);
+    verificationStatus = stillHolds ? 'verified' : 'decayed';
+  }
+}
+const lastVerifiedAt = retests.length > 0 ? retests[retests.length - 1].retestAt : null;
+
 const payload = {
   id: expId,
   lever,
@@ -101,9 +123,18 @@ const payload = {
   platforms: finding.platforms,
   trialsPerVariant: finding.trialsPerVariant,
   runAt: finding.runAt,
-  // Only significant findings become active recommendations; null results are
-  // stored for transparency but won't be surfaced as advice.
-  active: !isNull,
+  // Temporal/reproducibility metadata (added 2026-06) — consumed by the model
+  // spec's lever-prior features and the dashboard's freshness badges.
+  collectionSpanDays: finding.collectionSpanDays ?? null,
+  modelVersions: finding.modelVersions ?? {},
+  modelDrift: finding.modelDrift ?? false,
+  retestCount: retests.length,
+  lastVerifiedAt,
+  verificationStatus,                        // 'unverified' | 'verified' | 'decayed'
+  // Only significant findings that haven't decayed become active recommendations;
+  // null results and decayed findings are stored for transparency but not served
+  // as advice.
+  active: !isNull && stillHolds !== false,
 };
 
 // S6.4: one-line digest email when a SIGNIFICANT finding is published.

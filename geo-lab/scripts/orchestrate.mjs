@@ -393,6 +393,15 @@ async function longitudinalRetestPhase(state, backlog) {
         });
         await fs.writeFile(findingPath, JSON.stringify(finding, null, 2) + '\n');
         log(`Re-test complete for ${exp.id}. Aggregate: ${JSON.stringify(retestAgg)}`);
+
+        // Re-publish so the dashboard recommendation reflects the latest
+        // verification status (verified/decayed) — a decayed finding is
+        // deactivated server-side. Non-fatal.
+        try {
+          await runScript(path.join(__dir, 'publish-finding.mjs'), [expDir]);
+        } catch (pubErr) {
+          log(`⚠ Re-publish after re-test failed (non-fatal): ${pubErr.message}`);
+        }
       } catch (e) {
         log(`⚠ Re-test result parse failed (non-fatal): ${e.message}`);
       }
