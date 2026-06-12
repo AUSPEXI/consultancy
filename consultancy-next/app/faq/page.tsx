@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { PublicHeader } from '@/components/ui/public-header';
 import { Footerdemo } from '@/components/ui/footer-section';
@@ -20,12 +20,40 @@ const GLYPHS: Record<string, { sym: string; label: string }> = {
   'getting-started': { sym: '▸', label: 'GO'   },
 };
 
+// Stable URL-fragment anchor for each question, so AI engines can deep-link
+// citations (e.g. /faq#what-is-a-z-score) instead of pointing at the page top.
+function slugify(text: string): string {
+  return text.toLowerCase()
+    .replace(/['']/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80);
+}
+
 export default function FAQPage() {
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
   const toggle = (key: string) =>
     setOpenItems(prev => ({ ...prev, [key]: !prev[key] }));
+
+  // Deep-link support: when arriving on /faq#some-question-slug, open that
+  // question's accordion and scroll to it.
+  useEffect(() => {
+    const hash = decodeURIComponent(window.location.hash.replace(/^#/, ''));
+    if (!hash) return;
+    for (const cat of FAQ_CATEGORIES) {
+      const idx = cat.items.findIndex(item => slugify(item.question) === hash);
+      if (idx >= 0) {
+        setOpenItems(prev => ({ ...prev, [`${cat.id}-${idx}`]: true }));
+        // Defer until after first paint so the element exists at full height.
+        requestAnimationFrame(() => {
+          document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        return;
+      }
+    }
+  }, []);
 
   const scrollTo = (id: string) => {
     const el = sectionRefs.current[id];
@@ -45,6 +73,7 @@ export default function FAQPage() {
           cat.items.map(item => ({
             '@type': 'Question',
             name: item.question,
+            url: `https://l8entspace.com/faq#${slugify(item.question)}`,
             acceptedAnswer: { '@type': 'Answer', text: item.answer },
           }))
         ),
@@ -58,9 +87,9 @@ export default function FAQPage() {
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 text-pink-400 text-xs font-bold border border-pink-500/20 mb-6 uppercase tracking-widest">
             Master the AI Web
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold font-heading mb-5">GEO Knowledge Base</h1>
+          <h1 className="text-4xl md:text-6xl font-bold font-heading mb-5">GEO &amp; AEO Knowledge Base</h1>
           <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
-            {totalQuestions} questions across {FAQ_CATEGORIES.length} topics. Every answer is a standalone fact, structured for AI citation.
+            {totalQuestions} questions across {FAQ_CATEGORIES.length} topics covering Generative Engine Optimization and Answer Engine Optimization. Every answer is a standalone fact, structured for AI citation.
           </p>
         </div>
 
@@ -93,7 +122,9 @@ export default function FAQPage() {
             return (
               <section
                 key={cat.id}
+                id={cat.id}
                 ref={el => { sectionRefs.current[cat.id] = el; }}
+                style={{ scrollMarginTop: '148px' }}
               >
                 {/* Section header */}
                 <div className="mb-8 p-6 rounded-2xl bg-zinc-900/40 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
@@ -121,6 +152,8 @@ export default function FAQPage() {
                     return (
                       <div
                         key={key}
+                        id={slugify(item.question)}
+                        style={{ scrollMarginTop: '148px' }}
                         className={`border rounded-xl overflow-hidden transition-all duration-200 ${
                           isOpen
                             ? 'border-pink-500/30 bg-zinc-900/60'

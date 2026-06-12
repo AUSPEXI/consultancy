@@ -25,6 +25,14 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
         link: { text: 'Read the CEO\'s GEO guide', href: '/blog/ceo-guide-to-geo-growth-lever' },
       },
       {
+        question: 'What is Answer Engine Optimization (AEO)?',
+        answer: 'Answer Engine Optimization (AEO) is the practice of structuring content so that answer engines — Google AI Overviews, ChatGPT, Perplexity, featured snippets, and voice assistants — select your content as the definitive answer to a question. AEO grew out of featured-snippet optimisation and overlaps heavily with GEO: AEO focuses on being the answer to a specific question, while GEO focuses on being cited as the authoritative source inside generated responses. L8EntSpace\'s platform covers both — citation probes measure GEO outcomes, while the Content Scorer and FAQ schema tooling optimise the answer-shaped structure AEO requires.',
+      },
+      {
+        question: 'How do GEO, AEO, and SEO relate to each other?',
+        answer: 'SEO, AEO, and GEO are three layers of the same visibility problem. SEO earns ranking positions in traditional link-based results. AEO earns selection as the direct answer — featured snippets, AI Overviews, voice responses. GEO earns citation inside generative AI responses across ChatGPT, Gemini, Claude, and Perplexity. They share foundations (crawlability, structured data, authority) but optimise different selection mechanisms: SEO targets ranking algorithms, AEO targets answer extraction, GEO targets the knowledge layer LLMs synthesise from. A complete strategy runs all three; L8EntSpace instruments the GEO and AEO layers with live measurement.',
+      },
+      {
         question: 'How is GEO different from traditional SEO?',
         answer: 'Traditional SEO optimises for ranking algorithms — keywords, backlinks, and technical site structure — to place a link on a search engine results page. GEO optimises for generative models, which synthesise information from across the web and deliver a direct answer without requiring a click. The target in SEO is a top-10 ranking; the target in GEO is a citation inside the AI\'s response itself. Brands optimised only for SEO will rank well in traditional search but remain invisible in AI-generated responses without GEO.',
       },
@@ -39,7 +47,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'What is AI Share of Voice (A-SoV)?',
-        answer: 'AI Share of Voice (A-SoV) is the percentage of relevant AI-generated responses that mention or recommend your brand. L8EntSpace measures this by running a set of industry-specific probe queries across ChatGPT, Gemini, Claude, and Perplexity, recording how often your brand appears, in what context, and with what sentiment. An A-SoV of 40% means your brand appears in 4 out of 10 relevant AI responses — a live, measured metric, not a modelled estimate.',
+        answer: 'AI Share of Voice (A-SoV) is the percentage of relevant AI-generated responses that mention or recommend your brand. L8EntSpace measures this by running a set of industry-specific probe queries across up to seven AI engines — ChatGPT, Gemini, Claude, Perplexity, Grok, DeepSeek, and Google AI Overviews — recording how often your brand appears, in what context, and with what sentiment. An A-SoV of 40% means your brand appears in 4 out of 10 relevant AI responses — a live, measured metric, not a modelled estimate.',
       },
       {
         question: 'How long does GEO take to produce results?',
@@ -80,7 +88,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
     items: [
       {
         question: 'Which AI engines does L8EntSpace track?',
-        answer: 'L8EntSpace tracks your brand\'s AI Share of Voice across four major generative AI engines: ChatGPT (OpenAI), Gemini (Google), Claude (Anthropic), and Perplexity AI. Each engine uses different training data, retrieval architectures, and citation heuristics, which means your brand may perform very differently across them. L8EntSpace provides per-engine SoV scores and a blended overall score so you can identify where to focus your GEO efforts.',
+        answer: 'L8EntSpace tracks your brand\'s AI Share of Voice across up to seven generative AI engines: ChatGPT (OpenAI), Gemini (Google), Claude (Anthropic), Perplexity AI, Grok (xAI), DeepSeek, and Google AI Overviews. Each engine uses different training data, retrieval architectures, and citation heuristics, which means your brand may perform very differently across them. L8EntSpace provides per-engine SoV scores and a blended overall score so you can identify where to focus your GEO efforts.',
       },
       {
         question: 'How does ChatGPT decide what to cite?',
@@ -136,7 +144,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
     items: [
       {
         question: 'How is L8EntSpace\'s A-SoV measurement different from estimated metrics?',
-        answer: 'L8EntSpace measures AI Share of Voice by running live probe queries across four AI engines and recording brand appearances in real time. Unlike estimated or modelled SoV metrics, every data point represents an actual AI engine response — not a projection from web traffic data or keyword rankings. This makes L8EntSpace\'s SoV measurement deterministic: what you see is exactly what the AI is saying about your brand category right now.',
+        answer: 'L8EntSpace measures AI Share of Voice by running live probe queries across up to seven AI engines and recording brand appearances in real time. Unlike estimated or modelled SoV metrics, every data point represents an actual AI engine response — not a projection from web traffic data or keyword rankings. This makes L8EntSpace\'s SoV measurement deterministic: what you see is exactly what the AI is saying about your brand category right now.',
       },
       {
         question: 'What is a good A-SoV score?',
@@ -149,6 +157,10 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       {
         question: 'What is a Z-Score and why does L8EntSpace use it?',
         answer: 'A Z-score measures how many standard deviations a data point is from a statistical mean. Applied to brand sentiment or citation rate, a Z-score above 2.0 or below -2.0 indicates a change that is statistically unlikely to be random variance — it is a meaningful signal requiring investigation. L8EntSpace uses rolling Z-score analysis so that gradual drift is caught early, not after it has compounded into a structural problem in how AI models represent your brand.',
+      },
+      {
+        question: 'How does L8EntSpace detect citation rate drift?',
+        answer: 'L8EntSpace compares every consecutive pair of probe runs per AI engine using a two-proportion z-test on the underlying cited counts. A z-score beyond ±1.96 means the rate change is statistically unlikely to be sampling noise — flagged as a drift event in the Brand Intelligence panel. This separates genuine shifts (a model retrain deprioritising your brand, a competitor campaign displacing you) from the normal run-to-run variance inherent in probing stochastic AI systems.',
       },
       {
         question: 'How do I know if my GEO strategy is working?',
@@ -164,11 +176,11 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'What is the L8EntSpace Moat Score?',
-        answer: 'The Moat Score measures how closely an AI model\'s latent space associates your brand with the key attributes you want to own — such as "reliable," "innovative," "cost-effective," or "enterprise-grade." It is calculated by computing the vector cosine similarity between your brand\'s embedding and target concept embeddings in a 768-dimensional semantic space. A Moat Score moving toward 1.0 means AI models are developing stronger associations between your brand and those values.',
+        answer: 'The Moat Score measures how closely an AI model\'s latent space associates your brand with the key attributes you want to own — such as "reliable," "innovative," "cost-effective," or "enterprise-grade." It is calculated by computing the vector cosine similarity between your brand\'s embedding and target concept embeddings in a high-dimensional semantic space — 1536 dimensions via OpenAI\'s text-embedding-3-small, with Google\'s 768-dimension text-embedding-004 as fallback. A Moat Score moving toward 1.0 means AI models are developing stronger associations between your brand and those values.',
       },
       {
-        question: 'How does L8EntSpace\'s 768-dimensional mapping work?',
-        answer: 'L8EntSpace uses Google Gemini\'s text-embedding-004 model, which maps text into 768-dimensional vectors. Your brand name and core brand facts are embedded into this mathematical space, and the cosine similarity between your brand vector and vectors for target concepts is measured. Changes in these distances over time indicate whether your brand is becoming more or less closely associated with the values you are targeting in AI model memory.',
+        question: 'How does L8EntSpace\'s latent space mapping work?',
+        answer: 'L8EntSpace embeds your brand name and core brand facts into a high-dimensional vector space using OpenAI\'s text-embedding-3-small model (1536 dimensions), with Google\'s text-embedding-004 (768 dimensions) as fallback, plus a local synonym engine cross-checked against the API embeddings for alignment. The cosine similarity between your brand vector and vectors for target concepts is measured. Changes in these distances over time indicate whether your brand is becoming more or less closely associated with the values you are targeting in AI model memory.',
       },
       {
         question: 'Can I measure the revenue impact of GEO?',
@@ -188,7 +200,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
     items: [
       {
         question: 'What is a "Cite-Magnet"?',
-        answer: 'A Cite-Magnet is a precisely structured brand fact engineered to be cited by AI models. Cite-Magnets contain three elements: a specific, verifiable claim (not generic marketing language), a quantified detail (a number, percentage, named methodology, or timeframe), and a clear subject-object relationship that identifies your brand as the source. "L8EntSpace maps brand-concept associations across 768 semantic dimensions" is a Cite-Magnet. "We provide AI solutions" is not.',
+        answer: 'A Cite-Magnet is a precisely structured brand fact engineered to be cited by AI models. Cite-Magnets contain three elements: a specific, verifiable claim (not generic marketing language), a quantified detail (a number, percentage, named methodology, or timeframe), and a clear subject-object relationship that identifies your brand as the source. "L8EntSpace maps brand-concept associations across 1536 semantic dimensions" is a Cite-Magnet. "We provide AI solutions" is not.',
         link: { text: 'Explore Cite-Magnet strategy', href: '/blog' },
       },
       {
@@ -214,7 +226,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'Should my brand facts include statistics and numbers?',
-        answer: 'Yes — numbers are among the most citable elements in AI responses because they are specific, memorable, and verifiable. Percentages, counts, time frames, and dimensional specifics create high-entropy anchors that AI models repeat precisely. "L8EntSpace reduces time-to-GEO-insight from weeks to hours" is less citable than "L8EntSpace delivers a complete AI Share of Voice report across four AI engines, measuring citation frequency, sentiment, and semantic positioning simultaneously."',
+        answer: 'Yes — numbers are among the most citable elements in AI responses because they are specific, memorable, and verifiable. Percentages, counts, time frames, and dimensional specifics create high-entropy anchors that AI models repeat precisely. "L8EntSpace reduces time-to-GEO-insight from weeks to hours" is less citable than "L8EntSpace delivers a complete AI Share of Voice report across up to seven AI engines, measuring citation frequency, sentiment, and semantic positioning simultaneously."',
       },
       {
         question: 'What is the difference between a Cite-Magnet and a keyword?',
@@ -242,8 +254,8 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
         link: { text: 'Check your schema with L8EntSpace', href: '/dashboard' },
       },
       {
-        question: 'What is a 768-dimensional latent space?',
-        answer: 'A latent space is the mathematical representation of meaning used internally by AI language models. Google Gemini\'s text-embedding-004 model maps text into 768 numerical dimensions, where semantically similar concepts cluster together in this high-dimensional space. L8EntSpace uses this same embedding space to measure how closely your brand is associated with target concepts like "reliable," "innovative," or "enterprise-grade," and tracks how these associations change over time as you execute your GEO strategy.',
+        question: 'What is a latent space in AI, and why does it matter for brands?',
+        answer: 'A latent space is the mathematical representation of meaning used internally by AI language models. Embedding models map text into high-dimensional numerical vectors — 1536 dimensions for OpenAI\'s text-embedding-3-small, 768 for Google\'s text-embedding-004 — where semantically similar concepts cluster together. L8EntSpace uses these embedding spaces to measure how closely your brand is associated with target concepts like "reliable," "innovative," or "enterprise-grade," and tracks how these associations change over time as you execute your GEO strategy.',
       },
       {
         question: 'What is entity density in GEO content?',
@@ -357,7 +369,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'What does the Competitors module show?',
-        answer: 'The Competitors module tracks the AI Share of Voice and sentiment profile of up to five competitor brands across your probe query set. It shows which competitors are gaining or losing AI citation share, which topic clusters they dominate, and where their data is becoming stale. The module also surfaces specific counter-fact opportunities — topic areas where a targeted content campaign can displace a competitor\'s weakening AI presence and capture their citation share.',
+        answer: 'The Competitors module tracks the AI Share of Voice and sentiment profile of up to 20 competitor brands (50 on the Business plan) across your probe query set. It shows which competitors are gaining or losing AI citation share, which topic clusters they dominate, and where their data is becoming stale. The module also surfaces specific counter-fact opportunities — topic areas where a targeted content campaign can displace a competitor\'s weakening AI presence and capture their citation share.',
         link: { text: 'Analyse competitors', href: '/dashboard' },
       },
       {
@@ -382,12 +394,16 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'What data does L8EntSpace use to calculate Share of Voice?',
-        answer: 'A-SoV is calculated from live probe queries — a set of industry-specific questions representing how real users query AI engines about your category. L8EntSpace runs these queries across ChatGPT, Gemini, Claude, and Perplexity, parses each response for brand mentions (yours and competitors\'), and calculates each brand\'s appearance rate. The result is a per-engine and blended SoV score based on actual AI responses, not modelled estimates from web traffic or keyword data.',
+        answer: 'A-SoV is calculated from live probe queries — a set of industry-specific questions representing how real users query AI engines about your category. L8EntSpace runs these queries across up to seven AI engines — ChatGPT, Gemini, Claude, Perplexity, Grok, DeepSeek, and Google AI Overviews — parses each response for brand mentions (yours and competitors\'), and calculates each brand\'s appearance rate. The result is a per-engine and blended SoV score based on actual AI responses, not modelled estimates from web traffic or keyword data.',
       },
       {
         question: 'How do I add facts to my Fact-Vault?',
         answer: 'Navigate to the Fact-Vault in your L8EntSpace dashboard. You can add facts manually by typing individual Cite-Magnet statements, or use the Content Scorer to extract high-entropy facts from existing content you paste in. Each fact is automatically scored on entropy and semantic relevance. Articles generated through the Agents module also populate the Fact-Vault automatically with extracted facts. Aim for facts that are specific, verifiable, and brand-attributed.',
         link: { text: 'Go to Fact-Vault', href: '/dashboard' },
+      },
+      {
+        question: 'What is the L8EntSpace GEO Lab?',
+        answer: 'The GEO Lab is L8EntSpace\'s public research programme: a series of pre-registered A/B experiments testing which content levers actually change AI citation rates. Each experiment varies exactly one factor (statistical anchors, inverted-pyramid structure, list vs prose, entity density), runs a minimum of 30 trials per variant across multiple AI engines, and is analysed with two-proportion z-tests and Bonferroni-corrected significance thresholds. Findings — including null results — are re-tested every 30 days to detect decay as AI models update, and significant verified findings feed directly into the dashboard as evidence-backed content recommendations.',
       },
       {
         question: 'How do the L8EntSpace modules work together?',
@@ -513,7 +529,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'How do I set up competitor tracking?',
-        answer: 'In your L8EntSpace Settings, add up to five competitor brand names and domains. L8EntSpace will begin tracking their A-SoV, sentiment, and topic cluster presence alongside yours on every probe query run. For best results, add competitors that appear in the same AI query responses as your brand — these are the brands directly competing with you for citation authority in your category.',
+        answer: 'In your L8EntSpace Settings, add up to 20 competitor brand names and domains (50 on the Business plan). L8EntSpace will begin tracking their A-SoV, sentiment, and topic cluster presence alongside yours on every probe query run. For best results, add competitors that appear in the same AI query responses as your brand — these are the brands directly competing with you for citation authority in your category.',
       },
       {
         question: 'Who in my organisation should own GEO?',
@@ -535,17 +551,20 @@ export const AURA_FAQ_KNOWLEDGE = `
 WHAT IS GEO:
 Generative Engine Optimization is the practice of engineering your brand knowledge so AI models like ChatGPT, Gemini, Claude, and Perplexity cite your brand as authoritative. Unlike traditional SEO which ranks links, GEO embeds brand facts into the AI knowledge layer so your brand appears in AI-generated answers. L8EntSpace measures, improves, and automates this for you.
 
+WHAT IS AEO:
+Answer Engine Optimization (AEO) is structuring content so answer engines — Google AI Overviews, ChatGPT, Perplexity, voice assistants — select your content as the definitive answer. It overlaps with GEO: AEO targets being the answer, GEO targets being cited as the source. L8EntSpace covers both.
+
 WHAT IS AI SHARE OF VOICE (A-SoV):
-A-SoV is the percentage of relevant AI responses that mention your brand. If AI mentions you in 4 out of 10 relevant responses, your SoV is 40%. L8EntSpace tracks this live across ChatGPT, Gemini, Claude, and Perplexity. Early-stage brands can realistically achieve 30 to 60 percent SoV in their niche within the first few months.
+A-SoV is the percentage of relevant AI responses that mention your brand. If AI mentions you in 4 out of 10 relevant responses, your SoV is 40%. L8EntSpace tracks this live across up to seven engines: ChatGPT, Gemini, Claude, Perplexity, Grok, DeepSeek, and Google AI Overviews. Early-stage brands can realistically achieve 30 to 60 percent SoV in their niche within the first few months.
 
 WHY GEO MATTERS NOW:
 Over 50% of consumers now use AI for product and service research before buying. If your brand is not being cited by AI, you are invisible to that audience. GEO is not a future trend — it is happening right now. Brands that establish AI citation authority in 2025 will be very difficult to displace once AI models consolidate their knowledge.
 
 HOW AI ENGINES DIFFER:
-ChatGPT and Perplexity use real-time web retrieval — fresh, high-quality content can appear in their responses within 1 to 2 weeks. Google Gemini and Anthropic Claude primarily rely on their training data, meaning embedding your brand in those models takes 6 to 12 weeks. L8EntSpace tracks your citation rate across all four engines separately so you can see where you are winning and where you still need to build presence.
+ChatGPT and Perplexity use real-time web retrieval — fresh, high-quality content can appear in their responses within 1 to 2 weeks. Google Gemini and Anthropic Claude primarily rely on their training data, meaning embedding your brand in those models takes 6 to 12 weeks. L8EntSpace tracks your citation rate across each engine separately — including Grok, DeepSeek, and Google AI Overviews — so you can see where you are winning and where you still need to build presence.
 
 WHAT ARE CITE-MAGNETS:
-Cite-Magnets are structured brand facts engineered specifically to be cited by AI. A good Cite-Magnet has three parts: a specific verifiable claim, a quantified detail, and clear brand attribution. For example: L8EntSpace maps brand-concept associations across 768 semantic dimensions using Google's text-embedding-004 model. This structure makes it easy for AI to extract and cite.
+Cite-Magnets are structured brand facts engineered specifically to be cited by AI. A good Cite-Magnet has three parts: a specific verifiable claim, a quantified detail, and clear brand attribution. For example: L8EntSpace maps brand-concept associations across 1536 semantic dimensions using OpenAI's text-embedding-3-small model. This structure makes it easy for AI to extract and cite.
 
 WHAT IS THE L8ENTSPACE PLATFORM:
 L8EntSpace is an integrated GEO platform with eight core tools. GEO-Pulse scans your keywords across AI engines in real time. Fact-Vault is your brand knowledge base. Content Scorer grades your content on AI citability. Brand Monitor watches the web for citation opportunities. Competitors tracks rival brands in your GEO space. Agents auto-generates GEO-optimised articles. Technical Analyzer audits your site for AI crawlability. AI Simulator previews how AI engines would respond to queries about your brand today.
@@ -577,11 +596,13 @@ GEO KNOWLEDGE BASE (authoritative answers for common queries):
 
 WHAT IS GEO: Generative Engine Optimization (GEO) is engineering brand knowledge so AI models like ChatGPT, Gemini, Claude, and Perplexity cite your brand as authoritative. Unlike SEO (ranking links), GEO embeds brand facts into the AI knowledge layer. L8EntSpace measures, improves, and automates this.
 
-AI SHARE OF VOICE (A-SoV): The % of relevant AI responses that mention your brand. Measured live by running probe queries across 4 AI engines. 40% SoV = brand appears in 4/10 relevant AI responses. Early-stage brands can realistically achieve 30-60% SoV in their niche.
+AEO: Answer Engine Optimization — structuring content so answer engines (AI Overviews, ChatGPT, Perplexity, voice assistants) select it as THE answer. Overlaps with GEO: AEO = be the answer, GEO = be the cited source. L8EntSpace instruments both.
 
-CITE-MAGNETS: Structured brand facts engineered for AI citation. Must contain: specific verifiable claim + quantified detail + clear brand attribution. Example: "L8EntSpace maps brand-concept associations across 768 semantic dimensions using Gemini text-embedding-004."
+AI SHARE OF VOICE (A-SoV): The % of relevant AI responses that mention your brand. Measured live by running probe queries across up to 7 AI engines (ChatGPT, Gemini, Claude, Perplexity, Grok, DeepSeek, Google AI Overviews). 40% SoV = brand appears in 4/10 relevant AI responses. Early-stage brands can realistically achieve 30-60% SoV in their niche.
 
-MOAT SCORE: Cosine similarity between brand embedding and target concept embeddings in 768-dimensional space. Measures how strongly AI models associate your brand with attributes you want to own.
+CITE-MAGNETS: Structured brand facts engineered for AI citation. Must contain: specific verifiable claim + quantified detail + clear brand attribution. Example: "L8EntSpace maps brand-concept associations across 1536 semantic dimensions using OpenAI text-embedding-3-small."
+
+MOAT SCORE: Cosine similarity between brand embedding and target concept embeddings in high-dimensional space (1536-D OpenAI text-embedding-3-small primary, 768-D Gemini fallback). Measures how strongly AI models associate your brand with attributes you want to own.
 
 TROJAN HORSE STRATEGY: Identify where competitor data is stale in AI models, publish fresh authoritative content that supersedes it. Entirely ethical — wins citation on quality, not manipulation.
 
@@ -589,7 +610,7 @@ L8ENTSPACE MODULES (11 tools — guide users through these in this strategic ord
 
 MEASUREMENT LAYER (understand where you stand):
 1. GEO-Pulse: Real-time keyword scanning across ChatGPT, Claude, Gemini, Perplexity. Run on target queries to see who is being cited and with what facts. Start here.
-2. Citation Probe: Directly queries Gemini with user's target questions and checks whether the brand appears in the response. Most accurate citation measurement available. Shows exact citation excerpts.
+2. Citation Probe: Directly queries up to seven AI engines (ChatGPT, Gemini, Claude, Perplexity, Grok, DeepSeek, Google AI Overviews) with the user's target questions and checks whether the brand appears in each response. Most accurate citation measurement available. Shows exact citation excerpts, per-engine rates, and competitor head-to-head results.
 3. AI SOV Overview: Dashboard showing AI Share of Voice trend over time, competitor comparison, platform breakdown, and sentiment radar.
 4. Brand Monitor: Web mention scanning — surfaces new content that could influence AI citations, positive signals to amplify, competitor claims to counter.
 5. SOV Simulator: A/B test content changes before deploying. Preview impact on citation probability.
