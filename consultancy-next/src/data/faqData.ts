@@ -402,6 +402,11 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
         link: { text: 'Go to Fact-Vault', href: '/dashboard' },
       },
       {
+        question: 'What is the FAQ Architect?',
+        answer: 'FAQ Architect generates a complete, deploy-ready FAQ page for your brand. Unlike generic AI FAQ generators that invent questions, it sources questions from your Citation Probe history — the real queries AI engines are asked about your category, prioritising the ones where you are not yet cited — and grounds every answer in your verified Fact-Vault. Output includes visible HTML with per-question anchor links, FAQPage JSON-LD schema, and markdown, following the same AEO structure L8EntSpace uses on its own FAQ page.',
+        link: { text: 'Open FAQ Architect', href: '/dashboard/faq-architect' },
+      },
+      {
         question: 'What is the L8EntSpace GEO Lab?',
         answer: 'The GEO Lab is L8EntSpace\'s public research programme: a series of pre-registered A/B experiments testing which content levers actually change AI citation rates. Each experiment varies exactly one factor (statistical anchors, inverted-pyramid structure, list vs prose, entity density), runs a minimum of 30 trials per variant across multiple AI engines, and is analysed with two-proportion z-tests and Bonferroni-corrected significance thresholds. Findings — including null results — are re-tested every 30 days to detect decay as AI models update, and significant verified findings feed directly into the dashboard as evidence-backed content recommendations.',
       },
@@ -619,6 +624,7 @@ KNOWLEDGE LAYER (build what AI will cite):
 6. Fact-Vault: The foundation. All brand Cite-Magnets and structured facts live here. Every other module draws from it. A well-populated Fact-Vault is prerequisite for everything else.
 7. Content Scorer: Grades content on GEO readiness — entity density, entropy, schema markup, citation probability. Suggests specific edits.
 8. Technical Analyzer (Edge & Schema): Audits AI crawlability — robots.txt, schema markup, page performance, canonical URLs. Generates prioritised fix list.
+8b. FAQ Architect: Generates a deploy-ready FAQ page from the user's probe history (real queries, gap-first) and Fact-Vault. Exports HTML with anchor ids, FAQPage JSON-LD, and markdown.
 
 EXECUTION LAYER (actually move the needle):
 9. Multi-Agent Crawler (Agents): Automated content pipeline. Crawls the web for topic context, extracts high-entropy facts, generates JSON-LD schema, synthesises a GEO-optimised article. Publishes to Fact-Vault and CMS webhook.
