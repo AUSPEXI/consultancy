@@ -298,7 +298,7 @@ export default function UmapScene({
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
-      <Canvas camera={{ position: [0, 0, 15], fov: 45 }} frameloop="demand">
+      <Canvas camera={{ position: [0, 0, 25], fov: 55 }} frameloop="demand">
         <color attach="background" args={['#09090b']} />
         <ambientLight intensity={0.6} />
         <pointLight position={[10, 10, 10]} intensity={0.8} />
@@ -318,8 +318,8 @@ export default function UmapScene({
           />
         )}
 
-        <gridHelper args={[20, 20, '#27272a', '#18181b']} position={[0, -5, 0]} />
-        <OrbitControls enablePan={false} enableZoom autoRotate={false} maxDistance={25} minDistance={6} makeDefault />
+        <gridHelper args={[24, 24, '#52525b', '#3f3f46']} position={[0, -5, 0]} />
+        <OrbitControls enablePan={false} enableZoom autoRotate={false} maxDistance={40} minDistance={8} makeDefault />
       </Canvas>
 
       {/* ── DOM tooltip — outside Canvas, no event interference ── */}
@@ -359,9 +359,9 @@ export default function UmapScene({
         if (!rect) return null;
         // Project manually: NDC from 3D position (no camera rotation applied here —
         // just the initial camera position [0,0,15] with fov=45)
-        const fovRad = (45 * Math.PI) / 180;
+        const fovRad = (55 * Math.PI) / 180;
         const aspect = rect.width / rect.height;
-        const zDist = 15 - a.z;
+        const zDist = 25 - a.z;
         const ndcX = (a.x / zDist) / Math.tan(fovRad / 2) / aspect;
         const ndcY = (a.y / zDist) / Math.tan(fovRad / 2);
         const screenX = ((ndcX + 1) / 2) * rect.width;
