@@ -151,10 +151,7 @@ export default function GeoHealthPage() {
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
       <div>
         <h1 className="text-2xl font-black text-white">GEO Health</h1>
-        <p className="text-sm text-zinc-400 mt-1">
-          ChatGPT search runs on Bing. AI models draw on Wikidata, Wikipedia, and Crunchbase for entity knowledge.
-          Both need to know you exist before they can cite you.
-        </p>
+        <p className="text-sm text-zinc-400 mt-1">Bing indexation + entity grounding: the two foundations AI needs to cite you.</p>
       </div>
 
       {/* Shared inputs */}
@@ -186,10 +183,6 @@ export default function GeoHealthPage() {
           <h2 className="text-base font-semibold text-white">Bing Indexation Check</h2>
           <span className="ml-auto text-[10px] font-bold text-zinc-600 uppercase tracking-widest">ChatGPT runs on Bing</span>
         </div>
-        <p className="text-xs text-zinc-400">
-          If your domain is not indexed on Bing, ChatGPT-with-search cannot find it, regardless of how good your content is.
-        </p>
-
         <button
           onClick={checkBing}
           disabled={bingLoading || !domain}
@@ -223,13 +216,8 @@ export default function GeoHealthPage() {
             </div>
 
             {!bingResult.indexed && (
-              <div className="text-xs text-zinc-400 bg-zinc-950 border border-zinc-800 rounded-lg p-4 space-y-1">
-                <p className="font-semibold text-zinc-300">How to fix this:</p>
-                <ol className="list-decimal list-inside space-y-1">
-                  <li>Submit your sitemap in <a href="https://www.bing.com/webmasters" target="_blank" rel="noopener noreferrer" className="text-pink-400 hover:underline">Bing Webmaster Tools</a></li>
-                  <li>Use IndexNow below to push your key pages directly</li>
-                  <li>Add inbound links from already-indexed domains</li>
-                </ol>
+              <div className="text-xs text-zinc-400 bg-zinc-950 border border-zinc-800 rounded-lg p-4">
+                Submit your sitemap in <a href="https://www.bing.com/webmasters" target="_blank" rel="noopener noreferrer" className="text-pink-400 hover:underline">Bing Webmaster Tools</a>, then use IndexNow below to push key pages.
               </div>
             )}
           </div>
@@ -242,10 +230,7 @@ export default function GeoHealthPage() {
           <Send className="w-5 h-5 text-cyan-400" />
           <h2 className="text-base font-semibold text-white">IndexNow Push</h2>
         </div>
-        <p className="text-xs text-zinc-400">
-          Push URLs directly to Bing (and Yandex) for immediate crawl. Works best for new or updated pages.
-          After first use, a key file must be hosted at the displayed URL to verify ownership.
-        </p>
+        <p className="text-xs text-zinc-400">Push URLs to Bing for immediate crawl. One URL per line.</p>
         <textarea
           value={urls}
           onChange={e => setUrls(e.target.value)}
@@ -270,18 +255,11 @@ export default function GeoHealthPage() {
             )}
             {indexNowResult.keyFileLive === false && indexNowResult.indexNowKey && (
               <div className="mt-3 bg-zinc-950 border border-amber-500/30 rounded-lg p-3 space-y-2">
-                <p className="text-xs font-semibold text-amber-300">⚠ One-time setup needed: Bing will ignore these URLs until it can verify you own {domain}:</p>
-                <ol className="text-xs text-zinc-300 space-y-1.5 list-decimal pl-4">
-                  <li>
-                    <button onClick={() => downloadKeyFile(indexNowResult.indexNowKey!)} className="text-pink-400 underline hover:text-pink-300 font-semibold">
-                      Download your key file
-                    </button>{' '}
-                    (a tiny .txt file; we&apos;ve filled it in for you)
-                  </li>
-                  <li>Upload it to the top level of your website, so it appears at <code className="text-zinc-400 bg-zinc-900 px-1 rounded break-all">{indexNowResult.keyLocation}</code></li>
-                  <li>Push again: we re-check automatically and this notice turns green</li>
-                </ol>
-                <p className="text-[11px] text-zinc-500">On WordPress use a file-manager plugin; on Netlify/Vercel drop it in your <code className="bg-zinc-900 px-1 rounded">public/</code> folder. It&apos;s safe to leave there forever.</p>
+                <p className="text-xs font-semibold text-amber-300">⚠ One-time setup: host the key file at <code className="text-zinc-400 bg-zinc-900 px-1 rounded break-all">{indexNowResult.keyLocation}</code></p>
+                <button onClick={() => downloadKeyFile(indexNowResult.indexNowKey!)} className="text-xs text-pink-400 underline hover:text-pink-300 font-semibold">
+                  Download key file
+                </button>
+                <span className="text-xs text-zinc-500 ml-2">Then push again — we re-check automatically.</span>
               </div>
             )}
           </div>
@@ -294,10 +272,6 @@ export default function GeoHealthPage() {
           <Shield className="w-5 h-5 text-purple-400" />
           <h2 className="text-base font-semibold text-white">Entity Grounding Audit</h2>
         </div>
-        <p className="text-xs text-zinc-400">
-          AI models resolve brand identity through structured knowledge sources. Missing entries mean the model
-          treats your brand as an unknown entity, reducing citation probability even when your content is excellent.
-        </p>
 
         <button
           onClick={runEntityAudit}
@@ -356,7 +330,7 @@ export default function GeoHealthPage() {
                 <p className="text-xs font-semibold text-amber-300 uppercase tracking-widest mb-2 flex items-center gap-1.5">
                   <AlertCircle className="w-3.5 h-3.5" /> sameAs gaps detected
                 </p>
-                <p className="text-xs text-zinc-400 mb-2">These entity URLs were found but are NOT linked from your schema markup:</p>
+                <p className="text-xs text-zinc-400 mb-2">Found but missing from your schema markup:</p>
                 <div className="space-y-1">
                   {entityResult.sameAsGaps.map(url => (
                     <code key={url} className="block text-xs text-amber-300 bg-zinc-900 px-2 py-1 rounded">{url}</code>

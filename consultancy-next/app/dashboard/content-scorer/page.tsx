@@ -240,7 +240,7 @@ export default function ContentScorerPage() {
             <PenTool className="w-6 h-6 text-pink-500" />
             Pre-Publish Content Scorer
           </h1>
-          <p className="text-sm text-zinc-400 mt-1">Analyze your content for &ldquo;Machine Readability&rdquo; before you publish.</p>
+          <p className="text-sm text-zinc-400 mt-1">Paste a URL or text to score its GEO readiness.</p>
         </div>
       </div>
 
@@ -271,9 +271,6 @@ export default function ContentScorerPage() {
                 <FlaskConical className="w-4 h-4 text-indigo-400" />
                 <h3 className="text-sm font-semibold text-white">Lab-Validated GEO Levers</h3>
               </div>
-              <p className="text-xs text-zinc-500 mb-3">
-                Apply these while drafting. Each is backed by a real A/B citation experiment in the L8EntSpace GEO Lab.
-              </p>
               <div className="space-y-2">
                 {labLevers.map((lev) => (
                   <div key={lev.lever} className="bg-zinc-950 border border-zinc-800 rounded-lg p-3">

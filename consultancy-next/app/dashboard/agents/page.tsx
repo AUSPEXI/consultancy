@@ -458,8 +458,7 @@ export default function AgentsPage() {
               Query Permutations Engine
             </h3>
             <p className="text-xs text-zinc-500 mt-0.5">
-              Generate ~60 query variants for a keyword (7 formats × ~9 each), all embedded to 768D vectors and stored to
-              {' '}<code className="text-zinc-400 text-[10px]">fact_permutations</code> for model training. Load into bulk queue to generate GEO articles for the full query space.
+              Generate all intent variants of a keyword, embedded and queued for bulk article generation.
             </p>
           </div>
         </div>
@@ -960,12 +959,6 @@ export default function AgentsPage() {
             </div>
           )}
 
-          {!showResults && !isOrchestrating && (
-            <div className="mt-8 bg-zinc-950 border border-zinc-800 rounded-lg p-5">
-              <h4 className="text-sm font-semibold text-white mb-2">Why Multi-Agent?</h4>
-              <p className="text-sm text-zinc-400">Monolithic prompts lead to &ldquo;Lost in the Middle&rdquo; syndrome and hallucinations. By separating concerns, the Schema Agent never hallucinates facts, and the Extraction Agent never breaks JSON syntax. This ensures enterprise-grade accuracy.</p>
-            </div>
-          )}
         </div>
       </div>
     </div>

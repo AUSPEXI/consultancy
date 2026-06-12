@@ -96,9 +96,7 @@ export default function ExperimentsPage() {
           <FlaskConical className="w-7 h-7 text-pink-400" />
           Citability Lab
         </h1>
-        <p className="text-zinc-400 max-w-2xl">
-          Test your draft two ways. We apply one change, then ask the AI engines (in a randomised head-to-head) which version they&apos;d rather cite. This measures <span className="text-zinc-300">retrieval-time citability</span>, not live citations.
-        </p>
+        <p className="text-zinc-400 max-w-2xl">A/B test one content change across AI engines. Measures retrieval-time citability.</p>
       </div>
 
       {/* Inputs */}
@@ -122,7 +120,6 @@ export default function ExperimentsPage() {
               placeholder="e.g. best CRM for small sales teams"
               className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/40"
             />
-            <p className="text-[11px] text-zinc-600 mt-1">We generate the test questions from this.</p>
           </div>
           <div>
             <label className="text-sm font-medium text-zinc-300 mb-1.5 block">Change to test (the one variable)</label>
@@ -150,7 +147,6 @@ export default function ExperimentsPage() {
                 );
               })}
             </div>
-            <p className="text-[11px] text-zinc-600 mt-1">Perplexity costs more per call, so it is off by default.</p>
           </div>
           <div>
             <label className="text-sm font-medium text-zinc-300 mb-1.5 block">Trials per question: {trialsPerQuery}</label>

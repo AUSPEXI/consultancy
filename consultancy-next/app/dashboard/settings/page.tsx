@@ -327,7 +327,7 @@ export default function SettingsPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Account Settings</h1>
-          <p className="text-zinc-400">Configure your brand profile. Everything Citacious and the agent pipeline uses flows from here.</p>
+          <p className="text-zinc-400">Brand profile, keywords, competitors, and integrations.</p>
         </div>
         {/* Quick-fill for L8EntSpace account */}
         {userData?.email === 'hopiumcalculator@gmail.com' || userData?.email === 'sales@l8entspace.com' ? (
@@ -375,7 +375,7 @@ export default function SettingsPage() {
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="text-white">Target Keywords</CardTitle>
-          <CardDescription className="text-zinc-400">The primary queries you want your brand cited for in AI responses. Think "what would my customer ask ChatGPT before buying?"</CardDescription>
+          <CardDescription className="text-zinc-400">Queries you want your brand cited for in AI responses.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -395,7 +395,7 @@ export default function SettingsPage() {
           <div className="flex items-start justify-between">
             <div>
               <CardTitle className="text-white">Competitor Tracking</CardTitle>
-              <CardDescription className="text-zinc-400 mt-1">Brands racing you for AI citations. Primary competitors get full deep-analysis. Watchlist competitors are tracked for mentions.</CardDescription>
+              <CardDescription className="text-zinc-400 mt-1">Primary: deep analysis (max 4). Watchlist: mention tracking only.</CardDescription>
             </div>
             <button
               onClick={discoverCompetitors}
@@ -471,7 +471,6 @@ export default function SettingsPage() {
             )}
           </div>
 
-          <p className="text-xs text-zinc-600">Don&apos;t know your competitors? Click <span className="text-cyan-500">AI Discover</span>. Gemini will identify the brands most likely competing with you for AI citations.</p>
         </CardContent>
       </Card>
 
@@ -481,7 +480,7 @@ export default function SettingsPage() {
           <div className="flex items-start justify-between">
             <div>
               <CardTitle className="text-white">Semantic Anchors</CardTitle>
-              <CardDescription className="text-zinc-400 mt-1">The primary concepts AI engines associate with your brand in latent space. These appear in your Latent Space Map and guide Citacious&apos;s strategy.</CardDescription>
+              <CardDescription className="text-zinc-400 mt-1">Concepts AI engines associate with your brand. Guides Citacious and your Latent Space Map.</CardDescription>
             </div>
             <button
               onClick={generateAnchors}
@@ -498,7 +497,6 @@ export default function SettingsPage() {
             <div className="text-center py-8 border border-dashed border-zinc-700 rounded-xl">
               <Network className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
               <p className="text-sm text-zinc-500">No semantic anchors configured.</p>
-              <p className="text-xs text-zinc-600 mt-1">Set your brand name above, then click &ldquo;Generate Anchors&rdquo; to position your brand in the latent space.</p>
             </div>
           ) : (
             <div className="flex flex-wrap gap-3">
@@ -518,7 +516,7 @@ export default function SettingsPage() {
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="text-white">Connected Social Accounts</CardTitle>
-          <CardDescription className="text-zinc-400">Connect platforms to enable Fact Amplifier one-click publishing. Your credentials are stored only in your browser session (not transmitted to L8EntSpace servers).</CardDescription>
+          <CardDescription className="text-zinc-400">Connect platforms for Fact Amplifier publishing.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -592,7 +590,7 @@ export default function SettingsPage() {
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="text-white">Integrations</CardTitle>
-          <CardDescription className="text-zinc-400">Connect L8EntSpace to your internal server and submit your sitemap to search engines.</CardDescription>
+          <CardDescription className="text-zinc-400">Webhook endpoints and sitemap.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Sitemap */}
@@ -602,7 +600,7 @@ export default function SettingsPage() {
               <Input readOnly value="https://l8entspace.com/sitemap.xml" className="bg-zinc-950 border-zinc-800 text-zinc-400 font-mono text-xs" />
               <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText('https://l8entspace.com/sitemap.xml')}>Copy</Button>
             </div>
-            <p className="text-xs text-zinc-500">Submit to Google Search Console and Bing Webmaster Tools. All 40+ public pages are indexed here: critical for AI crawler discovery.</p>
+            <p className="text-xs text-zinc-500">Submit to Google Search Console and Bing Webmaster Tools.</p>
           </div>
 
           {/* Inbound webhook */}
@@ -613,7 +611,7 @@ export default function SettingsPage() {
               <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(`${origin}/api/webhooks/l8entspace`)}>Copy</Button>
             </div>
             <p className="text-xs text-zinc-500">
-              Configure your internal server to POST here when content is published. Header: <code className="text-zinc-300">x-l8entspace-secret</code>. Body: <code className="text-zinc-300">&#123; userId, type: &quot;article&quot;|&quot;fact&quot;, title, content, url &#125;</code>
+              POST here when content is published. Header: <code className="text-zinc-300">x-l8entspace-secret</code>. Body: <code className="text-zinc-300">&#123; userId, type, title, content, url &#125;</code>
             </p>
           </div>
 
@@ -635,9 +633,7 @@ export default function SettingsPage() {
               )}
             </div>
             <p className="text-xs text-zinc-500">
-              L8EntSpace posts generated articles and schema to this URL when you click &quot;Publish to Database &amp; CMS&quot;.{' '}
-              No CMS yet? Click <strong className="text-zinc-400">Use Email Notify</strong> and we&apos;ll email the article directly to your account address instead.
-              Payload: <code className="text-zinc-300">&#123; userId, topic, article, facts, schema, brand, timestamp &#125;</code>
+              Receives articles and schema on publish. No CMS? Use <strong className="text-zinc-400">Email Notify</strong> to get articles by email instead.
             </p>
           </div>
         </CardContent>
@@ -647,9 +643,7 @@ export default function SettingsPage() {
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="text-white">Industry Benchmarks</CardTitle>
-          <CardDescription className="text-zinc-400">
-            See how your citation rate compares to other brands in your industry. Opt in to contribute your anonymised rate and unlock the benchmark band on your Citation Probe chart.
-          </CardDescription>
+          <CardDescription className="text-zinc-400">Opt in to see how your citation rate compares to industry peers.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -673,9 +667,6 @@ export default function SettingsPage() {
               {benchmarkOptIn ? 'Contributing to industry benchmarks' : 'Not contributing (benchmarks hidden)'}
             </span>
           </button>
-          <p className="text-xs text-zinc-600">
-            We only ever share aggregated averages across at least 3 opted-in brands (never your brand name, your domain, or your individual rate). You can opt out anytime.
-          </p>
         </CardContent>
       </Card>
 
@@ -685,9 +676,7 @@ export default function SettingsPage() {
           <CardTitle className="text-white flex items-center gap-2">
             ⚡ Autopilot
           </CardTitle>
-          <CardDescription className="text-zinc-400">
-            L8EntSpace monitors your brand in the background and alerts you to what changed. No manual clicks required. Toggle individual tools or pause everything here.
-          </CardDescription>
+          <CardDescription className="text-zinc-400">Background monitoring. Toggle tools or pause everything here.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Master toggle */}
@@ -744,9 +733,6 @@ export default function SettingsPage() {
               </div>
             </button>
           )}
-          <p className="text-xs text-zinc-600">
-            Automation runs on our servers. No browser tab needed. Results appear on your Overview the next time you log in.
-          </p>
         </CardContent>
       </Card>
 

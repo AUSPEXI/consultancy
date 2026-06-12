@@ -124,7 +124,7 @@ function RequestForm({ userId, isReadOnly }: { userId: string; isReadOnly: boole
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-3">
       <div>
         <p className="text-sm font-semibold text-white mb-1">Request an experiment</p>
-        <p className="text-xs text-zinc-500">Have a hunch about what improves AI citations? Submit a hypothesis and it may be tested in a future GEO Lab A/B experiment.</p>
+        <p className="text-xs text-zinc-500">Submit a hypothesis to be tested in a future experiment.</p>
       </div>
       <div className="flex gap-3">
         <input
@@ -188,9 +188,7 @@ export default function GeoLabPage() {
             <FlaskConical className="w-7 h-7 text-pink-400" />
             GEO Lab Results
           </h1>
-          <p className="text-zinc-400 max-w-2xl">
-            Live findings from the L8EntSpace GEO Lab. Real A/B experiments measuring which content tactics lift citation rate. Only statistically significant results appear here.
-          </p>
+          <p className="text-zinc-400 max-w-2xl">A/B results: which content tactics lift citation rate. Significant findings only.</p>
         </div>
         <div className="flex items-center gap-3 text-xs text-zinc-500 shrink-0">
           <span className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-lg font-medium">
@@ -214,17 +212,11 @@ export default function GeoLabPage() {
         <div className="text-center py-16 bg-zinc-900/40 border border-zinc-800 rounded-xl">
           <FlaskConical className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
           <p className="text-zinc-400 font-medium">No lab findings yet.</p>
-          <p className="text-sm text-zinc-600 mt-1 max-w-md mx-auto">
-            The GEO Lab runs weekly A/B experiments. Significant results will appear here once the first experiment completes. Set <code className="text-pink-400">GEO_FINDINGS_SECRET</code> in both Netlify and GitHub secrets to connect the lab.
-          </p>
         </div>
       )}
 
       {!loading && recommendations.length > 0 && (
         <div className="space-y-3">
-          <p className="text-xs text-zinc-500 border-b border-zinc-800 pb-3">
-            Sorted by effect size (strongest first). Click any finding to expand the recommendation.
-          </p>
           {recommendations.map(rec => <FindingCard key={rec.lever} rec={rec} />)}
         </div>
       )}
@@ -232,7 +224,7 @@ export default function GeoLabPage() {
       {!loading && nullCount > 0 && (
         <div className="text-center py-4 text-xs text-zinc-600 flex items-center justify-center gap-2">
           <Minus className="w-3 h-3" />
-          {nullCount} experiment{nullCount !== 1 ? 's' : ''} returned null results. No significant effect detected. Null results are stored but not shown as recommendations.
+          {nullCount} null result{nullCount !== 1 ? 's' : ''} — no significant effect detected.
         </div>
       )}
 

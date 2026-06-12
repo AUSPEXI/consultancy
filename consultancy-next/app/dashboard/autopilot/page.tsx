@@ -273,9 +273,7 @@ export default function AutopilotPage() {
       )}
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">GEO Autopilot</h1>
-        <p className="text-zinc-400 max-w-2xl">
-          Full pipeline in one click: probe → crawl → extract → JSON-LD schema → GEO article → email. Run your entire keyword list or a one-off topic.
-        </p>
+        <p className="text-zinc-400 max-w-2xl">Full probe-to-publish pipeline, automated or on-demand.</p>
       </div>
 
       {/* Pipeline visualiser */}
@@ -321,9 +319,7 @@ export default function AutopilotPage() {
                 <CardTitle className="text-white flex items-center gap-2">
                   <Layers className="w-4 h-4 text-indigo-400" /> Run All Keywords
                 </CardTitle>
-                <CardDescription className="text-zinc-400 mt-1">
-                  Toggle which keywords to include. Each runs the full 5-step pipeline and emails the article + JSON-LD schema to you.
-                </CardDescription>
+                <CardDescription className="text-zinc-400 mt-1">Select keywords to run.</CardDescription>
               </div>
               <Button
                 onClick={runAllKeywords}
@@ -365,7 +361,7 @@ export default function AutopilotPage() {
             </div>
             {isBulkRunning && (
               <p className="text-xs text-zinc-500">
-                Processing {selectedKeywords.length} keywords in sequence. Keep this tab open. Each article is emailed to <span className="text-zinc-300">{user?.email}</span> as it completes.
+                Processing {selectedKeywords.length} keywords… results emailed to <span className="text-zinc-300">{user?.email}</span>.
               </p>
             )}
             {!userData?.brand && (

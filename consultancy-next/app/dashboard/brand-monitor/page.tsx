@@ -139,7 +139,7 @@ export default function BrandMonitorPage() {
           <Radar className="w-8 h-8 text-pink-500" />
           Consensus Platform Monitor
         </h1>
-        <p className="text-zinc-400">Scan Reddit and Quora to detect "Context Poisoning" before the next LLM training run.</p>
+        <p className="text-zinc-400">Real-time mention scanning across Reddit, Quora, and forums.</p>
       </div>
 
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">

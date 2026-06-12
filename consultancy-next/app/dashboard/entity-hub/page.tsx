@@ -158,12 +158,10 @@ export default function EntityHubPage() {
           <div>
             <BookOpen className="w-5 h-5 text-purple-400 mb-2" />
             <p className="font-semibold text-white mb-1">Ontological Foundation</p>
-            <p className="text-zinc-400">Your brand's Ontological anchor (what it fundamentally IS in AI minds) must exist as a structured entity before any other GEO work can compound.</p>
           </div>
           <div>
             <Link2 className="w-5 h-5 text-cyan-400 mb-2" />
-            <p className="font-semibold text-white mb-1">Entity Disambiguation</p>
-            <p className="text-zinc-400">When your brand appears in multiple authoritative sources with consistent sameAs links, AI models resolve citations to you with high confidence, not to a competitor with a similar name.</p>
+            <p className="font-semibold text-white mb-1" title="When your brand appears in multiple authoritative sources with consistent sameAs links, AI models resolve citations to you with high confidence, not to a competitor with a similar name.">Entity Disambiguation <span className="text-zinc-500 text-xs font-normal cursor-default">ℹ</span></p>
           </div>
           <div>
             <Globe className="w-5 h-5 text-emerald-400 mb-2" />

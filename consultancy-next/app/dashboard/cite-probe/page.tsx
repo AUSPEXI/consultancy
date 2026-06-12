@@ -548,13 +548,7 @@ export default function CiteProbePage() {
                   {probeData.misinformationCount} false claim{probeData.misinformationCount > 1 ? 's' : ''} detected below. Use the inline actions on each flagged result.
                 </div>
               )}
-              {probeData.citationRate === 0 && (
-                <div className="space-y-2 text-sm text-zinc-300">
-                  <p>1. Use <a href="/dashboard/agents" className="text-pink-400 underline">Agent Orchestration</a> to generate GEO-optimised articles about {brand} and publish them on {domain}.</p>
-                  <p>2. Add your core brand facts to the <a href="/dashboard/fact-vault" className="text-pink-400 underline">Fact Vault</a>. These inject into every LLM prompt via RAG.</p>
-                  <p>3. Run the probe again after publishing. Citations build over 2–6 weeks as LLMs index new content.</p>
-                </div>
-              )}
+              {probeData.citationRate === 0 && null}
               {probeData.citationRate > 0 && probeData.citationRate < 50 && (
                 <div className="space-y-2 text-sm text-zinc-300">
                   <p>You're being cited. Now amplify it. Target the platforms and queries that missed you below.</p>
@@ -599,10 +593,10 @@ export default function CiteProbePage() {
                 <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
                   <p className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-2">Prominence</p>
                   <div className={`text-4xl font-black ${posColor}`}>{posLabel}</div>
-                  <p className="text-xs text-zinc-500 mt-2">
-                    {pos === null || pos === undefined ? 'No position data' : `Brand appears ~${pos}% into the answer on average`}
-                  </p>
-                  <p className="text-[11px] text-zinc-600 mt-2">Earlier mentions carry more weight in AI answers.</p>
+                  <span
+                    title={pos === null || pos === undefined ? 'No position data' : `Brand appears ~${pos}% into the answer on average. Earlier mentions carry more weight.`}
+                    className="text-xs text-zinc-500 mt-2 cursor-help"
+                  >ℹ</span>
                 </div>
               </div>
             );
@@ -919,9 +913,7 @@ export default function CiteProbePage() {
                   <h3 className="text-sm font-semibold text-white">Content Gaps</h3>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300">{gaps.length}</span>
                 </div>
-                <p className="text-xs text-zinc-500 mt-1">
-                  Queries you&apos;re losing where you have <span className="text-zinc-300">no content nearby</span>. Close a gap, re-probe, and watch it flip.
-                </p>
+                <p className="text-xs text-zinc-500 mt-1">Queries where no nearby fact covers this topic.</p>
               </div>
               <div className="divide-y divide-zinc-800/50">
                 {gaps.slice(0, 6).map((g, i) => (
@@ -1080,8 +1072,7 @@ export default function CiteProbePage() {
           <Zap className="w-10 h-10 text-zinc-600 mx-auto mb-4" />
           <h3 className="text-base font-semibold text-white mb-2">Ready to probe</h3>
           <p className="text-zinc-400 text-sm max-w-md mx-auto mb-6">
-            Fires 7 real GEO-space questions simultaneously at every configured AI platform.
-            Checks live whether <span className="text-white font-medium">{brand}</span> gets cited accurately, and flags any misinformation.
+            Enter a brand and domain above to start your citation probe.
           </p>
           <div className="flex flex-wrap justify-center gap-2">
             {(Object.keys(PLATFORM_META) as PlatformKey[]).map(p => (

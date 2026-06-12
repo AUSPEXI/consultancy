@@ -109,7 +109,7 @@ export default function GeoPulsePage() {
             <h1 className="text-2xl font-bold text-white tracking-tight">GEO Pulse Index</h1>
             <span className="px-2 py-1 text-xs font-semibold rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30">Beta Test</span>
           </div>
-          <p className="text-sm text-zinc-400 mt-1">Legitimate First-Party Brand Sentiment Aggregator.</p>
+          <p className="text-sm text-zinc-400 mt-1">Scan AI engines for brand mentions across your target queries.</p>
         </div>
       </div>
 
@@ -191,9 +191,6 @@ export default function GeoPulsePage() {
                 </div>
               ))}
             </div>
-            <p className="text-sm text-zinc-500 mt-8 max-w-md mx-auto">
-              Aggregating first-party search intent patterns and mapping vector distributions against your Semantic Anchors.
-            </p>
           </div>
         )}
 

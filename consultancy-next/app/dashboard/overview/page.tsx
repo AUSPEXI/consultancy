@@ -403,7 +403,7 @@ export default function OverviewPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Executive Performance Hub</h1>
-          <p className="text-sm text-zinc-400 mt-1">Track Absolute SOV, Entity Recall, and the growth of your Proprietary Neural Moat.</p>
+          <p className="text-sm text-zinc-400 mt-1">Track SOV, Entity Recall, and your Neural Moat growth.</p>
         </div>
         <div className="flex items-center gap-3">
           {(() => {
@@ -662,8 +662,7 @@ export default function OverviewPage() {
 
         <div className="lg:col-span-2 bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
           <div className="mb-6">
-            <h3 className="text-base font-semibold text-white flex items-center gap-2"><LinkIcon className="w-4 h-4 text-pink-400" />"Dark AI" Shadow Tracking UTM Generator</h3>
-            <p className="text-xs text-zinc-400 mt-1">AI engines natively strip referral headers, making physical traffic look like "Direct" in Google Analytics. Generate a Shadow Link to embed in your JSON-LD Schema to definitively prove AI ROI.</p>
+            <h3 className="text-base font-semibold text-white flex items-center gap-2"><LinkIcon className="w-4 h-4 text-pink-400" />"Dark AI" Shadow Tracking UTM Generator <span className="text-zinc-500 text-xs font-normal cursor-default" title="AI engines natively strip referral headers, making physical traffic look like &quot;Direct&quot; in Google Analytics. Generate a Shadow Link to embed in your JSON-LD Schema to definitively prove AI ROI.">ℹ</span></h3>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
             <input type="text" value={shadowUrl} onChange={(e) => setShadowUrl(e.target.value)} placeholder="e.g., l8entspace.com/latency-report" className="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50 text-sm" />

@@ -229,9 +229,6 @@ export default function Competitors() {
               </div>
               <div>
                 <h3 className="text-base font-semibold text-rose-400">Trojan Horse Opportunities</h3>
-                <p className="text-sm text-zinc-400 mt-1 max-w-2xl">
-                  We've detected that the entities below have severe "Data Decay". Their LLM vectors are weak, generic, or outdated. This is a critical opportunity to push high-entropy facts to steal their citations.
-                </p>
               </div>
             </div>
           </div>
@@ -240,7 +237,6 @@ export default function Competitors() {
             <div className="text-center py-12 bg-zinc-900/50 border border-zinc-800 rounded-xl">
               <Radar className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
               <p className="text-zinc-400">No Trojan Horse opportunities detected yet.</p>
-              <p className="text-sm text-zinc-500 mt-1">Add more competitors to scan for decay.</p>
             </div>
           ) : (
             trojanOpportunities.map((comp) => (
@@ -352,9 +348,6 @@ export default function Competitors() {
               </button>
             </div>
             <div className="p-6">
-              <p className="text-sm text-zinc-400 mb-4">
-                Enter a competitor's URL. Our engine will analyze their content for data decay and identify Trojan Horse opportunities.
-              </p>
               <input
                 type="url"
                 value={inputUrl}

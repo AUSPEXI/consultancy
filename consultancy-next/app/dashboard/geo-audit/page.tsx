@@ -126,10 +126,7 @@ export default function GeoAuditPage() {
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
       <div>
         <h1 className="text-2xl font-black text-white">Full GEO Audit</h1>
-        <p className="text-sm text-zinc-400 mt-1">
-          One run, three diagnostics: how often AI engines cite you, whether Bing (ChatGPT&apos;s search index)
-          can see you, and whether the knowledge sources AI relies on know you exist.
-        </p>
+        <p className="text-sm text-zinc-400 mt-1">Citations · Bing indexation · entity grounding — in one run.</p>
       </div>
 
       <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 space-y-4">
@@ -222,10 +219,7 @@ export default function GeoAuditPage() {
                 <Rocket className="w-5 h-5 text-pink-400 shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-bold text-white">Keep this running automatically</p>
-                  <p className="text-xs text-zinc-400 mt-0.5">
-                    Turn on Autopilot: weekly citation tracking on these exact queries, brand monitoring,
-                    and an email digest when anything changes. One click (adjust anytime in Settings).
-                  </p>
+                  <p className="text-xs text-zinc-400 mt-0.5">Weekly citation tracking, brand monitoring, email digest. Adjust anytime in Settings.</p>
                 </div>
               </div>
               <button onClick={activateAutopilot} disabled={activating}

@@ -280,9 +280,6 @@ export default function FactVault() {
       <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden relative">
         <div className="p-6 border-b border-zinc-800 bg-zinc-900/80">
           <h3 className="text-base font-semibold text-white">Information Cliffhangers</h3>
-          <p className="text-sm text-zinc-400 mt-1 max-w-3xl">
-            To combat the "Zero-Click" nature of AI search, high-entropy facts are fed to the LLM, but the "How-To" or deep technical architecture is gated behind a citation link. This forces the user to click through to your site.
-          </p>
         </div>
 
         <div className="overflow-x-auto">
@@ -305,9 +302,7 @@ export default function FactVault() {
                         <Database className="w-8 h-8 text-pink-400" />
                       </div>
                       <h3 className="text-lg font-medium text-white mb-2">Your Fact-Vault is Empty</h3>
-                      <p className="text-zinc-400 text-sm mb-6">
-                        Store unique, high-entropy data points here to feed AI models. Not sure where to start? Let our Fact-Grabber research assistant generate some facts for your industry.
-                      </p>
+                      <p className="text-zinc-400 text-sm mb-6">Add facts for AI models to cite.</p>
                       <div className="flex gap-3 w-full">
                         <button
                           onClick={() => setIsResearchModalOpen(true)}
@@ -457,9 +452,6 @@ export default function FactVault() {
               </button>
             </div>
             <div className="p-6">
-              <p className="text-sm text-zinc-400 mb-4">
-                Paste your blog post, whitepaper, or technical documentation below. Our proprietary AI engine will analyze the text and extract unique, non-obvious data points that AI models are likely to cite.
-              </p>
               <textarea
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
@@ -514,9 +506,6 @@ export default function FactVault() {
               </button>
             </div>
             <div className="p-6">
-              <p className="text-sm text-zinc-400 mb-4">
-                Tell us your industry or domain. Our research assistant will generate high-entropy facts to kickstart your vault.
-              </p>
               <input
                 type="text"
                 value={industry}
@@ -602,10 +591,8 @@ export default function FactVault() {
                 </button>
               </div>
 
-              {/* How to add manually */}
-              <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 space-y-2">
-                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">If adding manually</p>
-                <p className="text-xs text-zinc-400">Paste inside your page's <code className="text-indigo-300">&lt;head&gt;</code> tag:</p>
+              {/* HTML snippet for manual install */}
+              <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4">
                 <div className="bg-black rounded-lg px-3 py-2 flex items-center justify-between gap-2">
                   <code className="text-[11px] text-indigo-300 font-mono">{`<script type="application/ld+json">${schemaPanel.json.replace(/\n/g, ' ')}</script>`}</code>
                   <button

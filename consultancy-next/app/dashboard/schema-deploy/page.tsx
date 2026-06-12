@@ -83,7 +83,7 @@ add_action('wp_head', function() {
       )}
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Schema Deploy</h1>
-        <p className="text-zinc-400">One snippet on your website. Your structured data stays in sync with your Fact-Vault automatically. No developer required after day one.</p>
+        <p className="text-zinc-400">One snippet keeps your structured data in sync with your Fact-Vault automatically.</p>
       </div>
 
       {/* How it works */}
@@ -105,7 +105,7 @@ add_action('wp_head', function() {
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2"><Globe className="w-4 h-4 text-pink-400" /> Your Live Schema API</CardTitle>
-          <CardDescription className="text-zinc-400">This URL returns your current JSON-LD structured data, generated from your Fact-Vault and brand profile. Publicly accessible, cached for 5 minutes.</CardDescription>
+          <CardDescription className="text-zinc-400">Your current JSON-LD, generated from Fact-Vault. Public, cached 5 min.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex gap-2">
@@ -130,7 +130,7 @@ add_action('wp_head', function() {
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2"><Code2 className="w-4 h-4 text-cyan-400" /> JavaScript Snippet</CardTitle>
-          <CardDescription className="text-zinc-400">Paste before {'</head>'} on every page. Works on any HTML site, Squarespace, Webflow, Shopify, or custom stack.</CardDescription>
+          <CardDescription className="text-zinc-400">Paste before <code className="text-zinc-300">&lt;/head&gt;</code> on every page.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="relative">
@@ -151,7 +151,7 @@ add_action('wp_head', function() {
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="text-white">WordPress / PHP Integration</CardTitle>
-          <CardDescription className="text-zinc-400">Add to your theme's functions.php or a site-specific plugin. Server-side fetch with no client-side latency.</CardDescription>
+          <CardDescription className="text-zinc-400">Add to functions.php or a site plugin.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="relative">

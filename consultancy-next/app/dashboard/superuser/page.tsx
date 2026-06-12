@@ -102,7 +102,6 @@ function CostAuditPanel({ userId }: { userId: string }) {
           </div>
           <div>
             <h3 className="text-xl font-bold text-white">Cost Audit</h3>
-            <p className="text-xs text-zinc-500 mt-0.5">Live unit economics: token usage, API costs, pricing calculator</p>
           </div>
         </div>
         <button
@@ -125,7 +124,6 @@ function CostAuditPanel({ userId }: { userId: string }) {
         <div className="text-center py-12 text-zinc-500">
           <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-30" />
           <p className="text-sm">Click &ldquo;Load Data&rdquo; to see your cost breakdown</p>
-          <p className="text-xs mt-1 text-zinc-600">Tracks every LLM call and Exa search made by your account</p>
         </div>
       )}
 
@@ -248,9 +246,6 @@ function CostAuditPanel({ userId }: { userId: string }) {
                 ))}
               </div>
             </div>
-            <p className="text-[10px] text-zinc-600 mt-4">
-              Based on your actual API usage pattern. 3× cost margin is conservative (SaaS tooling typically runs 5–10×). Assumes usage scales linearly with subscribers.
-            </p>
 
             {/* Platform rate card */}
             {data.platformRates && (
@@ -605,7 +600,7 @@ export default function SuperuserPage() {
             Superuser Control Center
           </div>
           <h1 className="text-3xl font-bold text-white mb-4">Account Debug &amp; Data Generation</h1>
-          <p className="text-zinc-400 text-lg mb-8 leading-relaxed">Seed synthetic GEO data or reset account state for testing. These actions write directly to Firestore.</p>
+          <p className="text-zinc-400 text-lg mb-8 leading-relaxed">Seed synthetic data, reset state, manage tiers — direct Firestore writes.</p>
 
           {ADMIN_BYPASS && !user && (
             <div className="p-3 rounded-xl mb-6 flex items-center gap-3 bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 text-xs font-mono">
@@ -660,7 +655,6 @@ export default function SuperuserPage() {
               </div>
               <h3 className="text-xl font-bold text-white">Investor Transparency Mode</h3>
             </div>
-            <p className="text-zinc-400 text-sm mb-6 max-w-xl">Use these tools to verify the &ldquo;Money Machine&rdquo; unit economics. These simulate high-growth scenarios used for Investor Pitch Decks and Series A Due Diligence.</p>
             <div className="flex flex-wrap gap-4">
               <Button onClick={() => window.location.href = '/investors'} variant="outline" className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10">
                 <Eye className="w-4 h-4 mr-2" /> View Live Data Room
@@ -692,7 +686,6 @@ export default function SuperuserPage() {
           </div>
           <h3 className="text-xl font-bold text-white">Blog Social Preview Manager</h3>
         </div>
-        <p className="text-zinc-400 text-sm mb-6">Visit any post&apos;s preview URL and take a screenshot, or use an automated service to fetch these URLs.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2">
           {blogPosts.map(post => (
             <div key={post.slug} className="p-4 bg-zinc-950 border border-zinc-800 rounded-xl flex items-center justify-between group hover:border-pink-500/30 transition-colors">

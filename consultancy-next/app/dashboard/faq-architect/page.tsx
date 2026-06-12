@@ -130,9 +130,7 @@ export default function FaqArchitectPage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-white">FAQ Architect</h1>
-            <p className="text-xs text-zinc-500">
-              Generates a deploy-ready FAQ page from your probe history and Fact-Vault: questions AI engines are actually asked, answered with your verified facts.
-            </p>
+            <p className="text-xs text-zinc-500">FAQ page from your real probe queries and Fact-Vault, ready to deploy.</p>
           </div>
         </div>
         <button
@@ -161,12 +159,7 @@ export default function FaqArchitectPage() {
         <div className="flex flex-col items-center text-center py-16 px-6 bg-zinc-900/40 border border-zinc-800 rounded-2xl">
           <Target className="w-8 h-8 text-zinc-700 mb-3" />
           <p className="text-sm font-semibold text-zinc-300">No FAQ draft yet</p>
-          <p className="text-xs text-zinc-500 mt-2 max-w-md leading-relaxed">
-            FAQ Architect reads your latest Citation Probe (the real queries AI engines are asked about
-            your category, including the ones where you&apos;re NOT cited) and your Fact-Vault, then
-            generates a complete categorised FAQ page (with FAQPage JSON-LD schema and per-question
-            anchor links) ready to paste into your site. For best results, run a probe and add 10+ facts first.
-          </p>
+          <p className="text-xs text-zinc-500 mt-2">Run a probe and add facts first, then generate.</p>
         </div>
       )}
 
@@ -253,11 +246,7 @@ export default function FaqArchitectPage() {
             </div>
           </div>
 
-          <p className="text-[10px] text-zinc-600 leading-relaxed">
-            Deploy notes: keep the answer text in the page HTML on load (no client-side click-to-reveal that removes it
-            from the DOM), keep the JSON-LD on the same URL as the visible questions, and re-run a Citation Probe 1–2
-            weeks after publishing to measure the citation lift. Generated {new Date(draft.generatedAt).toLocaleString()}.
-          </p>
+          <p className="text-[10px] text-zinc-600">Generated {new Date(draft.generatedAt).toLocaleString()}.</p>
         </>
       )}
     </div>
