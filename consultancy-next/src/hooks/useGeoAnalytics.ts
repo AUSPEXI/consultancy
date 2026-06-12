@@ -11,6 +11,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 export const useGeoAnalytics = (brandId: string, customPrompts: string[] = [], platform: string = 'All', timeframe: string = 'current', userId?: string) => {
   const [pulseData, setPulseData] = useState<any[]>([]);
   const [mapPoints, setMapPoints] = useState<any[]>([]);
+  const [synonymGaps, setSynonymGaps] = useState<{ text: string; alignmentScore: number }[]>([]);
   const [sentimentTrace, setSentimentTrace] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const promptsRef = useRef(customPrompts);
@@ -40,7 +41,10 @@ export const useGeoAnalytics = (brandId: string, customPrompts: string[] = [], p
       const trace = await traceRes.json();
 
       if (pulse.success) setPulseData(pulse.pulse);
-      if (map.success) setMapPoints(map.points);
+      if (map.success) {
+        setMapPoints(map.points);
+        if (Array.isArray(map.synonymGaps)) setSynonymGaps(map.synonymGaps);
+      }
       if (trace.success) setSentimentTrace(trace.trace);
     } catch (error) {
       console.error("Failed to fetch GEO analytics:", error);
@@ -53,5 +57,5 @@ export const useGeoAnalytics = (brandId: string, customPrompts: string[] = [], p
     fetchAnalytics();
   }, [fetchAnalytics]);
 
-  return { pulseData, mapPoints, sentimentTrace, loading, refetch: fetchAnalytics };
+  return { pulseData, mapPoints, synonymGaps, sentimentTrace, loading, refetch: fetchAnalytics };
 };

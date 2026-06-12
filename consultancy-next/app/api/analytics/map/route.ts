@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
     const timeframe = searchParams.get('timeframe') || 'current';
 
     let anchorLabels: { label: string; color: string; baseType: string; axisAlignment?: number }[] = DEFAULT_ANCHORS;
-    let vaultFacts: { text: string; id: string; embedding?: number[]; collection: 'facts' | 'knowledge_graph'; groupType?: string }[] = [];
+    let vaultFacts: { text: string; id: string; embedding?: number[]; alignmentScore?: number; collection: 'facts' | 'knowledge_graph'; groupType?: string }[] = [];
     // Synthetic nodes from settings (keywords, competitors, tracking queries).
     // These share the same latent space as vault facts so the visualisation and
     // the ML training set both see the full signal picture.
@@ -93,6 +93,7 @@ export async function GET(req: NextRequest) {
           id: d.id,
           text: (d.data().statement as string) || '',
           embedding: (d.data().embedding as number[] | undefined),
+          alignmentScore: (d.data().embeddingAlignmentScore as number | undefined),
           collection: 'facts' as const,
           groupType: 'Systemic Anchor',
         })).filter(f => f.text.length > 10);
@@ -108,6 +109,7 @@ export async function GET(req: NextRequest) {
             id: d.id,
             text: (d.data().fact as string) || '',
             embedding: (d.data().embedding as number[] | undefined),
+            alignmentScore: (d.data().embeddingAlignmentScore as number | undefined),
             collection: 'knowledge_graph' as const,
             groupType: 'Systemic Anchor',
           })).filter(f => f.text.length > 10);
@@ -176,23 +178,32 @@ export async function GET(req: NextRequest) {
       const needsEmbedding = vaultFacts.filter(f => !f.embedding || f.embedding.length === 0);
       const hasCached      = vaultFacts.filter(f =>  f.embedding && f.embedding.length > 0);
 
-      let freshEmbeddings: number[][] = [];
+      const embMap = new Map<string, number[]>();
+      hasCached.forEach(f         => embMap.set(f.id, f.embedding!));
+
       if (needsEmbedding.length > 0) {
-        freshEmbeddings = await embeddingService.generateEmbeddings(needsEmbedding.map(f => f.text));
+        // Use generateWithLocal so we get the dual-embed alignment score in the
+        // same API call — zero extra cost, just one extra local pass.
+        // alignmentScore < 0.3 → local synonym dictionary has poor coverage of
+        // this concept; those entries are surfaced in the response as synonym-gap
+        // recommendations so the user knows which synonym groups to expand.
+        const { apiEmbeddings: freshEmbeddings, localEmbeddings, alignmentScores, localSpace } = await embeddingService.generateWithLocal(needsEmbedding.map(f => f.text));
+        freshEmbeddings.forEach((emb, i) => embMap.set(needsEmbedding[i].id, emb));
         newlyEmbeddedCount = needsEmbedding.length;
         if (dbAdmin) {
           const batch = dbAdmin.batch();
           needsEmbedding.forEach((f, i) => {
-            batch.update(dbAdmin!.collection(f.collection).doc(f.id), { embedding: freshEmbeddings[i], embeddingSpace: activeSpace });
+            batch.update(dbAdmin!.collection(f.collection).doc(f.id), {
+              embedding: freshEmbeddings[i],
+              embeddingSpace: activeSpace,
+              localEmbedding: localEmbeddings[i],
+              localEmbeddingSpace: localSpace,
+              embeddingAlignmentScore: alignmentScores[i],
+            });
           });
           batch.commit().catch(() => {});
         }
       }
-
-      const embMap = new Map<string, number[]>();
-      hasCached.forEach(f         => embMap.set(f.id, f.embedding!));
-      needsEmbedding.forEach((f, i) => embMap.set(f.id, freshEmbeddings[i]));
-      const factEmbeddings = vaultFacts.map(f => embMap.get(f.id)!);
 
       // Compute citation status for each fact using the most recent cite-probe run
       const citationStatuses = await computeCitationStatuses(factEmbeddings, userId, dbAdmin);
@@ -287,6 +298,16 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    // Dual-embed alignment gaps — facts where the local synonym dictionary has
+    // poor coverage (alignment < 0.3). Sorted ascending so the weakest entry
+    // is first. Facts without a stored score are skipped (they will get one on
+    // the next page load when the embedding path runs).
+    const LOW_ALIGNMENT = 0.3;
+    const synonymGaps: { text: string; alignmentScore: number }[] = vaultFacts
+      .filter(f => typeof f.alignmentScore === 'number' && f.alignmentScore < LOW_ALIGNMENT)
+      .sort((a, b) => (a.alignmentScore ?? 0) - (b.alignmentScore ?? 0))
+      .map(f => ({ text: f.text.substring(0, 100), alignmentScore: f.alignmentScore! }));
+
     const engineInfo = embeddingService.getActiveEngine();
 
     const billableTexts = newlyEmbeddedCount + (axisEmbeddingsWereNew ? 3 : 0);
@@ -313,6 +334,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       points,
+      synonymGaps,
       metadata: {
         engine: engineInfo.model,
         provider: engineInfo.name,

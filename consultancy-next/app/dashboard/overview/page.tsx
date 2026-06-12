@@ -78,7 +78,7 @@ export default function OverviewPage() {
 
   const userPrompts = userData?.sentimentPrompts || defaultPrompts;
 
-  const { pulseData, mapPoints, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(
+  const { pulseData, mapPoints, synonymGaps, loading: geoLoading, refetch: refetchGeo } = useGeoAnalytics(
     userData?.brand || '',
     userPrompts,
     selectedPlatform,
@@ -618,6 +618,30 @@ export default function OverviewPage() {
             <UmapVisualization points={mapPoints} userAnchors={userAnchors} />
           </div>
           <NeuralLegend />
+
+          {/* Synonym dictionary gaps — concepts where the local embedder has
+              poor coverage (alignment < 0.3). Adding synonyms for these terms
+              in local-synonyms.ts improves zero-cost retrieval quality. */}
+          {synonymGaps.length > 0 && (
+            <div className="mt-4 border border-amber-500/20 bg-amber-500/5 rounded-xl overflow-hidden">
+              <div className="px-5 py-3 flex items-center gap-2 border-b border-amber-500/15">
+                <span className="text-[9px] font-black uppercase tracking-widest text-amber-400">Synonym Dictionary Gaps</span>
+                <span className="text-[9px] bg-amber-500/15 text-amber-300 font-bold px-1.5 py-0.5 rounded-full">{synonymGaps.length}</span>
+                <span className="text-[9px] text-zinc-600 ml-1">concepts poorly covered by local synonym embedder</span>
+              </div>
+              <div className="px-5 py-3 flex flex-wrap gap-2">
+                {synonymGaps.slice(0, 8).map((g, i) => (
+                  <div key={i} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/60 border border-amber-500/15 max-w-xs overflow-hidden">
+                    <span className="text-[10px] font-mono text-amber-300/70 shrink-0">{(g.alignmentScore * 100).toFixed(0)}%</span>
+                    <span className="text-[10px] text-zinc-400 truncate" title={g.text}>{g.text}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="px-5 pb-3 text-[9px] text-zinc-600">
+                Add synonyms for these terms in <code className="text-zinc-500">src/lib/local-synonyms.ts</code> to improve zero-cost retrieval accuracy.
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
