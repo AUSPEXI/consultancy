@@ -1,8 +1,20 @@
 {
   "_comment": "Managed by orchestrate.mjs — do not hand-edit.",
-  "active_experiment": null,
+  "active_experiment": {
+    "id": "013",
+    "slug": "engine-divergence",
+    "dir": "experiments/013-engine-divergence",
+    "started_at": "2026-06-12T12:13:32.297Z",
+    "n_target": 40,
+    "platforms": [
+      "gemini",
+      "openai",
+      "perplexity",
+      "claude"
+    ]
+  },
   "last_probe_run": "2026-06-11T22:03:00.726Z",
-  "last_design_run": "2026-06-06T21:01:12.122Z",
+  "last_design_run": "2026-06-12T12:13:32.297Z",
   "queue_position": 1,
   "history": [
     {
@@ -19,5 +31,6 @@
       ],
       "completed_at": "2026-06-11T22:04:18.428Z"
     }
-  ]
+  ],
+  "retestLog": {}
 }

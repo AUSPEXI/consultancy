@@ -39,9 +39,10 @@
       ],
       "n_per_variant": 40,
       "priority": 2,
-      "status": "queued",
+      "status": "running",
       "note": "Re-run 001 variants but report by engine. Zero extra content work — reuses 001 design.",
-      "youtube_angle": "Engine Wars episode — 'ChatGPT cites this. Perplexity ignores it.' Most shareable early video."
+      "youtube_angle": "Engine Wars episode — 'ChatGPT cites this. Perplexity ignores it.' Most shareable early video.",
+      "started_at": "2026-06-12T12:13:32.297Z"
     },
     {
       "id": "002",
