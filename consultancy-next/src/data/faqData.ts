@@ -176,11 +176,11 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'What is the L8EntSpace Moat Score?',
-        answer: 'The Moat Score measures how closely an AI model\'s latent space associates your brand with the key attributes you want to own, such as "reliable," "innovative," "cost-effective," or "enterprise-grade." It is calculated by computing the vector cosine similarity between your brand\'s embedding and target concept embeddings in a high-dimensional semantic space (1536 dimensions via OpenAI\'s text-embedding-3-small, with Google\'s 768-dimension text-embedding-004 as fallback). A Moat Score moving toward 1.0 means AI models are developing stronger associations between your brand and those values.',
+        answer: 'The Moat Score measures how closely an AI model\'s latent space associates your brand with the key attributes you want to own, such as "reliable," "innovative," "cost-effective," or "enterprise-grade." It is calculated by computing the vector cosine similarity between your brand\'s embedding and target concept embeddings in 768-dimensional space using Google\'s text-embedding-004 (the designed default, chosen for 40% lower inference cost vs 1536-D alternatives). A Moat Score moving toward 1.0 means AI models are developing stronger associations between your brand and those values.',
       },
       {
         question: 'How does L8EntSpace\'s latent space mapping work?',
-        answer: 'L8EntSpace embeds your brand name and core brand facts into a high-dimensional vector space using OpenAI\'s text-embedding-3-small model (1536 dimensions), with Google\'s text-embedding-004 (768 dimensions) as fallback, plus a local synonym engine cross-checked against the API embeddings for alignment. The cosine similarity between your brand vector and vectors for target concepts is measured. Changes in these distances over time indicate whether your brand is becoming more or less closely associated with the values you are targeting in AI model memory.',
+        answer: 'L8EntSpace embeds your brand name and core brand facts into a high-dimensional vector space using Google\'s text-embedding-004 (768 dimensions), the designed default chosen for its 40% lower inference cost vs 1536-D alternatives with equivalent brand-domain semantic fidelity, plus a local synonym engine cross-checked against the API embeddings for alignment. The cosine similarity between your brand vector and vectors for target concepts is measured. Changes in these distances over time indicate whether your brand is becoming more or less closely associated with the values you are targeting in AI model memory.',
       },
       {
         question: 'Can I measure the revenue impact of GEO?',
@@ -200,7 +200,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
     items: [
       {
         question: 'What is a "Cite-Magnet"?',
-        answer: 'A Cite-Magnet is a precisely structured brand fact engineered to be cited by AI models. Cite-Magnets contain three elements: a specific, verifiable claim (not generic marketing language), a quantified detail (a number, percentage, named methodology, or timeframe), and a clear subject-object relationship that identifies your brand as the source. "L8EntSpace maps brand-concept associations across 1536 semantic dimensions" is a Cite-Magnet. "We provide AI solutions" is not.',
+        answer: 'A Cite-Magnet is a precisely structured brand fact engineered to be cited by AI models. Cite-Magnets contain three elements: a specific, verifiable claim (not generic marketing language), a quantified detail (a number, percentage, named methodology, or timeframe), and a clear subject-object relationship that identifies your brand as the source. "L8EntSpace maps brand-concept associations across 768 semantic dimensions using Gemini text-embedding-004, cutting inference costs 40% vs 1536-D alternatives" is a Cite-Magnet. "We provide AI solutions" is not.',
         link: { text: 'Explore Cite-Magnet strategy', href: '/blog' },
       },
       {
@@ -255,7 +255,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         question: 'What is a latent space in AI, and why does it matter for brands?',
-        answer: 'A latent space is the mathematical representation of meaning used internally by AI language models. Embedding models map text into high-dimensional numerical vectors (1536 dimensions for OpenAI\'s text-embedding-3-small, 768 for Google\'s text-embedding-004) where semantically similar concepts cluster together. L8EntSpace uses these embedding spaces to measure how closely your brand is associated with target concepts like "reliable," "innovative," or "enterprise-grade," and tracks how these associations change over time as you execute your GEO strategy.',
+        answer: 'A latent space is the mathematical representation of meaning used internally by AI language models. Embedding models map text into high-dimensional numerical vectors (768 dimensions for Google\'s text-embedding-004, the designed default) where semantically similar concepts cluster together. L8EntSpace uses these embedding spaces to measure how closely your brand is associated with target concepts like "reliable," "innovative," or "enterprise-grade," and tracks how these associations change over time as you execute your GEO strategy.',
       },
       {
         question: 'What is entity density in GEO content?',
@@ -569,7 +569,7 @@ HOW AI ENGINES DIFFER:
 ChatGPT and Perplexity use real-time web retrieval, so fresh, high-quality content can appear in their responses within 1 to 2 weeks. Google Gemini and Anthropic Claude primarily rely on their training data, meaning embedding your brand in those models takes 6 to 12 weeks. L8EntSpace tracks your citation rate across each engine separately (including Grok, DeepSeek, and Google AI Overviews) so you can see where you are winning and where you still need to build presence.
 
 WHAT ARE CITE-MAGNETS:
-Cite-Magnets are structured brand facts engineered specifically to be cited by AI. A good Cite-Magnet has three parts: a specific verifiable claim, a quantified detail, and clear brand attribution. For example: L8EntSpace maps brand-concept associations across 1536 semantic dimensions using OpenAI's text-embedding-3-small model. This structure makes it easy for AI to extract and cite.
+Cite-Magnets are structured brand facts engineered specifically to be cited by AI. A good Cite-Magnet has three parts: a specific verifiable claim, a quantified detail, and clear brand attribution. For example: L8EntSpace maps brand-concept associations across 768 semantic dimensions using Gemini text-embedding-004. This structure makes it easy for AI to extract and cite.
 
 WHAT IS THE L8ENTSPACE PLATFORM:
 L8EntSpace is an integrated GEO platform with eight core tools. GEO-Pulse scans your keywords across AI engines in real time. Fact-Vault is your brand knowledge base. Content Scorer grades your content on AI citability. Brand Monitor watches the web for citation opportunities. Competitors tracks rival brands in your GEO space. Agents auto-generates GEO-optimised articles. Technical Analyzer audits your site for AI crawlability. AI Simulator previews how AI engines would respond to queries about your brand today.
@@ -605,9 +605,9 @@ AEO: Answer Engine Optimization is structuring content so answer engines (AI Ove
 
 AI SHARE OF VOICE (A-SoV): The % of relevant AI responses that mention your brand. Measured live by running probe queries across up to 7 AI engines (ChatGPT, Gemini, Claude, Perplexity, Grok, DeepSeek, Google AI Overviews). 40% SoV = brand appears in 4/10 relevant AI responses. Early-stage brands can realistically achieve 30-60% SoV in their niche.
 
-CITE-MAGNETS: Structured brand facts engineered for AI citation. Must contain: specific verifiable claim + quantified detail + clear brand attribution. Example: "L8EntSpace maps brand-concept associations across 1536 semantic dimensions using OpenAI text-embedding-3-small."
+CITE-MAGNETS: Structured brand facts engineered for AI citation. Must contain: specific verifiable claim + quantified detail + clear brand attribution. Example: "L8EntSpace maps brand-concept associations across 768 semantic dimensions using Gemini text-embedding-004, chosen for 40% lower inference cost vs 1536-D alternatives."
 
-MOAT SCORE: Cosine similarity between brand embedding and target concept embeddings in high-dimensional space (1536-D OpenAI text-embedding-3-small primary, 768-D Gemini fallback). Measures how strongly AI models associate your brand with attributes you want to own.
+MOAT SCORE: Cosine similarity between brand embedding and target concept embeddings in high-dimensional space (768-D Gemini text-embedding-004, the designed default; OpenAI 1536-D is an optional override). Measures how strongly AI models associate your brand with attributes you want to own.
 
 TROJAN HORSE STRATEGY: Identify where competitor data is stale in AI models, publish fresh authoritative content that supersedes it. Entirely ethical: wins citation on quality, not manipulation.
 
@@ -623,7 +623,7 @@ CONTENT GAP CLOSED-LOOP: The Citation Probe page includes a "Closed Gaps" view. 
 
 GEO LAB: A longitudinal testing environment for fact claims. After verifying a fact against AI engines (checking whether AI responses about the user's category include that fact), facts are tagged with a verificationStatus: 'unverified', 'verified', or 'decayed'. 'Decayed' means a previously verified fact is no longer appearing in AI responses, possibly because a model retrain dropped it. The GEO Lab re-tests facts on a schedule so decay is caught early.
 
-LATENT SPACE MAP (UMAP): Visual representation of the user's facts and competitor facts in reduced 2D projection of the 1536-D embedding space. Anchor cards show facts that are semantically distant from the user's brand concept centroid: these are the highest-priority gaps to fill. The grid is bright enough to read (zinc-600 lines on zinc-950 background). Camera starts at z=25, fov=55 to show the full point cloud.
+LATENT SPACE MAP (UMAP): Visual representation of the user's facts and competitor facts in reduced 2D projection of the 768-D embedding space (Gemini text-embedding-004). Anchor cards show facts that are semantically distant from the user's brand concept centroid: these are the highest-priority gaps to fill. The grid is bright enough to read (zinc-600 lines on zinc-950 background). Camera starts at z=25, fov=55 to show the full point cloud.
 
 DRIFT DETECTION: The Brand Intelligence panel compares consecutive probe pairs using a two-proportion z-test on cited counts per engine. Formula: z = (p2-p1) / sqrt(pPool * (1-pPool) * (1/n1 + 1/n2)). A z-score beyond ±1.96 (α=0.05) is flagged as a drift event. Requires minimum 5 queries per probe run for statistical validity. This distinguishes genuine model-level changes from sampling noise inherent in stochastic AI systems.
 

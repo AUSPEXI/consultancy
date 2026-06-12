@@ -22,11 +22,15 @@ export class EmbeddingService {
     if (mode === 'local') {
       return localEmbeddingService.getActiveEngine();
     }
-    if (process.env.OPENAI_API_KEY) {
-      return { name: 'openai', model: 'text-embedding-3-small', dimensions: 1536 };
-    }
+    // Gemini text-embedding-004 (768-D) is the designed default: 40% lower cost
+    // than 1536-D alternatives with equivalent semantic fidelity for brand-domain
+    // retrieval. OpenAI is an optional override when an OPENAI_API_KEY is set AND
+    // no Gemini key exists.
     if (process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY) {
       return { name: 'gemini', model: 'text-embedding-004', dimensions: 768 };
+    }
+    if (process.env.OPENAI_API_KEY) {
+      return { name: 'openai', model: 'text-embedding-3-small', dimensions: 1536 };
     }
     // No API key configured → zero-cost local embedder
     return localEmbeddingService.getActiveEngine();
@@ -65,31 +69,31 @@ export class EmbeddingService {
       return localEmbeddingService.embedMany(cleanInputs);
     }
 
-    // OpenAI text-embedding-3-small: 1536 dims, $0.02/1M tokens — preferred
-    if (openaiKey) {
-      const client = new OpenAI({ apiKey: openaiKey });
-      const response = await client.embeddings.create({
-        model: 'text-embedding-3-small',
-        input: cleanInputs,
+    // Gemini text-embedding-004 (768-D): designed default — lower cost, same fidelity for brand retrieval
+    if (geminiKey) {
+      const ai = getGenAI();
+      const responses = await Promise.all(
+        cleanInputs.map(text =>
+          ai.models.embedContent({ model: 'text-embedding-004', contents: text })
+        )
+      );
+      return responses.map(res => {
+        if (res.embeddings && res.embeddings.length > 0) {
+          return res.embeddings[0].values || [];
+        }
+        return [];
       });
-      return response.data
-        .sort((a, b) => a.index - b.index)
-        .map(d => d.embedding);
     }
 
-    // Fallback: Gemini text-embedding-004 (768 dims)
-    const ai = getGenAI();
-    const responses = await Promise.all(
-      cleanInputs.map(text =>
-        ai.models.embedContent({ model: 'text-embedding-004', contents: text })
-      )
-    );
-    return responses.map(res => {
-      if (res.embeddings && res.embeddings.length > 0) {
-        return res.embeddings[0].values || [];
-      }
-      return [];
+    // OpenAI text-embedding-3-small (1536-D): optional override when no Gemini key
+    const client = new OpenAI({ apiKey: openaiKey! });
+    const response = await client.embeddings.create({
+      model: 'text-embedding-3-small',
+      input: cleanInputs,
     });
+    return response.data
+      .sort((a, b) => a.index - b.index)
+      .map(d => d.embedding);
   }
 
   calculateCosineSimilarity(vecA: number[], vecB: number[]): number {

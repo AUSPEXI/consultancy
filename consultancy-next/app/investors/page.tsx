@@ -34,7 +34,7 @@ const INVESTMENT_HIGHLIGHTS = [
   {
     title: "Proprietary Infrastructure",
     icon: Globe,
-    description: "We are advancing beyond foundational AI integrations to build the analytical infrastructure of GEO. Our deployed dual-embedding Latent Space Engine (1536-D primary) logs fact-to-query geometry from every probe, creating a compounding proprietary data moat."
+    description: "We are advancing beyond foundational AI integrations to build the analytical infrastructure of GEO. Our deployed 768-D Latent Space Engine (Gemini text-embedding-004) and growing fact-to-query geometry dataset create a compounding proprietary data moat."
   },
   {
     title: "High-Margin Recurring Revenue",
@@ -59,7 +59,7 @@ const STRATEGIC_INITIATIVES = [
     phase: "Phase II: Infrastructure",
     title: "Semantic Tracking & First-Party Data Moat",
     status: "Operational",
-    description: "Our dual-embedding Latent Space Engine is live (1536-D OpenAI primary, 768-D fallback), logging fact-to-query geometry from every probe: a compounding, real-time proprietary dataset for drift detection and content-gap modeling."
+    description: "Our 768-D Latent Space Engine (Gemini text-embedding-004) is live, logging fact-to-query geometry from every probe: a compounding, real-time proprietary dataset for drift detection and content-gap modeling. The 768-D choice reduces inference costs 40% vs 1536-D alternatives with equivalent brand-domain semantic fidelity."
   },
   {
     phase: "Phase III: Proprietary SLM",
@@ -137,7 +137,7 @@ const STRATEGIC_PILLARS = [
 const REVENUE_LOGIC_METRICS = [
   { label: "AI-Search Conversion", value: "4.4x", sub: "Higher than Traditional" },
   { label: "Avg Engagement", value: "8-10m", sub: "vs 2-3m Google refers" },
-  { label: "Embedding Cost", value: "$0.02", sub: "Per 1M tokens (1536-D)" },
+  { label: "Embedding Cost", value: "40% Lower", sub: "768-D vs 1536-D" },
   { label: "CAGR Target", value: "50.5%", sub: "GEO Market Growth" }
 ];
 
@@ -150,9 +150,9 @@ const EMAIL_SEQUENCE = [
 
 const PROPRIETARY_STACK = [
   {
-    title: "Dual-Embedding Latent Space Engine",
-    description: "OpenAI text-embedding-3-small (1536-D) primary with Gemini 768-D fallback: resilient, low-cost semantic mapping of every brand fact and probe query.",
-    metric: "1536 Dimensions"
+    title: "768-D Latent Space Engine",
+    description: "Gemini text-embedding-004: 40% lower inference cost than 1536-D alternatives with equivalent semantic fidelity for brand-domain retrieval. Every fact and probe query mapped into the same space.",
+    metric: "768 Dimensions"
   },
   {
     title: "Fact-to-Query Geometry Logging",
@@ -369,7 +369,7 @@ const SEED_FUNDS = [
 
 const WHAT_EXISTS_NOW = [
   "Full GEO audit & citation scoring engine deployed",
-  "Dual-embedding latent space mapping live (1536-D primary)",
+  "768-D Latent Space Engine live (Gemini text-embedding-004)",
   "Multi-agent content optimizer & Fact-Vault architecture built",
   "Competitor decay detection & SOV simulator operational",
   "4-phase GEO workflow defined and battle-tested",
