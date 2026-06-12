@@ -81,11 +81,39 @@ Hard rules:
 - Spoken script target: 1,200–1,800 words (8–12 min at speaking pace).
 - Include [ON SCREEN:] cues and [B-ROLL:] suggestions throughout the script.`;
 
+// Surface temporal metadata for the video producer — collection window and
+// model drift are content assets, not just threats to validity. A video that
+// says "collected across 14 days, no model drift" is more credible than one
+// that doesn't mention it. A drift warning is an interesting narrative hook.
+let temporalContext = '';
+try {
+  const findingJson = JSON.parse(await fs.readFile(path.join(experimentDir, 'finding.json'), 'utf8'));
+  const span = findingJson.collectionSpanDays;
+  const mv = findingJson.modelVersions ?? {};
+  const drift = findingJson.modelDrift;
+  const retests = findingJson.retests ?? [];
+  temporalContext = `\n## Temporal & Reproducibility Context\n`;
+  temporalContext += `- Collection window: ${span >= 1 ? `${span} days` : '< 1 day'}`;
+  if (span < 5) temporalContext += ` ⚠ (narrow window — acknowledge in threats section)`;
+  temporalContext += '\n';
+  temporalContext += `- Model versions: ${Object.entries(mv).map(([p, v]) => `${p}: ${Array.isArray(v) ? v[v.length-1] : v}`).join(', ')}\n`;
+  if (drift) temporalContext += `- ⚠ Model drift detected mid-experiment — mention explicitly in Threats section as an honest limitation.\n`;
+  else temporalContext += `- No model drift: consistent engine versions across all batches — good for credibility.\n`;
+  if (retests.length > 0) {
+    temporalContext += `- Longitudinal re-tests: ${retests.length} re-test(s) conducted.\n`;
+    for (const rt of retests) {
+      const rtRates = Object.entries(rt.aggregate ?? {}).map(([v, s]) => `${v}: ${s.rate}%`).join(', ');
+      temporalContext += `  - ${rt.collectionDate}: ${rtRates}\n`;
+    }
+    temporalContext += `  Include a "We re-tested this 30 days later" moment in the script.\n`;
+  }
+} catch { /* non-fatal */ }
+
 const userPrompt = `Produce the complete YouTube video package for this experiment.
 
 ## The Finding
 ${finding}
-
+${temporalContext}
 ## Experiment Design (for context)
 ${design}
 
@@ -109,7 +137,7 @@ Full spoken script in 7-part format:
 3. Method (1:00–3:00) — variants on screen, the probe, n, the four engines. Show DESIGN.md timestamp as pre-registration proof.
 4. The Run (3:00–5:00) — describe watching probes execute, raw responses
 5. The Result (5:00–8:00) — rates, the chart, the p-value, plain conclusion
-6. Threats to Validity (8:00–9:30) — what could be wrong. This builds authority.
+6. Threats to Validity (8:00–9:30) — what could be wrong. This builds authority. Cover: temporal collection window (how many days, was it a snapshot?), model version stability/drift, fast-mode vs live-mode distinction, and multiple comparisons. Say it plainly — "here's why you shouldn't fully trust this" is what separates a scientist from a hype merchant.
 7. What it means for you (9:30–end) — practical takeaway + soft Auspexi CTA (approved language only)
 
 Include [ON SCREEN:] cues for charts, variant comparisons, terminal output, and data tables.

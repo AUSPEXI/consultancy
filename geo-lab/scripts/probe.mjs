@@ -36,6 +36,12 @@ const trialsArg = args.find(a => a.startsWith('--trials'))?.split('=')[1]
   ?? args[args.indexOf('--trials') + 1];
 const trialsPerVariant = parseInt(trialsArg ?? '30', 10);
 
+// --out lets the longitudinal re-tester write to a separate file without
+// clobbering the original raw.json.
+const outArg = args.find(a => a.startsWith('--out'))?.split('=')[1]
+  ?? (args.indexOf('--out') !== -1 ? args[args.indexOf('--out') + 1] : null);
+const isRetest = !!outArg;
+
 // ── Load experiment design ──────────────────────────────────────────────────
 const designPath = path.join(experimentDir, 'DESIGN.md');
 const variantsDir = path.join(experimentDir, 'variants');
@@ -151,6 +157,15 @@ async function callClaude(prompt) {
 
 const callers = { gemini: callGemini, openai: callOpenAI, perplexity: callPerplexity, claude: callClaude };
 
+// Model versions logged per trial so engine drift mid-experiment is detectable.
+// Update these when a provider announces a model change.
+const MODEL_VERSIONS = {
+  gemini:     'gemini-2.5-flash',
+  openai:     'gpt-4o-mini',
+  perplexity: 'sonar',
+  claude:     'claude-haiku-4-5-20251001',
+};
+
 // ── Build probe prompt ───────────────────────────────────────────────────────
 function buildPrompt(query, variantContents) {
   // Randomise source order to counter position bias.
@@ -226,6 +241,7 @@ for (let t = 0; t < trialsPerVariant; t++) {
         trial: t + 1,
         query,
         platform,
+        modelVersion: MODEL_VERSIONS[platform] ?? 'unknown',
         response: response?.slice(0, 500) ?? null,
         error,
         citations,
@@ -242,23 +258,36 @@ for (let t = 0; t < trialsPerVariant; t++) {
 console.log('\n\nProbe complete.\n');
 
 // ── Save results ─────────────────────────────────────────────────────────────
-// APPEND to any existing raw.json so trials accumulate across daily runs toward n.
-// (Each daily run is a small batch; the orchestrator caps batches via --trials.)
+// Re-tests use --out to write to a separate file. Normal runs APPEND to raw.json
+// so trials accumulate across daily batches toward n.
 const resultsDir = path.join(experimentDir, 'results');
 await fs.mkdir(resultsDir, { recursive: true });
-const outPath = path.join(resultsDir, 'raw.json');
+const outPath = outArg ?? path.join(resultsDir, 'raw.json');
 
 let priorResults = [];
 let firstRunAt = null;
-try {
-  const existing = JSON.parse(await fs.readFile(outPath, 'utf8'));
-  if (Array.isArray(existing.results)) priorResults = existing.results;
-  firstRunAt = existing.meta?.firstRunAt ?? existing.meta?.runAt ?? null;
-} catch {
-  // No existing file — this is the first batch.
+if (!isRetest) {
+  try {
+    const existing = JSON.parse(await fs.readFile(outPath, 'utf8'));
+    if (Array.isArray(existing.results)) priorResults = existing.results;
+    firstRunAt = existing.meta?.firstRunAt ?? existing.meta?.runAt ?? null;
+  } catch {
+    // No existing file — this is the first batch.
+  }
 }
 
 const combinedResults = [...priorResults, ...results];
+
+// Compute per-platform model versions seen across all results for drift detection.
+const modelVersionsByPlatform = {};
+for (const r of combinedResults) {
+  if (!r.modelVersion || r.modelVersion === 'unknown') continue;
+  if (!modelVersionsByPlatform[r.platform]) modelVersionsByPlatform[r.platform] = new Set();
+  modelVersionsByPlatform[r.platform].add(r.modelVersion);
+}
+const modelVersions = Object.fromEntries(
+  Object.entries(modelVersionsByPlatform).map(([p, s]) => [p, [...s]])
+);
 
 await fs.writeFile(outPath, JSON.stringify({
   meta: {
@@ -268,7 +297,8 @@ await fs.writeFile(outPath, JSON.stringify({
     trialsPerVariant,
     firstRunAt: firstRunAt ?? new Date().toISOString(),
     runAt: new Date().toISOString(),
-    batches: (priorResults.length > 0 ? 1 : 0) + 1, // informational
+    batches: (priorResults.length > 0 ? 1 : 0) + 1,
+    modelVersions, // all distinct model strings seen per platform across all batches
   },
   results: combinedResults,
 }, null, 2));

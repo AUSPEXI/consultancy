@@ -73,6 +73,31 @@ for (const r of results) {
   }
 }
 
+// ── Temporal spread analysis ─────────────────────────────────────────────────
+// Good temporal coverage means results aren't a snapshot of one model state.
+// We flag experiments collected over < 5 days as having low temporal coverage.
+const timestamps = results.map(r => r.timestamp).filter(Boolean).map(t => new Date(t).getTime());
+const minTs = Math.min(...timestamps);
+const maxTs = Math.max(...timestamps);
+const collectionSpanDays = timestamps.length > 1 ? (maxTs - minTs) / (1000 * 60 * 60 * 24) : 0;
+
+// Daily trial counts — useful for seeing if collection was uniform or bursty
+const byDay = {};
+for (const r of results) {
+  if (!r.timestamp) continue;
+  const day = r.timestamp.slice(0, 10);
+  byDay[day] = (byDay[day] ?? 0) + 1;
+}
+const dayEntries = Object.entries(byDay).sort(([a], [b]) => a.localeCompare(b));
+
+// ── Model drift detection ────────────────────────────────────────────────────
+// If a platform's model string changed mid-experiment, results from different
+// batches are not strictly comparable. Warn in the report.
+const modelVersions = meta.modelVersions ?? {};
+const driftedPlatforms = Object.entries(modelVersions)
+  .filter(([, versions]) => versions.length > 1)
+  .map(([p, versions]) => ({ platform: p, versions }));
+
 // ── Build report ─────────────────────────────────────────────────────────────
 const designText = await fs.readFile(path.join(experimentDir, 'DESIGN.md'), 'utf8').catch(() => '');
 const hypothesisMatch = designText.match(/## Hypothesis\n([\s\S]*?)(?=\n## |\n$)/);
@@ -81,6 +106,7 @@ const hypothesis = hypothesisMatch?.[1]?.trim() ?? '(no hypothesis recorded)';
 let report = `# Experiment Finding\n\n`;
 report += `**Hypothesis**: ${hypothesis}\n\n`;
 report += `**Run at**: ${meta.runAt}\n`;
+report += `**Collection window**: ${collectionSpanDays >= 1 ? `${collectionSpanDays.toFixed(1)} days` : `< 1 day`} (${new Date(minTs).toISOString().slice(0,10)} → ${new Date(maxTs).toISOString().slice(0,10)})\n`;
 report += `**Variants**: ${variants.join(', ')}\n`;
 report += `**Platforms**: ${platforms.join(', ')}\n`;
 report += `**Trials per variant**: ${meta.trialsPerVariant}\n\n`;
@@ -121,8 +147,13 @@ for (const platform of platforms) {
   }
 }
 
-// ── Cross-platform aggregate ─────────────────────────────────────────────────
-report += `---\n\n## Aggregate (all platforms pooled)\n\n`;
+// ── Cross-platform aggregate (primary endpoint) ──────────────────────────────
+// The aggregate test is pre-registered as the PRIMARY endpoint. Per-platform
+// tests are exploratory and subject to multiple-comparisons inflation.
+// Bonferroni-corrected threshold for k per-platform tests: α_adj = 0.05 / k.
+const kTests = platforms.length;
+const bonferroniAlpha = +(0.05 / kTests).toFixed(4);
+report += `---\n\n## Aggregate (all platforms pooled) — PRIMARY ENDPOINT\n\n`;
 report += `| Variant | Cited | n | Citation Rate |\n`;
 report += `|---------|-------|---|---------------|\n`;
 
@@ -137,6 +168,19 @@ for (const v of variants) {
   report += `| ${v} | ${agg[v].cited} | ${agg[v].total} | ${(rate * 100).toFixed(1)}% |\n`;
 }
 report += '\n';
+
+// Aggregate significance test (primary endpoint)
+const [aggControl, ...aggTreatments] = variants;
+for (const trt of aggTreatments) {
+  const ctrl = agg[aggControl];
+  const trtS = agg[trt];
+  const ctrlRate = ctrl.total > 0 ? ctrl.cited / ctrl.total : 0;
+  const trtRate  = trtS.total  > 0 ? trtS.cited  / trtS.total  : 0;
+  const { z: aggZ, pValue: aggP } = twoProportionZ(trtRate, trtS.total, ctrlRate, ctrl.total);
+  const aggDiff = +((trtRate - ctrlRate) * 100).toFixed(1);
+  const aggSig = aggP < 0.05;
+  report += `**Aggregate ${trt} vs ${aggControl}** (primary): ${aggDiff > 0 ? '+' : ''}${aggDiff}pp, z=${aggZ}, p=${aggP} — ${aggSig ? '✓ significant' : '✗ not significant'}\n\n`;
+}
 
 // ── Plain-English conclusion ─────────────────────────────────────────────────
 report += `---\n\n## Conclusion\n\n`;
@@ -153,13 +197,30 @@ if (allSignificant.length > 0) {
 
 // ── Threats to validity ──────────────────────────────────────────────────────
 report += `---\n\n## Threats to Validity\n\n`;
-report += `- **Model versioning**: Results reflect platform behaviour at time of run. Model updates may change these outcomes.\n`;
+
+// Temporal coverage
+if (collectionSpanDays < 5) {
+  report += `- **⚠ Low temporal coverage**: All ${results.length} trials collected over ${collectionSpanDays < 1 ? '< 1 day' : `${collectionSpanDays.toFixed(1)} days`}. Results reflect a narrow snapshot of model behaviour. Target ≥ 10 days for robust temporal coverage.\n`;
+  report += `  - Trials per day: ${dayEntries.map(([d, n]) => `${d}: ${n}`).join(', ')}\n`;
+} else {
+  report += `- **Temporal coverage**: ${collectionSpanDays.toFixed(1)}-day collection window. ${collectionSpanDays >= 10 ? 'Good.' : 'Acceptable — 10+ days preferred.'}\n`;
+  report += `  - Trials per day: ${dayEntries.map(([d, n]) => `${d}: ${n}`).join(', ')}\n`;
+}
+
+// Model drift
+if (driftedPlatforms.length > 0) {
+  report += `- **⚠ Model drift detected**: The following platforms served different model versions during collection — results from different batches may not be strictly comparable:\n`;
+  for (const { platform, versions } of driftedPlatforms) {
+    report += `  - ${platform.toUpperCase()}: ${versions.join(' → ')}\n`;
+  }
+} else {
+  report += `- **Model versions stable**: No model version changes detected across batches (${Object.entries(meta.modelVersions ?? {}).map(([p, v]) => `${p}: ${v[0]}`).join(', ')}).\n`;
+}
+
 report += `- **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.\n`;
 report += `- **n=${meta.trialsPerVariant} per variant**: ${meta.trialsPerVariant >= 30 ? 'Meets the lab minimum.' : '⚠ Below the lab minimum of 30 — treat as preliminary.'}\n`;
 report += `- **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.\n`;
-if (allSignificant.length > 1) {
-  report += `- **Multiple comparisons**: ${allSignificant.length} simultaneous tests inflate the false-positive rate. Treat findings as exploratory unless pre-registered.\n`;
-}
+report += `- **Multiple comparisons**: ${kTests} per-platform tests run alongside the primary aggregate test. Bonferroni-corrected α for per-platform comparisons = ${bonferroniAlpha}. Per-platform results with p > ${bonferroniAlpha} are exploratory.\n`;
 
 // ── Machine-readable finding ─────────────────────────────────────────────────
 // Consumed by publish-finding.mjs to push results into the dashboard's
@@ -183,6 +244,11 @@ const topEffect = allSignificant
 
 const findingJson = {
   runAt: meta.runAt,
+  firstRunAt: meta.firstRunAt ?? null,
+  collectionSpanDays: +collectionSpanDays.toFixed(1),
+  collectionDays: dayEntries.map(([date, n]) => ({ date, n })),
+  modelVersions: meta.modelVersions ?? {},
+  modelDrift: driftedPlatforms.length > 0,
   variants,
   platforms,
   trialsPerVariant: meta.trialsPerVariant,

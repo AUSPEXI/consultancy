@@ -316,7 +316,96 @@ async function analyzePhase(state, backlog) {
   state.queue_position = (state.queue_position || 0) + 1;
   await writeJson(path.join(ROOT, 'lab-state.json'), state);
 
-  log(`Experiment ${exp.id} complete. Next experiment will be designed on next Monday run.`);
+  log(`Experiment ${exp.id} complete. Designing next experiment immediately.`);
+}
+
+// ── LONGITUDINAL RE-TEST PHASE ────────────────────────────────────────────────
+// Every 30 days, re-probe completed experiments to check if the effect still
+// holds under current model versions. This is the core of "realtime temporal
+// data" — not just collecting slowly, but returning to measure drift over time.
+// A finding that reverses after a model update is itself a video: "We re-tested
+// our #1 finding 60 days later. Here's what happened."
+//
+// Re-test records go into <experiment-dir>/results/retest-<ISO-date>.json so
+// they never corrupt the original raw.json. A separate retest FINDING is
+// appended to the experiment folder.
+async function longitudinalRetestPhase(state, backlog) {
+  const completedWithFindings = backlog.experiments.filter(e => e.status === 'complete');
+  if (completedWithFindings.length === 0) return;
+
+  const now = Date.now();
+  const RETEST_INTERVAL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+  const retestLog = state.retestLog ?? {}; // { [expId]: lastRetestAt ISO }
+
+  for (const exp of completedWithFindings) {
+    const lastRetest = retestLog[exp.id] ? new Date(retestLog[exp.id]).getTime() : 0;
+    const completedAt = exp.completed_at ? new Date(exp.completed_at).getTime() : 0;
+    const refTime = Math.max(lastRetest, completedAt);
+    if (now - refTime < RETEST_INTERVAL_MS) continue;
+
+    const expDir = path.join(ROOT, 'experiments', `${exp.id}-${exp.slug}`);
+    try { await fs.access(expDir); } catch { continue; } // folder must exist
+
+    const findingPath = path.join(expDir, 'finding.json');
+    let finding;
+    try { finding = JSON.parse(await fs.readFile(findingPath, 'utf8')); } catch { continue; }
+
+    // Only re-test experiments that had a significant result — null findings
+    // don't need drift-tracking.
+    if (finding.verdict !== 'significant') {
+      retestLog[exp.id] = new Date().toISOString();
+      continue;
+    }
+
+    log(`Longitudinal re-test: experiment ${exp.id} (${exp.slug})`);
+
+    // Run a small re-probe batch (5 trials per variant) — cheap signal check
+    const platformArg = (exp.platforms ?? ['gemini', 'openai', 'perplexity', 'claude']).join(',');
+    const retestDir = expDir; // probe reads variants/ from the same folder
+
+    const retestResultsPath = path.join(expDir, 'results', `retest-${new Date().toISOString().slice(0, 10)}.json`);
+
+    if (!DRY_RUN) {
+      // Temporarily point probe output to the retest path by running it with a
+      // custom --out flag (added to probe.mjs above).
+      await runScript(path.join(__dir, 'probe.mjs'), [
+        retestDir,
+        '--platform', platformArg,
+        '--trials', '5',
+        '--out', retestResultsPath,
+      ]);
+
+      // Append retest summary to the finding for dashboard visibility
+      try {
+        const retestRaw = JSON.parse(await fs.readFile(retestResultsPath, 'utf8'));
+        const retestAgg = {};
+        for (const v of (finding.variants ?? [])) {
+          const citedCount = retestRaw.results.filter(r => r.citations?.[v]).length;
+          const total = retestRaw.results.filter(r => r.citations && v in r.citations).length;
+          retestAgg[v] = { cited: citedCount, total, rate: total > 0 ? +((citedCount / total) * 100).toFixed(1) : 0 };
+        }
+        finding.retests = finding.retests ?? [];
+        finding.retests.push({
+          retestAt: new Date().toISOString(),
+          collectionDate: new Date().toISOString().slice(0, 10),
+          modelVersions: retestRaw.meta?.modelVersions ?? {},
+          aggregate: retestAgg,
+        });
+        await fs.writeFile(findingPath, JSON.stringify(finding, null, 2) + '\n');
+        log(`Re-test complete for ${exp.id}. Aggregate: ${JSON.stringify(retestAgg)}`);
+      } catch (e) {
+        log(`⚠ Re-test result parse failed (non-fatal): ${e.message}`);
+      }
+    } else {
+      log(`[dry-run] Would re-test ${exp.id} with 5 trials per variant`);
+    }
+
+    retestLog[exp.id] = new Date().toISOString();
+    break; // one re-test per daily run to keep costs minimal
+  }
+
+  state.retestLog = retestLog;
+  await writeJson(statePath, state);
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
@@ -327,18 +416,15 @@ const backlogPath = path.join(ROOT, 'experiments', 'backlog.json');
 const state = await readJson(statePath);
 const backlog = await readJson(backlogPath);
 
-const dayOfWeek = new Date().getUTCDay(); // 0=Sun, 1=Mon
-const isMonday = dayOfWeek === 1;
 const hasActiveExperiment = !!state.active_experiment;
 
-// Determine phase
+// Determine phase.
+// Design runs immediately when no experiment is active — removing the Monday
+// gate means we don't lose days between experiments across a 20-experiment run.
 let phase = forcePhase;
 if (!phase) {
-  if (!hasActiveExperiment && isMonday) {
+  if (!hasActiveExperiment) {
     phase = 'design';
-  } else if (!hasActiveExperiment && !isMonday) {
-    log('No active experiment and not Monday — waiting for Monday to design next experiment.');
-    phase = 'wait';
   } else {
     phase = 'probe'; // will self-escalate to analyze if n is reached
   }
@@ -367,13 +453,24 @@ switch (phase) {
     break;
   }
 
-  case 'wait':
-    log('Nothing to do today.');
+  case 'retest': {
+    const freshState = await readJson(statePath);
+    await longitudinalRetestPhase(freshState, backlog);
     break;
+  }
 
   default:
     log(`Unknown phase: ${phase}`);
     process.exit(1);
+}
+
+// After every run, check whether any completed experiment is due a 30-day
+// longitudinal re-test. This piggybacks on the existing daily cron with no
+// schedule change — the re-tester checks elapsed time internally and is a no-op
+// if nothing is due.
+if (phase !== 'retest') {
+  const finalState = await readJson(statePath);
+  await longitudinalRetestPhase(finalState, backlog);
 }
 
 log('Orchestrator done.');
