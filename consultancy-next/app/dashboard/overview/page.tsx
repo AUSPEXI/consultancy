@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer, BarChart, Bar, Cell, PieChart, Pie } from 'recharts';
 import { TrendingUp, Users, Target, Link as LinkIcon, Plus, Loader2, Activity, BrainCircuit, Settings, X, HelpCircle, Sparkles } from 'lucide-react';
-import { SyntheticDataPanel } from '@/components/dashboard/SyntheticDataPanel';
+import { BrandIntelPanel } from '@/components/dashboard/BrandIntelPanel';
 import { Ga4AttributionPanel } from '@/components/dashboard/Ga4AttributionPanel';
 import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist';
 import { AutomationStatus } from '@/components/dashboard/AutomationStatus';
@@ -147,7 +147,7 @@ export default function OverviewPage() {
     return () => unsubscribe();
   }, [user, tier]);
 
-  // Recent articles — used by Content Scoring tab in SyntheticDataPanel
+  // Recent articles — used by Content Scores tab in BrandIntelPanel
   useEffect(() => {
     if (!user || !checkTierAccess(tier, 'Starter')) return;
     const q = query(
@@ -696,9 +696,8 @@ export default function OverviewPage() {
       {/* AI Referral Attribution (GA4) — renders only when GA4 is configured server-side */}
       <Ga4AttributionPanel />
 
-      {/* Synthetic Dataset Analytics */}
-      <SyntheticDataPanel
-        realPlatformRates={citationData?.platformRates ?? null}
+      {/* Brand Intelligence — real probe history, drift detection, competitor tracking */}
+      <BrandIntelPanel
         realArticles={recentArticles}
         userBrand={userData?.brand || ''}
       />
