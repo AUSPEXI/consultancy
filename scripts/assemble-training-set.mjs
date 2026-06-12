@@ -216,6 +216,8 @@ async function buildRowsForUser(userId, userData) {
       semantic_concentration_score: round2(semanticConcentration),
       cited_territory_pct: round2(citedPct),
       gap_territory_pct: round2(gapPct),
+      avg_min_fact_distance: typeof start.geometry?.avgMinFactDistance === 'number' ? start.geometry.avgMinFactDistance : null,
+      gap_query_count: typeof start.geometry?.gapQueryCount === 'number' ? start.geometry.gapQueryCount : null,
 
       // 3b vault
       fact_count: factsAtStart.length,
@@ -302,6 +304,10 @@ async function buildRowsForUser(userId, userData) {
           engine_model_changed: start.engineVersions && end.engineVersions
             ? start.engineVersions[engine] !== end.engineVersions[engine]
             : null,
+          // 3a semantic, per-query (logged by the cite-probe route at probe time;
+          // null for probes that predate geometry logging)
+          min_fact_distance: typeof startR.minFactDistance === 'number' ? startR.minFactDistance : null,
+          fact_density_near_query: typeof startR.factDensityNearQuery === 'number' ? startR.factDensityNearQuery : null,
           cited_now: sP.cited === true,
           sentiment_now: sP.sentiment ?? null,
           position_pct_now: typeof sP.positionPct === 'number' ? sP.positionPct : null,

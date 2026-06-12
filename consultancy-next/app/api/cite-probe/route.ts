@@ -4,6 +4,8 @@ import { computeAttribution } from '@/lib/attribution';
 import { requireAuth } from '@/lib/api-auth';
 import { buildQueries, runCitationProbe, probeBrandRate, ENGINE_MODEL_VERSIONS } from '@/lib/cite-probe-core';
 import { normalizeTier, checkTierAccess } from '@/constants/tiers';
+import { embeddingService } from '@/lib/embeddings';
+import { computeQueryGeometry, loadEmbeddedFacts, GEOMETRY_SIM_THRESHOLD } from '@/lib/fact-geometry';
 
 // Mine real questions from Reddit/Quora threads stored by the Brand Monitor.
 // Returns up to `max` question-shaped strings, or an empty array if nothing found.
@@ -276,13 +278,44 @@ export async function POST(request: Request) {
       }
     }
 
+    // Fact-to-query geometry — logged per probe interval so the ML training set
+    // (spec §3a) gets real semantic features instead of nulls: how far each
+    // probed query sits from the user's nearest vault fact, and how many facts
+    // cover it. Stored per result alongside the query embedding. Non-fatal.
+    let geometrySummary: { avgMinFactDistance: number | null; gapQueryCount: number; embeddingSpace: string } | null = null;
+    let resultsWithGeometry = queryResults;
+    if (dbAdmin && userId !== 'anonymous') {
+      try {
+        const [queryEmbeddings, facts] = await Promise.all([
+          embeddingService.generateEmbeddings(queryResults.map(r => r.query)),
+          loadEmbeddedFacts(dbAdmin, userId),
+        ]);
+        const geometry = computeQueryGeometry(queryEmbeddings, facts);
+        resultsWithGeometry = queryResults.map((r, i) => ({
+          ...r,
+          queryEmbedding: queryEmbeddings[i],
+          minFactDistance: geometry[i].minFactDistance,
+          factDensityNearQuery: geometry[i].factDensityNearQuery,
+        }));
+        const dists = geometry.map(g => g.minFactDistance).filter((d): d is number => d !== null);
+        geometrySummary = {
+          avgMinFactDistance: dists.length ? parseFloat((dists.reduce((s, d) => s + d, 0) / dists.length).toFixed(4)) : null,
+          gapQueryCount: geometry.filter((g, i) => !queryResults[i].cited && g.minFactDistance !== null && g.minFactDistance > 1 - GEOMETRY_SIM_THRESHOLD).length,
+          embeddingSpace: embeddingService.getActiveSpace('auto'),
+        };
+      } catch (geoErr) {
+        console.warn('[cite-probe] geometry logging failed (non-fatal):', geoErr);
+      }
+    }
+
     const probeResult = {
       brand, domain, userId, timestamp,
       citationRate, ci95, citedCount, misinformationCount,
       totalQueries: testQueries.length,
       activePlatforms, platformRates,
       sentimentBreakdown, avgPositionPct,
-      results: queryResults,
+      results: resultsWithGeometry,
+      geometry: geometrySummary,
       queriesSource,
       engineVersions: ENGINE_MODEL_VERSIONS,
       attribution,
@@ -326,7 +359,10 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, ...probeResult });
+    // Strip 768-d query embeddings from the client payload — they're training
+    // data, not UI data, and would add ~150KB per response.
+    const resultsForClient = resultsWithGeometry.map(({ queryEmbedding: _qe, ...rest }: any) => rest);
+    return NextResponse.json({ success: true, ...probeResult, results: resultsForClient });
   } catch (err: any) {
     console.error('cite-probe error:', err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

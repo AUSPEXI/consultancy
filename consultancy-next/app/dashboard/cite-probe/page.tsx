@@ -118,6 +118,19 @@ export default function CiteProbePage() {
 
   useEffect(() => { loadHistory(); }, [user?.uid]);
 
+  // Content gaps — uncited queries with no vault fact semantically nearby.
+  // Computed server-side from the last probe's geometry.
+  const [gaps, setGaps] = useState<{ query: string; minFactDistance: number | null; factDensityNearQuery: number; nearestFact: string | null; recommendation: string }[]>([]);
+  const loadGaps = async () => {
+    if (!user?.uid) return;
+    try {
+      const res = await authFetch('/api/analytics/gaps');
+      const json = await res.json();
+      if (json.success && Array.isArray(json.gaps)) setGaps(json.gaps);
+    } catch (_) {}
+  };
+  useEffect(() => { loadGaps(); }, [user?.uid]);
+
   // Known-false statements management
   const [negativeStatements, setNegativeStatements] = useState<string[]>([]);
   // Dismissed false positives — tracked by result index so one dismiss never hides another
@@ -241,6 +254,7 @@ export default function CiteProbePage() {
       setProbeData(json);
       setHistory(prev => [{ date: new Date().toLocaleTimeString(), rate: json.citationRate }, ...prev].slice(0, 10));
       loadHistory(); // refresh persistent trend with the run just saved to Firestore
+      loadGaps();    // recompute content gaps from the run just saved
       markStepComplete(1);
     } catch (e: any) {
       setError(e.message);
@@ -874,6 +888,46 @@ export default function CiteProbePage() {
               })}
             </div>
           </div>
+
+          {/* Content gaps — uncited queries with no vault fact nearby. Ranked
+              furthest-from-coverage first; each one is a concrete writing brief. */}
+          {gaps.length > 0 && (
+            <div className="bg-zinc-900/50 border border-violet-500/25 rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-zinc-800">
+                <div className="flex items-center gap-2">
+                  <Target className="w-4 h-4 text-violet-400" />
+                  <h3 className="text-sm font-semibold text-white">Content Gaps</h3>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300">{gaps.length}</span>
+                </div>
+                <p className="text-xs text-zinc-500 mt-1">
+                  Queries you&apos;re losing where you have <span className="text-zinc-300">no content nearby</span>. Close a gap, re-probe, and watch it flip.
+                </p>
+              </div>
+              <div className="divide-y divide-zinc-800/50">
+                {gaps.slice(0, 6).map((g, i) => (
+                  <div key={g.query} className="px-6 py-3.5 flex items-start gap-3">
+                    <span className="text-xs font-black text-violet-400/70 mt-0.5 shrink-0 w-4">{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-zinc-200 font-medium">"{g.query}"</p>
+                      <p className="text-xs text-zinc-500 mt-1">{g.recommendation}</p>
+                      {g.nearestFact && (
+                        <p className="text-[10px] text-zinc-600 mt-1 truncate">Closest existing fact: "{g.nearestFact}"</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => {
+                        localStorage.setItem('agents_topic', g.query);
+                        router.push('/dashboard/agents');
+                      }}
+                      className="shrink-0 text-[11px] font-bold px-3 py-1.5 rounded-lg bg-violet-500/15 text-violet-300 hover:bg-violet-500/25 transition-colors"
+                    >
+                      Write it
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Session history */}
           {history.length > 1 && (
