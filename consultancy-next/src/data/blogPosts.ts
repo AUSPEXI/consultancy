@@ -1,5 +1,105 @@
 export const blogPosts = [
   {
+    slug: "faq-architect-probe-grounded-faq-pages-that-win-ai-citations",
+    title: "FAQ Architect: How Probe-Grounded FAQ Pages Win AI Citations",
+    excerpt: "Most FAQ generators invent questions. Ours doesn't. FAQ Architect reads the queries AI engines are actually being asked about your category — including the ones where your brand isn't cited — and builds a complete, deploy-ready FAQ page that closes those exact gaps.",
+    date: "June 12, 2026",
+    category: "Product",
+    author: "Gwylym Pryce-Owen",
+    readTime: "7 min read",
+    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## The Problem With Generic FAQ Generators
+
+If you've ever used an AI FAQ generator, you know the drill. You give it your website URL or a product description, it produces 10–15 questions that sound reasonable, and you paste them into your site. Done.
+
+The problem is that those questions are invented. They're plausible guesses at what someone might ask about your category — generated from the same training data that every other company in your space could prompt. The resulting FAQ is indistinguishable from a competitor's FAQ. It's not wrong, exactly. It's just not *yours*.
+
+Meanwhile, there are real questions being asked about your category *right now* — queries typed into ChatGPT, Gemini, Claude, and Perplexity by real people making real buying decisions. Your brand may or may not be cited in the answers. The ones where you're not cited are the questions you most urgently need to answer.
+
+That's the problem FAQ Architect was built to solve.
+
+---
+
+## What Makes FAQ Architect Different
+
+FAQ Architect is a Pro-tier dashboard feature that generates a complete, deploy-ready FAQ page for your brand. The technical architecture is straightforward; the differentiator is where the questions come from.
+
+**Questions come from your Citation Probe history.** The Citation Probe directly queries AI engines with industry-specific questions and records which brands are cited in each answer. Every probe run creates a record of what AI engines are being asked about your category — and whether your brand appears in the response. FAQ Architect reads that history.
+
+**Gap queries are prioritised.** Not all probe queries are equal. The ones where your brand is *not* cited represent active citation gaps — places where AI engines are answering questions about your category without mentioning you. FAQ Architect surfaces these first. A FAQ built on gap queries is a targeted gap-filling asset, not generic boilerplate.
+
+**Every answer is grounded in your Fact-Vault.** This is the part generic generators get completely wrong. The answers in your FAQ need to reflect your brand's actual capabilities, real numbers, and verified claims — not invented statistics or vague marketing language. FAQ Architect is explicitly forbidden from making up facts: every brand claim must appear in your Fact-Vault. Answers that can't be grounded in verified facts are labelled accordingly.
+
+---
+
+## The Four Outputs
+
+After generation, FAQ Architect gives you four ways to deploy the content.
+
+**Preview** shows the structured FAQ with source attribution on every question — you can see exactly which questions came from uncited queries (gap queries), cited queries (won queries), the Fact-Vault directly, or general category knowledge. This is useful for editorial review before publishing.
+
+**HTML + Schema** is the deployable page HTML with the FAQPage JSON-LD embedded. The critical detail here is that every question has a stable URL anchor: \`/faq#what-is-answer-engine-optimization\`. This matters for AI engines more than it might seem.
+
+When an AI engine cites your FAQ, it typically points at the page root. But if the AI engine *can* deep-link to the specific question — and increasingly they do, particularly Perplexity — it will. A citation to \`/faq#how-does-citation-probe-measure-ai-share-of-voice\` is a higher-quality citation than a citation to \`/faq\`. More precise sources get cited at higher rates.
+
+**JSON-LD Only** exports just the FAQPage structured data block for brands who want to inject the schema into an existing page without replacing its HTML structure.
+
+**Markdown** exports a clean markdown version for brands publishing via a headless CMS, GitHub-based documentation, or any other markdown-driven publishing flow.
+
+---
+
+## The AEO Connection
+
+FAQ Architect is fundamentally an Answer Engine Optimization (AEO) tool. The goal isn't just to have a FAQ page — it's to be selected as the answer when AI engines handle questions about your category.
+
+AEO and GEO work differently but share the same infrastructure. GEO (Generative Engine Optimization) focuses on being cited as an authoritative source inside generated responses. AEO focuses on being selected as *the* answer to a specific question — featured snippets, AI Overviews, direct answers in ChatGPT and Perplexity.
+
+A well-structured FAQ page does both simultaneously. Each question-answer pair is a self-contained answer unit that AI engines can extract and cite. The FAQPage JSON-LD tells structured-data parsers exactly which text corresponds to which question. The per-question anchor IDs enable deep-link citations. The answers themselves — being grounded in verified, high-entropy Fact-Vault content — have the specificity that differentiates citable sources from generic ones.
+
+This is why FAQ Architect generates FAQ *pages* rather than FAQ *content*. The full deployable package — HTML, schema, anchors — is what creates the AI-crawlable surface. A FAQ buried in a JavaScript widget that renders client-side and has no anchor IDs is invisible to AI engines. A FAQ in the server-rendered HTML, with proper FAQPage markup, per-question URL fragments, and verified-fact answers is a citation machine.
+
+---
+
+## How to Use It
+
+The workflow is designed to be used in sequence with the rest of the platform:
+
+1. **Run at least one Citation Probe.** FAQ Architect gets more powerful the more probe history you have. If you have no probes, it will generate from your Fact-Vault alone — useful, but it misses the gap-prioritisation that makes the tool distinctive.
+
+2. **Add at least 5 facts to your Fact-Vault.** These are the raw material for answers. The more specific and verifiable your facts, the higher the answer quality. Generic facts produce generic answers.
+
+3. **Generate the draft.** The generation takes 15–30 seconds using Gemini 2.5 Flash. Review the preview, paying particular attention to gap-query questions — these are the areas where you're currently losing AI citations.
+
+4. **Deploy the HTML.** If you already have a FAQ page, review the generated questions against your existing ones before replacing. If you're starting fresh, the HTML output is paste-and-publish.
+
+5. **Re-run a Citation Probe 1–2 weeks after publishing.** This closes the measurement loop. Did the new FAQ content move your citation rate on the queries that were previously gaps? The probe data will tell you.
+
+---
+
+## Why This Belongs in a GEO Platform
+
+FAQ pages are one of the highest-leverage AEO assets a brand can deploy, and they're systematically underused. Most brands treat the FAQ as a customer service asset — a place to handle common support questions. That's useful, but it misses the bigger opportunity.
+
+From an AI citation perspective, a well-structured FAQ is one of the few content types where every question-answer pair is purpose-built to be extracted as a standalone answer. It's already in the format AI engines want. Add FAQPage JSON-LD and per-question anchors, and you've created a direct citation target for every question you cover.
+
+The reason most brands don't capitalise on this is they don't know which questions to cover. They don't have access to the queries AI engines are actually being asked about their category. They don't know which queries they're currently winning and which they're losing.
+
+That's exactly what the Citation Probe provides. FAQ Architect is what you do with that information.
+
+---
+
+## Key Takeaways
+
+- FAQ Architect is available on Pro plans. Access it from the dashboard sidebar under Entity & Schema.
+- Questions come from your Citation Probe history — real queries, not invented ones.
+- Gap queries (where your brand isn't cited) are prioritised — the FAQ is a gap-filling tool, not a content sampler.
+- Every brand claim is grounded in your Fact-Vault — no invented statistics.
+- Output includes HTML with per-question anchor IDs, FAQPage JSON-LD, and markdown — the full deployable package.
+- Measure the citation impact by re-running a Citation Probe 1–2 weeks after publishing.
+`,
+  },
+  {
     slug: "build-update-honest-numbers-bing-and-the-knowledge-graph",
     title: "Build Update: Honest Numbers, Bing, and Teaching AI Who You Are",
     excerpt: "This week's shipment: confidence intervals that admit when our own numbers are noisy, a Bing indexation check (because ChatGPT search runs on Bing), and an entity audit that checks whether AI's knowledge sources know your brand exists.",

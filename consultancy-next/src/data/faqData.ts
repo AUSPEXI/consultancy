@@ -611,7 +611,23 @@ MOAT SCORE: Cosine similarity between brand embedding and target concept embeddi
 
 TROJAN HORSE STRATEGY: Identify where competitor data is stale in AI models, publish fresh authoritative content that supersedes it. Entirely ethical — wins citation on quality, not manipulation.
 
-L8ENTSPACE MODULES (11 tools — guide users through these in this strategic order):
+BRAND INTELLIGENCE PANEL: The dashboard overview panel (visible on the Overview tab) shows real data from the user's probe history — NOT synthetic data. Contains five sub-views:
+- Citation Trend: line chart of citation rate over time from consecutive probe runs
+- Platforms: per-engine citation rate with delta vs previous probe run
+- Competitors: head-to-head competitor data extracted from probe results; includes trojan queries (where the competitor is cited but the user is not)
+- Drift Alerts: statistically significant citation rate changes detected via two-proportion z-test (|z| > 1.96). Alerts the user to genuine shifts vs normal run-to-run variance
+- Content Scores: content readiness scores if the user has run the Content Scorer
+If no probes have been run, the panel shows an honest empty state with a link to run the first probe.
+
+CONTENT GAP CLOSED-LOOP: The Citation Probe page includes a "Closed Gaps" view. After running a probe, the user can see which previously-uncited query topics now have covering facts in the Fact-Vault (gaps closed) vs which remain open. This closes the probe→fact→probe measurement loop so users can confirm that adding a new fact actually reduces their citation gaps.
+
+GEO LAB: A longitudinal testing environment for fact claims. After verifying a fact against AI engines (checking whether AI responses about the user's category include that fact), facts are tagged with a verificationStatus: 'unverified', 'verified', or 'decayed'. 'Decayed' means a previously verified fact is no longer appearing in AI responses — possibly because a model retrain dropped it. The GEO Lab re-tests facts on a schedule so decay is caught early.
+
+LATENT SPACE MAP (UMAP): Visual representation of the user's facts and competitor facts in reduced 2D projection of the 1536-D embedding space. Anchor cards show facts that are semantically distant from the user's brand concept centroid — these are the highest-priority gaps to fill. The grid is bright enough to read (zinc-600 lines on zinc-950 background). Camera starts at z=25, fov=55 to show the full point cloud.
+
+DRIFT DETECTION: The Brand Intelligence panel compares consecutive probe pairs using a two-proportion z-test on cited counts per engine. Formula: z = (p2-p1) / sqrt(pPool * (1-pPool) * (1/n1 + 1/n2)). A z-score beyond ±1.96 (α=0.05) is flagged as a drift event. Requires minimum 5 queries per probe run for statistical validity. This distinguishes genuine model-level changes from sampling noise inherent in stochastic AI systems.
+
+L8ENTSPACE MODULES (13 tools — guide users through these in this strategic order):
 
 MEASUREMENT LAYER (understand where you stand):
 1. GEO-Pulse: Real-time keyword scanning across ChatGPT, Claude, Gemini, Perplexity. Run on target queries to see who is being cited and with what facts. Start here.
@@ -624,7 +640,7 @@ KNOWLEDGE LAYER (build what AI will cite):
 6. Fact-Vault: The foundation. All brand Cite-Magnets and structured facts live here. Every other module draws from it. A well-populated Fact-Vault is prerequisite for everything else.
 7. Content Scorer: Grades content on GEO readiness — entity density, entropy, schema markup, citation probability. Suggests specific edits.
 8. Technical Analyzer (Edge & Schema): Audits AI crawlability — robots.txt, schema markup, page performance, canonical URLs. Generates prioritised fix list.
-8b. FAQ Architect: Generates a deploy-ready FAQ page from the user's probe history (real queries, gap-first) and Fact-Vault. Exports HTML with anchor ids, FAQPage JSON-LD, and markdown.
+8b. FAQ Architect (Pro): Generates a deploy-ready FAQ page from the user's probe history (real queries, prioritising uncited/gap queries) and Fact-Vault. All brand claims grounded in verified facts — never invented. Outputs: Preview with source attribution, HTML + embedded FAQPage JSON-LD with per-question anchor IDs (e.g. /faq#what-is-geo), JSON-LD only, and Markdown. Per-question anchor IDs enable AI deep-link citations. Re-run a Citation Probe 1-2 weeks after publishing to measure citation lift on gap queries.
 
 EXECUTION LAYER (actually move the needle):
 9. Multi-Agent Crawler (Agents): Automated content pipeline. Crawls the web for topic context, extracts high-entropy facts, generates JSON-LD schema, synthesises a GEO-optimised article. Publishes to Fact-Vault and CMS webhook.

@@ -9,7 +9,7 @@ import { Footerdemo } from '@/components/ui/footer-section';
 import { ImageZoom } from '@/components/ui/image-zoom';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { BlogHero } from '@/components/BlogHero';
-import { ArrowRight, Bot, Target, Zap, Search, BarChart3, ShieldAlert, CheckCircle2, Database, Mic, Brain, Blocks, Activity, Hash, Check, RefreshCw, Building2, Layers, Globe } from 'lucide-react';
+import { ArrowRight, Bot, Target, Zap, Search, BarChart3, ShieldAlert, CheckCircle2, Database, Mic, Brain, Blocks, Activity, Hash, Check, RefreshCw, Building2, Layers, Globe, FileQuestion } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LeadCaptureModal } from '@/components/ui/lead-capture-modal';
@@ -436,7 +436,7 @@ export function LandingPageClient() {
             </p>
           </div>
 
-          <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-3 lg:gap-4 xl:max-h-[34rem] xl:grid-rows-2 max-w-5xl mx-auto">
+          <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-3 lg:gap-4 xl:max-h-[34rem] xl:grid-rows-2 max-w-5xl mx-auto" aria-label="Platform features">
             <li className="min-h-[14rem] list-none md:[grid-area:1/1/2/7] xl:[grid-area:1/1/2/5]">
               <div className="relative h-full rounded-[1.25rem] border border-zinc-800 p-2 md:rounded-[1.5rem] md:p-3 bg-zinc-950">
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
@@ -493,7 +493,7 @@ export function LandingPageClient() {
                 </div>
               </div>
             </li>
-            <li className="min-h-[14rem] list-none md:[grid-area:3/1/4/13] xl:[grid-area:2/8/3/13]">
+            <li className="min-h-[14rem] list-none md:[grid-area:3/1/4/7] xl:[grid-area:2/8/3/11]">
               <div className="relative h-full rounded-[1.25rem] border border-zinc-800 p-2 md:rounded-[1.5rem] md:p-3 bg-zinc-950">
                 <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
                 <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
@@ -503,6 +503,20 @@ export function LandingPageClient() {
                     </div>
                     <h3 className="text-xl font-semibold text-white">Knowledge Decay Tracking</h3>
                     <p className="text-zinc-400 text-sm">Monitor your historical context in AI models and replace outdated information with your fresh insights.</p>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li className="min-h-[14rem] list-none md:[grid-area:3/7/4/13] xl:[grid-area:2/11/3/13]">
+              <div className="relative h-full rounded-[1.25rem] border border-zinc-800 p-2 md:rounded-[1.5rem] md:p-3 bg-zinc-950">
+                <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
+                <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-zinc-900/50 p-6 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
+                  <div className="space-y-3">
+                    <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
+                      <FileQuestion className="w-5 h-5 text-pink-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white">FAQ Architect</h3>
+                    <p className="text-zinc-400 text-sm">Generate a deploy-ready FAQ page from your real probe queries and Fact-Vault — with FAQPage JSON-LD schema and per-question anchor links for AI deep-link citations.</p>
                   </div>
                 </div>
               </div>
