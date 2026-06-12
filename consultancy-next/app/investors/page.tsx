@@ -34,7 +34,7 @@ const INVESTMENT_HIGHLIGHTS = [
   {
     title: "Proprietary Infrastructure",
     icon: Globe,
-    description: "We are advancing beyond foundational AI integrations to build the analytical infrastructure of GEO. Our fully deployed 768-dimensional Latent Space Engine and robust pgvector backend create an insurmountable proprietary data moat."
+    description: "We are advancing beyond foundational AI integrations to build the analytical infrastructure of GEO. Our deployed dual-embedding Latent Space Engine (1536-D primary) logs fact-to-query geometry from every probe, creating a compounding proprietary data moat."
   },
   {
     title: "High-Margin Recurring Revenue",
@@ -59,7 +59,7 @@ const STRATEGIC_INITIATIVES = [
     phase: "Phase II: Infrastructure",
     title: "Semantic Tracking & First-Party Data Moat",
     status: "Operational",
-    description: "We have fully deployed our 768-dimensional Latent Space Engine backed by pgvector, creating an insurmountable, real-time proprietary data moat for anomaly detection and sentiment drift modeling."
+    description: "Our dual-embedding Latent Space Engine is live (1536-D OpenAI primary, 768-D fallback), logging fact-to-query geometry from every probe: a compounding, real-time proprietary dataset for drift detection and content-gap modeling."
   },
   {
     phase: "Phase III: Proprietary SLM",
@@ -73,7 +73,7 @@ const DATA_ROOM_METRICS = [
   { label: "TAM (Global)", value: "$124B", sub: "By 2028" },
   { label: "Target NRR", value: "135%+", sub: "Premium Tier" },
   { label: "LTV / CAC", value: "16x", sub: "3-Year Lifecycle" },
-  { label: "Gross Margin", value: "84%", sub: "Efficiency Moat" }
+  { label: "Gross Margin", value: "84%", sub: "Target at Scale" }
 ];
 
 const UNIT_ECONOMICS = [
@@ -84,7 +84,7 @@ const UNIT_ECONOMICS = [
 ];
 
 const REVENUE_DATA = [
-  { year: 'Year 1 (Actual)', arr: 1.2, customers: 45 },
+  { year: 'Year 1 (Proj)', arr: 1.2, customers: 45 },
   { year: 'Year 2 (Proj)', arr: 4.8, customers: 180 },
   { year: 'Year 3 (Proj)', arr: 14.5, customers: 520 },
 ];
@@ -92,7 +92,7 @@ const REVENUE_DATA = [
 const USE_OF_FUNDS = [
   { name: 'Engineering', value: 45, color: '#ff1493', description: 'Phase III SLM Development & RAG Optimization' },
   { name: 'Sales & Growth', value: 35, color: '#f472b6', description: '2 AE Hires + $30k/mo Media Spend' },
-  { name: 'Ops & Infra', value: 20, color: '#3f3f46', description: '50M Vector Cluster & 12mo Runway' },
+  { name: 'Ops & Infra', value: 20, color: '#3f3f46', description: 'Vector infrastructure scale-up & 12mo runway' },
 ];
 
 const MARGIN_EXPANSION_DATA = [
@@ -106,7 +106,7 @@ const MARGIN_EXPANSION_DATA = [
 const SLM_BUDGET = [
   { item: 'Data Engineering', amount: '$150,000', detail: 'Auto-labeling systems for pgvector logs' },
   { item: 'Human Labeling', amount: '$50,000', detail: 'Specialized SEO/Legal analyst verification' },
-  { item: 'Compute (B200 Cloud)', amount: '$5,000', detail: 'Hires thousands of QLoRA training runs' },
+  { item: 'Compute (B200 Cloud)', amount: '$5,000', detail: 'Covers thousands of QLoRA training runs' },
 ];
 
 const B200_BENCHMARKS = [
@@ -124,7 +124,7 @@ const STRATEGIC_PILLARS = [
   },
   {
     title: "Fact-Vault Engine ROI",
-    description: "Adding specific 'High-Entropy' statistics increases AI citation probability by 37%. Quotations increase visibility by 30%.",
+    description: "Published GEO research (Aggarwal et al., KDD 2024) found adding statistics and quotations lifts AI visibility 30-40%. Our Fact-Vault operationalises exactly that, and our GEO Lab runs live A/B experiments to verify it per-brand.",
     icon: Database
   },
   {
@@ -137,12 +137,12 @@ const STRATEGIC_PILLARS = [
 const REVENUE_LOGIC_METRICS = [
   { label: "AI-Search Conversion", value: "4.4x", sub: "Higher than Traditional" },
   { label: "Avg Engagement", value: "8-10m", sub: "vs 2-3m Google refers" },
-  { label: "Computational Gain", value: "40%", sub: "Reduction vs 1536-D" },
+  { label: "Embedding Cost", value: "$0.02", sub: "Per 1M tokens (1536-D)" },
   { label: "CAGR Target", value: "50.5%", sub: "GEO Market Growth" }
 ];
 
 const EMAIL_SEQUENCE = [
-  { day: 1, title: "The Audit", focus: "768-D Visibility Map / Gap Analysis" },
+  { day: 1, title: "The Audit", focus: "Latent-Space Visibility Map / Gap Analysis" },
   { day: 3, title: "Competitor Jab", focus: "Semantic Gap Exploitation" },
   { day: 5, title: "The Cure", focus: "High-Entropy Fact Injection" },
   { day: 7, title: "The Conversion", focus: "Z-Score Drift FOMO / Pro Trial" },
@@ -150,19 +150,19 @@ const EMAIL_SEQUENCE = [
 
 const PROPRIETARY_STACK = [
   {
-    title: "768-D Latent Space Engine",
-    description: "Utilizing Gemini's text-embedding-004 for the perfect balance of semantic fidelity and 40% lower computational overhead.",
-    metric: "768 Dimensions"
+    title: "Dual-Embedding Latent Space Engine",
+    description: "OpenAI text-embedding-3-small (1536-D) primary with Gemini 768-D fallback: resilient, low-cost semantic mapping of every brand fact and probe query.",
+    metric: "1536 Dimensions"
   },
   {
-    title: "pgvector Infrastructure",
-    description: "Robust, high-scale vector database capable of indexing 50M+ brand interactions using HNSW indexing.",
-    metric: "50M+ Embeddings"
+    title: "Fact-to-Query Geometry Logging",
+    description: "Every probe records the semantic distance between live AI queries and the brand's facts: a growing proprietary training dataset no foundation model has.",
+    metric: "Logged Per Probe"
   },
   {
     title: "Z-Score Anomaly Detection",
     description: "Our 'Sentiment Pulse' watchdog that separates Generative Noise from true Brand Drift: a leading indicator.",
-    metric: "0.01ms Latency"
+    metric: "|z| > 1.96 Threshold"
   }
 ];
 
@@ -355,21 +355,21 @@ function InvestorCalculator() {
 
 const PRESEED_FUNDS = [
   { name: 'Founder Runway', value: 40, color: '#ff1493', description: 'Minimal founder salaries to go full-time, no distractions' },
-  { name: 'Product & Infra', value: 30, color: '#f472b6', description: 'Cloud hosting, AI API costs, dev tooling, pgvector cluster' },
+  { name: 'Product & Infra', value: 30, color: '#f472b6', description: 'Cloud hosting, AI API costs, dev tooling, vector infrastructure' },
   { name: 'First Customers', value: 20, color: '#a78bfa', description: 'High-touch outreach, demos, content to land first 20-50 subscribers' },
   { name: 'Legal & Ops', value: 10, color: '#3f3f46', description: 'Company structure, founder agreements, accounting' },
 ];
 
 const SEED_FUNDS = [
   { name: 'Team Building', value: 45, color: '#ff1493', description: '2-3 strategic hires: data scientist, growth marketer, content lead' },
-  { name: 'Data & Infra', value: 25, color: '#f472b6', description: 'Scale pgvector to 50M+ embeddings, real-time monitoring, SLM R&D begins' },
+  { name: 'Data & Infra', value: 25, color: '#f472b6', description: 'Scale vector store to 50M+ embeddings, real-time monitoring, SLM R&D begins' },
   { name: 'Market Authority', value: 20, color: '#a78bfa', description: 'GEO research publications, conference presence, thought leadership' },
   { name: 'Enterprise Outreach', value: 10, color: '#3f3f46', description: 'Enterprise CRM, sales tools, pilot programs with agency partners' },
 ];
 
 const WHAT_EXISTS_NOW = [
   "Full GEO audit & citation scoring engine deployed",
-  "768-D latent space mapping with pgvector backend live",
+  "Dual-embedding latent space mapping live (1536-D primary)",
   "Multi-agent content optimizer & Fact-Vault architecture built",
   "Competitor decay detection & SOV simulator operational",
   "4-phase GEO workflow defined and battle-tested",
@@ -764,7 +764,7 @@ export default function InvestorHubPage() {
                   </div>
                   <div className={`p-4 bg-zinc-900/50 rounded-xl ${NEON}`}>
                     <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase mb-1">Version</p>
-                    <p className="text-sm font-medium text-white">v4.1.2_BETA</p>
+                    <p className="text-sm font-medium text-white">v4.2</p>
                   </div>
                 </div>
               </div>
@@ -784,7 +784,7 @@ export default function InvestorHubPage() {
                     <h4 className="font-bold text-white uppercase text-xs tracking-widest">Projection Logic</h4>
                   </div>
                   <p className="text-sm text-zinc-400 leading-relaxed italic">
-                    "This UMAP reduction represents our proprietary Latent Space Map. We use hierarchical density-based clustering (HDBSCAN) to identify how brand entities are clustered within model weights, ensuring deterministic SOV modeling."
+                    "This UMAP reduction is a 2-D projection of our dual-embedding fact space. Distances show how strongly AI models associate facts, queries, and competitors with the brand: the geometry behind every content-gap signal we surface."
                   </p>
                 </div>
               </div>
@@ -819,12 +819,12 @@ export default function InvestorHubPage() {
                     >
                       <FileText className="w-4 h-4" /> Download Full Prospectus
                     </a>
-                    <button
-                      onClick={() => alert("HNSW Index Performance logs exported.")}
+                    <Link
+                      href="/lab"
                       className={`px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-bold rounded-full transition-colors flex items-center gap-2 ${NEON}`}
                     >
-                      <Layout className="w-4 h-4" /> Export Latent Clusters
-                    </button>
+                      <Layout className="w-4 h-4" /> View GEO Lab Findings
+                    </Link>
                   </div>
                 </div>
 
@@ -887,7 +887,7 @@ export default function InvestorHubPage() {
                       <div className="flex items-end justify-between">
                         <div>
                           <p className="text-2xl font-bold text-white">{item.current}</p>
-                          <p className="text-[10px] text-zinc-500">Target: {item.target}</p>
+                          <p className="text-[10px] text-zinc-500">Modelled · Target: {item.target}</p>
                         </div>
                         <div className={cn(
                           "px-1.5 py-0.5 rounded text-[10px] font-bold uppercase",
@@ -985,7 +985,7 @@ export default function InvestorHubPage() {
                       </div>
                       <div className="space-y-4">
                         <h4 className="font-bold text-white">Proprietary Scaling</h4>
-                        <p className="text-sm text-zinc-400 leading-relaxed">Replacing third-party APIs with our self-hosted 8B model reduces inference overhead by 85%, reclaiming 15% of ARR directly into EBIDTA.</p>
+                        <p className="text-sm text-zinc-400 leading-relaxed">Replacing third-party APIs with our self-hosted 8B model reduces inference overhead by 85%, reclaiming 15% of ARR directly into EBITDA.</p>
                       </div>
                       <div className="space-y-4">
                         <h4 className="font-bold text-white">Data &gt; Model</h4>
