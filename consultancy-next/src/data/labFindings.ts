@@ -24,13 +24,13 @@ export const labFindings: LabFinding[] = [
     id: '001-statistical-anchors',
     title: 'Do statistical anchors in the opening sentence increase AI citation?',
     hypothesis:
-      'If the opening sentence contains a specific number ("cut latency 43%"), citation rate will be higher than a version with vague language ("improved latency significantly") for product-performance queries — because LLMs weight precise, citable data points as credibility signals.',
+      'If the opening sentence contains a specific number ("cut latency 43%"), citation rate will be higher than a version with vague language ("improved latency significantly") for product-performance queries. LLMs weight precise, citable data points as credibility signals.',
     runAt: '2026-06-10',
     platforms: ['Gemini', 'ChatGPT', 'Perplexity', 'Claude'],
     sampleDescription:
-      '32 trials per variant across 4 engines (8 per engine) — below our pre-registered threshold of 30 per engine.',
+      '32 trials per variant across 4 engines (8 per engine), below our pre-registered threshold of 30 per engine.',
     resultSummary:
-      'The specific-number variant (B) was cited in 16 of 32 trials (50%) versus 7 of 32 (21.9%) for the vague variant (A). The only statistically significant per-engine effect was on Claude (+62.5pp, p=0.007) — which was not the pre-registered primary platform. Gemini returned 8/8 null responses due to API failures (since fixed), so its data is missing entirely.',
+      'The specific-number variant (B) was cited in 16 of 32 trials (50%) versus 7 of 32 (21.9%) for the vague variant (A). The only statistically significant per-engine effect was on Claude (+62.5pp, p=0.007), which was not the pre-registered primary platform. Gemini returned 8/8 null responses due to API failures (since fixed), so its data is missing entirely.',
     headlineNumbers: [
       { label: 'Variant A (vague) citation rate', value: '21.9%' },
       { label: 'Variant B (specific number) citation rate', value: '50%' },
@@ -38,7 +38,7 @@ export const labFindings: LabFinding[] = [
     ],
     verdict: 'preliminary',
     verdictReason:
-      'Sample size (n=8 per variant per engine) is below the pre-registered n≥30; the significant effect appeared on Claude rather than the pre-registered primary platform (Perplexity); and Gemini data is missing due to API failures. Encouraging direction — not yet a finding we will state as fact.',
+      'Sample size (n=8 per variant per engine) is below the pre-registered n≥30; the significant effect appeared on Claude rather than the pre-registered primary platform (Perplexity); and Gemini data is missing due to API failures. Encouraging direction, but not yet a finding we will state as fact.',
     whatWeDoNext:
       'Re-run at n≥30 per engine with the Gemini API fix in place, keeping Perplexity as the pre-registered primary platform. If the effect holds, it graduates to "supported" and we will say so plainly.',
   },

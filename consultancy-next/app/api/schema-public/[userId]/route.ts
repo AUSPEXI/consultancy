@@ -49,7 +49,7 @@ export async function GET(
           url: siteUrl,
           description: anchors.length > 0
             ? anchors.map((a: any) => a.label).join(', ')
-            : `${brand} — GEO-optimised brand`,
+            : `${brand}: GEO-optimised brand`,
         },
         ...(facts.length > 0 ? [{
           '@type': 'ItemList',

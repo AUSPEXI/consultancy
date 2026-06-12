@@ -4,7 +4,7 @@ import { Footerdemo } from '@/components/ui/footer-section';
 
 export const metadata: Metadata = {
   title: 'Acceptable Use Policy | L8EntSpace',
-  description: 'L8EntSpace\'s Acceptable Use Policy — what you may and may not do with the platform, brand protection rules, and enforcement.',
+  description: 'L8EntSpace\'s Acceptable Use Policy: what you may and may not do with the platform, brand protection rules, and enforcement.',
   metadataBase: new URL('https://l8entspace.com'),
   alternates: { canonical: 'https://l8entspace.com/acceptable-use' },
   openGraph: {
@@ -118,7 +118,7 @@ export default function AcceptableUsePage() {
                   </div>
                 ))}
               </div>
-              <p className="text-zinc-400 mt-4 text-xs">Unauthorised use of these marks — including in domain names, product descriptions, or social media profiles — constitutes trademark infringement and will be acted upon. We actively monitor for misuse.</p>
+              <p className="text-zinc-400 mt-4 text-xs">Unauthorised use of these marks (including in domain names, product descriptions, or social media profiles) constitutes trademark infringement and will be acted upon. We actively monitor for misuse.</p>
               <p className="text-zinc-400 mt-2 text-xs">If you wish to reference L8EntSpace for editorial, journalistic, or review purposes, use of the name &ldquo;L8EntSpace&rdquo; is permitted provided it is clearly descriptive and does not imply endorsement or partnership.</p>
             </section>
 

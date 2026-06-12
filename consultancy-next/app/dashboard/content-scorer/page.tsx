@@ -92,7 +92,7 @@ export default function ContentScorerPage() {
 
   const handleDownloadMarkdown = () => {
     if (!content.trim()) return;
-    const header = `# Content (${contentType}) — GEO Score: ${result?.overallScore ?? '?'}/100\n\n`;
+    const header = `# Content (${contentType}) - GEO Score: ${result?.overallScore ?? '?'}/100\n\n`;
     const blob = new Blob([header + content], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -116,7 +116,7 @@ export default function ContentScorerPage() {
         showToast('Published to your CMS via webhook.', 'success');
       } else {
         // No webhook — download as Markdown
-        const header = `# Content (${contentType}) — GEO Score: ${result?.overallScore ?? '?'}/100\n\n`;
+        const header = `# Content (${contentType}) - GEO Score: ${result?.overallScore ?? '?'}/100\n\n`;
         const blob = new Blob([header + content], { type: 'text/markdown' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -272,7 +272,7 @@ export default function ContentScorerPage() {
                 <h3 className="text-sm font-semibold text-white">Lab-Validated GEO Levers</h3>
               </div>
               <p className="text-xs text-zinc-500 mb-3">
-                Apply these while drafting — each is backed by a real A/B citation experiment in the L8EntSpace GEO Lab.
+                Apply these while drafting. Each is backed by a real A/B citation experiment in the L8EntSpace GEO Lab.
               </p>
               <div className="space-y-2">
                 {labLevers.map((lev) => (

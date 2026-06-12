@@ -91,7 +91,7 @@ export async function computeAttribution(
     articlesAddedInWindow: 0,
     contributingFacts: [],
     contributingArticles: [],
-    note: 'Baseline run — no previous probe to compare against yet. Run again after adding facts and articles to see what moves your citation rate.',
+    note: 'Baseline run: no previous probe to compare against yet. Run again after adding facts and articles to see what moves your citation rate.',
   };
 
   // ── Previous run ────────────────────────────────────────────────────────────
@@ -186,7 +186,7 @@ export async function computeAttribution(
       ? `You added ${windowFacts.length} fact(s) and ${windowArticles.length} article(s) since the last probe, but citation rate hasn't moved yet. GEO effects typically take 2–6 weeks to propagate into AI answers.`
       : 'No new facts or articles since your last probe, and citation rate is flat. Add Cite-Magnet facts and publish articles, then re-probe.';
   } else if (newlyWon.length > 0) {
-    note = `${newlyWon.length} quer${newlyWon.length === 1 ? 'y' : 'ies'} started getting cited since your last probe. The items below were published in that window and overlap those queries — likely contributors (correlation, not proof).`;
+    note = `${newlyWon.length} quer${newlyWon.length === 1 ? 'y' : 'ies'} started getting cited since your last probe. The items below were published in that window and overlap those queries (likely contributors; correlation, not proof).`;
   } else {
     note = `Citation rate moved ${deltaPp > 0 ? '+' : ''}${deltaPp}pp since your last probe.`;
   }

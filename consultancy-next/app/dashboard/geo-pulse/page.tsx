@@ -217,7 +217,7 @@ export default function GeoPulsePage() {
         {/* Batch results table */}
         {!isBatchScanning && batchResults.length > 0 && (
           <div className="space-y-4 animate-in slide-in-from-bottom-8 duration-700">
-            <h3 className="text-base font-semibold text-white border-b border-zinc-800 pb-2">Batch Scan Results — {batchResults.length} Keywords</h3>
+            <h3 className="text-base font-semibold text-white border-b border-zinc-800 pb-2">Batch Scan Results: {batchResults.length} Keywords</h3>
             <div className="overflow-x-auto rounded-xl border border-zinc-800">
               <table className="w-full text-sm">
                 <thead>
@@ -247,7 +247,7 @@ export default function GeoPulsePage() {
                             </span>
                           </td>
                           <td className="px-4 py-3 text-zinc-400 text-xs hidden md:table-cell max-w-xs truncate">
-                            {result.insights?.[0] ?? '—'}
+                            {result.insights?.[0] ?? 'N/A'}
                           </td>
                         </>
                       ) : (

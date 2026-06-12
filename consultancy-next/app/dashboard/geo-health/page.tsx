@@ -187,7 +187,7 @@ export default function GeoHealthPage() {
           <span className="ml-auto text-[10px] font-bold text-zinc-600 uppercase tracking-widest">ChatGPT runs on Bing</span>
         </div>
         <p className="text-xs text-zinc-400">
-          If your domain is not indexed on Bing, ChatGPT-with-search cannot find it — regardless of how good your content is.
+          If your domain is not indexed on Bing, ChatGPT-with-search cannot find it, regardless of how good your content is.
         </p>
 
         <button
@@ -266,20 +266,20 @@ export default function GeoHealthPage() {
           <div className={`text-sm p-4 rounded-lg border ${indexNowResult.success ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300' : 'bg-pink-500/10 border-pink-500/20 text-pink-300'}`}>
             <p className="font-semibold">{indexNowResult.success ? '✓ ' : '✗ '}{indexNowResult.message}</p>
             {indexNowResult.keyFileLive === true && (
-              <p className="text-xs text-emerald-300 mt-2">✓ Domain ownership verified — your key file is live. Bing will process these URLs; nothing else to do.</p>
+              <p className="text-xs text-emerald-300 mt-2">✓ Domain ownership verified. Your key file is live. Bing will process these URLs; nothing else to do.</p>
             )}
             {indexNowResult.keyFileLive === false && indexNowResult.indexNowKey && (
               <div className="mt-3 bg-zinc-950 border border-amber-500/30 rounded-lg p-3 space-y-2">
-                <p className="text-xs font-semibold text-amber-300">⚠ One-time setup needed — Bing will ignore these URLs until it can verify you own {domain}:</p>
+                <p className="text-xs font-semibold text-amber-300">⚠ One-time setup needed: Bing will ignore these URLs until it can verify you own {domain}:</p>
                 <ol className="text-xs text-zinc-300 space-y-1.5 list-decimal pl-4">
                   <li>
                     <button onClick={() => downloadKeyFile(indexNowResult.indexNowKey!)} className="text-pink-400 underline hover:text-pink-300 font-semibold">
                       Download your key file
                     </button>{' '}
-                    (a tiny .txt file — we&apos;ve filled it in for you)
+                    (a tiny .txt file; we&apos;ve filled it in for you)
                   </li>
                   <li>Upload it to the top level of your website, so it appears at <code className="text-zinc-400 bg-zinc-900 px-1 rounded break-all">{indexNowResult.keyLocation}</code></li>
-                  <li>Push again — we re-check automatically and this notice turns green</li>
+                  <li>Push again: we re-check automatically and this notice turns green</li>
                 </ol>
                 <p className="text-[11px] text-zinc-500">On WordPress use a file-manager plugin; on Netlify/Vercel drop it in your <code className="bg-zinc-900 px-1 rounded">public/</code> folder. It&apos;s safe to leave there forever.</p>
               </div>
@@ -296,7 +296,7 @@ export default function GeoHealthPage() {
         </div>
         <p className="text-xs text-zinc-400">
           AI models resolve brand identity through structured knowledge sources. Missing entries mean the model
-          treats your brand as an unknown entity — reducing citation probability even when your content is excellent.
+          treats your brand as an unknown entity, reducing citation probability even when your content is excellent.
         </p>
 
         <button

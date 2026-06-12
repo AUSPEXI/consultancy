@@ -39,7 +39,7 @@ export const DASHBOARD_TOOLS: DashboardTool[] = [
     id: 'overview',
     name: 'AI SOV Overview',
     status: 'active',
-    purpose: 'AI Share of Voice command centre — shows A-SOV trend from real Citation Probe history, 768-D Latent Space Map of vault facts, Competitive Citation Dominance chart, and Cite-Magnet Scorecard.',
+    purpose: 'AI Share of Voice command centre: shows A-SOV trend from real Citation Probe history, 768-D Latent Space Map of vault facts, Competitive Citation Dominance chart, and Cite-Magnet Scorecard.',
     metrics: ['A-SOV %', 'Entity Recall Rate (ERR)', 'Competitor Gap', 'AI Referral Traffic', 'Sentiment Index'],
     actions: ['View SOV trend chart', 'Inspect latent space map', 'Review scorecard', 'Generate a "Dark AI" Shadow Link (UTM-tagged URL for JSON-LD) to attribute AI traffic in Google Analytics'],
     flavor: 'AI SOV Command Center',
@@ -66,7 +66,7 @@ export const DASHBOARD_TOOLS: DashboardTool[] = [
     id: 'competitors',
     name: 'Competitor Radar',
     status: 'active',
-    purpose: 'Enemy Radar. Tracks competitor decay scores — competitors with stale, low-entropy content are vulnerable to displacement via the Trojan Horse strategy.',
+    purpose: 'Enemy Radar. Tracks competitor decay scores: competitors with stale, low-entropy content are vulnerable to displacement via the Trojan Horse strategy.',
     metrics: ['Competitor decay score', 'Competitor AI SOV', 'Stale topic clusters'],
     actions: ['Add competitor', 'View decay trend', 'Generate counter-facts', 'Identify Trojan Horse targets'],
     flavor: 'Enemy Radar',
@@ -84,7 +84,7 @@ export const DASHBOARD_TOOLS: DashboardTool[] = [
     id: 'content-scorer',
     name: 'Content Scorer',
     status: 'active',
-    purpose: "Analyst's Forge. Paste content to grade it on GEO readiness — entity density, fact entropy, schema coverage, and overall citation probability. Suggests specific edits before publishing, and surfaces Lab-Validated GEO Levers — content tactics proven to lift citation rate by real A/B experiments in the L8EntSpace GEO Lab, with effect sizes and p-values.",
+    purpose: "Analyst's Forge. Paste content to grade it on GEO readiness: entity density, fact entropy, schema coverage, and overall citation probability. Suggests specific edits before publishing, and surfaces Lab-Validated GEO Levers (content tactics proven to lift citation rate by real A/B experiments in the L8EntSpace GEO Lab, with effect sizes and p-values).",
     metrics: ['GEO score %', 'Entity density', 'Fact count extracted', 'Schema coverage', 'Lab-validated levers (live from GEO Lab)'],
     actions: ['Score content', 'Extract facts to Fact Vault', 'Get edit suggestions', 'Apply lab-validated GEO levers'],
     flavor: "Analyst's Forge",
@@ -93,7 +93,7 @@ export const DASHBOARD_TOOLS: DashboardTool[] = [
     id: 'simulator',
     name: 'SOV Simulator',
     status: 'active',
-    purpose: 'Scrying Pool. Fire a single high-intent query at every live AI engine (ChatGPT, Claude, Gemini, Perplexity) and measure the real Share of Voice — which engines actually cite the brand. Engines without a configured key are skipped, never faked.',
+    purpose: 'Scrying Pool. Fire a single high-intent query at every live AI engine (ChatGPT, Claude, Gemini, Perplexity) and measure the real Share of Voice: which engines actually cite the brand. Engines without a configured key are skipped, never faked.',
     metrics: ['Live Share of Voice %', 'Engines citing the brand', 'Per-engine response text'],
     actions: ['Query live engines', 'Compare per-engine brand citations', 'Identify which engines ignore the brand'],
     flavor: 'Scrying Pool',
@@ -129,7 +129,7 @@ export const DASHBOARD_TOOLS: DashboardTool[] = [
     id: 'audit-logs',
     name: 'Audit Logs',
     status: 'active',
-    purpose: "Scribe's Journal. Security and activity audit trail for all platform actions — fact additions, agent runs, probe executions, settings changes.",
+    purpose: "Scribe's Journal. Security and activity audit trail for all platform actions: fact additions, agent runs, probe executions, settings changes.",
     metrics: ['Action count', 'Recent activity timeline'],
     actions: ['Review activity history'],
     flavor: "Scribe's Journal",
@@ -138,7 +138,7 @@ export const DASHBOARD_TOOLS: DashboardTool[] = [
     id: 'settings',
     name: 'Settings',
     status: 'active',
-    purpose: 'Brand configuration. Set brand name and domain here — required before Citation Probe and Agent runs. Also manages keywords, competitor list, CMS webhook, and sitemap URL.',
+    purpose: 'Brand configuration. Set brand name and domain here (required before Citation Probe and Agent runs). Also manages keywords, competitor list, CMS webhook, and sitemap URL.',
     metrics: [],
     actions: ['Set brand name', 'Set domain', 'Add keywords', 'Add competitors', 'Configure webhook', 'Submit sitemap'],
     flavor: 'Brand Configuration',
@@ -165,7 +165,7 @@ export const DASHBOARD_TOOLS: DashboardTool[] = [
     id: 'geo-lab',
     name: 'GEO Lab Results',
     status: 'active',
-    purpose: 'Live findings from the L8EntSpace GEO Lab — real A/B experiments measuring which content tactics (statistical anchors, entity density, inverted pyramid, etc.) lift AI citation rate. Only statistically significant findings surface as recommendations, sorted by effect size.',
+    purpose: 'Live findings from the L8EntSpace GEO Lab: real A/B experiments measuring which content tactics (statistical anchors, entity density, inverted pyramid, etc.) lift AI citation rate. Only statistically significant findings surface as recommendations, sorted by effect size.',
     metrics: ['Active findings count', 'Effect size (pp)', 'p-value', 'Null result count'],
     actions: ['Browse lab findings', 'Expand a finding for full recommendation', 'Apply lever to content via Content Scorer'],
     flavor: 'Experimental Evidence Vault',
@@ -193,7 +193,7 @@ export function getActiveToolIds(): string[] {
 export function buildToolsSection(): string {
   const active = DASHBOARD_TOOLS.filter(t => t.status !== 'deprecated');
   const lines = active.map((t, i) => {
-    let line = `${i + 1}. ${t.id.padEnd(14)} — ${t.purpose}`;
+    let line = `${i + 1}. ${t.id.padEnd(14)}: ${t.purpose}`;
     if (t.status === 'beta') line += ' [BETA]';
     return line;
   });
@@ -206,7 +206,7 @@ export function buildToolsSection(): string {
  */
 export function buildQuestPath(): string {
   return `0. CONFIGURE  → settings: brand name, domain, keywords, competitors
-1. MEASURE    → cite-probe: establish baseline — what is my current citation rate?
+1. MEASURE    → cite-probe: establish baseline. What is my current citation rate?
 2. BUILD MOAT → fact-vault: add verified brand Cite-Magnet facts (aim for 50+)
 3. GENERATE   → agents: GEO-optimised articles for each uncited query
 4. SCORE      → content-scorer: quality-check each article before publishing

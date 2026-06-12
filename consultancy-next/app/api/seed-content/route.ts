@@ -51,7 +51,7 @@ URL: ${threadUrl || 'N/A'}
 SUMMARY: ${threadSummary || 'No summary available'}
 
 Your task is to craft COUNTER-NARRATIVE seeding content that will positively represent "${brand}" on Reddit and LinkedIn. This content must:
-1. Be genuine, helpful, and community-appropriate — never spammy or promotional
+1. Be genuine, helpful, and community-appropriate. Never spammy or promotional
 2. Address the actual concerns raised without being defensive
 3. Provide real value to the reader beyond brand promotion
 4. Be written in a natural, human voice appropriate to each platform
@@ -62,7 +62,7 @@ REDDIT:
 - Identify the BEST subreddit to post/comment in (relevant to the thread's topic, not a brand sub)
 - Decide: is this better as a new post or a reply/comment to the existing thread?
 - If a post: give a compelling title. If a comment: write a reply.
-- Write the body (Reddit markdown OK). Be genuine — Redditors detect promotion instantly.
+- Write the body (Reddit markdown OK). Be genuine. Redditors detect promotion instantly.
 - Suggest the optimal posting time (day/hour in UTC, e.g. "Tuesday 14:00 UTC")
 - Give a 1-sentence rationale for the targeting choice
 

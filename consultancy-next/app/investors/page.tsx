@@ -161,7 +161,7 @@ const PROPRIETARY_STACK = [
   },
   {
     title: "Z-Score Anomaly Detection",
-    description: "Our 'Sentiment Pulse' watchdog that separates Generative Noise from true Brand Drift—a leading indicator.",
+    description: "Our 'Sentiment Pulse' watchdog that separates Generative Noise from true Brand Drift: a leading indicator.",
     metric: "0.01ms Latency"
   }
 ];
@@ -375,7 +375,7 @@ const WHAT_EXISTS_NOW = [
   "4-phase GEO workflow defined and battle-tested",
   "Brand sentiment Z-score drift detection running",
   "Dashboard, blog, investor hub and public site complete",
-  "GEO strategy proven — need capital to prove the market",
+  "GEO strategy proven. Now we need capital to prove the market.",
 ];
 
 function PreSeedCalculator() {
@@ -514,7 +514,7 @@ function SeedCalculator() {
       <div className="p-5 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl mb-8">
         <p className="text-[10px] font-bold text-emerald-400 tracking-widest uppercase mb-1">Projected ARR entering Series A</p>
         <p className="text-3xl font-bold text-emerald-400">${(projectedARR / 1000).toFixed(0)}k</p>
-        <p className="text-[10px] text-emerald-500/70 mt-1">{customers} subscribers × $199/mo avg × 12 — Series A ready</p>
+        <p className="text-[10px] text-emerald-500/70 mt-1">{customers} subscribers × $199/mo avg × 12 (Series A ready)</p>
       </div>
 
       <div className="space-y-3">
@@ -600,7 +600,7 @@ export default function InvestorHubPage() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
             className="text-xl md:text-2xl text-zinc-400 max-w-3xl mx-auto mb-6 leading-relaxed"
           >
-            L8EntSpace has built the deterministic infrastructure for Generative Engine Optimization from scratch — no external capital, no compromises. We are at pre-seed: the platform is live, the workflow is proven, and the first paying subscribers are one funding round away.
+            L8EntSpace has built the deterministic infrastructure for Generative Engine Optimization from scratch: no external capital, no compromises. We are at pre-seed: the platform is live, the workflow is proven, and the first paying subscribers are one funding round away.
           </motion.p>
 
           {/* Stage progress strip */}
@@ -687,7 +687,7 @@ export default function InvestorHubPage() {
               <div className="space-y-2 text-xs text-zinc-500">
                 <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-emerald-500" />200–500 paying subscribers</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-emerald-500" />Data scientist + growth marketer hired</div>
-                <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-emerald-500" />GEO research published — own the narrative</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-emerald-500" />GEO research published: own the narrative</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-emerald-500" />Enterprise pilots, agency partnerships</div>
               </div>
             </motion.div>
@@ -715,7 +715,7 @@ export default function InvestorHubPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">Capital Models</h2>
-            <p className="text-zinc-400 max-w-2xl mx-auto">Adjust the sliders to see what each round size buys in concrete outcomes — no fabricated hockey sticks, just honest unit economics.</p>
+            <p className="text-zinc-400 max-w-2xl mx-auto">Adjust the sliders to see what each round size buys in concrete outcomes. No fabricated hockey sticks, just honest unit economics.</p>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <PreSeedCalculator />
@@ -735,7 +735,7 @@ export default function InvestorHubPage() {
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold font-heading text-white">The Series A Data Room</h2>
                 <p className="text-zinc-400 mt-4">
-                  Where the journey leads. Market positioning, technical architecture, financial models and proprietary datasets for the Series A round — accessed after pre-seed and seed milestones are proven.
+                  Where the journey leads. Market positioning, technical architecture, financial models and proprietary datasets for the Series A round. Accessed after pre-seed and seed milestones are proven.
                 </p>
               </div>
               <div className="flex items-center gap-4">
@@ -1182,7 +1182,7 @@ export default function InvestorHubPage() {
                                 {log.timestamp ? new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(log.timestamp.toDate()) : 'Just now'}
                               </td>
                               <td className="py-3 pr-6 text-zinc-500 font-mono text-xs truncate max-w-[160px]">{log.userId}</td>
-                              <td className="py-3 text-zinc-400 text-xs font-mono">{log.details?.page ?? '—'} · {log.details?.tier ?? '—'}</td>
+                              <td className="py-3 text-zinc-400 text-xs font-mono">{log.details?.page ?? 'n/a'} · {log.details?.tier ?? 'n/a'}</td>
                             </tr>
                           ))}
                         </tbody>

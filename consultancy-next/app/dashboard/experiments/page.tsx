@@ -97,7 +97,7 @@ export default function ExperimentsPage() {
           Citability Lab
         </h1>
         <p className="text-zinc-400 max-w-2xl">
-          Test your draft two ways. We apply one change, then ask the AI engines — in a randomised head-to-head — which version they&apos;d rather cite. This measures <span className="text-zinc-300">retrieval-time citability</span>, not live citations.
+          Test your draft two ways. We apply one change, then ask the AI engines (in a randomised head-to-head) which version they&apos;d rather cite. This measures <span className="text-zinc-300">retrieval-time citability</span>, not live citations.
         </p>
       </div>
 
@@ -150,7 +150,7 @@ export default function ExperimentsPage() {
                 );
               })}
             </div>
-            <p className="text-[11px] text-zinc-600 mt-1">Perplexity costs more per call — off by default.</p>
+            <p className="text-[11px] text-zinc-600 mt-1">Perplexity costs more per call, so it is off by default.</p>
           </div>
           <div>
             <label className="text-sm font-medium text-zinc-300 mb-1.5 block">Trials per question: {trialsPerQuery}</label>
@@ -186,7 +186,7 @@ export default function ExperimentsPage() {
                     ? 'No significant difference'
                     : pooled.winner === 'B'
                       ? `The change wins: "${data.lever.label}"`
-                      : 'Your original wins — the change did not help'}
+                      : 'Your original wins. The change did not help.'}
                 </p>
                 <p className="text-sm text-zinc-400">
                   {pooled.winner === 'B' ? '+' : ''}{pooled.diffPp}pp difference · p={pooled.pValue} · 95% CI [{pooled.ci95[0]}, {pooled.ci95[1]}]pp
@@ -196,7 +196,7 @@ export default function ExperimentsPage() {
             </div>
             {pooled.underpowered && (
               <p className="text-xs text-amber-400/80 mt-3 flex items-center gap-1.5">
-                <AlertTriangle className="w-3.5 h-3.5" /> Preliminary — fewer than 30 trials per variant. Add engines or trials for a firmer result.
+                <AlertTriangle className="w-3.5 h-3.5" /> Preliminary: fewer than 30 trials per variant. Add engines or trials for a firmer result.
               </p>
             )}
           </div>
@@ -204,13 +204,13 @@ export default function ExperimentsPage() {
           {/* Pooled rates */}
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
-              <p className="text-xs text-zinc-500 uppercase tracking-wide mb-2">Variant A — your original</p>
+              <p className="text-xs text-zinc-500 uppercase tracking-wide mb-2">Variant A: your original</p>
               <p className="text-2xl font-bold text-white mb-2">{Math.round(pooled.a.rate * 100)}%</p>
               <Bar rate={pooled.a.rate} color="bg-zinc-500" />
               <p className="text-[11px] text-zinc-600 mt-1.5">{pooled.a.cited} / {pooled.a.trials} trials cited it</p>
             </div>
             <div className="bg-zinc-900 border border-pink-500/20 rounded-xl p-4">
-              <p className="text-xs text-pink-400 uppercase tracking-wide mb-2">Variant B — {data.lever.label}</p>
+              <p className="text-xs text-pink-400 uppercase tracking-wide mb-2">Variant B: {data.lever.label}</p>
               <p className="text-2xl font-bold text-white mb-2">{Math.round(pooled.b.rate * 100)}%</p>
               <Bar rate={pooled.b.rate} color="bg-pink-500" />
               <p className="text-[11px] text-zinc-600 mt-1.5">{pooled.b.cited} / {pooled.b.trials} trials cited it</p>

@@ -362,7 +362,7 @@ export default function FactVault() {
                     <td className="px-6 py-4">
                       <span
                         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20 cursor-help"
-                        title="This fact is active in your Vault — it gets automatically included in every AI request as context (Retrieval-Augmented Generation). AI models citing your brand will draw from it."
+                        title="This fact is active in your Vault: it gets automatically included in every AI request as context (Retrieval-Augmented Generation). AI models citing your brand will draw from it."
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" /> AI Active
                       </span>
@@ -415,7 +415,7 @@ export default function FactVault() {
                                 if (!res.ok) throw new Error((await res.json()).error || `HTTP ${res.status}`);
                                 showToast('Schema saved to registry and pushed to CMS. Use "Verify on site" below to confirm.', 'success');
                               } catch (e: any) {
-                                showToast(`Webhook failed: ${e.message} — schema saved to registry. Copy snippet below to add manually.`, 'error');
+                                showToast(`Webhook failed: ${e.message}. Schema saved to registry. Copy snippet below to add manually.`, 'error');
                               }
                             } else {
                               showToast('Schema saved to site registry. Copy the snippet below to also add it manually to your site head.', 'info');
@@ -580,7 +580,7 @@ export default function FactVault() {
                 </h3>
                 <p className="text-xs text-zinc-500 mt-0.5">
                   {userData?.cmsWebhookUrl
-                    ? 'Sent to CMS — verify below that it appears in your live page HTML.'
+                    ? 'Sent to CMS. Verify below that it appears in your live page HTML.'
                     : 'No webhook configured. Add this to your site manually.'}
                 </p>
               </div>
@@ -647,7 +647,7 @@ export default function FactVault() {
                   {schemaVerify && !schemaVerify.error && (
                     <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 space-y-3 text-xs">
                       <div className="flex items-center justify-between">
-                        <p className="font-bold text-zinc-400 uppercase tracking-widest">Live schema check — {schemaVerify.url}</p>
+                        <p className="font-bold text-zinc-400 uppercase tracking-widest">Live schema check: {schemaVerify.url}</p>
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${schemaVerify.schemasFound > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
                           {schemaVerify.schemasFound} schema{schemaVerify.schemasFound !== 1 ? 's' : ''} found
                         </span>
@@ -672,13 +672,13 @@ export default function FactVault() {
                         </div>
                       )}
                       {schemaVerify.schemasFound === 0 && (
-                        <p className="text-amber-400/80 text-[11px] leading-relaxed">No structured data found on your homepage. The schema was not written to page HTML — the webhook server received the data but isn't embedding it.</p>
+                        <p className="text-amber-400/80 text-[11px] leading-relaxed">No structured data found on your homepage. The schema was not written to page HTML. The webhook server received the data but isn't embedding it.</p>
                       )}
                       {schemaVerify.schemasFound > 0 && !schemaVerify.hasClaim && (
-                        <p className="text-amber-400/80 text-[11px] leading-relaxed">Schemas found (Organization/WebSite) but no Claim type yet. Your webhook was received but the JSON-LD from Map Ontology hasn't been embedded — copy it manually from above and paste into your site's &lt;head&gt;.</p>
+                        <p className="text-amber-400/80 text-[11px] leading-relaxed">Schemas found (Organization/WebSite) but no Claim type yet. Your webhook was received but the JSON-LD from Map Ontology hasn't been embedded. Copy it manually from above and paste into your site's &lt;head&gt;.</p>
                       )}
                       {schemaVerify.schemasFound > 0 && schemaVerify.hasClaim && !schemaVerify.factFound && (
-                        <p className="text-emerald-400/70 text-[11px] leading-relaxed">Claim schema is present on the page. This specific fact statement wasn't detected in the schema text — may be a different claim or a truncation. Check the schema content on your site.</p>
+                        <p className="text-emerald-400/70 text-[11px] leading-relaxed">Claim schema is present on the page. This specific fact statement wasn't detected in the schema text (may be a different claim or a truncation). Check the schema content on your site.</p>
                       )}
                       {schemaVerify.schemasFound > 0 && schemaVerify.hasClaim && schemaVerify.factFound && (
                         <p className="text-emerald-400 text-[11px] leading-relaxed">This fact is live in your page structured data. AI crawlers will see it as an authoritative Claim attributed to your brand.</p>

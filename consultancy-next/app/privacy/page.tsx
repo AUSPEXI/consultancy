@@ -4,7 +4,7 @@ import { Footerdemo } from '@/components/ui/footer-section';
 
 export const metadata: Metadata = {
   title: 'Privacy & Cookie Policy | L8EntSpace',
-  description: 'How L8EntSpace collects, uses, and protects your personal data. UK GDPR compliant — covering AI data processing, voice data, cookies, and your data rights.',
+  description: 'How L8EntSpace collects, uses, and protects your personal data. UK GDPR compliant: covering AI data processing, voice data, cookies, and your data rights.',
   metadataBase: new URL('https://l8entspace.com'),
   alternates: { canonical: 'https://l8entspace.com/privacy' },
   openGraph: {
@@ -25,7 +25,7 @@ const privacyJsonLd = {
   '@type': 'WebPage',
   name: 'Privacy & Cookie Policy',
   url: 'https://l8entspace.com/privacy',
-  description: 'L8EntSpace privacy and cookie policy — UK GDPR compliant.',
+  description: 'L8EntSpace privacy and cookie policy. UK GDPR compliant.',
   isPartOf: { '@id': 'https://l8entspace.com/#website' },
 };
 
@@ -81,7 +81,7 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4 text-white font-heading">3. Why We Use Your Data — and Our Lawful Basis</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-white font-heading">3. Why We Use Your Data (and Our Lawful Basis)</h2>
               <p className="text-zinc-300 mb-4">Under UK GDPR, we must have a lawful basis for each use of your personal data:</p>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs border-collapse">
@@ -99,9 +99,9 @@ export default function PrivacyPolicyPage() {
                       ['Sending transactional emails (billing, security alerts)', 'Contract / Legal Obligation'],
                       ['Maintaining security, preventing fraud and abuse', 'Legitimate Interests (Art. 6(1)(f))'],
                       ['Improving platform features and performance', 'Legitimate Interests (Art. 6(1)(f))'],
-                      ['Sending marketing emails about new features', 'Consent (Art. 6(1)(a)) — opt out anytime'],
+                      ['Sending marketing emails about new features', 'Consent (Art. 6(1)(a)): opt out anytime'],
                       ['Retaining financial records for HMRC', 'Legal Obligation (Art. 6(1)(c))'],
-                      ['Processing voice queries via Citacious', 'Consent (Art. 6(1)(a)) — granted by initiating a call'],
+                      ['Processing voice queries via Citacious', 'Consent (Art. 6(1)(a)): granted by initiating a call'],
                     ].map(([purpose, basis], i) => (
                       <tr key={i} className="border-b border-zinc-800/60">
                         <td className="py-3 pr-4">{purpose}</td>
@@ -114,7 +114,7 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4 text-white font-heading">4. AI Processing — How Your Data Is Used with Third-Party AI Services</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-white font-heading">4. AI Processing: How Your Data Is Used with Third-Party AI Services</h2>
               <p className="text-zinc-300 mb-4">Our platform is built on artificial intelligence. To deliver our core services, your brand data (keywords, competitor names, brand facts) is sent to the following AI providers as <strong>data processors</strong> acting on our instructions:</p>
               <div className="space-y-3">
                 {[
@@ -216,10 +216,10 @@ export default function PrivacyPolicyPage() {
               <p className="text-zinc-300">We implement appropriate technical and organisational measures to protect your data, including:</p>
               <ul className="list-disc pl-6 space-y-1 text-zinc-400 mt-3 text-sm">
                 <li>Encryption at rest (AES-256) and in transit (TLS 1.3)</li>
-                <li>Role-based access control — staff access is need-to-know only</li>
+                <li>Role-based access control: staff access is need-to-know only</li>
                 <li>Firestore security rules restricting data access to the owning user UID</li>
                 <li>Automated audit trails for all data mutations</li>
-                <li>Multi-tenant data isolation — your data is never shared with or visible to other L8EntSpace customers</li>
+                <li>Multi-tenant data isolation: your data is never shared with or visible to other L8EntSpace customers</li>
               </ul>
               <p className="text-zinc-400 mt-3 text-xs">No system is 100% secure. In the event of a data breach that poses a risk to your rights and freedoms, we will notify the ICO within 72 hours and notify affected individuals without undue delay.</p>
             </section>

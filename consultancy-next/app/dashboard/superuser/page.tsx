@@ -102,7 +102,7 @@ function CostAuditPanel({ userId }: { userId: string }) {
           </div>
           <div>
             <h3 className="text-xl font-bold text-white">Cost Audit</h3>
-            <p className="text-xs text-zinc-500 mt-0.5">Live unit economics — token usage, API costs, pricing calculator</p>
+            <p className="text-xs text-zinc-500 mt-0.5">Live unit economics: token usage, API costs, pricing calculator</p>
           </div>
         </div>
         <button
@@ -137,7 +137,7 @@ function CostAuditPanel({ userId }: { userId: string }) {
               { label: 'Total API Calls', value: data.totalCalls.toLocaleString(), sub: 'since tracking started' },
               { label: 'Total Spend', value: `$${data.grandTotalCost.toFixed(4)}`, sub: 'USD, real cost' },
               { label: 'Avg Daily Cost', value: `$${avgDailyCost.toFixed(4)}`, sub: 'based on active days' },
-              { label: 'Cost / Call', value: data.totalCalls > 0 ? `$${(data.grandTotalCost / data.totalCalls).toFixed(5)}` : '—', sub: 'blended average' },
+              { label: 'Cost / Call', value: data.totalCalls > 0 ? `$${(data.grandTotalCost / data.totalCalls).toFixed(5)}` : 'N/A', sub: 'blended average' },
             ].map(stat => (
               <div key={stat.label} className="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 text-center">
                 <div className="text-xl font-black text-white mb-0.5">{stat.value}</div>
@@ -203,7 +203,7 @@ function CostAuditPanel({ userId }: { userId: string }) {
 
           {data.totalCalls === 0 && (
             <div className="text-center py-6 text-zinc-600 text-sm mb-8">
-              No cost entries yet — use the platform features above to start tracking.
+              No cost entries yet. Use the platform features above to start tracking.
             </div>
           )}
 
@@ -249,7 +249,7 @@ function CostAuditPanel({ userId }: { userId: string }) {
               </div>
             </div>
             <p className="text-[10px] text-zinc-600 mt-4">
-              Based on your actual API usage pattern. 3× cost margin is conservative — SaaS tooling typically runs 5–10×. Assumes usage scales linearly with subscribers.
+              Based on your actual API usage pattern. 3× cost margin is conservative (SaaS tooling typically runs 5–10×). Assumes usage scales linearly with subscribers.
             </p>
 
             {/* Platform rate card */}
@@ -372,7 +372,7 @@ export default function SuperuserPage() {
       }
       if (user) {
         const userRef = doc(db, 'users', user.uid);
-        await logAuditAction(user.uid, 'Hard Reset — All Data Purged', { collectionsCleared: collectionsToClear });
+        await logAuditAction(user.uid, 'Hard Reset: All Data Purged', { collectionsCleared: collectionsToClear });
         await setDoc(userRef, { uid: user.uid, email: user.email, onboardingCompleted: false, brand: '', domain: '', keywords: [], competitors: [], connectedSocials: [], cmsWebhookUrl: '', sentimentPrompts: [], tier: 'Free', role: 'user', createdAt: new Date().toISOString().split('T')[0] });
       }
       localStorage.clear();
@@ -514,7 +514,7 @@ export default function SuperuserPage() {
         { title: 'Case Study: 3x AI Visibility in 90 Days', geoScore: 95, type: 'case-study' },
         { title: 'Latent Space Positioning: What It Means for Brands', geoScore: 78, type: 'blog' },
         { title: 'Competitor Analysis: How We Stack Up in AI Search', geoScore: 72, type: 'blog' },
-        { title: 'Pricing Page — L8ENTSPACE Plans Compared', geoScore: 65, type: 'pricing' },
+        { title: 'Pricing Page: L8ENTSPACE Plans Compared', geoScore: 65, type: 'pricing' },
         { title: 'Integration Docs: Connecting Your CMS', geoScore: 88, type: 'docs' },
         { title: 'Webinar Recap: GEO Strategies for B2B SaaS', geoScore: 81, type: 'content' },
         { title: 'FAQ: Common Questions About AI Visibility', geoScore: 76, type: 'faq' },

@@ -384,7 +384,7 @@ export default function CiteProbePage() {
         {showCompetitorPanel && (
           <div className="px-5 pb-5 border-t border-zinc-800 pt-4 space-y-3">
             <p className="text-xs text-zinc-500">
-              Runs the same {activePlatformsCount > 1 ? 'queries' : 'questions'} for each of your saved competitors and shows who wins each one. Rates are measured live — no fabricated data. This also populates the Head-to-Head card on your Overview.
+              Runs the same {activePlatformsCount > 1 ? 'queries' : 'questions'} for each of your saved competitors and shows who wins each one. Rates are measured live (no fabricated data). This also populates the Head-to-Head card on your Overview.
             </p>
             {savedCompetitors.length > 0 ? (
               <>
@@ -506,7 +506,7 @@ export default function CiteProbePage() {
                 <p className="text-xs text-zinc-600 mt-1 font-mono">
                   95% CI: {probeData.ci95[0]}%–{probeData.ci95[1]}%
                   {(probeData.ci95[1] - probeData.ci95[0]) > 40 && (
-                    <span className="ml-1 text-amber-500" title="Wide CI — run more queries for a reliable rate">⚠</span>
+                    <span className="ml-1 text-amber-500" title="Wide CI: run more queries for a reliable rate">⚠</span>
                   )}
                 </p>
               )}
@@ -545,25 +545,25 @@ export default function CiteProbePage() {
               {(probeData.misinformationCount ?? 0) > 0 && (
                 <div className="mb-3 flex items-center gap-2 text-xs text-amber-300 bg-amber-500/5 border border-amber-500/20 rounded-lg px-3 py-2">
                   <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                  {probeData.misinformationCount} false claim{probeData.misinformationCount > 1 ? 's' : ''} detected below — use the inline actions on each flagged result.
+                  {probeData.misinformationCount} false claim{probeData.misinformationCount > 1 ? 's' : ''} detected below. Use the inline actions on each flagged result.
                 </div>
               )}
               {probeData.citationRate === 0 && (
                 <div className="space-y-2 text-sm text-zinc-300">
                   <p>1. Use <a href="/dashboard/agents" className="text-pink-400 underline">Agent Orchestration</a> to generate GEO-optimised articles about {brand} and publish them on {domain}.</p>
-                  <p>2. Add your core brand facts to the <a href="/dashboard/fact-vault" className="text-pink-400 underline">Fact Vault</a> — these inject into every LLM prompt via RAG.</p>
+                  <p>2. Add your core brand facts to the <a href="/dashboard/fact-vault" className="text-pink-400 underline">Fact Vault</a>. These inject into every LLM prompt via RAG.</p>
                   <p>3. Run the probe again after publishing. Citations build over 2–6 weeks as LLMs index new content.</p>
                 </div>
               )}
               {probeData.citationRate > 0 && probeData.citationRate < 50 && (
                 <div className="space-y-2 text-sm text-zinc-300">
-                  <p>You're being cited — now amplify it. Target the platforms and queries that missed you below.</p>
+                  <p>You're being cited. Now amplify it. Target the platforms and queries that missed you below.</p>
                   <p>Each article should include JSON-LD schema with your brand as <code className="text-pink-400">author</code> or <code className="text-pink-400">provider</code>.</p>
                 </div>
               )}
               {probeData.citationRate >= 50 && (probeData.misinformationCount ?? 0) === 0 && (
                 <div className="space-y-2 text-sm text-zinc-300">
-                  <p>Strong citation presence. Defend it with monthly freshness updates — citation weights decay as newer content emerges.</p>
+                  <p>Strong citation presence. Defend it with monthly freshness updates. Citation weights decay as newer content emerges.</p>
                   <p>Focus on the uncited platforms and queries below to push toward 100%.</p>
                 </div>
               )}
@@ -576,7 +576,7 @@ export default function CiteProbePage() {
             const total = sb.positive + sb.neutral + sb.negative;
             const pct = (n: number) => total ? Math.round((n / total) * 100) : 0;
             const pos = probeData.avgPositionPct;
-            const posLabel = pos === null || pos === undefined ? '—'
+            const posLabel = pos === null || pos === undefined ? 'N/A'
               : pos <= 33 ? 'Early' : pos <= 66 ? 'Mid' : 'Late';
             const posColor = pos === null || pos === undefined ? 'text-zinc-400'
               : pos <= 33 ? 'text-emerald-400' : pos <= 66 ? 'text-amber-400' : 'text-rose-400';
@@ -615,7 +615,7 @@ export default function CiteProbePage() {
                 <Layers className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
                 <div>
                   <p className="text-sm font-semibold text-white">
-                    {probeData.results.filter(r => !r.cited).length} missed {probeData.results.filter(r => !r.cited).length === 1 ? 'query' : 'queries'} — process them all at once
+                    {probeData.results.filter(r => !r.cited).length} missed {probeData.results.filter(r => !r.cited).length === 1 ? 'query' : 'queries'}: process them all at once
                   </p>
                   <p className="text-xs text-zinc-400 mt-0.5">
                     Sends every uncited query through the full agent pipeline (crawl → extract → schema → article) and auto-saves each result.
@@ -749,7 +749,7 @@ export default function CiteProbePage() {
               )}
 
               <p className="text-[10px] text-zinc-600 mt-4">
-                Correlation, not proof — these items were published in the window where these queries changed and overlap their wording. GEO effects typically take 2–6 weeks to surface.
+                Correlation, not proof. These items were published in the window where these queries changed and overlap their wording. GEO effects typically take 2–6 weeks to surface.
               </p>
             </div>
           )}
@@ -852,7 +852,7 @@ export default function CiteProbePage() {
                               <button
                                 onClick={() => dismissMisinformation(i)}
                                 className="px-3 py-2 text-[11px] text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 transition-colors"
-                                title="This is actually correct — dismiss"
+                                title="This is actually correct. Dismiss."
                               >
                                 Not wrong
                               </button>
@@ -862,7 +862,7 @@ export default function CiteProbePage() {
 
                         {!r.cited && (
                           <p className="text-xs text-zinc-500 mt-1">
-                            Not cited —{' '}
+                            Not cited.{' '}
                             <button
                               onClick={() => {
                                 localStorage.setItem('agents_topic', r.query);
@@ -902,7 +902,7 @@ export default function CiteProbePage() {
                 {closedGaps.map(c => (
                   <p key={c.query} className="text-xs text-emerald-200/90">
                     ✓ "{c.query}" flipped to <span className="font-bold text-emerald-400">cited</span>
-                    {c.wasContentGap && <span className="text-zinc-500"> — was a content gap; your new content worked</span>}
+                    {c.wasContentGap && <span className="text-zinc-500"> (was a content gap; your new content worked)</span>}
                   </p>
                 ))}
               </div>
@@ -1081,7 +1081,7 @@ export default function CiteProbePage() {
           <h3 className="text-base font-semibold text-white mb-2">Ready to probe</h3>
           <p className="text-zinc-400 text-sm max-w-md mx-auto mb-6">
             Fires 7 real GEO-space questions simultaneously at every configured AI platform.
-            Checks live whether <span className="text-white font-medium">{brand}</span> gets cited accurately — and flags any misinformation.
+            Checks live whether <span className="text-white font-medium">{brand}</span> gets cited accurately, and flags any misinformation.
           </p>
           <div className="flex flex-wrap justify-center gap-2">
             {(Object.keys(PLATFORM_META) as PlatformKey[]).map(p => (

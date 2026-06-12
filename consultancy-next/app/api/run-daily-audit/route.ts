@@ -150,7 +150,7 @@ ${combinedContext.substring(0, 30000)}
 
 Return ONLY a JSON object.
 IMPORTANT: Base every estimate strictly on citation frequency in the context above.
-If the brand is NOT mentioned in the context, return 0 for its scores — never invent
+If the brand is NOT mentioned in the context, return 0 for its scores. Never invent
 a baseline. Honest zeros are required; this data feeds an ML training pipeline.
 
 {

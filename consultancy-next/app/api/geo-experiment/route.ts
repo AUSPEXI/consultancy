@@ -78,7 +78,7 @@ export async function POST(request: Request) {
 
 CHANGE: ${lever.transform}
 
-Do not add, remove or alter any factual claims beyond what the change requires. Return ONLY the edited article in markdown — no preamble.
+Do not add, remove or alter any factual claims beyond what the change requires. Return ONLY the edited article in markdown. No preamble.
 
 ARTICLE:
 """

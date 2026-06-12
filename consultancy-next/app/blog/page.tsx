@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     description: 'The latest tactics, research and case studies on Generative Engine Optimization.',
     url: 'https://l8entspace.com/blog',
     type: 'website',
-    images: [{ url: '/geo-infographic.png', width: 1200, height: 630, alt: 'L8EntSpace Blog — GEO Strategy Insights' }],
+    images: [{ url: '/geo-infographic.png', width: 1200, height: 630, alt: 'L8EntSpace Blog | GEO Strategy Insights' }],
   },
   twitter: {
     card: 'summary_large_image',

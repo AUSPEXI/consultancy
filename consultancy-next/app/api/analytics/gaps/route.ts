@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
           minFactDistance: null,
           factDensityNearQuery: 0,
           nearestFact: null,
-          recommendation: `Add facts to your Brand Truth vault and publish content answering "${r.query}" — you have no indexed knowledge near this query.`,
+          recommendation: `Add facts to your Brand Truth vault and publish content answering "${r.query}". You have no indexed knowledge near this query.`,
         })),
       });
     }

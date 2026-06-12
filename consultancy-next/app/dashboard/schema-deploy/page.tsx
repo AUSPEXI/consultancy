@@ -23,7 +23,7 @@ export default function SchemaDeployPage() {
 
   const publicSchemaUrl = user ? `${origin}/api/schema-public/${user.uid}` : '';
 
-  const snippet = `<!-- L8EntSpace Schema Deploy — dynamic structured data from your Fact-Vault -->
+  const snippet = `<!-- L8EntSpace Schema Deploy: dynamic structured data from your Fact-Vault -->
 <script>
   fetch('${publicSchemaUrl}')
     .then(r => r.json())
@@ -83,7 +83,7 @@ add_action('wp_head', function() {
       )}
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Schema Deploy</h1>
-        <p className="text-zinc-400">One snippet on your website. Your structured data stays in sync with your Fact-Vault automatically — no developer required after day one.</p>
+        <p className="text-zinc-400">One snippet on your website. Your structured data stays in sync with your Fact-Vault automatically. No developer required after day one.</p>
       </div>
 
       {/* How it works */}
@@ -151,7 +151,7 @@ add_action('wp_head', function() {
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="text-white">WordPress / PHP Integration</CardTitle>
-          <CardDescription className="text-zinc-400">Add to your theme's functions.php or a site-specific plugin. Server-side fetch — no client-side latency.</CardDescription>
+          <CardDescription className="text-zinc-400">Add to your theme's functions.php or a site-specific plugin. Server-side fetch with no client-side latency.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="relative">

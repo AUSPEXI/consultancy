@@ -56,7 +56,7 @@ const RacingDial = ({ value, label, color = "#ff1493", size = "sm" }: { value: n
           </PieChart>
         </ResponsiveContainer>
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center">
-          <span className={`${isLarge ? 'text-3xl' : 'text-xl'} font-black tracking-tighter ${value === null ? 'text-zinc-600' : 'text-white'}`}>{value === null ? '—' : `${value}%`}</span>
+          <span className={`${isLarge ? 'text-3xl' : 'text-xl'} font-black tracking-tighter ${value === null ? 'text-zinc-600' : 'text-white'}`}>{value === null ? 'N/A' : `${value}%`}</span>
         </div>
       </div>
       <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-2">{label}</p>
@@ -182,7 +182,7 @@ export default function OverviewPage() {
 
   const runAudit = async () => {
     if (!canAct) {
-      setToastMessage({ text: 'Refreshing live metrics is a Starter feature — upgrade to unlock.', type: 'info' });
+      setToastMessage({ text: 'Refreshing live metrics is a Starter feature. Upgrade to unlock.', type: 'info' });
       return;
     }
     if (!user) return;
@@ -212,7 +212,7 @@ export default function OverviewPage() {
           refetchGeo();
         } else {
           const msg = response.status === 429
-            ? 'Gemini quota exceeded — enable billing at console.cloud.google.com → APIs → Gemini API'
+            ? 'Gemini quota exceeded. Enable billing at console.cloud.google.com → APIs → Gemini API'
             : (data.error || 'Audit failed');
           throw new Error(msg);
         }
@@ -232,7 +232,7 @@ export default function OverviewPage() {
 
   const generateShadowLink = async () => {
     if (!canAct) {
-      setToastMessage({ text: 'Shadow Links are a Starter feature — upgrade to unlock.', type: 'info' });
+      setToastMessage({ text: 'Shadow Links are a Starter feature. Upgrade to unlock.', type: 'info' });
       return;
     }
     if (!shadowUrl.trim()) return;
@@ -253,7 +253,7 @@ export default function OverviewPage() {
 
   const handleSyncCMS = async () => {
     if (!canAct) {
-      setToastMessage({ text: 'CMS sync is a Starter feature — upgrade to unlock.', type: 'info' });
+      setToastMessage({ text: 'CMS sync is a Starter feature. Upgrade to unlock.', type: 'info' });
       return;
     }
     if (!user || !userData?.cmsWebhookUrl) { setToastMessage({ text: 'Configure an Outbound Webhook in Settings first.', type: 'info' }); return; }
@@ -387,7 +387,7 @@ export default function OverviewPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-xl border border-pink-500/30 bg-pink-500/5 px-4 py-3">
           <p className="text-sm text-zinc-300">
             <span className="font-semibold text-pink-400">Read-only preview.</span>{' '}
-            You&apos;re on the Free plan — explore the dashboard, then upgrade to Starter to refresh live metrics, run audits, and switch on Autopilot.
+            You&apos;re on the Free plan. Explore the dashboard, then upgrade to Starter to refresh live metrics, run audits, and switch on Autopilot.
           </p>
           <a
             href="/#pricing"
@@ -457,8 +457,8 @@ export default function OverviewPage() {
       <TooltipProvider>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { label: 'A-SOV Dominance', value: displayAsov, color: '#ff1493', icon: Target, source: asovSource, desc: cpRate !== undefined ? `Citation Probe: ${cpCited} of ${cpTotal} queries cited your brand` : 'Absolute Share of Voice — run Citation Probe for real data' },
-            { label: 'Platform Sync', value: displayPlatformSync, color: '#3b82f6', icon: Activity, source: platSource, desc: cpRates ? 'Average citation rate across ChatGPT, Claude, Gemini, Perplexity (Citation Probe)' : 'Across-model consistency — run Citation Probe for real data' },
+            { label: 'A-SOV Dominance', value: displayAsov, color: '#ff1493', icon: Target, source: asovSource, desc: cpRate !== undefined ? `Citation Probe: ${cpCited} of ${cpTotal} queries cited your brand` : 'Absolute Share of Voice. Run Citation Probe for real data.' },
+            { label: 'Platform Sync', value: displayPlatformSync, color: '#3b82f6', icon: Activity, source: platSource, desc: cpRates ? 'Average citation rate across ChatGPT, Claude, Gemini, Perplexity (Citation Probe)' : 'Across-model consistency. Run Citation Probe for real data.' },
             { label: 'Misinformation Risk', value: misinfoRate, color: '#f43f5e', icon: TrendingUp, source: misinfoRate !== null ? '● CITE-PROBE' : '◌ NO DATA', desc: misinfoRate !== null ? `${cpMisinfo} of ${cpCited} cited answers contained an inaccuracy about your brand` : 'Run Citation Probe to measure how often LLMs cite your brand inaccurately' },
           ].map((dial, i) => (
             <UITooltip key={i}>
@@ -477,8 +477,8 @@ export default function OverviewPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[
-          { label: 'Competitor Gap', value: hasCompetitor ? `${compGapReal! > 0 ? '+' : ''}${compGapReal}%` : '—', trend: hasCompetitor ? `you ${cpRate ?? 0}% vs ${comp!.brand || 'them'} ${comp!.citationRate}%` : 'Run a competitor probe', source: hasCompetitor ? '● CITE-PROBE' : '◌ NO DATA', icon: TrendingUp, color: hasCompetitor && compGapReal! >= 0 ? 'text-emerald-400' : 'text-blue-400', desc: hasCompetitor ? `Real head-to-head citation-rate gap vs ${comp!.domain || comp!.brand}` : 'Run a Citation Probe with the competitor panel open to measure a real gap' },
-          { label: 'Citations Found', value: cpCited !== undefined ? `${cpCited} / ${cpTotal}` : '— / —', trend: cpRate !== undefined ? `${Math.round(cpRate)}% rate` : 'Run Citation Probe', source: cpCited !== undefined ? '● CITE-PROBE' : '◌ NO DATA', icon: Users, color: 'text-emerald-400', desc: cpCited !== undefined ? 'Queries where your brand was cited by LLMs' : 'Run Citation Probe to measure real brand citations across LLMs' },
+          { label: 'Competitor Gap', value: hasCompetitor ? `${compGapReal! > 0 ? '+' : ''}${compGapReal}%` : 'N/A', trend: hasCompetitor ? `you ${cpRate ?? 0}% vs ${comp!.brand || 'them'} ${comp!.citationRate}%` : 'Run a competitor probe', source: hasCompetitor ? '● CITE-PROBE' : '◌ NO DATA', icon: TrendingUp, color: hasCompetitor && compGapReal! >= 0 ? 'text-emerald-400' : 'text-blue-400', desc: hasCompetitor ? `Real head-to-head citation-rate gap vs ${comp!.domain || comp!.brand}` : 'Run a Citation Probe with the competitor panel open to measure a real gap' },
+          { label: 'Citations Found', value: cpCited !== undefined ? `${cpCited} / ${cpTotal}` : 'N/A', trend: cpRate !== undefined ? `${Math.round(cpRate)}% rate` : 'Run Citation Probe', source: cpCited !== undefined ? '● CITE-PROBE' : '◌ NO DATA', icon: Users, color: 'text-emerald-400', desc: cpCited !== undefined ? 'Queries where your brand was cited by LLMs' : 'Run Citation Probe to measure real brand citations across LLMs' },
         ].map((kpi, i) => (
           <div key={i} className="bg-zinc-900/40 border border-zinc-800/60 rounded-xl p-5 flex items-center justify-between">
             <div>
@@ -505,7 +505,7 @@ export default function OverviewPage() {
               <p className="text-xs text-zinc-400 mt-1">Your exact response dominance across all LLM matrices.</p>
             </div>
             <span className={`shrink-0 text-[9px] font-mono px-2 py-1 rounded-full border ${trendIsReal ? 'text-emerald-500 border-emerald-500/30 bg-emerald-500/10' : 'text-zinc-500 border-zinc-700 bg-zinc-900'}`}>
-              {trendIsReal ? '● LIVE DATA' : '◌ DEMO — run Citation Probe'}
+              {trendIsReal ? '● LIVE DATA' : '◌ DEMO: run Citation Probe'}
             </span>
           </div>
           <div className="h-[300px] w-full">

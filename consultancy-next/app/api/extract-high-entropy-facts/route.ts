@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     if (!content) return NextResponse.json({ error: 'Missing content' }, { status: 400 });
 
     const prompt = `You are an expert Generative Engine Optimization (GEO) agent.
-Analyze the following text and extract 3 "High-Entropy Facts" — unique, non-obvious, highly specific data points that AI models would want to cite.
+Analyze the following text and extract 3 "High-Entropy Facts": unique, non-obvious, highly specific data points that AI models would want to cite.
 For each fact, assign an "Entropy Score" from 0 to 100 (higher = more unique and citable).
 
 Text:

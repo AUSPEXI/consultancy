@@ -8,7 +8,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const { slug } = await params;
   const post = blogPosts.find(p => p.slug === slug);
 
-  const title = post?.title || 'L8EntSpace — GEO Strategy';
+  const title = post?.title || 'L8EntSpace: GEO Strategy';
   const category = post?.category || 'GEO';
   const fontSize = title.length > 70 ? 40 : title.length > 50 ? 48 : 56;
 

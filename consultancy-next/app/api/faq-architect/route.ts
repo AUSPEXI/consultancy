@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     }
     if (ctx.facts.length < 5) {
       return NextResponse.json(
-        { success: false, error: 'Add at least 5 facts to your Fact-Vault first — answers are grounded in your verified facts.' },
+        { success: false, error: 'Add at least 5 facts to your Fact-Vault first. Answers are grounded in your verified facts.' },
         { status: 400 },
       );
     }
@@ -106,20 +106,20 @@ export async function POST(request: Request) {
 
 Generate a complete, AI-citation-optimised FAQ page. This FAQ exists to win citations from AI engines (ChatGPT, Gemini, Claude, Perplexity), so every answer must follow GEO/AEO best practice.
 
-## GROUND TRUTH — the brand's verified Fact-Vault (your ONLY source for brand claims):
+## GROUND TRUTH: the brand's verified Fact-Vault (your ONLY source for brand claims):
 ${ctx.facts.map((f, i) => `${i + 1}. ${f}`).join('\n')}
 
 ## REAL QUERIES AI engines are asked about this category (from live citation probes):
 ${ctx.probeQueries.length > 0
-  ? ctx.probeQueries.map(q => `- "${q.query}" [${q.cited ? 'brand IS cited' : 'brand NOT cited'}${q.isGap ? ', no covering fact — CONTENT GAP' : ''}]`).join('\n')
-  : '(no probe history — derive questions from the facts and category knowledge)'}
+  ? ctx.probeQueries.map(q => `- "${q.query}" [${q.cited ? 'brand IS cited' : 'brand NOT cited'}${q.isGap ? ', no covering fact: CONTENT GAP' : ''}]`).join('\n')
+  : '(no probe history: derive questions from the facts and category knowledge)'}
 
 ## RULES
-1. PRIORITISE the uncited queries${gaps.length > 0 ? ' and especially the CONTENT GAP queries' : ''} — each should become an FAQ question (rephrased as a natural question if needed). These are where the brand is losing AI citations today.
-2. Every answer: 40–70 words. First sentence directly and completely answers the question (lead with the answer — no preamble, no marketing filler). Remaining sentences add supporting facts.
+1. PRIORITISE the uncited queries${gaps.length > 0 ? ' and especially the CONTENT GAP queries' : ''}: each should become an FAQ question (rephrased as a natural question if needed). These are where the brand is losing AI citations today.
+2. Every answer: 40–70 words. First sentence directly and completely answers the question (lead with the answer: no preamble, no marketing filler). Remaining sentences add supporting facts.
 3. Brand claims MUST come from the Fact-Vault above. Never invent statistics, customer counts, certifications, or capabilities. General category/industry education that doesn't claim anything about the brand is allowed (mark source "category-knowledge").
 4. High entropy: prefer specific numbers, named methods, and concrete entities from the facts over vague language.
-5. Each question must address a DISTINCT intent — no near-duplicates (AI engines skip sources with redundant answers).
+5. Each question must address a DISTINCT intent. No near-duplicates (AI engines skip sources with redundant answers).
 6. Organise into 3–6 logical categories with kebab-case ids, a short title, and a one-line description.
 7. Mark each item's source: "uncited-query" (from an uncited probe query), "cited-query", "fact-vault" (built from facts, no matching query), or "category-knowledge".
 8. 15–30 questions total, weighted toward categories where the uncited queries cluster.

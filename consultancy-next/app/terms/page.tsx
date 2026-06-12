@@ -4,7 +4,7 @@ import { Footerdemo } from '@/components/ui/footer-section';
 
 export const metadata: Metadata = {
   title: 'Terms of Service | L8EntSpace',
-  description: 'Terms governing your use of the L8EntSpace GEO platform — subscriptions, IP rights, AI content, limitations of liability, and governing law (England & Wales).',
+  description: 'Terms governing your use of the L8EntSpace GEO platform: subscriptions, IP rights, AI content, limitations of liability, and governing law (England & Wales).',
   metadataBase: new URL('https://l8entspace.com'),
   alternates: { canonical: 'https://l8entspace.com/terms' },
   openGraph: {
@@ -25,7 +25,7 @@ const termsJsonLd = {
   '@type': 'WebPage',
   name: 'Terms of Service',
   url: 'https://l8entspace.com/terms',
-  description: 'L8EntSpace Terms of Service — English law.',
+  description: 'L8EntSpace Terms of Service. Governed by English law.',
   isPartOf: { '@id': 'https://l8entspace.com/#website' },
 };
 

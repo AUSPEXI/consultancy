@@ -365,7 +365,7 @@ export default function AutopilotPage() {
             </div>
             {isBulkRunning && (
               <p className="text-xs text-zinc-500">
-                Processing {selectedKeywords.length} keywords in sequence — keep this tab open. Each article is emailed to <span className="text-zinc-300">{user?.email}</span> as it completes.
+                Processing {selectedKeywords.length} keywords in sequence. Keep this tab open. Each article is emailed to <span className="text-zinc-300">{user?.email}</span> as it completes.
               </p>
             )}
             {!userData?.brand && (
@@ -451,7 +451,7 @@ export default function AutopilotPage() {
                 </span>
               ) : (
                 <span className="text-amber-400 text-xs">
-                  Saved — email skipped (set EMAIL_USER + EMAIL_APP_PASSWORD in Netlify env vars)
+                  Saved. Email skipped (set EMAIL_USER + EMAIL_APP_PASSWORD in Netlify env vars)
                 </span>
               )}
             </div>

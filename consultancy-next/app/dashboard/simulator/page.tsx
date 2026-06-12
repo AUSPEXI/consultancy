@@ -58,7 +58,7 @@ export default function SimulatorPage() {
             <Bot className="w-5 h-5 text-zinc-600" />
             <h3 className="font-semibold text-zinc-500">{name}</h3>
           </div>
-          <p className="text-sm text-zinc-600 leading-relaxed italic">No API key set for this engine — excluded from the SOV score.</p>
+          <p className="text-sm text-zinc-600 leading-relaxed italic">No API key set for this engine. Excluded from the SOV score.</p>
         </div>
       );
     }

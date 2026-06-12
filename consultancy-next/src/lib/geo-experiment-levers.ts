@@ -29,7 +29,7 @@ export const EXPERIMENT_LEVERS: Lever[] = [
     id: 'stat-density',
     label: 'Increase statistic density',
     description: 'Surfaces concrete numbers, dates and named entities into the prose.',
-    transform: 'Rewrite so that concrete statistics, dates, percentages and named entities are stated explicitly and early in each section. Do not invent any new facts — only surface and sharpen the ones already present. Keep the same structure and length.',
+    transform: 'Rewrite so that concrete statistics, dates, percentages and named entities are stated explicitly and early in each section. Do not invent any new facts. Only surface and sharpen the ones already present. Keep the same structure and length.',
   },
   {
     id: 'declarative',
@@ -47,7 +47,7 @@ export const EXPERIMENT_LEVERS: Lever[] = [
     id: 'entity-first',
     label: 'Lead with the brand entity',
     description: 'States who/what the entity is, plainly, in the opening lines.',
-    transform: 'Rewrite the opening paragraph so it states plainly what the entity is, what it does, and its single most distinctive fact — in the first two sentences. Keep the rest unchanged.',
+    transform: 'Rewrite the opening paragraph so it states plainly what the entity is, what it does, and its single most distinctive fact (in the first two sentences). Keep the rest unchanged.',
   },
 ];
 

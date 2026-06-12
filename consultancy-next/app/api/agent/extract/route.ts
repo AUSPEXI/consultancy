@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       .substring(0, 12000);
 
     const vaultSection = vaultContext
-      ? `\n\nBrand Vault Context (first-party facts — treat as ground truth):\n- ${vaultContext}`
+      ? `\n\nBrand Vault Context (first-party facts; treat as ground truth):\n- ${vaultContext}`
       : '';
 
     const prompt = `You are an expert Fact Extraction Agent specializing in Generative Engine Optimization (GEO).
@@ -30,7 +30,7 @@ Crawled Sources:
 ${sourcesSummary}
 
 Your task:
-1. Extract only verifiable, concrete facts from the sources above — statistics, named entities, data points, specific claims with attribution.
+1. Extract only verifiable, concrete facts from the sources above: statistics, named entities, data points, specific claims with attribution.
 2. Discard vague opinions, marketing language, and unverifiable assertions.
 3. If Brand Vault Context is provided, include those facts as authoritative and clearly marked.
 4. Format as a clean markdown bullet list. Group related facts under sub-headings.

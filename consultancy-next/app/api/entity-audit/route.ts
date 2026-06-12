@@ -138,9 +138,9 @@ function buildRecommendations(sources: EntitySource[], sameAsGaps: string[]): st
   const recs: string[] = [];
   for (const src of sources) {
     if (!src.found) {
-      if (src.name === 'Wikidata') recs.push('Create a Wikidata entity for your brand — include founder, founding date, website, and industry. This directly feeds the knowledge graph ChatGPT and Gemini draw on.');
+      if (src.name === 'Wikidata') recs.push('Create a Wikidata entity for your brand. Include founder, founding date, website, and industry. This directly feeds the knowledge graph ChatGPT and Gemini draw on.');
       if (src.name === 'Wikipedia') recs.push('A Wikipedia article (even a stub) significantly increases AI citability. Build notability through press coverage first, then submit a draft.');
-      if (src.name === 'Crunchbase') recs.push('Claim or create your Crunchbase profile — it is a primary entity-resolution source for Perplexity and Google AIO for company questions.');
+      if (src.name === 'Crunchbase') recs.push('Claim or create your Crunchbase profile. It is a primary entity-resolution source for Perplexity and Google AIO for company questions.');
     }
   }
   for (const gap of sameAsGaps) {

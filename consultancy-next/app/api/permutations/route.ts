@@ -32,13 +32,13 @@ export async function POST(request: Request) {
       prompt: `You are a GEO (Generative Engine Optimization) expert. Generate exactly 60 realistic search queries a user might type into an AI engine (ChatGPT, Perplexity, Gemini, Claude) when researching the topic: "${kw}"${brand ? ` in the context of the brand "${brand}"` : ''}.
 
 Cover all 7 format types with ~8-9 queries each:
-1. "question" — questions starting with What/How/Why/Which/When/Who
-2. "comparison" — comparing options or approaches
-3. "howto" — step-by-step how-to queries
-4. "definition" — definitional or explanatory queries
-5. "best" — "best X for Y" or "top X" queries
-6. "review" — evaluation, pros/cons, is-it-worth-it queries
-7. "vs" — direct head-to-head comparison queries (e.g. "X vs Y")
+1. "question": questions starting with What/How/Why/Which/When/Who
+2. "comparison": comparing options or approaches
+3. "howto": step-by-step how-to queries
+4. "definition": definitional or explanatory queries
+5. "best": "best X for Y" or "top X" queries
+6. "review": evaluation, pros/cons, is-it-worth-it queries
+7. "vs": direct head-to-head comparison queries (e.g. "X vs Y")
 
 For each query also classify:
 - intent: "informational" | "commercial" | "navigational"
@@ -49,7 +49,7 @@ Return ONLY a JSON array:
   ...
 ]
 
-Generate exactly 60 items. Vary phrasing — don't repeat the same sentence structure.`,
+Generate exactly 60 items. Vary phrasing. Don't repeat the same sentence structure.`,
     });
 
     let permutations: Omit<PermutationResult, 'embedding'>[] = [];

@@ -458,7 +458,7 @@ export default function AgentsPage() {
               Query Permutations Engine
             </h3>
             <p className="text-xs text-zinc-500 mt-0.5">
-              Generate ~60 query variants for a keyword (7 formats × ~9 each) — all embedded to 768D vectors and stored to
+              Generate ~60 query variants for a keyword (7 formats × ~9 each), all embedded to 768D vectors and stored to
               {' '}<code className="text-zinc-400 text-[10px]">fact_permutations</code> for model training. Load into bulk queue to generate GEO articles for the full query space.
             </p>
           </div>
@@ -794,7 +794,7 @@ export default function AgentsPage() {
               <div>
                 <h4 className="text-sm font-semibold text-red-400">
                   {rateLimitWarning.includes('401') || rateLimitWarning.includes('UNAUTHENTICATED') || rateLimitWarning.includes('service account')
-                    ? 'API Key Invalid — Service Account Disabled'
+                    ? 'API Key Invalid: Service Account Disabled'
                     : rateLimitWarning.includes('429') || rateLimitWarning.includes('rate limit')
                       ? 'API Rate Limit Exceeded'
                       : 'Agent Workflow Error'}

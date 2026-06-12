@@ -132,13 +132,13 @@ export async function POST(request: Request) {
 
 Below are REAL search results from Reddit, Quora, and other public forums. Each is numbered. Analyse the actual text of each result.
 
-IMPORTANT: Some results may be about a different product or company that happens to share similar words. If a result does NOT actually mention "${brandName}" by name (or a clear abbreviation/alias of it), classify it as "Irrelevant" with summary "Not about ${brandName} — discard."
+IMPORTANT: Some results may be about a different product or company that happens to share similar words. If a result does NOT actually mention "${brandName}" by name (or a clear abbreviation/alias of it), classify it as "Irrelevant" with summary "Not about ${brandName}: discard."
 
 For results that DO mention "${brandName}", classify the sentiment as Positive, Neutral, Negative, or Mixed, and write a one-sentence factual summary grounded ONLY in the excerpt.
 
 Then assess the OVERALL picture using only the relevant results:
 - overallSentiment: the dominant sentiment across relevant results (Positive, Neutral, or Negative)
-- riskScore (0-100): "context poisoning" risk — how likely negative or misleading narratives about ${brandName} are to be absorbed into future LLM training. More negative/misleading threads on high-authority platforms = higher risk.
+- riskScore (0-100): "context poisoning" risk: how likely negative or misleading narratives about ${brandName} are to be absorbed into future LLM training. More negative/misleading threads on high-authority platforms = higher risk.
 - actionPlan: 2-3 sentences of specific defensive GEO advice based on what you actually found.
 
 RESULTS:

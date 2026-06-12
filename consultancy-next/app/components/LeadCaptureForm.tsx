@@ -29,7 +29,7 @@ export default function LeadCaptureForm() {
     return (
       <div className="text-center py-4">
         <p className="text-green-400 font-semibold text-lg">
-          Report is on its way — check your inbox.
+          Report is on its way. Check your inbox.
         </p>
       </div>
     );

@@ -30,7 +30,7 @@ Additional context: ${domainContext || 'None provided.'}
 You will generate EXACTLY 7 semantic anchors structured by the TEO framework:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-AXIS 1 — ONTOLOGICAL  (What this brand fundamentally IS in AI minds)
+AXIS 1: ONTOLOGICAL  (What this brand fundamentally IS in AI minds)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Generate 2 × "Systemic Anchor"  (color: #ff1493)
 These are the load-bearing identity concepts AI engines co-activate when reasoning
@@ -39,19 +39,19 @@ Everything else in the latent space orbits around them.
 axisAlignment: 1
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-AXIS 2 — EPISTEMOLOGICAL  (What this brand KNOWS and can prove)
+AXIS 2: EPISTEMOLOGICAL  (What this brand KNOWS and can prove)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Generate 2 × "Signal Point"  (color: #06b6d4)
 These are specific, verifiable claims, methodologies, or data points the brand has
-established in the public knowledge base. Citation fuel — the concrete, citable
+established in the public knowledge base. Citation fuel: the concrete, citable
 facts that AI training data can anchor to.
 axisAlignment: 2
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-AXIS 3 — TELEOLOGICAL  (What this brand IS FOR / where it is going)
+AXIS 3: TELEOLOGICAL  (What this brand IS FOR / where it is going)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Generate 2 × "Emergent Trend"  (color: #8b5cf6)
-These are growing associations forming in newer model iterations — conceptual
+These are growing associations forming in newer model iterations. Conceptual
 territory the brand is actively claiming but has not yet fully locked in.
 Strategic opportunities before competitors occupy the space.
 axisAlignment: 3
@@ -60,7 +60,7 @@ axisAlignment: 3
 RISK DIMENSION  (What threatens TEO coherence)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Generate 1 × "Risk Vector"  (color: #f59e0b)
-The most significant threat to this brand's latent space position — a competitor
+The most significant threat to this brand's latent space position: a competitor
 bleed-in, negative association cluster, conceptual misclassification, or market
 perception gap that could erode brand authority or divert citations.
 axisAlignment: whichever axis (1, 2, or 3) is most at risk for this brand.
@@ -71,7 +71,7 @@ Return ONLY a JSON array of exactly 7 objects. No markdown. No explanation. No w
 
 Schema for each object:
 {
-  "label": "2–4 word concept, specific to THIS brand — not generic marketing language",
+  "label": "2–4 word concept, specific to THIS brand (not generic marketing language)",
   "color": "#ff1493 | #06b6d4 | #8b5cf6 | #f59e0b",
   "baseType": "Systemic Anchor | Signal Point | Emergent Trend | Risk Vector",
   "axisAlignment": 1 | 2 | 3,
@@ -84,7 +84,7 @@ Hard rules:
 - Exactly 2 with baseType "Signal Point" and axisAlignment 2
 - Exactly 2 with baseType "Emergent Trend" and axisAlignment 3
 - Exactly 1 with baseType "Risk Vector"
-- Labels must be specific to this brand — no generic terms like "Market Leader" or "Innovation"
+- Labels must be specific to this brand. No generic terms like "Market Leader" or "Innovation"
 - Think carefully about what AI models trained on public web data actually associate with this brand`;
 
     const result = await llmOrchestrator.executeCall<any>({

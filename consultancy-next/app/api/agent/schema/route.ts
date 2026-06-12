@@ -22,7 +22,7 @@ Requirements:
 - Use "@context": "https://schema.org"
 - Embed concrete statistics and named entities as schema properties
 - Structure so AI crawlers can extract specific citable facts
-- Return ONLY the raw JSON-LD string — no markdown code blocks, no explanation
+- Return ONLY the raw JSON-LD string. No markdown code blocks, no explanation
 
 Extracted Facts:
 """

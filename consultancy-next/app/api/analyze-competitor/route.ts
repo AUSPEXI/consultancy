@@ -99,7 +99,7 @@ export async function POST(request: Request) {
           trojanHorseOpportunity: false,
           vulnerabilities: [],
           totalSignals: 0,
-          message: `No public content for ${host} is currently indexed by our crawler. We can't assess their AI-citation decay yet — this often means they have a thin or well-gated web presence. Try the root domain, or run a Citation Probe on your shared keywords to see who AI actually cites.`,
+          message: `No public content for ${host} is currently indexed by our crawler. We can't assess their AI-citation decay yet. This often means they have a thin or well-gated web presence. Try the root domain, or run a Citation Probe on your shared keywords to see who AI actually cites.`,
         },
       });
     }
@@ -124,14 +124,14 @@ export async function POST(request: Request) {
 
     const prompt = `You are a Generative Engine Optimization (GEO) analyst assessing how well a competitor's content is positioned to be CITED by AI engines (ChatGPT, Gemini, Claude, Perplexity). The competitor is "${competitorName}" (${host}).
 
-Below are REAL excerpts from their actual indexed pages. Judge ONLY what is in the excerpts — do not invent pages, claims, or numbers.
+Below are REAL excerpts from their actual indexed pages. Judge ONLY what is in the excerpts. Do not invent pages, claims, or numbers.
 
 Score 0-100:
 - entityDensityScore: how rich the content is in specific named entities (products, people, places, technologies). High = lots of concrete, citable specifics.
 - statisticalAnchorsScore: how much the content leans on verifiable data points, figures, dates, and statistics (which AI engines reward) versus vague opinion.
 - contentScore: overall how citation-worthy this content is for an AI engine answering a user question.
 
-Then list 1-4 concrete vulnerabilities — specific weaknesses in THIS content that a competitor could exploit to win the citation instead. Ground every vulnerability in what you actually see (or its absence) in the excerpts. If the content is genuinely strong, return fewer vulnerabilities.
+Then list 1-4 concrete vulnerabilities: specific weaknesses in THIS content that a competitor could exploit to win the citation instead. Ground every vulnerability in what you actually see (or its absence) in the excerpts. If the content is genuinely strong, return fewer vulnerabilities.
 
 PAGES:
 ${context}
@@ -160,9 +160,9 @@ Return ONLY valid JSON:
 
     // Add a freshness vulnerability grounded in the REAL newest-page age.
     if (newestAge !== null && newestAge > 365) {
-      vulnerabilities.unshift(`Their newest indexed page is ${newestAge} days old — AI engines deprioritise stale sources, so fresh authoritative content can displace them.`);
+      vulnerabilities.unshift(`Their newest indexed page is ${newestAge} days old. AI engines deprioritise stale sources, so fresh authoritative content can displace them.`);
     } else if (newestAge !== null && newestAge > 180) {
-      vulnerabilities.unshift(`Slow publishing cadence — newest indexed content is ${newestAge} days old, opening a freshness gap to exploit.`);
+      vulnerabilities.unshift(`Slow publishing cadence: newest indexed content is ${newestAge} days old, opening a freshness gap to exploit.`);
     }
 
     // Trojan Horse = a real opening: stale/decaying OR weak specificity in their content.

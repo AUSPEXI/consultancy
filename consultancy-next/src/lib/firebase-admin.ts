@@ -48,7 +48,7 @@ if (!admin.apps.length && saRaw) {
     );
   }
 } else if (!admin.apps.length) {
-  console.error('Firebase Admin: FIREBASE_SERVICE_ACCOUNT_BASE64 env var is NOT set — server-side auth/DB disabled.');
+  console.error('Firebase Admin: FIREBASE_SERVICE_ACCOUNT_BASE64 env var is NOT set. Server-side auth/DB disabled.');
 }
 // No fallback to admin.initializeApp() — default creds probe GCP metadata server
 // which hangs indefinitely on non-GCP hosts (Netlify/Vercel) causing build timeouts.

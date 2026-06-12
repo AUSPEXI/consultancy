@@ -202,7 +202,7 @@ export default function FAQPage() {
           <div className="bg-zinc-900/50 rounded-3xl p-8 md:p-12 text-center shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]">
             <h2 className="text-3xl font-bold font-heading mb-4 text-white">Still have questions?</h2>
             <p className="text-zinc-400 mb-8 max-w-xl mx-auto text-lg leading-relaxed">
-              Talk to Citacious in your dashboard — she knows every answer on this page and can show you exactly where to act on it in your GEO workflow.
+              Talk to Citacious in your dashboard. She knows every answer on this page and can show you exactly where to act on it in your GEO workflow.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

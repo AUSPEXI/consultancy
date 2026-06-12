@@ -21,8 +21,8 @@ const voiceJsonLd = {
 
 const features = [
   { icon: Zap, title: "Ultra-Low Latency", description: "Sub-500ms response times powered by Gemini Live API for natural, real-time conversation." },
-  { icon: Brain, title: "GEO Expert Knowledge", description: "Aura knows everything about Generative Engine Optimization — what it is, how it works, and whether L8EntSpace is right for you." },
-  { icon: MessageSquare, title: "Instant Navigation", description: "Ask Aura to take you anywhere on the site and she'll navigate on your behalf — no clicking required." },
+  { icon: Brain, title: "GEO Expert Knowledge", description: "Aura knows everything about Generative Engine Optimization: what it is, how it works, and whether L8EntSpace is right for you." },
+  { icon: MessageSquare, title: "Instant Navigation", description: "Ask Aura to take you anywhere on the site and she'll navigate on your behalf. No clicking required." },
   { icon: Shield, title: "Echo Cancellation", description: "Advanced audio processing eliminates feedback so the agent only hears you, not itself." },
 ];
 
@@ -46,7 +46,7 @@ export default function VoiceAgentsPage() {
                 Meet <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-pink-600">Aura</span>
               </h1>
               <p className="text-xl text-zinc-400 leading-relaxed">
-                L8EntSpace&apos;s voice brand guide. Ask anything about GEO, what L8EntSpace does, pricing, or where to go next — and get an instant, intelligent answer.
+                L8EntSpace&apos;s voice brand guide. Ask anything about GEO, what L8EntSpace does, pricing, or where to go next, and get an instant, intelligent answer.
               </p>
             </div>
 
@@ -79,7 +79,7 @@ export default function VoiceAgentsPage() {
                   {[
                     { step: "01", title: "Connect", desc: "Click Start Call. Your browser requests mic access and establishes a secure real-time session with Gemini Live. No account needed." },
                     { step: "02", title: "Ask Anything", desc: "Ask about GEO strategy, what L8EntSpace does, how pricing works, or have Aura navigate you to the right page on the site." },
-                    { step: "03", title: "Get Started", desc: "Ready to go deeper? Aura will guide you to sign up for the dashboard where Citacious — our dedicated GEO strategist AI — takes over." },
+                    { step: "03", title: "Get Started", desc: "Ready to go deeper? Aura will guide you to sign up for the dashboard where Citacious (our dedicated GEO strategist AI) takes over." },
                   ].map((item) => (
                     <div key={item.step} className="flex gap-4">
                       <div className="text-3xl font-black text-pink-500/30 font-mono leading-none mt-1">{item.step}</div>

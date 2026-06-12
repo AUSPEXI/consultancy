@@ -78,9 +78,9 @@ async function pushIndexNow(domain: string, urls: string[], apiKey: string): Pro
 
   const message =
     res.status === 200 ? 'URLs submitted successfully'
-    : res.status === 202 ? 'Accepted — crawl queued'
+    : res.status === 202 ? 'Accepted: crawl queued'
     : res.status === 400 ? 'Invalid request (check URL format)'
-    : res.status === 403 ? 'Key mismatch — verify key file is reachable at keyLocation'
+    : res.status === 403 ? 'Key mismatch: verify key file is reachable at keyLocation'
     : res.status === 422 ? 'URLs must share the host in the key field'
     : `HTTP ${res.status}`;
 

@@ -112,7 +112,7 @@ async function syncSitemapToIndexNow(
   let xml: string;
   try {
     const res = await fetch(`https://${host}/sitemap.xml`, { signal: AbortSignal.timeout(15_000) });
-    if (!res.ok) return { cost: 0, success: false, summary: `sitemap.xml HTTP ${res.status} — skipped` };
+    if (!res.ok) return { cost: 0, success: false, summary: `sitemap.xml HTTP ${res.status}: skipped` };
     xml = await res.text();
   } catch (e: any) {
     return { cost: 0, success: false, summary: `sitemap fetch failed: ${e.message}` };
@@ -132,10 +132,10 @@ async function syncSitemapToIndexNow(
   await seenRef.set({ urls: union, lastSyncAt: new Date().toISOString(), domain: host }, { merge: true });
 
   if (!seenSnap.exists) {
-    return { cost: 0, success: true, summary: `baseline recorded — ${locs.length} URLs; new pages will auto-push from next run` };
+    return { cost: 0, success: true, summary: `baseline recorded: ${locs.length} URLs. New pages will auto-push from next run` };
   }
   if (newUrls.length === 0) {
-    return { cost: 0, success: true, summary: 'sitemap unchanged — nothing to push' };
+    return { cost: 0, success: true, summary: 'sitemap unchanged: nothing to push' };
   }
 
   const r = await fetch(`${baseUrl}/api/bing-index`, {
@@ -207,7 +207,7 @@ async function callTool(
     }
 
     if (tool === 'daily-audit') {
-      if (keywords.length === 0) return { cost: 0, success: false, summary: 'no keywords configured — skipped' };
+      if (keywords.length === 0) return { cost: 0, success: false, summary: 'no keywords configured: skipped' };
       const r = await fetch(`${baseUrl}/api/run-daily-audit`, {
         method: 'POST',
         headers,
@@ -296,7 +296,7 @@ async function sendDigestEmail(
         : `<span style="color:${delta > 0 ? '#4ade80' : '#f87171'};font-size:14px;font-weight:700;"> ${delta > 0 ? '▲' : '▼'} ${Math.abs(delta)}pp since last probe</span>`;
 
       const gapRows = gaps.slice(0, 3).map(g =>
-        `<li style="margin:4px 0;color:#a1a1aa;font-size:13px;">"${g.query}" — <span style="color:#c4b5fd;">no content nearby; write a dedicated answer</span></li>`
+        `<li style="margin:4px 0;color:#a1a1aa;font-size:13px;">"${g.query}": <span style="color:#c4b5fd;">no content nearby; write a dedicated answer</span></li>`
       ).join('');
 
       const closedRows = closed.slice(0, 3).map((c: any) =>
@@ -444,7 +444,7 @@ export async function POST(req: NextRequest) {
       if (tool === 'daily-audit') {
         const hasReal = await auditHasRealData(userId);
         if (!hasReal) {
-          log.push({ userId, tool, result: 'skipped — SOV floor data (no real web presence yet)' });
+          log.push({ userId, tool, result: 'skipped: SOV floor data (no real web presence yet)' });
           totalSkipped++;
           continue;
         }

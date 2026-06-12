@@ -5,9 +5,9 @@ import { Footerdemo } from '@/components/ui/footer-section';
 import { labFindings, type Verdict } from '@/data/labFindings';
 
 export const metadata: Metadata = {
-  title: 'GEO Lab — Published Experiment Results | L8EntSpace',
+  title: 'GEO Lab: Published Experiment Results | L8EntSpace',
   description:
-    'Controlled A/B experiments on what makes AI engines cite a brand. Pre-registered hypotheses, real statistical tests, and published results — including null and preliminary findings.',
+    'Controlled A/B experiments on what makes AI engines cite a brand. Pre-registered hypotheses, real statistical tests, and published results (including null and preliminary findings).',
   alternates: { canonical: 'https://l8entspace.com/lab' },
 };
 
@@ -22,7 +22,7 @@ export default function LabPage() {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: 'L8EntSpace GEO Lab — Published Experiment Results',
+    name: 'L8EntSpace GEO Lab: Published Experiment Results',
     description: metadata.description,
     url: 'https://l8entspace.com/lab',
     hasPart: labFindings.map(f => ({
@@ -42,11 +42,11 @@ export default function LabPage() {
       <main className="max-w-4xl mx-auto px-6 pt-32 pb-24">
         <header className="mb-12">
           <p className="text-xs font-black tracking-[0.25em] text-pink-500 uppercase mb-3">GEO Lab</p>
-          <h1 className="text-4xl font-black text-white mb-4">What actually changes AI citations — tested, not guessed</h1>
+          <h1 className="text-4xl font-black text-white mb-4">What actually changes AI citations: tested, not guessed</h1>
           <p className="text-zinc-400 leading-relaxed">
             Most GEO advice is confident guessing. The GEO Lab runs controlled A/B experiments instead:
             pre-registered hypotheses, identical content except one variable, real queries across multiple AI engines,
-            and a proper statistical test. We publish every result here — including the preliminary ones and the failures —
+            and a proper statistical test. We publish every result here (including the preliminary ones and the failures),
             with the caveats stated up front. If a number on this page has an asterisk in spirit, we write the asterisk out.
           </p>
         </header>
@@ -107,11 +107,11 @@ export default function LabPage() {
         <section className="mt-16 bg-zinc-900/30 border border-zinc-800 rounded-2xl p-8">
           <h2 className="text-xl font-bold text-white mb-3">How the lab works</h2>
           <ol className="list-decimal list-inside space-y-2 text-sm text-zinc-300">
-            <li><strong className="text-white">Pre-register the hypothesis</strong> — the prediction, primary platform, and sample threshold are written down before the run.</li>
-            <li><strong className="text-white">Change exactly one thing</strong> — variant B is identical to variant A except for the variable under test.</li>
-            <li><strong className="text-white">Probe real engines</strong> — the same query set runs across Gemini, ChatGPT, Perplexity, and Claude, with randomised variant order.</li>
-            <li><strong className="text-white">Test for significance</strong> — a two-proportion z-test decides whether the difference beats chance.</li>
-            <li><strong className="text-white">Publish whatever comes out</strong> — supported, rejected, null, or preliminary. Preliminary means "promising but underpowered," and we say so.</li>
+            <li><strong className="text-white">Pre-register the hypothesis</strong>: the prediction, primary platform, and sample threshold are written down before the run.</li>
+            <li><strong className="text-white">Change exactly one thing</strong>: variant B is identical to variant A except for the variable under test.</li>
+            <li><strong className="text-white">Probe real engines</strong>: the same query set runs across Gemini, ChatGPT, Perplexity, and Claude, with randomised variant order.</li>
+            <li><strong className="text-white">Test for significance</strong>: a two-proportion z-test decides whether the difference beats chance.</li>
+            <li><strong className="text-white">Publish whatever comes out</strong>: supported, rejected, null, or preliminary. Preliminary means "promising but underpowered," and we say so.</li>
           </ol>
           <p className="text-sm text-zinc-400 mt-6">
             Want to run experiments like these on your own content?{' '}

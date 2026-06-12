@@ -101,7 +101,7 @@ export function OnboardingChecklist({ userId, brandConfigured, hasProbed }: Prop
         </div>
         <div>
           <h3 className="text-base font-semibold text-white">Get cited by AI in 5 steps</h3>
-          <p className="text-xs text-zinc-400">{doneCount} of {steps.length} complete — finish the quest to start showing up in AI answers.</p>
+          <p className="text-xs text-zinc-400">{doneCount} of {steps.length} complete. Finish the quest to start showing up in AI answers.</p>
         </div>
       </div>
 

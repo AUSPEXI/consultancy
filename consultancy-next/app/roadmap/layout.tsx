@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'L8EntSpace Product Roadmap | The Future of GEO',
-  description: 'Our master plan for building the deterministic operating system for AI-era search. Track completed milestones — SoV tracking, 768-D latent space mapping, drift detection — and upcoming GEO features.',
+  description: 'Our master plan for building the deterministic operating system for AI-era search. Track completed milestones (SoV tracking, 768-D latent space mapping, drift detection) and upcoming GEO features.',
   metadataBase: new URL('https://l8entspace.com'),
   alternates: { canonical: 'https://l8entspace.com/roadmap' },
   openGraph: {

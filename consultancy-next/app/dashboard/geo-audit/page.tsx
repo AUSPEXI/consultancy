@@ -148,9 +148,9 @@ export default function GeoAuditPage() {
 
         {(running || probe || bing || entity) && (
           <div className="space-y-2 pt-2 border-t border-zinc-800">
-            <StepRow k="probe" icon={Zap} label="Citation Probe — live queries across AI engines" />
-            <StepRow k="bing" icon={Search} label="Bing indexation — ChatGPT's search index" />
-            <StepRow k="entity" icon={Shield} label="Entity grounding — Wikidata, Wikipedia, Crunchbase" />
+            <StepRow k="probe" icon={Zap} label="Citation Probe: live queries across AI engines" />
+            <StepRow k="bing" icon={Search} label="Bing indexation: ChatGPT's search index" />
+            <StepRow k="entity" icon={Shield} label="Entity grounding: Wikidata, Wikipedia, Crunchbase" />
           </div>
         )}
 
@@ -196,7 +196,7 @@ export default function GeoAuditPage() {
           <div className="space-y-2">
             <p className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">Do these first</p>
             {bing && !bing.indexed && (
-              <ActionRow text="Your domain is invisible to ChatGPT search. Fix Bing indexation first — it gates everything else." href="/dashboard/geo-health" cta="GEO Health" />
+              <ActionRow text="Your domain is invisible to ChatGPT search. Fix Bing indexation first: it gates everything else." href="/dashboard/geo-health" cta="GEO Health" />
             )}
             {entity && entity.score < 60 && (
               <ActionRow text={`Entity grounding is weak (${entity.score}/100). AI can't confidently say who you are.`} href="/dashboard/geo-health" cta="Entity Audit" />
@@ -208,7 +208,7 @@ export default function GeoAuditPage() {
               <ActionRow text="You're being cited sometimes. See exactly which queries and engines miss you, then target those." href="/dashboard/cite-probe" cta="Citation Probe" />
             )}
             {(probe?.misinformationCount ?? 0) > 0 && (
-              <ActionRow text={`${probe.misinformationCount} misinformation citation(s) detected — AI is saying false things about your brand.`} href="/dashboard/cite-probe" cta="Review" />
+              <ActionRow text={`${probe.misinformationCount} misinformation citation(s) detected. AI is saying false things about your brand.`} href="/dashboard/cite-probe" cta="Review" />
             )}
             {bing?.indexed && (entity?.score ?? 0) >= 60 && (probe?.citationRate ?? 0) >= 50 && (
               <p className="text-sm text-emerald-300 flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Strong foundations across all three checks. Defend the position: keep facts fresh and re-probe monthly.</p>
@@ -224,7 +224,7 @@ export default function GeoAuditPage() {
                   <p className="text-sm font-bold text-white">Keep this running automatically</p>
                   <p className="text-xs text-zinc-400 mt-0.5">
                     Turn on Autopilot: weekly citation tracking on these exact queries, brand monitoring,
-                    and an email digest when anything changes. One click — adjust anytime in Settings.
+                    and an email digest when anything changes. One click (adjust anytime in Settings).
                   </p>
                 </div>
               </div>
@@ -237,7 +237,7 @@ export default function GeoAuditPage() {
           )}
           {(autopilotAlreadyOn || activated) && (
             <p className="text-sm text-emerald-300 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4" /> Autopilot is on — this audit repeats automatically and you&apos;ll get an email digest when things change.
+              <CheckCircle2 className="w-4 h-4" /> Autopilot is on. This audit repeats automatically and you&apos;ll get an email digest when things change.
               <Link href="/dashboard/settings" className="text-pink-400 hover:text-pink-300 font-bold">Adjust</Link>
             </p>
           )}

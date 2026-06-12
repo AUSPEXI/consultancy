@@ -114,12 +114,12 @@ export function BrandIntelPanel({ realArticles = [], userBrand = 'Your Brand' }:
             {[
               {
                 label: 'Citation Rate',
-                value: data.summary.citationRate !== null ? `${data.summary.citationRate}%` : '—',
+                value: data.summary.citationRate !== null ? `${data.summary.citationRate}%` : 'N/A',
               },
               {
                 label: 'Δ Last Probe',
                 value: data.summary.citationDelta !== null
-                  ? `${data.summary.citationDelta > 0 ? '+' : ''}${data.summary.citationDelta}pp` : '—',
+                  ? `${data.summary.citationDelta > 0 ? '+' : ''}${data.summary.citationDelta}pp` : 'N/A',
               },
               { label: 'Drift Events', value: String(data.summary.driftEventCount) },
               { label: 'Trojan Opps', value: String(data.summary.trojanOpportunityCount) },
@@ -172,7 +172,7 @@ export function BrandIntelPanel({ realArticles = [], userBrand = 'Your Brand' }:
             <p className="text-sm font-semibold text-zinc-300">No probe history yet</p>
             <p className="text-xs text-zinc-500 mt-1.5 max-w-sm">
               Run a Citation Probe to start building your brand intelligence: citation trends,
-              per-platform drift detection, and competitor head-to-head tracking — all from real
+              per-platform drift detection, and competitor head-to-head tracking, all from real
               AI engine responses, not synthetic data.
             </p>
             <a
@@ -197,7 +197,7 @@ export function BrandIntelPanel({ realArticles = [], userBrand = 'Your Brand' }:
                 </div>
                 {data.probeCount < 2 ? (
                   <p className="text-xs text-zinc-500 py-6 text-center">
-                    One probe run so far — the trend appears after your second run.
+                    One probe run so far. The trend appears after your second run.
                   </p>
                 ) : (
                   <div className="h-[260px]">
@@ -245,7 +245,7 @@ export function BrandIntelPanel({ realArticles = [], userBrand = 'Your Brand' }:
             {activeTab === 'platforms' && (
               <div className="space-y-6">
                 <div>
-                  <h4 className="text-sm font-semibold text-white">Per-Engine Citation Rate — Latest Probe</h4>
+                  <h4 className="text-sm font-semibold text-white">Per-Engine Citation Rate: Latest Probe</h4>
                   <p className="text-xs text-zinc-500 mt-0.5">With change vs your previous probe</p>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -299,7 +299,7 @@ export function BrandIntelPanel({ realArticles = [], userBrand = 'Your Brand' }:
                 </div>
                 {(data.competitors ?? []).length === 0 ? (
                   <p className="text-xs text-zinc-500 py-6 text-center">
-                    No competitor probes yet. Add competitors on the Citation Probe page and re-run — each rival is probed
+                    No competitor probes yet. Add competitors on the Citation Probe page and re-run. Each rival is probed
                     on the same queries as your brand.
                   </p>
                 ) : (
@@ -324,7 +324,7 @@ export function BrandIntelPanel({ realArticles = [], userBrand = 'Your Brand' }:
                         {c.trojanQueries.length > 0 && (
                           <div className="pt-2 border-t border-zinc-800/50">
                             <p className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-1.5">
-                              Trojan opportunities — they&apos;re cited, you&apos;re not
+                              Trojan opportunities: they&apos;re cited, you&apos;re not
                             </p>
                             <div className="flex flex-wrap gap-1.5">
                               {c.trojanQueries.slice(0, 6).map(q => (
@@ -361,7 +361,7 @@ export function BrandIntelPanel({ realArticles = [], userBrand = 'Your Brand' }:
                 </div>
                 {(data.driftAlerts ?? []).length === 0 ? (
                   <p className="text-xs text-zinc-500 py-6 text-center">
-                    No statistically significant rate changes between your probe runs — your citation rates are stable.
+                    No statistically significant rate changes between your probe runs. Your citation rates are stable.
                   </p>
                 ) : (
                   <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
@@ -391,12 +391,12 @@ export function BrandIntelPanel({ realArticles = [], userBrand = 'Your Brand' }:
             {activeTab === 'content' && (
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-sm font-semibold text-white">Your Content — Real GEO Scores</h4>
+                  <h4 className="text-sm font-semibold text-white">Your Content: Real GEO Scores</h4>
                   <p className="text-xs text-zinc-500 mt-0.5">Scored autopilot articles, most recent first</p>
                 </div>
                 {scoredArticles.length === 0 ? (
                   <p className="text-xs text-zinc-500 py-6 text-center">
-                    No scored articles yet — run the content scorer on your autopilot articles to populate this tab.
+                    No scored articles yet. Run the content scorer on your autopilot articles to populate this tab.
                   </p>
                 ) : (
                   <div className="space-y-2">

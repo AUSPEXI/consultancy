@@ -255,7 +255,7 @@ export default {
           <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
           <div>
             <p className="text-sm font-medium text-emerald-300">Content loaded from Step 4</p>
-            <p className="text-xs text-zinc-500">Your scored article has been pre-filled into the fields below — ready to generate schema and restructured HTML.</p>
+            <p className="text-xs text-zinc-500">Your scored article has been pre-filled into the fields below, ready to generate schema and restructured HTML.</p>
           </div>
         </div>
       )}

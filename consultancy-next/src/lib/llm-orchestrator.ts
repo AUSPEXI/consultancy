@@ -137,7 +137,7 @@ export class LLMOrchestrator {
           error.message?.includes('401') ||
           error.message?.includes('ACCOUNT_STATE_INVALID'));
       if (isGeminiUnavailable && process.env.PERPLEXITY_API_KEY) {
-        console.log('[llm-orchestrator] Gemini quota exceeded — auto-falling back to perplexity sonar');
+        console.log('[llm-orchestrator] Gemini quota exceeded. Auto-falling back to perplexity sonar');
         try {
           rawOutput = await callWithExponentialBackoff(
             async () => this.callPerplexity('llama-3.1-sonar-large-128k-online', finalPrompt, temperature),
@@ -149,7 +149,7 @@ export class LLMOrchestrator {
         } catch (fallbackError: any) {
           // Perplexity failed — try OpenAI as last resort
           if (process.env.OPENAI_API_KEY) {
-            console.log('[llm-orchestrator] Perplexity fallback failed — trying gpt-4o-mini');
+            console.log('[llm-orchestrator] Perplexity fallback failed. Trying gpt-4o-mini');
             try {
               rawOutput = await callWithExponentialBackoff(
                 async () => this.callProvider('openai', 'gpt-4o-mini', finalPrompt, temperature, undefined, logCtx, requiresJson),
@@ -174,7 +174,7 @@ export class LLMOrchestrator {
           }
         }
       } else if (isGeminiUnavailable && process.env.OPENAI_API_KEY) {
-        console.log('[llm-orchestrator] Gemini quota exceeded — auto-falling back to gpt-4o-mini');
+        console.log('[llm-orchestrator] Gemini quota exceeded. Auto-falling back to gpt-4o-mini');
         try {
           rawOutput = await callWithExponentialBackoff(
             async () => this.callProvider('openai', 'gpt-4o-mini', finalPrompt, temperature, undefined, logCtx),

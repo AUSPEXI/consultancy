@@ -52,7 +52,7 @@ export function AutomationStatus() {
         <div className="flex items-center gap-2 min-w-0">
           <Zap className="w-4 h-4 shrink-0 text-zinc-600" />
           <span className="text-sm text-zinc-400 truncate">
-            Autopilot runs your monitoring in the background — <span className="text-zinc-200">upgrade to Starter</span> to switch it on.
+            Autopilot runs your monitoring in the background. <span className="text-zinc-200">Upgrade to Starter</span> to switch it on.
           </span>
         </div>
         <a
@@ -131,7 +131,7 @@ export function AutomationStatus() {
       {!hasResults && enabled && (
         <div className="px-4 pb-3 text-[11px] text-zinc-500">
           <Clock className="w-3 h-3 inline mr-1" />
-          First run scheduled — {nextRunLabel(tier ?? 'Free')}
+          First run scheduled: {nextRunLabel(tier ?? 'Free')}
         </div>
       )}
 

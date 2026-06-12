@@ -14,7 +14,7 @@ describe('secretsMatch', () => {
     expect(secretsMatch('short', 'short-but-longer')).toBe(false);
   });
 
-  it('fails closed on null/undefined/empty — never matches a missing secret', () => {
+  it('fails closed on null/undefined/empty (never matches a missing secret)', () => {
     expect(secretsMatch(null, null)).toBe(false);
     expect(secretsMatch(undefined, undefined)).toBe(false);
     expect(secretsMatch('', '')).toBe(false);

@@ -12,12 +12,12 @@ import { authFetch } from '@/lib/auth-fetch';
 const ENTITY_PLATFORMS = [
   { name: 'Wikidata', url: 'https://www.wikidata.org/wiki/Special:NewItem', desc: 'The master knowledge graph that feeds Wikipedia, Google, and most LLMs.', impact: 'Very High', color: 'text-emerald-400', badge: 'bg-emerald-500/10 border-emerald-500/20' },
   { name: 'Google Knowledge Panel', url: 'https://support.google.com/business/answer/9798848', desc: 'Claim and verify your brand\'s Knowledge Panel to anchor your entity across Google products.', impact: 'Very High', color: 'text-blue-400', badge: 'bg-blue-500/10 border-blue-500/20' },
-  { name: 'Crunchbase', url: 'https://www.crunchbase.com/add-company', desc: 'Tech company entity authority — indexed by most LLMs and business intelligence platforms.', impact: 'High', color: 'text-orange-400', badge: 'bg-orange-500/10 border-orange-500/20' },
+  { name: 'Crunchbase', url: 'https://www.crunchbase.com/add-company', desc: 'Tech company entity authority: indexed by most LLMs and business intelligence platforms.', impact: 'High', color: 'text-orange-400', badge: 'bg-orange-500/10 border-orange-500/20' },
   { name: 'LinkedIn Company Page', url: 'https://www.linkedin.com/company/setup/new/', desc: 'Professional authority signal, consistently indexed by Claude, Gemini, and Perplexity.', impact: 'High', color: 'text-blue-300', badge: 'bg-blue-500/10 border-blue-500/20' },
-  { name: 'Companies House (UK)', url: 'https://www.gov.uk/file-your-confirmation-statement-with-companies-house', desc: 'Official UK company registration — one of the highest-trust entity signals for UK brands.', impact: 'High', color: 'text-pink-400', badge: 'bg-pink-500/10 border-pink-500/20' },
+  { name: 'Companies House (UK)', url: 'https://www.gov.uk/file-your-confirmation-statement-with-companies-house', desc: 'Official UK company registration: one of the highest-trust entity signals for UK brands.', impact: 'High', color: 'text-pink-400', badge: 'bg-pink-500/10 border-pink-500/20' },
   { name: 'schema.org sameAs', url: 'https://schema.org/sameAs', desc: 'Cross-link all your entity profiles using the sameAs property in your Organisation schema. Use Schema Deploy to automate this.', impact: 'Medium', color: 'text-purple-400', badge: 'bg-purple-500/10 border-purple-500/20' },
   { name: 'Open Corporates', url: 'https://opencorporates.com/', desc: 'Global company registry used by financial and legal AI systems as entity anchor.', impact: 'Medium', color: 'text-cyan-400', badge: 'bg-cyan-500/10 border-cyan-500/20' },
-  { name: 'Google Business Profile', url: 'https://business.google.com/', desc: 'Local entity anchor — even for non-local brands, this triggers Knowledge Panel eligibility.', impact: 'Medium', color: 'text-yellow-400', badge: 'bg-yellow-500/10 border-yellow-500/20' },
+  { name: 'Google Business Profile', url: 'https://business.google.com/', desc: 'Local entity anchor (even for non-local brands, this triggers Knowledge Panel eligibility).', impact: 'Medium', color: 'text-yellow-400', badge: 'bg-yellow-500/10 border-yellow-500/20' },
 ];
 
 interface EntityProfile {
@@ -142,7 +142,7 @@ export default function EntityHubPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Entity Intelligence Hub</h1>
-          <p className="text-zinc-400 max-w-2xl">AI models can only cite what they know exists as a discrete entity. Most brands are invisible at the entity layer — not missing citations, missing <em>existence</em>. Fix that here.</p>
+          <p className="text-zinc-400 max-w-2xl">AI models can only cite what they know exists as a discrete entity. Most brands are invisible at the entity layer: not missing citations, missing <em>existence</em>. Fix that here.</p>
         </div>
         {!userData?.brand && (
           <div className="flex items-center gap-2 px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400 text-xs">
@@ -158,17 +158,17 @@ export default function EntityHubPage() {
           <div>
             <BookOpen className="w-5 h-5 text-purple-400 mb-2" />
             <p className="font-semibold text-white mb-1">Ontological Foundation</p>
-            <p className="text-zinc-400">Your brand's Ontological anchor — what it fundamentally IS in AI minds — must exist as a structured entity before any other GEO work can compound.</p>
+            <p className="text-zinc-400">Your brand's Ontological anchor (what it fundamentally IS in AI minds) must exist as a structured entity before any other GEO work can compound.</p>
           </div>
           <div>
             <Link2 className="w-5 h-5 text-cyan-400 mb-2" />
             <p className="font-semibold text-white mb-1">Entity Disambiguation</p>
-            <p className="text-zinc-400">When your brand appears in multiple authoritative sources with consistent sameAs links, AI models resolve citations to you with high confidence — not to a competitor with a similar name.</p>
+            <p className="text-zinc-400">When your brand appears in multiple authoritative sources with consistent sameAs links, AI models resolve citations to you with high confidence, not to a competitor with a similar name.</p>
           </div>
           <div>
             <Globe className="w-5 h-5 text-emerald-400 mb-2" />
             <p className="font-semibold text-white mb-1">Permanent Compounding</p>
-            <p className="text-zinc-400">Entity establishment is a one-time action with permanent benefit. Every model trained on a knowledge graph that includes your entity gets it for free — forever.</p>
+            <p className="text-zinc-400">Entity establishment is a one-time action with permanent benefit. Every model trained on a knowledge graph that includes your entity gets it for free, forever.</p>
           </div>
         </div>
       </div>
@@ -180,7 +180,7 @@ export default function EntityHubPage() {
             <Sparkles className="w-4 h-4 text-purple-400" /> Entity Profile Generator
           </CardTitle>
           <CardDescription className="text-zinc-400 mt-1">
-            Generates your complete entity profile — Wikidata description, Knowledge Panel triggers, key statements, and sameAs links. All fields are editable after generation.
+            Generates your complete entity profile: Wikidata description, Knowledge Panel triggers, key statements, and sameAs links. All fields are editable after generation.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -214,7 +214,7 @@ export default function EntityHubPage() {
 
           <div className="flex items-center justify-between">
             <p className="text-xs text-zinc-600">
-              Brand: <span className="text-zinc-400">{userData?.brand || '—'}</span>
+              Brand: <span className="text-zinc-400">{userData?.brand || 'N/A'}</span>
               {userData?.domain && <> · Domain: <span className="text-zinc-400">{userData.domain}</span></>}
             </p>
             <Button
@@ -230,7 +230,7 @@ export default function EntityHubPage() {
           {!country.trim() && (
             <p className="text-xs text-amber-400/70 flex items-center gap-1.5">
               <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-              Enter your country so the profile is generated correctly — the AI cannot reliably guess it.
+              Enter your country so the profile is generated correctly. The AI cannot reliably guess it.
             </p>
           )}
 
@@ -241,7 +241,7 @@ export default function EntityHubPage() {
           {profile && (
             <div className="space-y-5 pt-2">
               <div className="flex items-center gap-2 text-[10px] text-zinc-500 font-mono">
-                <Pencil className="w-3 h-3" /> All fields below are editable — click any value to correct it
+                <Pencil className="w-3 h-3" /> All fields below are editable. Click any value to correct it.
               </div>
 
               {/* Core identity */}
@@ -352,7 +352,7 @@ export default function EntityHubPage() {
                   <div>
                     <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Wikidata QuickStatements Export</p>
                     <p className="text-xs text-zinc-600 max-w-sm">
-                      Copies a ready-to-paste QuickStatements batch for Wikidata&apos;s batch importer — CREATE + label + description + official website. Open the{' '}
+                      Copies a ready-to-paste QuickStatements batch for Wikidata&apos;s batch importer: CREATE + label + description + official website. Open the{' '}
                       <a href="https://quickstatements.toolforge.org/" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 underline">QuickStatements tool</a>{' '}
                       and paste the output to register your entity.
                     </p>

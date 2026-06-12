@@ -81,7 +81,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="flex h-screen bg-zinc-950 text-zinc-50 font-sans overflow-hidden relative">
       {ADMIN_BYPASS && typeof window !== 'undefined' && window.location.hostname === 'localhost' && (
         <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-black text-xs font-bold text-center py-1 tracking-widest uppercase">
-          Dev bypass active — not visible in production
+          Dev bypass active. Not visible in production.
         </div>
       )}
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />

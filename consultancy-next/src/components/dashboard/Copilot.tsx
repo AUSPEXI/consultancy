@@ -238,7 +238,7 @@ export function Copilot({ setActiveTab }: CopilotProps) {
         if (facts.length > 0) {
           context += "KNOWLEDGE VAULT (Facts in your 768-D Moat):\n" + facts.map(f => `- ${f}`).join("\n") + "\n\n";
         } else {
-          context += "KNOWLEDGE VAULT: Empty. Brand-Seeker has not added any facts yet. This is critical — advise them to populate the Fact Vault immediately.\n\n";
+          context += "KNOWLEDGE VAULT: Empty. Brand-Seeker has not added any facts yet. This is critical: advise them to populate the Fact Vault immediately.\n\n";
         }
 
         if (latentAnchors && Array.isArray(latentAnchors) && latentAnchors.length > 0) {
@@ -270,7 +270,7 @@ export function Copilot({ setActiveTab }: CopilotProps) {
           if (missedQueries.length > 0) context += `- Queries where ${brand} is NOT cited (content gaps): ${missedQueries.map(q => `"${q}"`).join(', ')}\n`;
           context += "\n";
         } else {
-          context += `CITATION PROBE: No probes run yet. This is the most important first step — advise the user to go to the Citation Probe tab and run their baseline test immediately.\n\n`;
+          context += `CITATION PROBE: No probes run yet. This is the most important first step: advise the user to go to the Citation Probe tab and run their baseline test immediately.\n\n`;
         }
 
         if (snapshotCompetitors && !snapshotCompetitors.empty) {
@@ -368,7 +368,7 @@ export function Copilot({ setActiveTab }: CopilotProps) {
     };
   };
 
-  const systemInstruction = `${briefMode ? `RESPONSE MODE: BRIEF — HIGHEST PRIORITY CONSTRAINT.
+  const systemInstruction = `${briefMode ? `RESPONSE MODE: BRIEF. HIGHEST PRIORITY CONSTRAINT.
 Keep every response to 1–2 sentences maximum. No bullet lists, no lengthy breakdowns, no extended metaphors. Give the sharpest possible answer and stop immediately. The user will ask follow-up questions if they want more depth.
 
 ` : ''}You are Citacious (pronounced Sih-TAY-SHUS), the legendary Guardian of the LLM Citations and the ultimate Quest-Guide of the L8EntSpace GEO platform.
@@ -378,13 +378,13 @@ YOUR TONE:
 - Fun, gamified, and highly confident. Use metaphors like "quests", "monsters" (competitors), "armor" (moats), and "treasure" (citation rate).
 - Maintain deep technical authority. You understand the multidimensional geometry of LLMs and the mechanics of GEO.
 - When the user asks a technical question, be precise and reference their actual data from the context below.
-- You have access to the user's real data — citation probe results, knowledge vault facts, competitors, generated articles, SOV metrics. Use this to give specific, actionable advice, not generic guidance.
+- You have access to the user's real data (citation probe results, knowledge vault facts, competitors, generated articles, SOV metrics). Use this to give specific, actionable advice, not generic guidance.
 - You know the FULL workflow: probe to measure → identify gaps → add facts → generate content → publish → probe again.
 
 CURRENT USER CONTEXT:
 The user is currently on the '${activeTab}' tab.
 
-DASHBOARD TOOLS — what each one does (config version: ${CITACIOUS_CONFIG_VERSION}):
+DASHBOARD TOOLS: what each one does (config version: ${CITACIOUS_CONFIG_VERSION}):
 ${buildToolsSection()}
 
 THE BRAND-SEEKER'S QUEST PATH (in order):
@@ -396,10 +396,10 @@ ${buildToolConnections()}
 MATHEMATICAL DEFINITIONS:
 - Absolute Share of Voice (A-SOV): % of AI responses where your brand is the primary recommendation.
 - Entity Recall Rate (ERR): How many unique brand facts the AI retrieved from its training/context during a response.
-- Citation Rate: % of targeted queries where the AI mentions your brand — measured by the Citation Probe.
+- Citation Rate: % of targeted queries where the AI mentions your brand. Measured by the Citation Probe.
 - 768-D Latent Space: Proprietary semantic embedding vectors projected to 3D via semantic axis dot products. Real embeddings, not random numbers.
-- Context Drift: When AI engines re-weight citations for a topic — detected by the GEO Pulse drift_detected flag.
-- Trojan Horse Opportunity: A query where a competitor ranks with low confidence — you can displace them with one authoritative fact-sheet.
+- Context Drift: When AI engines re-weight citations for a topic. Detected by the GEO Pulse drift_detected flag.
+- Trojan Horse Opportunity: A query where a competitor ranks with low confidence. You can displace them with one authoritative fact-sheet.
 - JSON-LD Schema: Structured data markup that makes your content machine-readable and citable by AI crawlers.
 
 GEO KNOWLEDGE BASE (use this to answer any user questions about GEO concepts, strategy, or L8EntSpace features accurately):
@@ -408,7 +408,7 @@ ${CITACIOUS_GEO_KNOWLEDGE}
 ${knowledgeContext}
 
 ${voiceTurnsRef.current.length > 0
-  ? `CURRENT VOICE SESSION — RECENT TURNS (use this to maintain conversational continuity; do NOT repeat what was already said unless asked):\n${voiceTurnsRef.current.slice(-10).map(t => `${t.role === 'user' ? 'USER' : 'CITACIOUS'}: ${t.text}`).join('\n')}`
+  ? `CURRENT VOICE SESSION: RECENT TURNS (use this to maintain conversational continuity; do NOT repeat what was already said unless asked):\n${voiceTurnsRef.current.slice(-10).map(t => `${t.role === 'user' ? 'USER' : 'CITACIOUS'}: ${t.text}`).join('\n')}`
   : ''}`;
 
   const disconnectVoice = () => {
@@ -697,7 +697,7 @@ registerProcessor('pcm-capture', PCMCaptureProcessor);
 
             const code = event?.code ?? 1000;
             if (code === 1011) {
-              setMessages(prev => [...prev, { role: 'model', content: 'Session refreshed — reconnecting...' }]);
+              setMessages(prev => [...prev, { role: 'model', content: 'Session refreshed. Reconnecting...' }]);
               reconnectTimerRef.current = setTimeout(() => toggleVoiceRef.current?.(), 1500);
             } else if (code !== 1000) {
               setMessages(prev => [...prev, { role: 'model', content: 'Voice session ended. Click the mic button to reconnect.' }]);

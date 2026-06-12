@@ -169,7 +169,7 @@ export function Ga4AttributionPanel() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-zinc-500">No AI-referral traffic detected in this window yet. Many AI engines don&apos;t pass a referrer, so this undercounts — treat it as a floor, not the full picture.</p>
+            <p className="text-sm text-zinc-500">No AI-referral traffic detected in this window yet. Many AI engines don&apos;t pass a referrer, so this undercounts (treat it as a floor, not the full picture).</p>
           )}
 
           <p className="text-[11px] text-zinc-600 mt-4 flex items-center gap-1">

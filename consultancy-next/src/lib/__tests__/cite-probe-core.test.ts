@@ -32,7 +32,7 @@ describe('wilsonCI95', () => {
     expect(hi).toBeGreaterThanOrEqual(point);
   });
 
-  it('is wide at n=7 — the honesty the UI warns about', () => {
+  it('is wide at n=7 (the honesty the UI warns about)', () => {
     const [lo, hi] = wilsonCI95(3, 7);
     expect(hi - lo).toBeGreaterThan(40);
   });
@@ -104,9 +104,9 @@ describe('checkCitation', () => {
   it('returns list rank when the brand appears in a numbered list', () => {
     const response = [
       'Here are the top options:',
-      '1. WidgetCo — solid all-rounder',
-      '2. Acme — strong for enterprises',
-      '3. Gadgetly — budget pick',
+      '1. WidgetCo: solid all-rounder',
+      '2. Acme: strong for enterprises',
+      '3. Gadgetly: budget pick',
     ].join('\n');
     const r = checkCitation(response, brand, domain);
     expect(r.position).toBe(2);
@@ -126,7 +126,7 @@ describe('checkCitation', () => {
   it('does NOT flag misinformation when the false claim is negated', () => {
     const falseStmt = 'Acme was founded in Germany by Klaus Schmidt';
     const r = checkCitation(
-      'Acme was not founded in Germany by Klaus Schmidt — it started in Ohio.',
+      'Acme was not founded in Germany by Klaus Schmidt. It started in Ohio.',
       brand, domain, [falseStmt],
     );
     expect(r.accurate).toBe(true);

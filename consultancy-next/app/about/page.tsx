@@ -12,7 +12,7 @@ const THESIS = [
   {
     stat: '70%',
     label: 'of search journeys now start with an AI engine',
-    detail: 'Google, ChatGPT, Perplexity, Claude — the discovery layer has fundamentally shifted. Traditional SEO optimises for a ranking algorithm. GEO engineers the underlying knowledge that makes AI cite you as the answer.',
+    detail: 'Google, ChatGPT, Perplexity, Claude: the discovery layer has fundamentally shifted. Traditional SEO optimises for a ranking algorithm. GEO engineers the underlying knowledge that makes AI cite you as the answer.',
   },
   {
     stat: '< 3%',
@@ -30,7 +30,7 @@ const PILLARS = [
   {
     icon: <Target className="w-6 h-6 text-zinc-100" />,
     title: 'Citation Engineering',
-    desc: 'We architect the exact data structures — JSON-LD schema, entity graphs, semantic anchors — that force AI models to cite your brand as the authoritative source for high-intent queries.',
+    desc: 'We architect the exact data structures (JSON-LD schema, entity graphs, semantic anchors) that force AI models to cite your brand as the authoritative source for high-intent queries.',
   },
   {
     icon: <Database className="w-6 h-6 text-zinc-100" />,
@@ -40,12 +40,12 @@ const PILLARS = [
   {
     icon: <BrainCircuit className="w-6 h-6 text-zinc-100" />,
     title: 'Semantic Moat Construction',
-    desc: 'Your brand\'s knowledge vault — mapped in 768-dimensional space. Facts that are structured, dense, and positioned so that AI models retrieve them with high confidence across every relevant query cluster.',
+    desc: 'Your brand\'s knowledge vault, mapped in 768-dimensional space. Facts that are structured, dense, and positioned so that AI models retrieve them with high confidence across every relevant query cluster.',
   },
   {
     icon: <Network className="w-6 h-6 text-zinc-100" />,
     title: 'Multi-Agent Content Pipeline',
-    desc: 'Automated orchestration from topic to published, citable content. Neural crawl, fact extraction, schema generation, and synthesis — without hallucination. Content that LLMs can read, trust, and repeat.',
+    desc: 'Automated orchestration from topic to published, citable content. Neural crawl, fact extraction, schema generation, and synthesis, without hallucination. Content that LLMs can read, trust, and repeat.',
   },
 ];
 
@@ -89,7 +89,7 @@ export default function AboutPage() {
             The Infrastructure Layer for <span className="text-zinc-400">AI-Era Brand Authority</span>
           </h1>
           <p className="text-lg md:text-xl text-zinc-400 max-w-3xl mx-auto leading-relaxed">
-            Search has changed permanently. We build the deterministic infrastructure that ensures your business is cited, recommended, and trusted by the world&apos;s leading AI models — not left to chance.
+            Search has changed permanently. We build the deterministic infrastructure that ensures your business is cited, recommended, and trusted by the world&apos;s leading AI models. Not left to chance.
           </p>
         </motion.div>
 
@@ -138,7 +138,7 @@ export default function AboutPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-white">Why Generative Engine Optimization?</h2>
             <p className="text-xl text-zinc-400">We are moving from an era of probabilistic guesswork to deterministic truth.</p>
             <p className="text-lg text-zinc-300 leading-relaxed">
-              When a customer asks an AI for a recommendation, the model doesn&apos;t crawl the web in real time — it retrieves from structured knowledge. Brands that have engineered their presence into that knowledge layer get cited. Brands that haven&apos;t, don&apos;t. L8EntSpace exists to close that gap systematically, measurably, and permanently.
+              When a customer asks an AI for a recommendation, the model doesn&apos;t crawl the web in real time. It retrieves from structured knowledge. Brands that have engineered their presence into that knowledge layer get cited. Brands that haven&apos;t, don&apos;t. L8EntSpace exists to close that gap systematically, measurably, and permanently.
             </p>
             <blockquote className="border-l-4 border-zinc-500 pl-8 py-4 my-12 text-2xl font-medium italic text-zinc-200 text-left bg-zinc-900/50 rounded-r-xl">
               &ldquo;The future of digital visibility is engineering the fundamental knowledge structure so your brand becomes the irrefutable answer in the AI era.&rdquo;
@@ -190,7 +190,7 @@ export default function AboutPage() {
               </div>
               <div className="flex-1">
                 <p className="text-zinc-300 text-lg leading-relaxed italic mb-6">
-                  &ldquo;Two decades in digital strategy taught me one thing — every major platform shift creates a brief window where early movers lock in structural advantages that compound for years. We are at that window with AI now. L8EntSpace is built to make sure the brands that move first get the citations that matter, before the space saturates.&rdquo;
+                  &ldquo;Two decades in digital strategy taught me one thing: every major platform shift creates a brief window where early movers lock in structural advantages that compound for years. We are at that window with AI now. L8EntSpace is built to make sure the brands that move first get the citations that matter, before the space saturates.&rdquo;
                 </p>
                 <div>
                   <div className="font-bold text-white">Gwylym Pryce-Owen</div>
@@ -206,13 +206,13 @@ export default function AboutPage() {
           <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-8">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Built on Evidence, Not Estimates</h2>
-              <p className="text-xl text-zinc-400 mb-8">Every L8EntSpace recommendation is grounded in live measurement — not industry averages or projected models.</p>
+              <p className="text-xl text-zinc-400 mb-8">Every L8EntSpace recommendation is grounded in live measurement, not industry averages or projected models.</p>
               <ul className="space-y-5">
                 {[
-                  'Live citation testing across AI engines — not simulated, not sampled',
+                  'Live citation testing across AI engines: not simulated, not sampled',
                   'Semantic embedding of your brand facts into a real 768-dimensional space',
                   'Automated content pipeline from topic to published, schema-structured article',
-                  'Trend tracking from baseline — so you know whether your position is improving',
+                  'Trend tracking from baseline, so you know whether your position is improving',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-4 text-zinc-300">
                     <CheckCircle2 className="w-5 h-5 text-pink-500 shrink-0 mt-0.5" />

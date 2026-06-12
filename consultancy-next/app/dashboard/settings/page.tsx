@@ -40,12 +40,12 @@ const L8ENTSPACE_SOCIALS: Record<string, string> = {
 // 2 Ontological (Systemic Anchor) · 2 Epistemological (Signal Point)
 // · 2 Teleological (Emergent Trend) · 1 Risk Vector
 const L8ENTSPACE_ANCHORS = [
-  { label: 'GEO Category Owner',       color: '#ff1493', baseType: 'Systemic Anchor', axisAlignment: 1, description: 'L8EntSpace is the defining brand in the Generative Engine Optimization category — the first mover whose name becomes the category name.' },
+  { label: 'GEO Category Owner',       color: '#ff1493', baseType: 'Systemic Anchor', axisAlignment: 1, description: 'L8EntSpace is the defining brand in the Generative Engine Optimization category: the first mover whose name becomes the category name.' },
   { label: 'AI Visibility Platform',   color: '#ff1493', baseType: 'Systemic Anchor', axisAlignment: 1, description: 'L8EntSpace is the infrastructure layer for tracking and building brand presence across AI-generated responses at scale.' },
-  { label: 'Citation Engineering',     color: '#06b6d4', baseType: 'Signal Point',    axisAlignment: 2, description: 'L8EntSpace owns a verifiable, named methodology — the Cite-Magnet framework — with documented techniques for generating AI citations.' },
-  { label: 'AI Share of Voice Data',   color: '#06b6d4', baseType: 'Signal Point',    axisAlignment: 2, description: 'L8EntSpace produces real, auditable SOV measurements across ChatGPT, Claude, Gemini, and Perplexity — no other tool does this.' },
+  { label: 'Citation Engineering',     color: '#06b6d4', baseType: 'Signal Point',    axisAlignment: 2, description: 'L8EntSpace owns a verifiable, named methodology (the Cite-Magnet framework) with documented techniques for generating AI citations.' },
+  { label: 'AI Share of Voice Data',   color: '#06b6d4', baseType: 'Signal Point',    axisAlignment: 2, description: 'L8EntSpace produces real, auditable SOV measurements across ChatGPT, Claude, Gemini, and Perplexity. No other tool does this.' },
   { label: 'AI-Era Brand Authority',   color: '#8b5cf6', baseType: 'Emergent Trend',  axisAlignment: 3, description: 'L8EntSpace is becoming the standard framework for how forward-thinking brands build authority in the AI search era.' },
-  { label: 'GEO as Growth Channel',    color: '#8b5cf6', baseType: 'Emergent Trend',  axisAlignment: 3, description: 'Positioning GEO as a measurable, revenue-generating channel alongside traditional SEO — a category L8EntSpace is creating.' },
+  { label: 'GEO as Growth Channel',    color: '#8b5cf6', baseType: 'Emergent Trend',  axisAlignment: 3, description: 'Positioning GEO as a measurable, revenue-generating channel alongside traditional SEO (a category L8EntSpace is creating).' },
   { label: 'SEO Legacy Resistance',    color: '#f59e0b', baseType: 'Risk Vector',     axisAlignment: 2, description: 'The primary threat: brands and agencies anchored in traditional SEO frameworks, mischaracterising GEO as an SEO variant.' },
 ];
 
@@ -247,7 +247,7 @@ export default function SettingsPage() {
         }, { merge: true });
       } catch {}
     }
-    setSaveMsg({ type: 'success', text: 'L8EntSpace defaults applied — TEO anchors, competitors, CMS webhook, and social accounts all set. Hit Save Settings to persist the rest.' });
+    setSaveMsg({ type: 'success', text: 'L8EntSpace defaults applied: TEO anchors, competitors, CMS webhook, and social accounts all set. Hit Save Settings to persist the rest.' });
   };
 
   // ── AI competitor discovery ─────────────────────────────────────────────────
@@ -277,7 +277,7 @@ export default function SettingsPage() {
         competitor4: primary[3] || prev.competitor4,
       }));
       if (watchlist.length) setWatchlistCompetitors(prev => [...new Set([...prev, ...watchlist])]);
-      setSaveMsg({ type: 'success', text: `Discovered ${comps.length} competitors — ${primary.length} primary, ${watchlist.length} added to watchlist. Review below, then hit Save.` });
+      setSaveMsg({ type: 'success', text: `Discovered ${comps.length} competitors: ${primary.length} primary, ${watchlist.length} added to watchlist. Review below, then hit Save.` });
     } catch (err: any) {
       setSaveMsg({ type: 'error', text: `Discovery failed: ${err.message}` });
     } finally {
@@ -309,7 +309,7 @@ export default function SettingsPage() {
       setSaveMsg({ type: 'success', text: 'Settings saved. Citacious will pick up your brand data on next message.' });
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'users');
-      setSaveMsg({ type: 'error', text: 'Save failed — check Firestore rules.' });
+      setSaveMsg({ type: 'error', text: 'Save failed. Check Firestore rules.' });
     } finally {
       setIsSaving(false);
     }
@@ -412,7 +412,7 @@ export default function SettingsPage() {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <span className="text-xs font-bold text-pink-400 uppercase tracking-widest">Primary</span>
-              <span className="text-xs text-zinc-600">— max 4, full benchmark analysis</span>
+              <span className="text-xs text-zinc-600">(max 4, full benchmark analysis)</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[1,2,3,4].map(num => (
@@ -428,7 +428,7 @@ export default function SettingsPage() {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest">Watchlist</span>
-              <span className="text-xs text-zinc-600">— unlimited, mention tracking only</span>
+              <span className="text-xs text-zinc-600">(unlimited, mention tracking only)</span>
             </div>
             <div className="flex gap-2 mb-3">
               <Input
@@ -440,7 +440,7 @@ export default function SettingsPage() {
                     setWatchlistInput('');
                   }
                 }}
-                placeholder="competitor.com — press Enter to add"
+                placeholder="competitor.com (press Enter to add)"
                 className="bg-zinc-950 border-zinc-800 text-white text-sm"
               />
               <button
@@ -471,7 +471,7 @@ export default function SettingsPage() {
             )}
           </div>
 
-          <p className="text-xs text-zinc-600">Don&apos;t know your competitors? Click <span className="text-cyan-500">AI Discover</span> — Gemini will identify the brands most likely competing with you for AI citations.</p>
+          <p className="text-xs text-zinc-600">Don&apos;t know your competitors? Click <span className="text-cyan-500">AI Discover</span>. Gemini will identify the brands most likely competing with you for AI citations.</p>
         </CardContent>
       </Card>
 
@@ -518,7 +518,7 @@ export default function SettingsPage() {
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="text-white">Connected Social Accounts</CardTitle>
-          <CardDescription className="text-zinc-400">Connect platforms to enable Fact Amplifier one-click publishing. Your credentials are stored only in your browser session — not transmitted to L8EntSpace servers.</CardDescription>
+          <CardDescription className="text-zinc-400">Connect platforms to enable Fact Amplifier one-click publishing. Your credentials are stored only in your browser session (not transmitted to L8EntSpace servers).</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -602,12 +602,12 @@ export default function SettingsPage() {
               <Input readOnly value="https://l8entspace.com/sitemap.xml" className="bg-zinc-950 border-zinc-800 text-zinc-400 font-mono text-xs" />
               <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText('https://l8entspace.com/sitemap.xml')}>Copy</Button>
             </div>
-            <p className="text-xs text-zinc-500">Submit to Google Search Console and Bing Webmaster Tools. All 40+ public pages are indexed here — critical for AI crawler discovery.</p>
+            <p className="text-xs text-zinc-500">Submit to Google Search Console and Bing Webmaster Tools. All 40+ public pages are indexed here: critical for AI crawler discovery.</p>
           </div>
 
           {/* Inbound webhook */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">Inbound Webhook — Your Server → L8EntSpace</label>
+            <label className="text-sm font-medium text-zinc-300">Inbound Webhook: Your Server → L8EntSpace</label>
             <div className="flex gap-2">
               <Input readOnly value={origin ? `${origin}/api/webhooks/l8entspace` : ''} className="bg-zinc-950 border-zinc-800 text-zinc-400 font-mono text-xs" />
               <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(`${origin}/api/webhooks/l8entspace`)}>Copy</Button>
@@ -619,7 +619,7 @@ export default function SettingsPage() {
 
           {/* Outbound webhook */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">Outbound Webhook — L8EntSpace → Your CMS</label>
+            <label className="text-sm font-medium text-zinc-300">Outbound Webhook: L8EntSpace → Your CMS</label>
             <div className="flex gap-2">
               <Input name="cmsWebhookUrl" value={formData.cmsWebhookUrl} onChange={handleChange} className="bg-zinc-950 border-zinc-800 text-white" placeholder="https://your-internal-server.com/api/l8entspace-push" />
               {origin && (
@@ -636,7 +636,7 @@ export default function SettingsPage() {
             </div>
             <p className="text-xs text-zinc-500">
               L8EntSpace posts generated articles and schema to this URL when you click &quot;Publish to Database &amp; CMS&quot;.{' '}
-              No CMS yet? Click <strong className="text-zinc-400">Use Email Notify</strong> — we&apos;ll email the article directly to your account address instead.
+              No CMS yet? Click <strong className="text-zinc-400">Use Email Notify</strong> and we&apos;ll email the article directly to your account address instead.
               Payload: <code className="text-zinc-300">&#123; userId, topic, article, facts, schema, brand, timestamp &#125;</code>
             </p>
           </div>
@@ -674,7 +674,7 @@ export default function SettingsPage() {
             </span>
           </button>
           <p className="text-xs text-zinc-600">
-            We only ever share aggregated averages across at least 3 opted-in brands — never your brand name, your domain, or your individual rate. You can opt out anytime.
+            We only ever share aggregated averages across at least 3 opted-in brands (never your brand name, your domain, or your individual rate). You can opt out anytime.
           </p>
         </CardContent>
       </Card>
@@ -686,7 +686,7 @@ export default function SettingsPage() {
             ⚡ Autopilot
           </CardTitle>
           <CardDescription className="text-zinc-400">
-            L8EntSpace monitors your brand in the background and alerts you to what changed — no manual clicks required. Toggle individual tools or pause everything here.
+            L8EntSpace monitors your brand in the background and alerts you to what changed. No manual clicks required. Toggle individual tools or pause everything here.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -699,7 +699,7 @@ export default function SettingsPage() {
               <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${automationEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
             </span>
             <span className="text-sm text-zinc-300">
-              {automationEnabled ? 'Autopilot active — running in the background' : 'Autopilot paused'}
+              {automationEnabled ? 'Autopilot active: running in the background' : 'Autopilot paused'}
             </span>
           </button>
 
@@ -707,10 +707,10 @@ export default function SettingsPage() {
           {automationEnabled && (
             <div className="space-y-2 pl-2 border-l-2 border-zinc-800">
               {[
-                { key: 'brand-monitor', label: 'Brand Monitor', desc: 'Weekly — Reddit/Quora/HN threat scan' },
-                { key: 'cite-probe',    label: 'Citation Tracker', desc: 'Weekly — track how often AI cites you' },
+                { key: 'brand-monitor', label: 'Brand Monitor', desc: 'Weekly: Reddit/Quora/HN threat scan' },
+                { key: 'cite-probe',    label: 'Citation Tracker', desc: 'Weekly: track how often AI cites you' },
                 { key: 'daily-audit',   label: 'SOV Audit', desc: 'Daily (once your brand has real web presence)' },
-                { key: 'indexnow-sync', label: 'Bing IndexNow Sync', desc: 'Daily — new pages in your sitemap are auto-pushed to Bing (ChatGPT search)' },
+                { key: 'indexnow-sync', label: 'Bing IndexNow Sync', desc: 'Daily: new pages in your sitemap are auto-pushed to Bing (ChatGPT search)' },
               ].map(({ key, label, desc }) => (
                 <button
                   key={key}
@@ -745,7 +745,7 @@ export default function SettingsPage() {
             </button>
           )}
           <p className="text-xs text-zinc-600">
-            Automation runs on our servers — no browser tab needed. Results appear on your Overview the next time you log in.
+            Automation runs on our servers. No browser tab needed. Results appear on your Overview the next time you log in.
           </p>
         </CardContent>
       </Card>

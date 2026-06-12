@@ -115,7 +115,7 @@ function RequestForm({ userId, isReadOnly }: { userId: string; isReadOnly: boole
   if (submitted) {
     return (
       <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4 text-sm text-emerald-400">
-        Request submitted — the GEO Lab team will review it for the next experiment batch.
+        Request submitted. The GEO Lab team will review it for the next experiment batch.
       </div>
     );
   }
@@ -189,7 +189,7 @@ export default function GeoLabPage() {
             GEO Lab Results
           </h1>
           <p className="text-zinc-400 max-w-2xl">
-            Live findings from the L8EntSpace GEO Lab — real A/B experiments measuring which content tactics lift citation rate. Only statistically significant results appear here.
+            Live findings from the L8EntSpace GEO Lab. Real A/B experiments measuring which content tactics lift citation rate. Only statistically significant results appear here.
           </p>
         </div>
         <div className="flex items-center gap-3 text-xs text-zinc-500 shrink-0">
@@ -232,7 +232,7 @@ export default function GeoLabPage() {
       {!loading && nullCount > 0 && (
         <div className="text-center py-4 text-xs text-zinc-600 flex items-center justify-center gap-2">
           <Minus className="w-3 h-3" />
-          {nullCount} experiment{nullCount !== 1 ? 's' : ''} returned null results — no significant effect detected. Null results are stored but not shown as recommendations.
+          {nullCount} experiment{nullCount !== 1 ? 's' : ''} returned null results. No significant effect detected. Null results are stored but not shown as recommendations.
         </div>
       )}
 

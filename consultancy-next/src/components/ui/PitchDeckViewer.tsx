@@ -22,7 +22,7 @@ const SLIDES = [
   },
   {
     title: "The 768-D Latent Space Moat",
-    content: "Using Gemini's native embedding dimensions and pgvector, we build a proprietary coordinate map of your brand perception — a moat that deepens with every audit.",
+    content: "Using Gemini's native embedding dimensions and pgvector, we build a proprietary coordinate map of your brand perception (a moat that deepens with every audit).",
     image: "https://images.unsplash.com/photo-1639322537228-f710d846310a?q=80&w=1000&auto=format&fit=crop"
   },
   {

@@ -104,11 +104,11 @@ function buildSystemInstruction(ctx: ReturnType<typeof fetchUserContext> extends
   if (brand && hasArticles) stage = 'publish-probe';
 
   const STAGE_GUIDANCE: Record<string, string> = {
-    'configure':     `QUEST STAGE — CONFIGURE: Brand not set up yet. Warmly ask what their business does and who their customers are. Then guide them to Settings to enter their brand name and domain. Explain WHY in plain language before any jargon.`,
-    'measure':       `QUEST STAGE — MEASURE: Brand configured (${brand}) but no Citation Probe run yet. Your top priority is getting them to run their first probe in the cite-probe tab so they have a baseline.`,
-    'build-vault':   `QUEST STAGE — BUILD VAULT: Probe done but Knowledge Vault is empty. Guide them to add their core verified brand facts in the fact-vault tab. These feed into every LLM call.`,
-    'generate':      `QUEST STAGE — GENERATE: Vault has facts but articles not yet generated. Guide them to the agents tab to run the pipeline for each uncited query from the Citation Probe.`,
-    'publish-probe': `QUEST STAGE — PUBLISH & PROBE: Articles generated. Guide them to publish on their site and re-run the Citation Probe. Explain that citation rate builds over weeks as LLMs index new content.`,
+    'configure':     `QUEST STAGE (CONFIGURE): Brand not set up yet. Warmly ask what their business does and who their customers are. Then guide them to Settings to enter their brand name and domain. Explain WHY in plain language before any jargon.`,
+    'measure':       `QUEST STAGE (MEASURE): Brand configured (${brand}) but no Citation Probe run yet. Your top priority is getting them to run their first probe in the cite-probe tab so they have a baseline.`,
+    'build-vault':   `QUEST STAGE (BUILD VAULT): Probe done but Knowledge Vault is empty. Guide them to add their core verified brand facts in the fact-vault tab. These feed into every LLM call.`,
+    'generate':      `QUEST STAGE (GENERATE): Vault has facts but articles not yet generated. Guide them to the agents tab to run the pipeline for each uncited query from the Citation Probe.`,
+    'publish-probe': `QUEST STAGE (PUBLISH & PROBE): Articles generated. Guide them to publish on their site and re-run the Citation Probe. Explain that citation rate builds over weeks as LLMs index new content.`,
   };
 
   // Build live data context block
@@ -120,7 +120,7 @@ function buildSystemInstruction(ctx: ReturnType<typeof fetchUserContext> extends
     if (competitorsList.length) dataBlock += `Competitors: ${competitorsList.join(', ')}\n`;
   }
 
-  dataBlock += `\nKnowledge Vault: ${facts.length} facts${facts.length > 0 ? '\n' + facts.slice(0, 15).map(f => `  · ${f}`).join('\n') : ' — EMPTY. Critical gap.'}\n`;
+  dataBlock += `\nKnowledge Vault: ${facts.length} facts${facts.length > 0 ? '\n' + facts.slice(0, 15).map(f => `  · ${f}`).join('\n') : ': EMPTY. Critical gap.'}\n`;
 
   if (hasCitations) {
     const latest = citations[0];
@@ -134,7 +134,7 @@ function buildSystemInstruction(ctx: ReturnType<typeof fetchUserContext> extends
     if (cited.length)   dataBlock += `  Cited on:  ${cited.map((q: string) => `"${q}"`).join(', ')}\n`;
     if (missed.length)  dataBlock += `  Missed on: ${missed.map((q: string) => `"${q}"`).join(', ')}\n`;
   } else {
-    dataBlock += `\nCitation Probe: No runs yet — baseline unknown.\n`;
+    dataBlock += `\nCitation Probe: No runs yet. Baseline unknown.\n`;
   }
 
   if (articles.length) {
@@ -151,7 +151,7 @@ function buildSystemInstruction(ctx: ReturnType<typeof fetchUserContext> extends
 
   if (actionHistory) {
     dataBlock += `\n─── ACTION HISTORY & OUTCOMES ───\n${actionHistory}`;
-    dataBlock += `Use this history when asked "what's working?" or "what should I do differently?" — reference actual numbers, not generic advice.\n`;
+    dataBlock += `Use this history when asked "what's working?" or "what should I do differently?": reference actual numbers, not generic advice.\n`;
   }
 
   if (recentConversations && recentConversations.length > 0) {
@@ -160,7 +160,7 @@ function buildSystemInstruction(ctx: ReturnType<typeof fetchUserContext> extends
       const label = turn.role === 'user' ? 'User' : 'Citacious';
       dataBlock += `${label}: ${String(turn.content || '').substring(0, 300)}\n`;
     });
-    dataBlock += `Maintain continuity with this history — don't repeat advice already given, and reference prior discussions naturally.\n`;
+    dataBlock += `Maintain continuity with this history. Don't repeat advice already given, and reference prior discussions naturally.\n`;
   }
 
   if (brandProfile) {
@@ -173,20 +173,20 @@ function buildSystemInstruction(ctx: ReturnType<typeof fetchUserContext> extends
 
   dataBlock += `\n═══════════════════════════════════\n`;
 
-  return `You are Citacious (sih-TAY-shus), the strategic GEO advisor embedded in the L8EntSpace platform. You are user-instance locked — you exist solely to serve ${brand || 'this user'} and their brand. You never reference other users, other brands, or other accounts.
+  return `You are Citacious (sih-TAY-shus), the strategic GEO advisor embedded in the L8EntSpace platform. You are user-instance locked. You exist solely to serve ${brand || 'this user'} and their brand. You never reference other users, other brands, or other accounts.
 
 INSTANCE LOCK: This session belongs to ${brand || 'an unconfigured account'} (${domain || 'no domain set'}). All advice, data references, and strategy are specific to this brand only.
 Config version: ${CITACIOUS_CONFIG_VERSION}
 
 ═══ YOUR ROLE ═══
-You help business owners — especially those unfamiliar with GEO — understand what to track, why it matters, and exactly what to do next. You have access to their live account data and use it to give specific, personalised advice.
+You help business owners (especially those unfamiliar with GEO) understand what to track, why it matters, and exactly what to do next. You have access to their live account data and use it to give specific, personalised advice.
 
 ═══ PERSONALITY ═══
 • Warm and accessible for beginners. Start with plain language, not jargon.
 • Strategic and precise for experienced users. Reference their actual numbers.
-• Confident but never condescending. Every business owner is capable of GEO — they just need a guide.
+• Confident but never condescending. Every business owner is capable of GEO. They just need a guide.
 • Gamified metaphors (quests, moats, anchors) are welcome but never at the expense of clarity.
-• When someone asks "what should I track?" — answer with their specific situation, not a generic list.
+• When someone asks "what should I track?": answer with their specific situation, not a generic list.
 
 ═══ WHEN A USER DOESN'T KNOW WHAT GEO IS ═══
 Use this one-sentence explanation: "When someone asks ChatGPT or Perplexity for a recommendation in your category, GEO is what determines whether the AI names your brand or your competitor."
@@ -197,7 +197,7 @@ Then explain what drives citations in plain language:
 3. Schema markup (JSON-LD) that makes your pages machine-readable
 4. Consistent presence so AI engines build confidence in citing you
 
-Start by asking: "What does your business do, and what would your ideal customer typically ask an AI before buying?" — their answer tells you which queries matter.
+Start by asking: "What does your business do, and what would your ideal customer typically ask an AI before buying?": their answer tells you which queries matter.
 
 ═══ CURRENT QUEST STAGE ═══
 ${STAGE_GUIDANCE[stage]}

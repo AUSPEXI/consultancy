@@ -182,14 +182,14 @@ export function LandingPageClient() {
     {
       Icon: RefreshCw,
       name: "GEO Autopilot",
-      description: "The complete probe→generate→publish→re-probe execution loop in one action. Target a query, watch L8EntSpace identify what's being cited, generate stronger counter-content, publish it to your Fact-Vault, and measure the impact — automatically.",
+      description: "The complete probe→generate→publish→re-probe execution loop in one action. Target a query, watch L8EntSpace identify what's being cited, generate stronger counter-content, publish it to your Fact-Vault, and measure the impact. Automatically.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-pink-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
     },
     {
       Icon: Brain,
       name: "Citacious AI Strategist",
-      description: "Your always-on GEO analyst, embedded in your dashboard. Citacious reads your live SOV data, Fact-Vault, and competitor signals to surface exactly what to do next — not just report what happened.",
+      description: "Your always-on GEO analyst, embedded in your dashboard. Citacious reads your live SOV data, Fact-Vault, and competitor signals to surface exactly what to do next, not just report what happened.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-sky-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-2 lg:col-end-4 lg:row-start-1 lg:row-end-2",
     },
@@ -210,7 +210,7 @@ export function LandingPageClient() {
     {
       Icon: Building2,
       name: "Entity Intelligence Hub",
-      description: "AI models can only cite what they recognise as a discrete entity. Entity Hub generates your Wikidata profile, Knowledge Panel triggers, and sameAs link set — and the GEO Health audit live-checks your presence on Wikidata, Wikipedia, and Crunchbase, plus your Bing indexation (the index ChatGPT search runs on) with one-click IndexNow push.",
+      description: "AI models can only cite what they recognise as a discrete entity. Entity Hub generates your Wikidata profile, Knowledge Panel triggers, and sameAs link set. The GEO Health audit live-checks your presence on Wikidata, Wikipedia, and Crunchbase, plus your Bing indexation (the index ChatGPT search runs on) with one-click IndexNow push.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-purple-500/60 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-3 lg:row-start-3 lg:row-end-4",
     },
@@ -224,14 +224,14 @@ export function LandingPageClient() {
     {
       Icon: Globe,
       name: "768-D Latent Space Map",
-      description: "Visualise your brand's semantic position in embedding space. L8EntSpace maps 768-dimensional Gemini embeddings onto a TEO framework — Ontological, Epistemological, and Teleological axes — so you can see where you own the narrative and where gaps exist.",
+      description: "Visualise your brand's semantic position in embedding space. L8EntSpace maps 768-dimensional Gemini embeddings onto a TEO framework (Ontological, Epistemological, and Teleological axes) so you can see where you own the narrative and where gaps exist.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-fuchsia-700/50 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-5",
     },
     {
       Icon: Layers,
       name: "Schema Deploy",
-      description: "One JS snippet on your website. Your structured data stays permanently in sync with your Fact-Vault — no developer needed after day one. GPTBot, ClaudeBot, and Google-Extended read fresh JSON-LD on every crawl.",
+      description: "One JS snippet on your website. Your structured data stays permanently in sync with your Fact-Vault. No developer needed after day one. GPTBot, ClaudeBot, and Google-Extended read fresh JSON-LD on every crawl.",
       background: <div className="absolute -right-20 -top-20 opacity-20 group-hover:opacity-100 transition-opacity duration-500 bg-yellow-500/50 w-64 h-64 rounded-full blur-3xl" />,
       className: "lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5",
     },
@@ -372,12 +372,12 @@ export function LandingPageClient() {
       {/* Value band — the human "why this matters to you" before the feature boxes */}
       <ValueSection
         eyebrow="The quiet shift"
-        heading="Right now, AI is answering questions about your industry — without you in the room."
+        heading="Right now, AI is answering questions about your industry. Without you in the room."
         tone="muted"
       >
         <p>
           Think about the last time you looked something up. Now picture your customers skipping
-          the search box completely. They just ask ChatGPT, Gemini, or Claude — and they trust
+          the search box completely. They just ask ChatGPT, Gemini, or Claude, and they trust
           whatever answer comes back.
         </p>
         <p>
@@ -516,7 +516,7 @@ export function LandingPageClient() {
                       <FileQuestion className="w-5 h-5 text-pink-400" />
                     </div>
                     <h3 className="text-xl font-semibold text-white">FAQ Architect</h3>
-                    <p className="text-zinc-400 text-sm">Generate a deploy-ready FAQ page from your real probe queries and Fact-Vault — with FAQPage JSON-LD schema and per-question anchor links for AI deep-link citations.</p>
+                    <p className="text-zinc-400 text-sm">Generate a deploy-ready FAQ page from your real probe queries and Fact-Vault, with FAQPage JSON-LD schema and per-question anchor links for AI deep-link citations.</p>
                   </div>
                 </div>
               </div>
@@ -539,8 +539,8 @@ export function LandingPageClient() {
           brands are quietly shocked by how low it is.
         </p>
         <p>
-          Then we give the AI clear, true facts about your business — written the way AI likes to
-          read them — and we put those facts where the AI goes looking.
+          Then we give the AI clear, true facts about your business, written the way AI likes to
+          read them, and we put those facts where the AI goes looking.
         </p>
         <p>
           A few weeks later, we check again. You watch your score climb, and you see the AI naming
@@ -560,7 +560,7 @@ export function LandingPageClient() {
         </p>
         <p>
           And unlike an ad, it doesn&apos;t switch off the moment you stop paying. The facts you build
-          with L8EntSpace keep working for you — in answer after answer, day after day.
+          with L8EntSpace keep working for you, in answer after answer, day after day.
         </p>
         <p>
           Most of our customers were already spending far more on clicks that disappear the second
@@ -599,7 +599,7 @@ export function LandingPageClient() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-sm font-bold text-white uppercase tracking-wider">Free</span>
-                  <span className="text-xs text-zinc-500">— no card required</span>
+                  <span className="text-xs text-zinc-500">(no card required)</span>
                 </div>
                 <p className="text-sm text-zinc-400">
                   See your AI Share-of-Voice dashboard read-only and run <strong className="text-zinc-300">1 live Citation Probe / month</strong>. Upgrade to Starter to unlock unlimited probes and background Autopilot.

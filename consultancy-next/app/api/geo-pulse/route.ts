@@ -112,22 +112,22 @@ function buildInsights(keyword: string, brand: string, sovGemini: number, aggreg
   const insights: string[] = [];
 
   if (!brand) {
-    insights.push(`No brand configured — set your brand name in Settings to see citation tracking.`);
+    insights.push(`No brand configured. Set your brand name in Settings to see citation tracking.`);
     return insights;
   }
 
   if (aggregateSov === 0) {
     insights.push(`${brand} is not currently cited by Gemini for "${keyword}" queries. Publishing a GEO-optimised article on this topic is the fastest route to changing that.`);
   } else if (aggregateSov < 40) {
-    insights.push(`${brand} appears in ${aggregateSov}% of AI responses for "${keyword}" — still below the 40% threshold for reliable citation. Increase entity density and add statistical anchors.`);
+    insights.push(`${brand} appears in ${aggregateSov}% of AI responses for "${keyword}", still below the 40% threshold for reliable citation. Increase entity density and add statistical anchors.`);
   } else if (aggregateSov < 70) {
-    insights.push(`${brand} is cited in ${aggregateSov}% of Gemini responses for "${keyword}". Solid presence — defend with monthly freshness updates.`);
+    insights.push(`${brand} is cited in ${aggregateSov}% of Gemini responses for "${keyword}". Solid presence. Defend with monthly freshness updates.`);
   } else {
     insights.push(`${brand} is the dominant cited source for "${keyword}" at ${aggregateSov}% SoV across probed queries. Maintain with fresh statistics every 30 days.`);
   }
 
   if (aggregateSov < 30) {
-    insights.push(`This topic is still open — early authority content can capture the citation slot before a competitor does.`);
+    insights.push(`This topic is still open. Early authority content can capture the citation slot before a competitor does.`);
   }
 
   insights.push(`Real-time probe via Gemini. ${new Date().toLocaleDateString('en-GB', { dateStyle: 'medium' })}.`);

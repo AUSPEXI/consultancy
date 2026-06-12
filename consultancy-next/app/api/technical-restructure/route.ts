@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 You are a Generative Engine Optimization (GEO) specialist.
 
 Analyze the following HTML or plain text and:
-1. Identify "semantic fluff" — generic sentences, vague claims, filler phrases, passive voice, and buzzwords that AI engines cannot cite or verify.
+1. Identify "semantic fluff": generic sentences, vague claims, filler phrases, passive voice, and buzzwords that AI engines cannot cite or verify.
 2. Rewrite the content as a semantic HTML table with clear entities, statistics, and verifiable facts.
 
 Return ONLY valid JSON with exactly these two keys:

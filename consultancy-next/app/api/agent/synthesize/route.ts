@@ -25,7 +25,7 @@ export async function POST(request: Request) {
           .sort((a, b) => Math.abs(b.topEffect?.diffPp || 0) - Math.abs(a.topEffect?.diffPp || 0))
           .slice(0, 3);
         if (activeFindings.length > 0) {
-          labLeverSection = `\n\nLAB-VALIDATED GEO TACTICS (apply ALL of these — each is empirically proven to lift citation rate in real A/B experiments):\n${activeFindings.map((f, i) => `${i + 1}. ${f.headline}: ${f.recommendation}`).join('\n')}`;
+          labLeverSection = `\n\nLAB-VALIDATED GEO TACTICS (apply ALL of these): each is empirically proven to lift citation rate in real A/B experiments.\n${activeFindings.map((f, i) => `${i + 1}. ${f.headline}: ${f.recommendation}`).join('\n')}`;
         }
       } catch { /* non-fatal */ }
     }
@@ -35,11 +35,11 @@ export async function POST(request: Request) {
       : 'Write from an authoritative, neutral expert perspective.';
 
     const correctionInstruction = negativeStatements.length > 0
-      ? `\n\nKnown Misinformation to Correct (LLMs have stated these false claims — the article must implicitly or explicitly counter them by establishing the truth):\n${negativeStatements.map((s: string) => `- FALSE: "${s}"`).join('\n')}`
+      ? `\n\nKnown Misinformation to Correct (LLMs have stated these false claims; the article must implicitly or explicitly counter them by establishing the truth):\n${negativeStatements.map((s: string) => `- FALSE: "${s}"`).join('\n')}`
       : '';
 
     const improvementInstruction = improvementFeedback
-      ? `\n\nIMPROVEMENT REQUIRED (a prior version of this article scored below the quality threshold — you MUST address all of these issues in your rewrite):\n${improvementFeedback}`
+      ? `\n\nIMPROVEMENT REQUIRED (a prior version of this article scored below the quality threshold; you MUST address all of these issues in your rewrite):\n${improvementFeedback}`
       : '';
 
     const prompt = `You are a Synthesis Agent specializing in Generative Engine Optimization (GEO) content. Your articles are written to be cited by AI engines like ChatGPT, Perplexity, Claude, and Gemini.
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
 Topic: "${topic}"
 ${brandInstruction}${correctionInstruction}${improvementInstruction}${labLeverSection}
 
-Verified Facts (ground truth — do not hallucinate beyond these):
+Verified Facts (ground truth: do not hallucinate beyond these):
 """
 ${facts.substring(0, 6000)}
 """
@@ -55,9 +55,9 @@ ${facts.substring(0, 6000)}
 Write a comprehensive GEO-optimized article following these rules:
 1. Open with a clear, citable definition or thesis statement
 2. Use H2/H3 headers that match common AI query patterns
-3. Embed statistics and named entities from the facts — these are what AI engines cite
+3. Embed statistics and named entities from the facts: these are what AI engines cite
 4. Include a "Key Takeaways" section with 4–6 bullet points of the most citable facts
-5. Use direct, declarative sentences — no hedging language
+5. Use direct, declarative sentences. No hedging language
 6. Target 600–900 words
 7. Format in clean markdown
 

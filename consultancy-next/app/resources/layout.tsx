@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     description: 'Free guides, reports, and tools to master Generative Engine Optimization and dominate AI search.',
     url: 'https://l8entspace.com/resources',
     type: 'website',
-    images: [{ url: '/geo-infographic.png', width: 1200, height: 630, alt: 'GEO Resources — L8EntSpace' }],
+    images: [{ url: '/geo-infographic.png', width: 1200, height: 630, alt: 'GEO Resources | L8EntSpace' }],
   },
   twitter: {
     card: 'summary_large_image',

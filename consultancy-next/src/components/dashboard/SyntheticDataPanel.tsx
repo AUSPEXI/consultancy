@@ -69,7 +69,7 @@ export function SyntheticDataPanel({ realPlatformRates, realArticles = [], userB
               { label: 'Trojan Ops', value: data.stats.trojan_count.toLocaleString() },
             ].map(s => (
               <div key={s.label}>
-                <p className="text-xs font-bold text-white">{loading ? '—' : s.value}</p>
+                <p className="text-xs font-bold text-white">{loading ? 'N/A' : s.value}</p>
                 <p className="text-[9px] text-zinc-500 uppercase tracking-widest">{s.label}</p>
               </div>
             ))}
@@ -116,7 +116,7 @@ export function SyntheticDataPanel({ realPlatformRates, realArticles = [], userB
               <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                   <div>
-                    <h4 className="text-sm font-semibold text-white">Share of Voice — 18-Month Trend</h4>
+                    <h4 className="text-sm font-semibold text-white">Share of Voice: 18-Month Trend</h4>
                     <p className="text-xs text-zinc-500 mt-0.5">Monthly avg SOV per brand across all 4 AI engines</p>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -182,7 +182,7 @@ export function SyntheticDataPanel({ realPlatformRates, realArticles = [], userB
                 {/* Real data callout when available */}
                 {realPlatformRates && (
                   <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
-                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-3">Your Brand — Real Citation Rates</p>
+                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-3">Your Brand: Real Citation Rates</p>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {[
                         { key: 'chatgpt', label: 'ChatGPT', color: ENGINE_COLORS['ChatGPT'] },
@@ -195,7 +195,7 @@ export function SyntheticDataPanel({ realPlatformRates, realArticles = [], userB
                         return (
                           <div key={key} className="flex flex-col items-center gap-1 p-2 bg-zinc-900/60 rounded-lg border border-zinc-800">
                             <span className="text-lg font-black" style={{ color: pct !== null ? color : '#3f3f46' }}>
-                              {pct !== null ? `${pct}%` : '—'}
+                              {pct !== null ? `${pct}%` : 'N/A'}
                             </span>
                             <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{label}</span>
                           </div>
@@ -389,7 +389,7 @@ export function SyntheticDataPanel({ realPlatformRates, realArticles = [], userB
                 {/* Real scored articles when available */}
                 {realArticles.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Your Scored Articles — Real GEO Scores</p>
+                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Your Scored Articles: Real GEO Scores</p>
                     {realArticles.filter(a => a.geoScore != null).slice(0, 5).map(a => (
                       <div key={a.id} className="flex items-center gap-3 p-3 bg-zinc-950 border border-zinc-800/50 rounded-xl">
                         <div className="flex-1 min-w-0">
@@ -413,7 +413,7 @@ export function SyntheticDataPanel({ realPlatformRates, realArticles = [], userB
                       <p className="text-xs text-zinc-500 py-2">Run content scorer on your autopilot articles to see real scores here.</p>
                     )}
                     <div className="border-t border-zinc-800 pt-4">
-                      <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Industry Benchmark — Synthetic Reference</p>
+                      <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Industry Benchmark: Synthetic Reference</p>
                     </div>
                   </div>
                 )}
