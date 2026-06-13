@@ -25,6 +25,7 @@ export interface UserData {
   cmsWebhookUrl?: string
   connectedSocials?: string[]
   industry?: string
+  personaType?: 'marketer' | 'agency' | 'founder' | 'other'
   benchmarkOptIn?: boolean
   negativeStatements?: string[]
   trackingQueries?: string[]

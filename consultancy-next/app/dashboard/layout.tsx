@@ -7,6 +7,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { Header } from '@/components/dashboard/Header';
 import { ErrorBoundary } from '@/components/dashboard/ErrorBoundary';
+import { PersonaOnboardingModal } from '@/components/dashboard/PersonaOnboardingModal';
 
 const Copilot = dynamic(() => import('@/components/dashboard/Copilot').then(m => ({ default: m.Copilot })), { ssr: false });
 
@@ -49,7 +50,7 @@ function DashboardSkeleton() {
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading, userData } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -95,6 +96,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </main>
       </div>
       <ErrorBoundary fallback={null}><Copilot /></ErrorBoundary>
+      {user && userData && !userData.onboardingCompleted && <PersonaOnboardingModal />}
     </div>
   );
 }
