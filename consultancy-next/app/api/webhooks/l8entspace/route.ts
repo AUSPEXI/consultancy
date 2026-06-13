@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbAdmin } from '@/lib/firebase-admin';
 import { secretsMatch } from '@/lib/api-auth';
+import { llmOrchestrator } from '@/lib/llm-orchestrator';
+import { AmplifySchema } from '@/lib/output-validation';
 
 /**
  * Inbound webhook — receives content from the l8entspace.com internal server.
@@ -55,6 +57,35 @@ export async function POST(req: NextRequest) {
         brand: 'L8EntSpace',
         timestamp,
       });
+
+      // Auto-amplify: generate 6-platform social posts and add to the social queue.
+      // Non-fatal — ingest always succeeds even if amplification fails.
+      try {
+        const snippet = content.slice(0, 800);
+        const fact = title ? `${title}: ${snippet}` : snippet;
+        const prompt = `You are a GEO Expert. Take this core brand fact and rewrite it for 6 social channels (LinkedIn, Twitter, Reddit, YouTube, TikTok, Instagram) to maximize semantic authority and citation probability. Fact: "${fact}" Return ONLY valid JSON with exactly these keys: linkedin, twitter, reddit, youtube, tiktok, instagram.`;
+        const result = await llmOrchestrator.executeCall<any>({
+          userId,
+          provider: 'gemini',
+          model: 'gemini-2.5-flash',
+          prompt,
+          schema: AmplifySchema,
+          feature: 'amplify',
+        });
+        if (result.success && result.data) {
+          await dbAdmin.collection('social_queue').add({
+            userId,
+            sourceTitle: title || 'Inbound content',
+            sourceUrl: url || null,
+            sourceType: type,
+            platforms: result.data,
+            status: 'pending',
+            createdAt: timestamp,
+          });
+        }
+      } catch (ampErr: any) {
+        console.warn('[webhook/l8entspace] auto-amplify failed (non-fatal):', ampErr.message);
+      }
     }
 
     return NextResponse.json({ success: true, type, timestamp });

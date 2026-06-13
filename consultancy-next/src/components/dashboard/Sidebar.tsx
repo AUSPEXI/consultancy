@@ -1,6 +1,6 @@
 'use client'
 
-import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert, Zap, RefreshCw, Building2, Layers3, Target, CheckCircle2, FlaskConical, Beaker, Search, ChevronDown, FileQuestion } from 'lucide-react';
+import { LayoutDashboard, Database, Radar, Code, Bot, Settings, X, LogOut, Lock, PenTool, MonitorPlay, ShieldCheck, Activity, Globe, ShieldAlert, Zap, RefreshCw, Building2, Layers3, Target, CheckCircle2, FlaskConical, Beaker, Search, ChevronDown, FileQuestion, ListVideo } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -62,10 +62,11 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     {
       label: 'COMMAND CENTRE',
       items: [
-        { id: 'geo-audit', label: 'Full GEO Audit', icon: Zap,            requiredTier: 'Starter' as UserTier, path: '/dashboard/geo-audit' },
-        { id: 'overview',  label: 'SOV Overview',  icon: LayoutDashboard, requiredTier: 'Starter' as UserTier, path: '/dashboard/overview' },
-        { id: 'geo-pulse', label: 'GEO Pulse',     icon: Activity,        requiredTier: 'Pro'     as UserTier, path: '/dashboard/geo-pulse' },
-        { id: 'autopilot', label: 'GEO Autopilot', icon: RefreshCw,       requiredTier: 'Pro'     as UserTier, path: '/dashboard/autopilot' },
+        { id: 'geo-audit',     label: 'Full GEO Audit', icon: Zap,            requiredTier: 'Starter' as UserTier, path: '/dashboard/geo-audit' },
+        { id: 'overview',      label: 'SOV Overview',  icon: LayoutDashboard, requiredTier: 'Starter' as UserTier, path: '/dashboard/overview' },
+        { id: 'geo-pulse',     label: 'GEO Pulse',     icon: Activity,        requiredTier: 'Pro'     as UserTier, path: '/dashboard/geo-pulse' },
+        { id: 'autopilot',     label: 'GEO Autopilot', icon: RefreshCw,       requiredTier: 'Pro'     as UserTier, path: '/dashboard/autopilot' },
+        { id: 'social-queue',  label: 'Social Queue',  icon: ListVideo,       requiredTier: 'Starter' as UserTier, path: '/dashboard/social-queue' },
       ],
     },
     {
