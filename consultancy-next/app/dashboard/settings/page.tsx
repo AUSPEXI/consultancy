@@ -368,6 +368,16 @@ export default function SettingsPage() {
               <Input name="domain" value={formData.domain} onChange={handleChange} placeholder="l8entspace.com" className="bg-zinc-950 border-zinc-800 text-white" />
             </div>
           </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-zinc-300">Industry Category</label>
+            <Input
+              value={industry}
+              onChange={e => setIndustry(e.target.value)}
+              placeholder="e.g. Marketing Technology, SEO / GEO Tools, B2B SaaS"
+              className="bg-zinc-950 border-zinc-800 text-white"
+              title="Used for benchmark comparisons and peer grouping in GEO Pulse"
+            />
+          </div>
         </CardContent>
       </Card>
 
