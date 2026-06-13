@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getExa } from '@/lib/exa';
-import { requireAuth } from '@/lib/api-auth';
+import { requireTier } from '@/lib/api-auth';
 
 export async function POST(request: Request) {
-  const authResult = await requireAuth(request);
+  const authResult = await requireTier(request, 'Starter');
   if (authResult instanceof NextResponse) return authResult;
 
   try {

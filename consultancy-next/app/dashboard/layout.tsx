@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { Header } from '@/components/dashboard/Header';
+import { ErrorBoundary } from '@/components/dashboard/ErrorBoundary';
 
 const Copilot = dynamic(() => import('@/components/dashboard/Copilot').then(m => ({ default: m.Copilot })), { ssr: false });
 
@@ -89,11 +90,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Header onMenuClick={() => setIsSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="max-w-6xl mx-auto">
-            {children}
+            <ErrorBoundary>{children}</ErrorBoundary>
           </div>
         </main>
       </div>
-      <Copilot />
+      <ErrorBoundary fallback={null}><Copilot /></ErrorBoundary>
     </div>
   );
 }

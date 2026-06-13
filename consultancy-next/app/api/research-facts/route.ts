@@ -3,10 +3,10 @@ import { getExa } from '@/lib/exa';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
 import { FactExtractionSchema } from '@/lib/output-validation';
 import { embeddingService } from '@/lib/embeddings';
-import { requireAuth } from '@/lib/api-auth';
+import { requireTier } from '@/lib/api-auth';
 
 export async function POST(request: Request) {
-  const auth = await requireAuth(request);
+  const auth = await requireTier(request, 'Starter');
   if (auth instanceof NextResponse) return auth;
   const { userId } = auth;
   try {

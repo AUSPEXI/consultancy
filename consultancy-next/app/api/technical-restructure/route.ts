@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
-import { requireAuth } from '@/lib/api-auth';
+import { requireTier } from '@/lib/api-auth';
 
 export async function POST(request: Request) {
-  const auth = await requireAuth(request);
+  const auth = await requireTier(request, 'Starter');
   if (auth instanceof NextResponse) return auth;
   const { userId } = auth;
   try {

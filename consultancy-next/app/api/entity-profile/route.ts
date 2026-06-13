@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
-import { requireAuth } from '@/lib/api-auth';
+import { requireTier } from '@/lib/api-auth';
 import { z } from 'zod';
 
 const EntityProfileSchema = z.object({
@@ -15,7 +15,7 @@ const EntityProfileSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const auth = await requireAuth(req);
+  const auth = await requireTier(req, 'Starter');
   if (auth instanceof NextResponse) return auth;
   const { userId } = auth;
   try {

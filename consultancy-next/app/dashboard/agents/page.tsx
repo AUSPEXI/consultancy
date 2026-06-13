@@ -275,7 +275,11 @@ export default function AgentsPage() {
           await addDoc(collection(db, 'articles'), payload);
           await logAuditAction(user.uid, 'Bulk Article Saved', { topic: result.topic });
           if (userData?.cmsWebhookUrl) {
-            fetch(userData.cmsWebhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(() => {});
+            try {
+              await fetch(userData.cmsWebhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            } catch (webhookErr) {
+              console.warn('CMS webhook delivery failed (non-fatal):', webhookErr);
+            }
           }
         }
 

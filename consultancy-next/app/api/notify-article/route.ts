@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { dbAdmin } from '@/lib/firebase-admin';
 import admin from '@/lib/firebase-admin';
 import nodemailer from 'nodemailer';
-import { requireAuth } from '@/lib/api-auth';
+import { requireTier } from '@/lib/api-auth';
 
 function buildArticleEmail(topic: string, brand: string, article: string, schema: string, timestamp: string): string {
   const date = new Date(timestamp || Date.now()).toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short' });
@@ -64,7 +64,7 @@ function buildArticleEmail(topic: string, brand: string, article: string, schema
 }
 
 export async function POST(request: Request) {
-  const auth = await requireAuth(request);
+  const auth = await requireTier(request, 'Starter');
   if (auth instanceof NextResponse) return auth;
   const { userId } = auth;
 

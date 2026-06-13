@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import OpenAI from 'openai';
-import { requireAuth } from '@/lib/api-auth';
+import { requireTier } from '@/lib/api-auth';
 import { dbAdmin } from '@/lib/firebase-admin';
 
 // Server-side knowledge extraction from voice conversations.
 // Keeps GEMINI_API_KEY off the client entirely.
 export async function POST(request: Request) {
-  const authResult = await requireAuth(request);
+  const authResult = await requireTier(request, 'Starter');
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 

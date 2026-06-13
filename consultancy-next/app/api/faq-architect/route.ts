@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
-import { requireAuth } from '@/lib/api-auth';
+import { requireTier } from '@/lib/api-auth';
 import { dbAdmin } from '@/lib/firebase-admin';
-import { checkTierAccess } from '@/constants/tiers';
 
 // FAQ Architect — generates a complete, deploy-ready FAQ page for the user's
 // brand. The differentiator vs generic "AI FAQ generators": questions are not
@@ -72,17 +71,11 @@ async function loadContext(userId: string) {
 }
 
 export async function POST(request: Request) {
-  const authResult = await requireAuth(request);
+  const authResult = await requireTier(request, 'Pro');
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   if (!dbAdmin) return NextResponse.json({ error: 'Datastore unavailable' }, { status: 503 });
-
-  const userDoc = await dbAdmin.collection('users').doc(userId).get();
-  const tier = userDoc.exists ? (userDoc.data()?.tier || 'Free') : 'Free';
-  if (!checkTierAccess(tier, 'Pro')) {
-    return NextResponse.json({ error: 'upgrade_required', upgradeTo: 'Pro' }, { status: 403 });
-  }
 
   try {
     const ctx = await loadContext(userId);
@@ -180,7 +173,7 @@ Return ONLY valid JSON:
 }
 
 export async function GET(request: Request) {
-  const authResult = await requireAuth(request);
+  const authResult = await requireTier(request, 'Pro');
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 

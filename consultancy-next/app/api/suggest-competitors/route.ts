@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { llmOrchestrator } from '@/lib/llm-orchestrator';
 import { CompetitorSuggestSchema } from '@/lib/output-validation';
-import { requireAuth } from '@/lib/api-auth';
+import { requireTier } from '@/lib/api-auth';
 
 export async function POST(req: NextRequest) {
-  const authResult = await requireAuth(req);
+  const authResult = await requireTier(req, 'Starter');
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
