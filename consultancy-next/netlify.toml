@@ -10,6 +10,7 @@
 [build.environment]
   NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
+  SECRETS_SCAN_OMIT_KEYS = "DIGEST_EMAIL"
 
 [build.cache]
   paths = ["node_modules"]
