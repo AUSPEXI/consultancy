@@ -285,6 +285,51 @@
 
 ---
 
+## MESSAGING — Backlog from ICP Framework (2026-06-13)
+
+> These items surfaced from the L8EntSpace Messaging Framework (personas: Marketing Director Mara,
+> Agency Owner Adil, Solo Founder Sam). Don't build now — prioritise alongside sprint work.
+
+- [ ] **[MESSAGING] M1 — Persona tagging on Brand Monitor.**
+  When a competitor threat or citation gap is detected, tag which persona it's most
+  relevant to: Mara (executive reporting angle), Adil (agency/reseller angle), Sam
+  (indie/niche coverage gap). Helps users prioritise which threats to respond to first.
+  `app/dashboard/brand-monitor/page.tsx` — no persona logic exists today.
+  *Accept:* each Brand Monitor result has a suggested persona lens; users can filter by it.
+
+- [ ] **[MESSAGING] M2 — White-label report export for Citation Probe (Adil / Business tier).**
+  Agency Owner Adil needs to show clients proof. Add a PDF or shareable-link export of
+  Citation Probe results. Business tier: L8EntSpace branding removable (white-label).
+  Lower tiers: branded export only.
+  `app/dashboard/cite-probe/page.tsx` currently has a JSONL training-data export only —
+  no client-facing report format exists.
+  *Accept:* Business tier users can export a branded/unbranded PDF report of probe results.
+
+- [ ] **[MESSAGING] M3 — Public-facing GEO Lab experiment log on marketing site.**
+  The "why us" messaging leans heavily on publishing real weekly GEO experiments
+  (including null results). This proof point only works if it's publicly visible.
+  Currently `/dashboard/geo-lab` is dashboard-only (auth-gated).
+  Need a public page at `l8entspace.com/geo-lab` (or similar) listing experiments with
+  hypothesis, sample size, engines tested, and result (including nulls).
+  This is a **core credibility asset** — without it, the "we show our work" claim is
+  unverifiable by prospects.
+  *Accept:* a publicly accessible experiment log exists on the marketing site; links from
+  the landing page and from the dashboard geo-lab page.
+
+- [ ] **[MESSAGING] M4 — Persona/role capture at signup for tailored onboarding.**
+  When a new user signs up, ask: "What best describes you?" (In-house marketer /
+  Agency owner / Solo founder / Other). Store as `personaType` in the user Firestore
+  doc alongside the `industry` field added 2026-06-13.
+  Use `personaType` to tailor:
+  - Empty states ("Here's how agencies use this tool to show clients ROI…")
+  - First-run checklist order (Mara → Citation Probe first; Sam → Schema Deploy first)
+  - Citacious personality context
+  No onboarding persona question exists today — signup goes straight to dashboard.
+  *Accept:* new users answer a single role question at signup; `personaType` stored and
+  used in at least one empty state or first-run message.
+
+---
+
 ## Suggested execution order
 
 1. **Sprint 0** (trust/security) — fastest path to a production-safe state.
