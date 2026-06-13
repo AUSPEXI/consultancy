@@ -301,6 +301,33 @@ async function analyzePhase(state, backlog) {
     log(`Publish step failed (non-fatal): ${err.message}`);
   }
 
+  // Sync latest outputs to Cowork local folder so Cowork Desktop can read
+  // without needing GitHub access — overwrites previous experiment's copy.
+  const coworkDir = path.join(process.env.HOME || '/root', 'L8EntSpace-Cowork', 'geo-lab-latest');
+  try {
+    await fs.mkdir(coworkDir, { recursive: true });
+    const filesToSync = [
+      path.join(experimentDir, 'FINDING.md'),
+      path.join(experimentDir, 'finding.json'),
+    ];
+    for (const src of filesToSync) {
+      try {
+        await fs.copyFile(src, path.join(coworkDir, path.basename(src)));
+      } catch { /* file may not exist on dry-run */ }
+    }
+    // Sync entire video/ folder
+    const videoSrc = path.join(experimentDir, 'video');
+    const videoDst = path.join(coworkDir, 'video');
+    await fs.mkdir(videoDst, { recursive: true });
+    try {
+      const videoFiles = await fs.readdir(videoSrc);
+      await Promise.all(videoFiles.map(f => fs.copyFile(path.join(videoSrc, f), path.join(videoDst, f))));
+    } catch { /* video/ may not exist */ }
+    log(`Cowork sync complete: ${coworkDir}`);
+  } catch (err) {
+    log(`⚠ Cowork sync failed (non-fatal): ${err.message}`);
+  }
+
   // Mark experiment complete
   const expEntry = backlog.experiments.find(e => e.id === exp.id);
   if (expEntry) {
