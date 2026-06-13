@@ -65,20 +65,25 @@ export default function SocialQueuePage() {
     }
     setPublishing(key);
     try {
-      await fetch(userData.cmsWebhookUrl, {
+      const res = await authFetch('/api/social-publish', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          event: 'SOCIAL_PUBLISH',
-          timestamp: new Date().toISOString(),
-          payload: { platform, content: item.platforms[platform], sourceTitle: item.sourceTitle, sourceUrl: item.sourceUrl },
+          id: item.id,
+          platform,
+          content: item.platforms[platform],
+          sourceTitle: item.sourceTitle,
+          sourceUrl: item.sourceUrl,
+          webhookUrl: userData.cmsWebhookUrl,
         }),
       });
-      await authFetch('/api/social-queue', { method: 'PATCH', body: JSON.stringify({ id: item.id, status: 'published' }) });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
       setItems(prev => prev.map(i => i.id === item.id ? { ...i, status: 'published' } : i));
-    } catch (err) {
+    } catch (err: any) {
       console.error('Publish failed:', err);
-      alert('Publish failed. Check your Webhook URL in Settings.');
+      alert(`Publish failed: ${err.message}`);
     } finally {
       setPublishing(null);
     }
