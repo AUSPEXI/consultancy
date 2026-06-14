@@ -44,8 +44,11 @@ export async function sendMail(opts: { to: string; subject: string; html: string
     return false;
   }
   try {
+    // Authenticate as the real mailbox (EMAIL_USER = sales@auspexi.com) but send
+    // from the public-facing l8entspace.com alias. Override with EMAIL_FROM.
+    const from = process.env.EMAIL_FROM || 'sales@l8entspace.com';
     await transporter.sendMail({
-      from: `"L8EntSpace" <${process.env.EMAIL_USER}>`,
+      from: `"L8EntSpace" <${from}>`,
       to: opts.to,
       subject: opts.subject,
       html: opts.html,

@@ -2,11 +2,11 @@
  * L8ENTSPACE branded email templates — pink (#ff1493) on near-black, matching
  * the website. One shared shell wraps every email so branding stays consistent.
  *
- * Ported from the legacy Vite/Express funnel (_legacy/server.ts), but:
- *   - rebranded to L8EntSpace / l8entspace.com (legacy said "Auspexi"),
- *   - the stale "£499/mo lifetime deal (normally £1,250)" claims were removed —
- *     they contradict live pricing. Urgency emails use a truthful founding-cohort
- *     angle instead of a fabricated discount. Insert a real promo only on sign-off.
+ * Ported from the legacy Vite/Express funnel (_legacy/server.ts), rebranded to
+ * L8EntSpace / l8entspace.com (legacy said "Auspexi"). The founding offer is the
+ * real one: the highest (Business) tier — normally $1,899/mo — for £499/month,
+ * locked for the lifetime of the subscription; cancelling forfeits the rate.
+ * A 7-day countdown runs across the sequence.
  */
 
 const SITE = 'https://l8entspace.com';
@@ -71,6 +71,18 @@ export function reportEmail(domain: string, reportHtml: string): { subject: stri
   };
 }
 
+/**
+ * The founding offer block, shared across the funnel with a per-email countdown.
+ * Terms are exactly as set: Business tier (highest) at £499/mo, locked for the
+ * life of the subscription; cancelling ends the rate.
+ */
+function offerBlock(countdown: string): string {
+  return `<div style="background-color:#18181b;border:1px solid ${PINK};border-radius:10px;padding:20px 22px;margin:24px 0;">
+    <p style="margin:0 0 6px;color:${PINK};font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">Founding offer · ${countdown}</p>
+    <p style="margin:0;color:#d4d4d8;line-height:1.6;">Lock our highest <strong style="color:#fafafa;">Business tier</strong> (normally $1,899/mo) at <strong style="color:#fafafa;">£499/month for the lifetime of your subscription</strong>. The rate holds for as long as you stay subscribed — cancel and the founding price is gone for good.</p>
+  </div>${cta('Claim your £499 founding rate', `${SITE}/#pricing`)}`;
+}
+
 /** One step in the 7-email post-report drip. */
 export interface FunnelEmail {
   index: number;       // lastEmailSentIndex this email advances FROM (0-based)
@@ -86,26 +98,26 @@ export interface FunnelEmail {
 export const FUNNEL_EMAILS: FunnelEmail[] = [
   {
     index: 0, minHours: 24,
-    subject: 'Why traditional SEO is quietly failing your brand',
+    subject: 'Why traditional SEO is quietly failing your brand (+ a founding offer)',
     build: (domain) => brandedEmail({
       eyebrow: 'Day 1 — the AI visibility gap',
       bodyHtml: `
         <p style="color:#d4d4d8;line-height:1.6;">Hi there,</p>
         <p style="color:#d4d4d8;line-height:1.6;">Yesterday we sent your GEO Visibility Report for <strong style="color:#fafafa;">${domain}</strong>. A quick follow-up on why it matters.</p>
         <p style="color:#d4d4d8;line-height:1.6;">Traditional SEO optimises for blue links. Generative Engine Optimization optimises for <strong style="color:#fafafa;">citations inside ChatGPT, Gemini, and Claude</strong> — where a growing share of buyers now start. If you're not structured to be cited, competitors who are will fill that space.</p>
-        ${cta('See how L8EntSpace works', `${SITE}/#pricing`)}`,
+        ${offerBlock('6 days left')}`,
     }),
   },
   {
     index: 1, minHours: 48,
-    subject: 'How to displace competitor data inside generative AI',
+    subject: 'Displace competitor data inside AI — and lock £499/mo for life',
     build: (domain) => brandedEmail({
       eyebrow: 'Day 2 — the freshness advantage',
       bodyHtml: `
         <p style="color:#d4d4d8;line-height:1.6;">Hi again,</p>
         <p style="color:#d4d4d8;line-height:1.6;">AI models train on a lag, so much of what they "know" about any market is already stale. By structuring your newest facts as machine-readable JSON-LD, you feed current, citable data to AI crawlers for <strong style="color:#fafafa;">${domain}</strong>.</p>
         <p style="color:#d4d4d8;line-height:1.6;">That's what the L8EntSpace Fact Vault automates — turning your verified facts into the evidence AI engines prefer to quote.</p>
-        ${cta('Explore the Fact Vault', `${SITE}/#pricing`)}`,
+        ${offerBlock('5 days left')}`,
     }),
   },
   {
@@ -117,7 +129,7 @@ export const FUNNEL_EMAILS: FunnelEmail[] = [
         <p style="color:#d4d4d8;line-height:1.6;">Hi there,</p>
         <p style="color:#d4d4d8;line-height:1.6;">Tracking your AI Share of Voice by hand doesn't scale. Citacious, the L8EntSpace analyst, reads your dashboard, learns from past results, and recommends the next actions to grow citations for <strong style="color:#fafafa;">${domain}</strong>.</p>
         <p style="color:#d4d4d8;line-height:1.6;">Pair it with Fact Vault extraction to find your highest-value data points and turn them into cite-magnets automatically.</p>
-        ${cta('Meet Citacious', `${SITE}/#pricing`)}`,
+        ${offerBlock('4 days left')}`,
     }),
   },
   {
@@ -129,7 +141,7 @@ export const FUNNEL_EMAILS: FunnelEmail[] = [
         <p style="color:#d4d4d8;line-height:1.6;">Hi there,</p>
         <p style="color:#d4d4d8;line-height:1.6;">If you can't measure it, you can't improve it. The L8EntSpace SOV Simulator and Brand Monitor track how often <strong style="color:#fafafa;">${domain}</strong> is recommended across Gemini, ChatGPT, Claude, and Perplexity — versus your competitors.</p>
         <p style="color:#d4d4d8;line-height:1.6;">It's the report you can confidently put in front of stakeholders.</p>
-        ${cta('Track your Share of Voice', `${SITE}/#pricing`)}`,
+        ${offerBlock('3 days left')}`,
     }),
   },
   {
@@ -140,30 +152,31 @@ export const FUNNEL_EMAILS: FunnelEmail[] = [
       bodyHtml: `
         <p style="color:#d4d4d8;line-height:1.6;">Hi again,</p>
         <p style="color:#d4d4d8;line-height:1.6;">Holding position in AI answers takes continuous work. The L8EntSpace multi-agent crew crawls, analyses, and refreshes your brand's facts across multiple LLMs — so <strong style="color:#fafafa;">${domain}</strong> stays current and cited without manual effort.</p>
-        ${cta('See the agents in action', `${SITE}/#pricing`)}`,
+        ${offerBlock('2 days left')}`,
     }),
   },
   {
     index: 5, minHours: 144,
-    subject: 'We\'re onboarding our founding cohort',
+    subject: '⏳ 48 hours left: your £499/mo lifetime rate',
     build: (domain) => brandedEmail({
-      eyebrow: 'Day 6 — founding customers',
+      eyebrow: 'Day 6 — 48 hours left',
       bodyHtml: `
         <p style="color:#d4d4d8;line-height:1.6;">Hi there,</p>
-        <p style="color:#d4d4d8;line-height:1.6;">We're bringing on a small group of founding customers and working closely with each on their GEO strategy. If getting <strong style="color:#fafafa;">${domain}</strong> cited in AI answers is a priority this quarter, this is a good moment to start.</p>
-        ${cta('View plans', `${SITE}/#pricing`)}`,
+        <p style="color:#d4d4d8;line-height:1.6;">A quick reminder: your founding rate for <strong style="color:#fafafa;">${domain}</strong> — the full Business tier at £499/month, locked for the life of your subscription — closes in about 48 hours.</p>
+        <p style="color:#d4d4d8;line-height:1.6;">That's unlimited feature access, the Citacious analyst, Fact Vault, and the multi-agent crew, at the lowest price we'll ever offer it.</p>
+        ${offerBlock('48 hours left')}`,
     }),
   },
   {
     index: 6, minHours: 168,
-    subject: 'A last note on your GEO report',
+    subject: '🚨 Final call: your £499/mo founding rate ends today',
     build: (domain) => brandedEmail({
-      eyebrow: 'Day 7 — last note',
+      eyebrow: 'Day 7 — final call',
       bodyHtml: `
         <p style="color:#d4d4d8;line-height:1.6;">Hi there,</p>
-        <p style="color:#d4d4d8;line-height:1.6;">This is the last email in your GEO report series. If the analysis of <strong style="color:#fafafa;">${domain}</strong> was useful and you'd like help acting on it, just reply — a real person reads these.</p>
-        <p style="color:#d4d4d8;line-height:1.6;">Either way, thanks for taking a look at L8EntSpace.</p>
-        ${cta('Start when you\'re ready', `${SITE}/#pricing`)}`,
+        <p style="color:#d4d4d8;line-height:1.6;">This is the last email in your GEO report series — and the last day of your founding rate for <strong style="color:#fafafa;">${domain}</strong>. After today, the Business tier returns to standard pricing.</p>
+        <p style="color:#d4d4d8;line-height:1.6;">If you'd like to lock £499/month for the lifetime of your subscription, now's the moment. Questions? Just reply — a real person reads these.</p>
+        ${offerBlock('Ends today')}`,
     }),
   },
 ];
