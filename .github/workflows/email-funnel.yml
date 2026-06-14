@@ -1,0 +1,34 @@
+name: Email Funnel Drip
+
+on:
+  schedule:
+    # Hourly — the route itself decides which leads are due (24h/48h/.../168h),
+    # so an hourly tick walks each lead through the 7-day sequence on time.
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  drip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Trigger email-funnel cron
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ secrets.DASHBOARD_URL }}
+        run: |
+          URL="${SITE_URL:-https://l8entspace.com}/api/cron/email-funnel"
+          echo "POST $URL"
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
+            -X POST "$URL" \
+            -H "Content-Type: application/json" \
+            -H "x-cron-secret: $CRON_SECRET")
+          BODY=$(echo "$RESPONSE" | sed -n '1,/HTTP_STATUS/p' | head -n -1)
+          STATUS=$(echo "$RESPONSE" | grep -o 'HTTP_STATUS:[0-9]*' | cut -d: -f2)
+          echo "Status: $STATUS"
+          echo "Response: $BODY"
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ Email-funnel cron failed with status $STATUS"
+            exit 1
+          fi
+          echo "✅ Email-funnel drip complete"
