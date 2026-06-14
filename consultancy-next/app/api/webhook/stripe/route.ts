@@ -47,6 +47,16 @@ export async function POST(req: NextRequest) {
           const userDoc = userQuery.docs[0];
           const newTier = tierFromAmount(session.amount_total);
           await userDoc.ref.update({ tier: newTier, updatedAt: new Date().toISOString() });
+          // Audit the upgrade so Analytics A4 can track tier-upgrade events
+          // (the `timestamp` Date is stored as a Firestore Timestamp, matching
+          // the client-side logAuditAction shape that A4 reads).
+          await dbAdmin.collection('audit_logs').add({
+            userId: userDoc.id,
+            action: 'Subscription Upgrade (Stripe)',
+            details: { newTier, email, amountTotal: session.amount_total },
+            timestamp: new Date(),
+            source: 'stripe-webhook',
+          });
           console.log(`[stripe-webhook] Upgraded ${email} to ${newTier}`);
         } else {
           console.warn(`[stripe-webhook] No user found for email: ${email}`);
