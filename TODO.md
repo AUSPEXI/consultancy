@@ -285,6 +285,41 @@
 
 ---
 
+## ANALYTICS — Platform owner visibility (2026-06-14)
+
+> Data exists in Firestore for all of these. Missing piece is queries + UI.
+> Build these on/around the Superuser page or a new Admin Analytics page.
+
+- [ ] **[ANALYTICS] A1 — Citation rate trend chart (your account).**
+  Query `citation_tests` for userId=admin, plot citation rate over time as a weekly
+  AreaChart (Recharts). This is also TODO S2.1 — same work, tag both.
+  *Accept:* admin account sees own GEO performance trend week-over-week on Cite-Probe page.
+
+- [ ] **[ANALYTICS] A2 — Fact Vault & article count cards on Superuser.**
+  Query `knowledge_graph` and `articles` collections (count only, no data exposed) and
+  show total facts, total articles, and ingestion rate (docs added in last 7 days).
+  *Accept:* Superuser page shows live content depth at a glance.
+
+- [ ] **[ANALYTICS] A3 — Social Queue publish rate summary.**
+  Query `social_queue` for published/dismissed/pending counts and per-platform breakdown.
+  Show on Superuser or Social Queue page as a small stats bar.
+  *Accept:* can see "X posts published, Y dismissed, Z pending across N platforms" without
+  manual counting.
+
+- [ ] **[ANALYTICS] A4 — Platform pipeline dashboard on Superuser (highest value).**
+  Query `users` collection to show: total users by tier, signups per week (using
+  `createdAt`), and tier upgrade events from `audit_logs`. This is the metric that tells
+  you whether the business is growing.
+  No conversion tracking exists today — all data is in Firestore, needs a query + chart.
+  *Accept:* Superuser shows total users, tier breakdown pie/bar, and weekly signup sparkline.
+
+- [ ] **[ANALYTICS] A5 — Google Search Console integration (do later).**
+  GSC API requires OAuth per property. Lower priority — track in GSC directly until
+  pipeline dashboard (A4) is built and you have enough organic traffic to warrant it.
+  *Accept (future):* GSC data surfaced on a new SEO tab in Superuser.
+
+---
+
 ## MESSAGING — Backlog from ICP Framework (2026-06-13)
 
 > These items surfaced from the L8EntSpace Messaging Framework (personas: Marketing Director Mara,
