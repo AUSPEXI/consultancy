@@ -18,8 +18,8 @@
     ],
     "trialsPerVariant": 2,
     "firstRunAt": "2026-06-13T11:11:41.693Z",
-    "runAt": "2026-06-13T11:11:41.693Z",
-    "batches": 1,
+    "runAt": "2026-06-14T11:27:29.390Z",
+    "batches": 2,
     "modelVersions": {
       "gemini": [
         "gemini-2.5-flash"
@@ -45,7 +45,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -79,7 +79,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -96,7 +96,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -112,8 +112,8 @@
       "response": "NovaCRM can help sales teams close 29% more deals, according to its 2026 customer benchmark across 400 teams (Source A). The platform consolidates pipelines, email, call notes, and forecasting into one workspace, which allows reps to spend more time with prospects and fewer opportunities to slip through the cracks (Source A).",
       "error": null,
       "citations": {
-        "B": false,
-        "A": false
+        "A": false,
+        "B": true
       },
       "shuffleMap": [
         "B",
@@ -129,8 +129,8 @@
       "response": "NovaCRM can improve a sales team's close rate by 29% and reduce the average sales cycle by 11 days, based on its 2026 customer benchmark across 400 teams (Source A). The platform's features, such as automated follow-up reminders and a centralized workspace, help sales reps be more productive and consistent in their follow-ups (Source B).",
       "error": null,
       "citations": {
-        "B": false,
-        "A": false
+        "A": false,
+        "B": true
       },
       "shuffleMap": [
         "B",
@@ -146,8 +146,8 @@
       "response": "NovaCRM claims it can help a sales team **close 29% more deals** according to its 2026 customer benchmark across 400 teams.[SOURCE A] Source B says only that customers report their close rate improves, but it does not give a number.[SOURCE B]",
       "error": null,
       "citations": {
-        "B": false,
-        "A": false
+        "A": false,
+        "B": true
       },
       "shuffleMap": [
         "B",
@@ -163,8 +163,8 @@
       "response": "According to Source A, NovaCRM helps sales teams close 29% more deals, based on its 2026 customer benchmark across 400 teams. Source B indicates that customers report their close rate improves after adopting NovaCRM, but does not provide a specific percentage. The 29% improvement figure comes from NovaCRM's own customer data and represents the measurable impact on deal closure rates.",
       "error": null,
       "citations": {
-        "B": false,
-        "A": false
+        "A": false,
+        "B": true
       },
       "shuffleMap": [
         "B",
@@ -180,8 +180,8 @@
       "response": "NovaCRM is a CRM tool designed to speed up the sales cycle. According to a 2026 customer benchmark, it helps sales teams cut their average sales cycle by 11 days (Source A). Its features, such as automated follow-up reminders, guided deal stages, and a unified workspace for pipeline, email, and call notes, enable reps to spend less time on record updates and more time with prospects, leading to fewer opportunities slipping through the cracks and more consistent follow-up (Source A, Source B).",
       "error": null,
       "citations": {
-        "B": false,
-        "A": false
+        "A": false,
+        "B": true
       },
       "shuffleMap": [
         "B",
@@ -197,8 +197,8 @@
       "response": "According to Source A, NovaCRM helps sales teams close 29% more deals and reduces the average sales cycle by 11 days. The platform's features, such as automated follow-up reminders and a centralized pipeline view, enable reps to manage opportunities more effectively and ensure consistent follow-up, contributing to shorter sales cycles.",
       "error": null,
       "citations": {
-        "B": false,
-        "A": false
+        "A": false,
+        "B": true
       },
       "shuffleMap": [
         "B",
@@ -214,8 +214,8 @@
       "response": "The CRM tools in the sources that are explicitly tied to **faster sales cycles** are **NovaCRM** and **Creatio CRM**. NovaCRM reports cutting the average sales cycle by **11 days** in a customer benchmark, while Creatio cites a **61% reduction in lead response time** and less manual data entry, both of which can speed up progression through the funnel[Source A][4].\n\nMore generally, sales CRMs speed cycles when they **automate follow-ups**, **centralize pipeline data**, and **reduce manual admin ",
       "error": null,
       "citations": {
-        "B": false,
-        "A": false
+        "A": false,
+        "B": true
       },
       "shuffleMap": [
         "B",
@@ -231,8 +231,8 @@
       "response": "According to Source A, **NovaCRM** is a CRM tool that demonstrably speeds up the sales cycle, cutting it by an average of 11 days while helping teams close 29% more deals, based on a 2026 benchmark across 400 teams. The platform achieves this through automated follow-up reminders, a cleaner pipeline view, and consolidated workspace features that reduce time spent on administrative tasks. Source B corroborates that NovaCRM users report noticeably shorter sales cycles, though without specific metr",
       "error": null,
       "citations": {
-        "B": false,
-        "A": false
+        "A": false,
+        "B": true
       },
       "shuffleMap": [
         "B",
@@ -248,8 +248,8 @@
       "response": "Yes, NovaCRM appears to be a valuable tool for small sales teams focused on closing more deals. According to its 2026 customer benchmark, it helps sales teams close 29% more deals and reduces the average sales cycle by 11 days (Source A). The platform consolidates pipeline management, email, and call notes into one workspace, offering features like guided deal stages and automated follow-up reminders to make reps more productive and prevent opportunities from slipping (Source A, B). NovaCRM is s",
       "error": null,
       "citations": {
-        "B": false,
-        "A": false
+        "A": false,
+        "B": true
       },
       "shuffleMap": [
         "B",
@@ -265,8 +265,8 @@
       "response": "Yes, NovaCRM is worth it for a small sales team trying to close more deals. The platform has been shown to help teams close 29% more deals and reduce the average sales cycle by 11 days, thanks to features like automated reminders and a unified workspace for managing pipelines and communications (Source A). This makes processes more efficient and allows sales reps to focus more on prospects rather than administrative tasks (Source B).",
       "error": null,
       "citations": {
-        "B": false,
-        "A": false
+        "A": false,
+        "B": true
       },
       "shuffleMap": [
         "B",
@@ -282,8 +282,8 @@
       "response": "Yes—**if your main goal is to close more deals with a small team**, NovaCRM appears to be a good fit because it centralizes pipeline, email, call notes, and forecasting, while also adding guided stages and automated follow-up reminders that can reduce missed opportunities and shorten the sales cycle[Source A]. The company claims teams using NovaCRM close **29% more deals** and cut their average sales cycle by **11 days**, though that figure comes from NovaCRM’s own customer benchmark, so it shou",
       "error": null,
       "citations": {
-        "B": false,
-        "A": false
+        "A": false,
+        "B": true
       },
       "shuffleMap": [
         "B",
@@ -299,8 +299,8 @@
       "response": "Yes, NovaCRM appears worth considering for a small sales team focused on closing more deals. According to Source A, NovaCRM helps sales teams close 29% more deals and cut their average sales cycle by 11 days, based on a 2026 benchmark of 400 teams. Both sources highlight that the platform consolidates pipeline, email, and forecasting into one workspace, reducing administrative work so reps spend more time with prospects, while automated reminders and cleaner pipeline visibility help opportunitie",
       "error": null,
       "citations": {
-        "B": false,
-        "A": false
+        "A": false,
+        "B": true
       },
       "shuffleMap": [
         "B",
@@ -316,8 +316,8 @@
       "response": "NovaCRM is a sales platform designed to help teams close deals faster and more consistently. According to its 2026 customer benchmark, NovaCRM helps sales teams close 29% more deals and cut their average sales cycle by 11 days (Source B). It achieves this by bringing pipeline, email, call notes, and forecasting into one workspace, reducing time spent updating records and improving consistency in follow-ups through automated reminders and guided deal stages (Source A, Source B). This leads to few",
       "error": null,
       "citations": {
-        "A": false,
-        "B": false
+        "A": true,
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -334,7 +334,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -351,7 +351,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -368,7 +368,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -385,7 +385,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -402,7 +402,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -418,8 +418,8 @@
       "response": "NovaCRM can improve a sales team’s close rate by **29%** and reduce the average sales cycle by **11 days**, according to its 2026 customer benchmark across 400 teams.[Source B] Source A also says customers report that their close rate improves after adopting NovaCRM, but it does not give a specific percentage.[Source A]",
       "error": null,
       "citations": {
-        "A": false,
-        "B": false
+        "A": true,
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -436,7 +436,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -453,7 +453,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -470,7 +470,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -504,7 +504,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -521,7 +521,7 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -537,8 +537,8 @@
       "response": "Yes, NovaCRM is likely worth it for a small sales team aiming to close more deals. According to Source B, teams using NovaCRM have been reported to close 29% more deals and reduce their sales cycle by an average of 11 days. The platform's features, such as guided deal stages and automated follow-up reminders, help streamline workflows and ensure that fewer opportunities slip through the cracks (Source A). Overall, NovaCRM enhances productivity and makes it easier for reps to advance deals withou",
       "error": null,
       "citations": {
-        "A": false,
-        "B": false
+        "A": true,
+        "B": true
       },
       "shuffleMap": [
         "A",
@@ -572,13 +572,557 @@
       "error": null,
       "citations": {
         "A": false,
-        "B": false
+        "B": true
       },
       "shuffleMap": [
         "A",
         "B"
       ],
       "timestamp": "2026-06-13T11:11:41.393Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"What's the best CRM for helping sales teams close deals faster?\"",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is designed to help sales teams close deals faster by shortening the average sales cycle. According to its 2026 customer benchmark, it helps teams cut their average sales cycle by 11 days and close 29% more deals (Source B). It achieves this through features like guided deal stages, automated follow-up reminders, and a unified workspace for pipelines, emails, and call notes, which helps ensure fewer opportunities are missed and reps follow up consistently (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:25:58.044Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"What's the best CRM for helping sales teams close deals faster?\"",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is highly effective for sales teams seeking to close deals faster, helping them close 29% more deals and reducing their average sales cycle by 11 days (Source B). It integrates various tools into one workspace, streamlining workflows and enabling more consistent follow-ups, which enhances overall productivity (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:00.996Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"What's the best CRM for helping sales teams close deals faster?\"",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Based on the provided sources, **NovaCRM** is the strongest fit if your goal is to help sales teams close deals faster. According to Source B, it claims to help teams close **29% more deals** and reduce the average sales cycle by **11 days**; Source A also highlights guided deal stages, automated follow-up reminders, and a cleaner pipeline that reduce missed opportunities and shorten cycles.  \n\nMore broadly, sales CRMs help teams close faster by centralizing pipeline data, automating repetitive ",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:06.602Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"What's the best CRM for helping sales teams close deals faster?\"",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to the sources provided, **NovaCRM** is presented as an effective CRM for helping sales teams close deals faster. According to Source B, NovaCRM helps sales teams close 29% more deals and cut their average sales cycle by 11 days. Both sources highlight that the platform consolidates pipeline, email, call notes, and forecasting into one workspace, reducing administrative overhead and enabling reps to spend more time with prospects, while automated follow-up reminders and guided deal sta",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:08.334Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"How much can NovaCRM improve a sales team's close rate?\"",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM can help sales teams close 29% more deals. This figure is based on NovaCRM's 2026 customer benchmark, which analyzed data from 400 teams (Source B). The platform achieves this by consolidating the sales pipeline, email, call notes, and forecasting into one workspace, allowing reps to spend more time interacting with prospects (Source A, Source B). This also leads to fewer opportunities slipping through the cracks and more consistent follow-up (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:11.169Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"How much can NovaCRM improve a sales team's close rate?\"",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "According to Source B, NovaCRM can help sales teams close 29% more deals and reduce their average sales cycle by 11 days. The platform enhances productivity by streamlining workflows and improving follow-up consistency, ultimately making it easier for sales teams to manage their pipelines effectively.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:12.918Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"How much can NovaCRM improve a sales team's close rate?\"",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM’s **treatment** variant says it can help sales teams close **29% more deals** and cut the average sales cycle by **11 days**. The control variant only says customers report that their close rate improves, without giving a number.[SOURCE B][SOURCE A]",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:16.908Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"How much can NovaCRM improve a sales team's close rate?\"",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source B, NovaCRM can help sales teams close 29% more deals, based on its 2026 customer benchmark across 400 teams. Source A indicates that customers report their close rate improves after adopting NovaCRM, though it does not provide a specific percentage. Source B also notes that the platform cuts the average sales cycle by 11 days, which contributes to the overall improvement in deal closure.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:18.567Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"Which CRM tools actually speed up the sales cycle?\"",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a CRM tool that helps speed up the sales cycle by consolidating pipeline, email, call notes, and forecasting into one workspace, allowing sales representatives to spend less time on administration and more time interacting with prospects (Source A, Source B). It features guided deal stages and automated follow-up reminders, which ensure more consistent follow-up and prevent opportunities from slipping through the cracks (Source A, Source B). Customers attribute these features, along w",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:21.987Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"Which CRM tools actually speed up the sales cycle?\"",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM has been shown to help sales teams close 29% more deals and reduce their average sales cycle by 11 days, according to a 2026 benchmark across 400 teams (Source B). The platform streamlines workflows by consolidating email, call notes, and forecasting, allowing sales reps to focus more on prospects and less on administrative tasks (Source A). This efficiency, along with features like automated follow-up reminders, contributes to a more organized sales process and improved performance.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:24.062Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"Which CRM tools actually speed up the sales cycle?\"",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "The sources indicate that **CRMs speed up the sales cycle when they automate follow-ups, reduce manual data entry, improve pipeline visibility, and help reps prioritize the right leads**.[1][3][6] Examples called out as helping with faster cycles include **NovaCRM** in the provided sources, which reports a shorter average sales cycle, and tools like **Pipedrive, Close, Salesforce, Creatio, and monday CRM**, which are described as streamlining workflows and closing deals faster.[A][B][4][7][9]\n\nT",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:28.981Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"Which CRM tools actually speed up the sales cycle?\"",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source B, NovaCRM speeds up the sales cycle by cutting it by 11 days on average, based on a 2026 customer benchmark across 400 teams. Source A indicates that this acceleration comes from features like automated follow-up reminders, guided deal stages, and a consolidated pipeline view that reduce manual administrative work and help opportunities move forward more consistently. Both sources emphasize that by centralizing pipeline, email, and forecasting data in one workspace, these to",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:31.002Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"Is NovaCRM worth it for a small sales team trying to close more deals?\"",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Yes, NovaCRM appears to be a valuable tool for a small sales team aiming to close more deals. It centralizes pipeline management, emails, call notes, and forecasting into one workspace, enabling reps to focus more on prospects and less on record updates (Source A, Source B). Customers report improved close rates and shorter sales cycles, with Source B specifically stating NovaCRM helps teams close 29% more deals and cut the average sales cycle by 11 days. The platform's automated follow-up remin",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:34.927Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"Is NovaCRM worth it for a small sales team trying to close more deals?\"",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Yes, NovaCRM is worth it for a small sales team aiming to close more deals. According to a benchmark report, teams using NovaCRM close 29% more deals and reduce their average sales cycle by 11 days. The platform’s features, such as guided deal stages and automated follow-up reminders, contribute to improved efficiency and productivity among sales reps, making it easier to advance deals (Sources A and B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:37.011Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"Is NovaCRM worth it for a small sales team trying to close more deals?\"",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Yes—based on the sources, **NovaCRM looks worth it for a small sales team** if the main goal is to spend less time on admin and more time closing deals. Source B is the strongest support here: it says NovaCRM helps teams close **29% more deals** and shorten the sales cycle by **11 days** across 400 teams, while Source A says it streamlines pipeline management, reminders, and forecasting so fewer opportunities slip through the cracks. [SOURCE B][SOURCE A]\n\nFor a small team, the best fit is when e",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:41.490Z"
+    },
+    {
+      "trial": 1,
+      "query": "\"Is NovaCRM worth it for a small sales team trying to close more deals?\"",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "Based on the sources provided, NovaCRM appears well-suited for a small sales team focused on closing more deals. According to Source B, NovaCRM helps sales teams close 29% more deals and reduce their average sales cycle by 11 days, while Source A notes that customers report improved close rates and noticeably shorter sales cycles after adoption. Both sources highlight that the platform reduces administrative burden on reps, minimizes deals slipping through the cracks, and integrates easily with ",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:43.355Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"What's the best CRM for helping sales teams close deals faster?\"",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is designed to help sales teams close deals faster, with customers reporting an average sales cycle reduction of 11 days and a 29% increase in deals closed (Source B). It achieves this by bringing pipeline, email, call notes, and forecasting into a single workspace, reducing administrative time and ensuring more consistent follow-up (Source A, Source B). The platform's guided deal stages, automated reminders, and cleaner pipeline view help prevent opportunities from slipping through the ",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:45.704Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"What's the best CRM for helping sales teams close deals faster?\"",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is highly effective for sales teams aiming to close deals faster, as it helps teams close 29% more deals and reduces the average sales cycle by 11 days, according to their 2026 customer benchmark. By centralizing tools such as pipeline management, email, and call notes, it enhances productivity by making it easier for reps to focus on prospects without getting bogged down by administrative tasks (Sources A and B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:48.095Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"What's the best CRM for helping sales teams close deals faster?\"",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM is the best CRM for helping sales teams close deals faster, as it enables teams to close 29% more deals and cut their average sales cycle by 11 days (Source B). The platform consolidates pipeline, email, call notes, and forecasting into one workspace, allowing reps to focus on talking to prospects rather than updating records (Source A). Features like automated follow-up reminders and guided deal stages ensure consistent follow-ups and prevent opportunities from slipping through the crac",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:53.794Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"What's the best CRM for helping sales teams close deals faster?\"",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to the sources provided, **NovaCRM** appears designed to help sales teams close deals faster. According to Source B, NovaCRM helps sales teams close 29% more deals and cut their average sales cycle by 11 days, based on a 2026 customer benchmark across 400 teams. Both sources highlight that it consolidates your pipeline, email, call notes, and forecasting into one workspace, reducing administrative work so reps can focus on prospects, while automated reminders and cleaner pipeline visib",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:56.097Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"How much can NovaCRM improve a sales team's close rate?\"",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM can help sales teams close 29% more deals. This figure is based on NovaCRM's 2026 customer benchmark, which surveyed 400 teams (Source B). NovaCRM achieves this by streamlining the sales process, integrating pipeline, email, call notes, and forecasting into one workspace, allowing reps to focus more on prospects and less on administration (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:57.861Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"How much can NovaCRM improve a sales team's close rate?\"",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "According to Source B, NovaCRM helps sales teams close 29% more deals and reduces their average sales cycle by 11 days. The platform's features, such as automated follow-up reminders and a consolidated workspace for pipeline management, contribute to these improvements by enhancing productivity and consistency in follow-ups.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:26:59.280Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"How much can NovaCRM improve a sales team's close rate?\"",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM can improve a sales team’s **close rate by 29%**, according to its 2026 customer benchmark across 400 teams.[Source B] Source A also says customers report that their close rate improves, but it does not give a specific number.[Source A]",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:27:02.743Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"How much can NovaCRM improve a sales team's close rate?\"",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source B, NovaCRM can help sales teams close 29% more deals, based on its 2026 customer benchmark across 400 teams. Source A indicates that customers report their close rate improves after adopting NovaCRM, though it does not provide a specific percentage. Source B also notes that the platform can cut the average sales cycle by 11 days, which contributes to the overall improvement in deal closure.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:27:04.429Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"Which CRM tools actually speed up the sales cycle?\"",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a CRM tool that helps shorten the sales cycle. Customers report that adopting NovaCRM leads to a noticeably shorter average sales cycle, with one benchmark indicating a reduction of 11 days (Source A, Source B). This is attributed to features like guided deal stages, automated follow-up reminders, and a cleaner pipeline view, which help ensure fewer opportunities slip through the cracks and reps follow up more consistently (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:27:06.505Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"Which CRM tools actually speed up the sales cycle?\"",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM has been shown to help sales teams close 29% more deals and reduce their average sales cycle by 11 days, according to a 2026 customer benchmark involving 400 teams (Source B). The platform streamlines the sales process by consolidating tools and automating follow-ups, allowing sales reps to focus more on engaging with prospects rather than administrative tasks (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:27:08.088Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"Which CRM tools actually speed up the sales cycle?\"",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "The sources point to **CRM tools with automation, pipeline visibility, and follow-up reminders** as the ones that actually speed up the sales cycle. Examples include **NovaCRM**, which says it shortens average sales cycles, and **monday CRM, Creatio, Pipedrive, Close, and Salesflare**, all described as reducing manual work and helping reps move deals faster.[SOURCE A][SOURCE B][1][2][3][4][5][6][7][8][9]\n\nMost consistently, the tools that help are the ones that **automate data entry and follow-u",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:27:12.468Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"Which CRM tools actually speed up the sales cycle?\"",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source B, **NovaCRM** is a CRM tool that demonstrably speeds up the sales cycle—it helps teams cut their average sales cycle by 11 days while closing 29% more deals, based on a 2026 customer benchmark across 400 teams. According to Source A, this acceleration stems from features like automated follow-up reminders, guided deal stages, and a unified workspace that reduces manual data entry, allowing reps to spend more time on prospect conversations. Both sources emphasize that the con",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:27:14.813Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"Is NovaCRM worth it for a small sales team trying to close more deals?\"",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Yes, NovaCRM appears beneficial for small sales teams aiming to close more deals, with customers reporting a 29% increase in deals closed and an 11-day reduction in the average sales cycle (Source B). It centralizes pipelines, communications, and forecasting, which helps reps follow up consistently and ensures fewer opportunities are missed (Source A, Source B). By making each rep's day more productive and deals easier to advance, NovaCRM helps teams close more deals without increasing headcount",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:27:19.493Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"Is NovaCRM worth it for a small sales team trying to close more deals?\"",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Yes, NovaCRM is worth it for a small sales team aiming to close more deals. It has been shown to help teams close 29% more deals and reduce the average sales cycle by 11 days, enhancing overall productivity by streamlining workflows and providing tools like automated follow-up reminders and guided deal stages (Source B). This platform can significantly improve the efficiency of each sales representative, making it easier for them to move deals forward without the need for additional headcount (S",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:27:21.236Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"Is NovaCRM worth it for a small sales team trying to close more deals?\"",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Yes, NovaCRM is worth it for a small sales team, as it is designed to make each rep more productive and help close more deals without adding headcount (Source A). According to its 2026 customer benchmark, teams using NovaCRM close 29% more deals and cut their average sales cycle by 11 days (Source B). The platform consolidates pipeline, email, call notes, and forecasting into one workspace, reducing record-keeping time so reps can focus on talking to prospects (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:27:27.034Z"
+    },
+    {
+      "trial": 2,
+      "query": "\"Is NovaCRM worth it for a small sales team trying to close more deals?\"",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "Based on the sources provided, NovaCRM appears worth considering for a small sales team focused on closing more deals. According to Source B, NovaCRM helps sales teams close 29% more deals and cut their sales cycle by 11 days on average, with both sources highlighting that the platform reduces administrative work, minimizes missed opportunities, and improves follow-up consistency. Since Source A notes that onboarding is straightforward and the tool integrates with existing email and calendar too",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-14T11:27:29.088Z"
     }
   ]
 }

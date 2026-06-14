@@ -1,0 +1,92 @@
+{
+  "runAt": "2026-06-14T11:27:29.390Z",
+  "firstRunAt": "2026-06-13T11:11:41.693Z",
+  "collectionSpanDays": 1,
+  "collectionDays": [
+    {
+      "date": "2026-06-13",
+      "n": 32
+    },
+    {
+      "date": "2026-06-14",
+      "n": 32
+    }
+  ],
+  "modelVersions": {
+    "gemini": [
+      "gemini-2.5-flash"
+    ],
+    "openai": [
+      "gpt-4o-mini"
+    ],
+    "perplexity": [
+      "sonar"
+    ],
+    "claude": [
+      "claude-haiku-4-5-20251001"
+    ]
+  },
+  "modelDrift": false,
+  "variants": [
+    "A",
+    "B"
+  ],
+  "platforms": [
+    "gemini",
+    "openai",
+    "perplexity",
+    "claude"
+  ],
+  "trialsPerVariant": 2,
+  "hypothesis": "If we hold the variant pair from experiment 001 (buried statistic vs. answer-first statistic) constant and vary only the engine identity, then the winning variant will differ across at least one engine pair, because each engine applies engine-specific retrieval and citation heuristics rather than a single universal citation principle.",
+  "aggregate": {
+    "A": {
+      "cited": 5,
+      "total": 64,
+      "rate": 7.8
+    },
+    "B": {
+      "cited": 56,
+      "total": 64,
+      "rate": 87.5
+    }
+  },
+  "significant": [
+    {
+      "platform": "gemini",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 75,
+      "pValue": 0
+    },
+    {
+      "platform": "openai",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 87.5,
+      "pValue": 0
+    },
+    {
+      "platform": "perplexity",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 56.3,
+      "pValue": 0.0014
+    },
+    {
+      "platform": "claude",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 100,
+      "pValue": 0
+    }
+  ],
+  "verdict": "significant",
+  "bestVariant": "B",
+  "topEffect": {
+    "platform": "claude",
+    "treatment": "B",
+    "diffPp": 100,
+    "pValue": 0
+  }
+}

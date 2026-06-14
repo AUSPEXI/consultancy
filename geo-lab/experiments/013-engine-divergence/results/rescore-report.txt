@@ -1,0 +1,8 @@
+Canonical rescore — 2026-06-14T11:27:29.435Z
+Scored 64 responses; 56 citation records changed.
+Method: content-fingerprint (auto-derived unique phrases per variant)
+
+Variant | Cited | N | Rate
+--------|-------|---|-----
+A       | 5     | 64 | 7.8%
+B       | 56    | 64 | 87.5%
