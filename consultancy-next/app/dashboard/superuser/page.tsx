@@ -293,6 +293,7 @@ export default function SuperuserPage() {
   const [isResetting, setIsResetting] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
   const [isGeoSeeding, setIsGeoSeeding] = useState(false);
+  const [isBackfillingUtm, setIsBackfillingUtm] = useState(false);
   const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Tier management
@@ -616,6 +617,30 @@ export default function SuperuserPage() {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button
+              onClick={async () => {
+                setIsBackfillingUtm(true);
+                setStatus(null);
+                try {
+                  const res = await authFetch('/api/admin/backfill-utm', { method: 'POST' });
+                  const data = await res.json();
+                  setStatus({ type: res.ok ? 'success' : 'error', message: data.message || data.error });
+                } catch (err: any) {
+                  setStatus({ type: 'error', message: `UTM backfill failed: ${err.message}` });
+                } finally {
+                  setIsBackfillingUtm(false);
+                }
+              }}
+              disabled={isBackfillingUtm}
+              className="group p-6 bg-zinc-900 border border-blue-500/20 rounded-2xl text-left hover:border-blue-500/50 transition-all disabled:opacity-50"
+            >
+              <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 mb-4 group-hover:scale-110 transition-transform">
+                {isBackfillingUtm ? <Loader2 className="w-5 h-5 animate-spin" /> : <Share2 className="w-5 h-5" />}
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2">Backfill UTM Links</h3>
+              <p className="text-xs text-zinc-500 leading-relaxed">Adds per-platform UTM parameters to existing Social Queue posts that predate attribution tracking. Run once.</p>
+            </button>
+
             <button onClick={seedGeoData} disabled={isGeoSeeding || isSeeding || isResetting || !effectiveUid} className="group p-6 bg-zinc-900 border border-emerald-500/20 rounded-2xl text-left hover:border-emerald-500/50 transition-all disabled:opacity-50">
               <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-4 group-hover:scale-110 transition-transform">
                 {isGeoSeeding ? <Loader2 className="w-5 h-5 animate-spin" /> : <Zap className="w-5 h-5" />}

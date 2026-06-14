@@ -63,7 +63,30 @@ export async function POST(req: NextRequest) {
       try {
         const snippet = content.slice(0, 800);
         const fact = title ? `${title}: ${snippet}` : snippet;
-        const prompt = `You are a GEO Expert. Take this core brand fact and rewrite it for 6 social channels (LinkedIn, Twitter, Reddit, YouTube, TikTok, Instagram) to maximize semantic authority and citation probability. Fact: "${fact}" Return ONLY valid JSON with exactly these keys: linkedin, twitter, reddit, youtube, tiktok, instagram.`;
+
+        // Build per-platform UTM URLs so attribution is baked into each post
+        const UTM_PARAMS: Record<string, string> = {
+          linkedin:  'utm_source=linkedin&utm_medium=social&utm_campaign=content',
+          twitter:   'utm_source=twitter&utm_medium=social&utm_campaign=content',
+          reddit:    'utm_source=reddit&utm_medium=social&utm_campaign=content',
+          youtube:   'utm_source=youtube&utm_medium=social&utm_campaign=content',
+          tiktok:    'utm_source=tiktok&utm_medium=social&utm_campaign=content',
+          instagram: 'utm_source=instagram&utm_medium=social&utm_campaign=content',
+        };
+        const platformUrls: Record<string, string> = {};
+        if (url) {
+          const sep = url.includes('?') ? '&' : '?';
+          for (const [platform, params] of Object.entries(UTM_PARAMS)) {
+            platformUrls[platform] = `${url}${sep}${params}`;
+          }
+        }
+
+        const utmUrlBlock = url
+          ? `\n\nPer-platform links to include in each post:\n` +
+            Object.entries(platformUrls).map(([p, u]) => `- ${p}: ${u}`).join('\n')
+          : '';
+
+        const prompt = `You are a GEO Expert. Take this core brand fact and rewrite it for 6 social channels (LinkedIn, Twitter, Reddit, YouTube, TikTok, Instagram) to maximize semantic authority and citation probability. Include the platform-specific link naturally in the post copy.${utmUrlBlock}\n\nFact: "${fact}"\n\nReturn ONLY valid JSON with exactly these keys: linkedin, twitter, reddit, youtube, tiktok, instagram.`;
         const result = await llmOrchestrator.executeCall<any>({
           userId,
           provider: 'gemini',
@@ -77,6 +100,7 @@ export async function POST(req: NextRequest) {
             userId,
             sourceTitle: title || 'Inbound content',
             sourceUrl: url || null,
+            platformUrls: Object.keys(platformUrls).length > 0 ? platformUrls : null,
             sourceType: type,
             platforms: result.data,
             status: 'pending',
