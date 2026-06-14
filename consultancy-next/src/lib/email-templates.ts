@@ -51,7 +51,7 @@ export function brandedEmail(opts: { eyebrow: string; bodyHtml: string }): strin
   <div style="padding:24px 32px;text-align:center;border-top:1px solid #27272a;color:#71717a;font-size:12px;line-height:1.6;">
     © ${new Date().getFullYear()} L8EntSpace. All rights reserved.<br/>
     You're receiving this because you requested a free GEO report at l8entspace.com.
-    <a href="${SITE}/unsubscribe" style="color:#71717a;text-decoration:underline;">Unsubscribe</a>.
+    <a href="${SITE}/unsubscribe?email=__UNSUB_EMAIL__" style="color:#71717a;text-decoration:underline;">Unsubscribe</a>.
   </div>
 </div>`;
 }

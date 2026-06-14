@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
 
     for (const doc of snap.docs) {
       const lead = doc.data() as ReportLead;
+      if (lead.unsubscribed) continue;
       const due = dueFunnelEmail(lead, now);
       if (!due) continue;
 

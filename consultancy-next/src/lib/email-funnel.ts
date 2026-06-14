@@ -14,6 +14,7 @@ export interface ReportLead {
   domain: string;
   signupDate: number;       // ms epoch
   lastEmailSentIndex: number; // 0 = only the initial report sent
+  unsubscribed?: boolean;
 }
 
 /**

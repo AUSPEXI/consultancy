@@ -44,14 +44,17 @@ export async function sendMail(opts: { to: string; subject: string; html: string
     return false;
   }
   try {
-    // Authenticate as the real mailbox (EMAIL_USER = sales@auspexi.com) but send
-    // from the public-facing l8entspace.com alias. Override with EMAIL_FROM.
-    const from = process.env.EMAIL_FROM || 'sales@l8entspace.com';
+    // Send From the verified mailbox by default (EMAIL_USER = sales@auspexi.com),
+    // which is guaranteed to send. To present the public l8entspace.com alias,
+    // set EMAIL_FROM=sales@l8entspace.com once Gmail "send mail as" is verified.
+    const from = process.env.EMAIL_FROM || process.env.EMAIL_USER;
+    // Fill the per-recipient unsubscribe link placeholder used by the templates.
+    const html = opts.html.replace(/__UNSUB_EMAIL__/g, encodeURIComponent(opts.to));
     await transporter.sendMail({
       from: `"L8EntSpace" <${from}>`,
       to: opts.to,
       subject: opts.subject,
-      html: opts.html,
+      html,
     });
     return true;
   } catch (err) {
