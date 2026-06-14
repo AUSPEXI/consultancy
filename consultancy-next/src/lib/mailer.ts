@@ -34,14 +34,14 @@ function getTransporter(): nodemailer.Transporter | null {
 }
 
 /**
- * Send a single HTML email. Returns true on success, false if email is not
- * configured or the send fails. Never throws — email is always best-effort.
+ * Send a single HTML email. Returns { ok, error? } — ok=false (never throws) if
+ * email is unconfigured or the send fails, with a short error for diagnostics.
  */
-export async function sendMail(opts: { to: string; subject: string; html: string }): Promise<boolean> {
+export async function sendMail(opts: { to: string; subject: string; html: string }): Promise<{ ok: boolean; error?: string }> {
   const transporter = getTransporter();
   if (!transporter) {
     console.log('[mailer] EMAIL_USER/EMAIL_APP_PASSWORD not set — skipping send to', opts.to);
-    return false;
+    return { ok: false, error: 'not_configured' };
   }
   try {
     // Send From the verified mailbox by default (EMAIL_USER = sales@auspexi.com),
@@ -56,9 +56,9 @@ export async function sendMail(opts: { to: string; subject: string; html: string
       subject: opts.subject,
       html,
     });
-    return true;
-  } catch (err) {
+    return { ok: true };
+  } catch (err: any) {
     console.error('[mailer] send failed:', err);
-    return false;
+    return { ok: false, error: String(err?.message || err).slice(0, 200) };
   }
 }
