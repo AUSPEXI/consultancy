@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
         subject: due.subject,
         html: due.build(lead.domain),
       });
-      if (!ok) continue; // leave index unchanged so it retries next run
+      if (!ok.ok) continue; // leave index unchanged so it retries next run
 
       await doc.ref.update({
         lastEmailSentIndex: due.index + 1,
