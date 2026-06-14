@@ -24,6 +24,7 @@ interface QueueItem {
   id: string;
   sourceTitle: string;
   sourceUrl: string | null;
+  platformUrls?: Record<string, string>;
   status: 'pending' | 'published' | 'dismissed';
   platforms: Record<string, string>;
   createdAt: string;
@@ -51,8 +52,12 @@ export default function SocialQueuePage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const copy = (key: string, text: string) => {
-    navigator.clipboard.writeText(text);
+  const copy = (key: string, text: string, utmUrl?: string) => {
+    // Append UTM URL on a new line if it's not already present in the post text
+    const payload = utmUrl && !text.includes(utmUrl)
+      ? `${text}\n\n${utmUrl}`
+      : text;
+    navigator.clipboard.writeText(payload);
     setCopied(key);
     setTimeout(() => setCopied(null), 2000);
   };
@@ -171,7 +176,7 @@ export default function SocialQueuePage() {
                           <Icon className={`w-3.5 h-3.5 ${color}`} />
                           <span className="text-xs font-medium text-zinc-300">{label}</span>
                         </div>
-                        <button onClick={() => copy(copyKey, text)} className="text-zinc-500 hover:text-zinc-300 transition-colors">
+                        <button onClick={() => copy(copyKey, text, item.platformUrls?.[platform])} className="text-zinc-500 hover:text-zinc-300 transition-colors">
                           {copied === copyKey ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
                       </div>
