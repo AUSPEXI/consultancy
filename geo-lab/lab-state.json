@@ -1,8 +1,20 @@
 {
   "_comment": "Managed by orchestrate.mjs — do not hand-edit.",
-  "active_experiment": null,
+  "active_experiment": {
+    "id": "002",
+    "slug": "answer-first-structure",
+    "dir": "experiments/002-answer-first-structure",
+    "started_at": "2026-06-15T14:59:35.327Z",
+    "n_target": 30,
+    "platforms": [
+      "gemini",
+      "openai",
+      "perplexity",
+      "claude"
+    ]
+  },
   "last_probe_run": "2026-06-14T11:27:29.397Z",
-  "last_design_run": "2026-06-12T12:13:32.297Z",
+  "last_design_run": "2026-06-15T14:59:35.328Z",
   "queue_position": 2,
   "history": [
     {
