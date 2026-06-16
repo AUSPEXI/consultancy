@@ -61,9 +61,10 @@
       ],
       "n_per_variant": 30,
       "priority": 3,
-      "status": "running",
+      "status": "complete",
       "youtube_angle": "Structural writing advice with data behind it — broad appeal beyond GEO.",
-      "started_at": "2026-06-15T14:59:35.327Z"
+      "started_at": "2026-06-15T14:59:35.327Z",
+      "completed_at": "2026-06-16T13:27:17.316Z"
     },
     {
       "id": "003",

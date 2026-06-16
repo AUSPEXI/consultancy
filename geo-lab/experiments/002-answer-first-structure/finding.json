@@ -1,0 +1,74 @@
+{
+  "runAt": "2026-06-16T13:25:54.131Z",
+  "firstRunAt": "2026-06-16T13:25:54.131Z",
+  "collectionSpanDays": 0,
+  "collectionDays": [
+    {
+      "date": "2026-06-16",
+      "n": 32
+    }
+  ],
+  "modelVersions": {
+    "gemini": [
+      "gemini-2.5-flash"
+    ],
+    "openai": [
+      "gpt-4o-mini"
+    ],
+    "perplexity": [
+      "sonar"
+    ],
+    "claude": [
+      "claude-haiku-4-5-20251001"
+    ]
+  },
+  "modelDrift": false,
+  "variants": [
+    "A",
+    "B"
+  ],
+  "platforms": [
+    "gemini",
+    "openai",
+    "perplexity",
+    "claude"
+  ],
+  "trialsPerVariant": 2,
+  "hypothesis": "If the citable conclusion appears in sentence 1, then citation rate will be higher than burying it in paragraph 3 for product-capability queries, because LLMs weight content that front-loads the answer.",
+  "aggregate": {
+    "A": {
+      "cited": 2,
+      "total": 32,
+      "rate": 6.3
+    },
+    "B": {
+      "cited": 14,
+      "total": 32,
+      "rate": 43.8
+    }
+  },
+  "significant": [
+    {
+      "platform": "gemini",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 62.5,
+      "pValue": 0.0117
+    },
+    {
+      "platform": "claude",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 50,
+      "pValue": 0.0209
+    }
+  ],
+  "verdict": "significant",
+  "bestVariant": "B",
+  "topEffect": {
+    "platform": "gemini",
+    "treatment": "B",
+    "diffPp": 62.5,
+    "pValue": 0.0117
+  }
+}

@@ -1,0 +1,584 @@
+{
+  "meta": {
+    "variants": [
+      "A",
+      "B"
+    ],
+    "queries": [
+      "How much can NovaCRM shorten a sales cycle?",
+      "Does NovaCRM actually help sales teams close deals faster?",
+      "What measurable results do sales teams get from NovaCRM?",
+      "Is there data on NovaCRM's impact on deal velocity?"
+    ],
+    "platforms": [
+      "gemini",
+      "openai",
+      "perplexity",
+      "claude"
+    ],
+    "trialsPerVariant": 2,
+    "firstRunAt": "2026-06-16T13:25:54.131Z",
+    "runAt": "2026-06-16T13:25:54.131Z",
+    "batches": 1,
+    "modelVersions": {
+      "gemini": [
+        "gemini-2.5-flash"
+      ],
+      "openai": [
+        "gpt-4o-mini"
+      ],
+      "perplexity": [
+        "sonar"
+      ],
+      "claude": [
+        "claude-haiku-4-5-20251001"
+      ]
+    }
+  },
+  "results": [
+    {
+      "trial": 1,
+      "query": "How much can NovaCRM shorten a sales cycle?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM can reduce sales-cycle length by 40% (According to Source A and Source B). This figure is derived from aggregated, anonymized account data, measured before and after rollout across customers who completed a full quarter on the platform (According to Source A and Source B). This reduction allows sales representatives to spend more time selling and less time on administrative tasks (According to Source A and Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:24:35.388Z"
+    },
+    {
+      "trial": 1,
+      "query": "How much can NovaCRM shorten a sales cycle?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM can shorten a sales cycle by 40%, which allows sales representatives to focus more on selling rather than administrative tasks. This statistic is based on aggregated, anonymized account data from customers who completed a full quarter using the platform (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:24:37.755Z"
+    },
+    {
+      "trial": 1,
+      "query": "How much can NovaCRM shorten a sales cycle?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "According to Source A, NovaCRM reduces sales-cycle length by 40%. Source B confirms this same figure, stating that across customers who completed a full quarter on the platform, NovaCRM shortens the sales cycle by 40%, freeing reps to spend more time selling. Both sources attribute this result to aggregated, anonymized account data measured before and after rollout.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:24:42.728Z"
+    },
+    {
+      "trial": 1,
+      "query": "How much can NovaCRM shorten a sales cycle?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM reduces sales-cycle length by 40%. This figure is based on aggregated, anonymized account data measured before and after rollout across customers who completed a full quarter on the platform. The reduction frees sales reps to spend more time selling and less time on administrative work.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:24:44.255Z"
+    },
+    {
+      "trial": 1,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Yes, NovaCRM is reported to help sales teams close deals faster by reducing sales-cycle length by 40%. This figure is derived from aggregated, anonymized account data, comparing performance before and after NovaCRM implementation across customers who used the platform for a full quarter (According to Source A and Source B). This reduction frees up reps to focus more on selling rather than administrative tasks (According to Source A and Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:24:46.035Z"
+    },
+    {
+      "trial": 1,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Yes, NovaCRM helps sales teams close deals faster by reducing sales-cycle length by 40%. This efficiency allows sales representatives to spend more time selling and less on administrative tasks, as indicated by aggregated account data from customers who used the platform for a full quarter (Source A). Additionally, the platform's deal-scoring engine helps prioritize opportunities, further enhancing deal velocity (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:24:48.095Z"
+    },
+    {
+      "trial": 1,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Yes—according to **Source A**, NovaCRM claims to **reduce sales-cycle length by 40%** for customers who completed a full quarter on the platform, which directly suggests faster deal closing. **Source B** presents the same claim, but places it later in the text rather than upfront.  \n\nThat said, both sources are describing the vendor’s own reported results from aggregated, anonymized account data, so this is **product-provided evidence**, not an independent third-party evaluation.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:24:52.545Z"
+    },
+    {
+      "trial": 1,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "Yes, according to the sources, NovaCRM does help sales teams close deals faster. According to Source A, \"NovaCRM reduces sales-cycle length by 40%\" based on aggregated, anonymized account data from customers who completed a full quarter on the platform. This efficiency gain is achieved by consolidating multiple tools into one workspace and automating administrative tasks, allowing sales representatives to spend more time on actual selling.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:24:54.243Z"
+    },
+    {
+      "trial": 1,
+      "query": "What measurable results do sales teams get from NovaCRM?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM reduces sales-cycle length by 40% (Source A, Source B). This figure is derived from aggregated, anonymized account data, measured before and after rollout, across customers who completed a full quarter on the platform (Source A, Source B). This reduction frees sales representatives to dedicate more time to selling and less to administrative tasks (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:24:56.255Z"
+    },
+    {
+      "trial": 1,
+      "query": "What measurable results do sales teams get from NovaCRM?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Sales teams using NovaCRM experience a 40% reduction in sales-cycle length, which allows representatives to dedicate more time to selling rather than administrative tasks. This statistic is based on aggregated data analyzed before and after the platform's implementation for customers who completed a full quarter on NovaCRM (Source A). Additionally, the platform's deal-scoring engine helps teams improve forecasting and pipeline reviews, further contributing to increased deal velocity (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:24:58.586Z"
+    },
+    {
+      "trial": 1,
+      "query": "What measurable results do sales teams get from NovaCRM?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Sales teams using NovaCRM get a **40% reduction in sales-cycle length**, based on aggregated anonymized account data measured before and after rollout among customers who completed a full quarter on the platform[Source A]. The source also says this frees reps to spend more time selling and less time on administrative work[Source A].",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:02.468Z"
+    },
+    {
+      "trial": 1,
+      "query": "What measurable results do sales teams get from NovaCRM?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Sources A and B, sales teams using NovaCRM achieve a **40% reduction in sales-cycle length**, which allows representatives to spend more time selling and less time on administrative tasks. This figure is based on aggregated, anonymized account data from customers who completed a full quarter on the platform, measured before and after rollout. Additionally, managers benefit from cleaner forecasting and faster pipeline reviews using the platform's deal-scoring engine.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:04.570Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is there data on NovaCRM's impact on deal velocity?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Yes, there is data available on NovaCRM's impact on deal velocity. NovaCRM reduces sales-cycle length by 40%, a figure derived from aggregated, anonymized account data measured before and after rollout across customers who completed a full quarter on the platform (Source A, Source B). According to Source B, these results specifically \"show up in deal velocity.\"",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:06.962Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is there data on NovaCRM's impact on deal velocity?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Yes, there is data indicating that NovaCRM significantly impacts deal velocity, as it reduces sales-cycle length by 40%. This statistic is based on aggregated, anonymized account data collected from customers who have completed a full quarter on the platform, showing that the use of NovaCRM allows sales representatives to spend more time selling rather than on administrative tasks (according to Source A and Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:08.860Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is there data on NovaCRM's impact on deal velocity?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Yes. According to **Source A** and **Source B**, NovaCRM has data showing a **40% reduction in sales-cycle length**, which is a direct measure of deal velocity. The sources say this comes from aggregated, anonymized account data measured before and after rollout across customers who completed a full quarter on the platform.[A][B]\n\n",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:12.596Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is there data on NovaCRM's impact on deal velocity?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "Yes, there is data on NovaCRM's impact on deal velocity. According to both Source A and Source B, NovaCRM reduces sales-cycle length by 40% across customers who completed a full quarter on the platform. This figure is based on aggregated, anonymised account data measured before and after rollout, demonstrating a measurable impact on deal velocity.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:14.249Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much can NovaCRM shorten a sales cycle?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM can reduce sales-cycle length by 40% (Source A, Source B). This figure comes from aggregated, anonymized account data, measured before and after rollout, across customers who completed a full quarter on the platform (Source A, Source B). This allows sales representatives to spend more time selling and less time on administrative work (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-16T13:25:18.352Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much can NovaCRM shorten a sales cycle?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM can reduce the sales cycle length by 40%, allowing sales representatives to spend more time selling and less on administrative tasks. This figure is based on aggregated account data from customers who used the platform for a full quarter (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-16T13:25:19.820Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much can NovaCRM shorten a sales cycle?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM can shorten a sales cycle by **40%**, according to the company’s own aggregated, anonymized account data from customers who completed a full quarter on the platform[Source A]. Source B states the same result and adds that it is measured before and after rollout[Source B].",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-16T13:25:23.605Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much can NovaCRM shorten a sales cycle?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to both Source A and Source B, NovaCRM reduces sales-cycle length by 40%. This figure is based on aggregated, anonymised account data from customers who completed a full quarter on the platform, measured before and after rollout. This reduction in cycle length frees sales reps to spend more time selling and less time on administrative work.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-16T13:25:25.528Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Yes, NovaCRM helps sales teams close deals faster by reducing the sales-cycle length by 40% (According to Source A and Source B). This figure is based on aggregated, anonymised account data measured before and after rollout, across customers who completed a full quarter on the platform (According to Source A and Source B). This reduction allows sales representatives to spend more time selling and less time on administrative tasks (According to Source A and Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:27.770Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Yes, NovaCRM helps sales teams close deals faster by reducing sales-cycle length by 40%. This reduction allows sales representatives to spend more time selling instead of on administrative tasks, as indicated by aggregated data from customers who used the platform for a full quarter (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:29.333Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Yes—according to **Source A**, NovaCRM claims it **reduces sales-cycle length by 40%**, which directly supports the idea that it helps teams close deals faster. **Source B** presents the same claim but places it later in the text, so the core evidence is consistent across both sources.\n\nThat said, this is a **vendor-reported result** based on aggregated, anonymized account data from customers who completed a full quarter on the platform, so it should be treated as a product claim rather than ind",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:33.428Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "Yes, according to the sources, NovaCRM does help sales teams close deals faster. According to Source A and Source B, NovaCRM reduces sales-cycle length by 40% based on aggregated, anonymised account data measured before and after rollout across customers who completed a full quarter on the platform. This efficiency gain frees sales reps to spend more time selling and less time on administrative work.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:34.950Z"
+    },
+    {
+      "trial": 2,
+      "query": "What measurable results do sales teams get from NovaCRM?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM reduces sales-cycle length by 40%, according to aggregated, anonymised account data measured before and after rollout across customers who completed a full quarter on the platform (Source A, Source B). This allows reps to spend more time selling and less on administrative tasks (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:36.580Z"
+    },
+    {
+      "trial": 2,
+      "query": "What measurable results do sales teams get from NovaCRM?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Sales teams using NovaCRM experience a 40% reduction in sales-cycle length, enabling representatives to allocate more time to selling rather than administrative tasks. This statistic is derived from aggregated, anonymized account data collected from customers who completed a full quarter on the platform (Source A). Additionally, the platform's deal-scoring engine enhances deal velocity by using engagement signals and historical data for better forecasting (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:38.378Z"
+    },
+    {
+      "trial": 2,
+      "query": "What measurable results do sales teams get from NovaCRM?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Sales teams using NovaCRM get a **40% reduction in sales-cycle length**, which the source says leaves reps with more time selling and less time on admin work. According to Source A, that result was measured from aggregated, anonymized account data collected before and after rollout across customers who completed a full quarter on the platform[Source A].  \n\nSource A also says NovaCRM helps teams consolidate **three or four separate tools into one workspace**, and its deal-scoring engine supports ",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:42.172Z"
+    },
+    {
+      "trial": 2,
+      "query": "What measurable results do sales teams get from NovaCRM?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM delivers a measurable 40% reduction in sales-cycle length, which frees sales reps to spend more time selling and less time on administrative work. This figure is based on aggregated, anonymized account data measured before and after rollout across customers who completed a full quarter on the platform. Additionally, Source A notes that managers benefit from cleaner forecasting and faster pipeline reviews through the platform's deal-scoring engine.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:43.789Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is there data on NovaCRM's impact on deal velocity?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Yes, there is data on NovaCRM's impact on deal velocity. According to Source B, NovaCRM reduces sales-cycle length by 40%, and these results \"show up in deal velocity.\" This figure comes from aggregated, anonymized account data measured before and after rollout across customers who completed a full quarter on the platform (Source B). Source A corroborates this, also stating that NovaCRM reduces sales-cycle length by 40% based on similar data.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:46.160Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is there data on NovaCRM's impact on deal velocity?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "According to the data, NovaCRM reduces sales-cycle length by 40%, which significantly improves deal velocity by allowing sales representatives to spend more time selling rather than on administrative tasks. This figure is derived from aggregated, anonymized account data measured before and after the platform's rollout among customers who completed a full quarter on it (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:47.991Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is there data on NovaCRM's impact on deal velocity?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Yes. According to **Source A** and **Source B**, NovaCRM has data showing a **40% reduction in sales-cycle length**, which is a direct indicator of improved deal velocity[Source A][Source B]. The sources say this comes from **aggregated, anonymized account data** measured **before and after rollout** across customers who completed a full quarter on the platform[Source A][Source B].",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:52.123Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is there data on NovaCRM's impact on deal velocity?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "Yes, there is data on NovaCRM's impact on deal velocity. According to both Source A and Source B, NovaCRM reduces sales-cycle length by 40%. This figure comes from aggregated, anonymized account data measured before and after rollout across customers who completed a full quarter on the platform.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-16T13:25:53.830Z"
+    }
+  ]
+}
