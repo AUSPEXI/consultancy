@@ -141,9 +141,9 @@ const payload = {
 // Reuses the same Gmail transport as send-report.mjs. Non-fatal by design.
 async function sendDigestEmail() {
   if (isNull) return; // only significant findings warrant a digest
-  const user = process.env.EMAIL_USER;
-  const pass = process.env.EMAIL_APP_PASSWORD;
-  const toEmail = process.env.REPORT_EMAIL || user;
+  const user = (process.env.EMAIL_USER || '').trim();
+  const pass = (process.env.EMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
+  const toEmail = (process.env.REPORT_EMAIL || user).trim();
   if (!user || !pass) {
     console.log('EMAIL_USER / EMAIL_APP_PASSWORD not set — skipping digest email (non-fatal).');
     return;
@@ -166,7 +166,7 @@ async function sendDigestEmail() {
   }
 }
 
-const dashboardUrl = process.env.DASHBOARD_URL;
+const dashboardUrl = (process.env.DASHBOARD_URL || '').trim().replace(/\/+$/, '');
 const secret = process.env.GEO_FINDINGS_SECRET;
 
 if (!dashboardUrl || !secret) {

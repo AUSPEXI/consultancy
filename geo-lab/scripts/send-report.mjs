@@ -26,9 +26,10 @@ if (!experimentDir) {
   process.exit(1);
 }
 
-const user = process.env.EMAIL_USER;
-const pass = process.env.EMAIL_APP_PASSWORD;
-const toEmail = process.env.REPORT_EMAIL || user;
+const user = (process.env.EMAIL_USER || '').trim();
+const pass = (process.env.EMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
+const toEmail = (process.env.REPORT_EMAIL || user).trim();
+console.log(`[send-report] Gmail auth as "${user}" (app-password length after stripping spaces: ${pass.length}; a valid Gmail app password is 16)`);
 
 if (!user || !pass) {
   console.error('EMAIL_USER and EMAIL_APP_PASSWORD must be set');
