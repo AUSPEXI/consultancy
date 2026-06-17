@@ -1,8 +1,20 @@
 {
   "_comment": "Managed by orchestrate.mjs — do not hand-edit.",
-  "active_experiment": null,
+  "active_experiment": {
+    "id": "003",
+    "slug": "definition-sentences",
+    "dir": "experiments/003-definition-sentences",
+    "started_at": "2026-06-17T12:47:07.935Z",
+    "n_target": 30,
+    "platforms": [
+      "gemini",
+      "openai",
+      "perplexity",
+      "claude"
+    ]
+  },
   "last_probe_run": "2026-06-16T13:25:54.139Z",
-  "last_design_run": "2026-06-15T14:59:35.328Z",
+  "last_design_run": "2026-06-17T12:47:07.936Z",
   "queue_position": 3,
   "history": [
     {
