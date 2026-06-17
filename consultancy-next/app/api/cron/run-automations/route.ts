@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import admin, { dbAdmin } from '@/lib/firebase-admin';
 import { normalizeTier, checkTierAccess, UserTier } from '@/constants/tiers';
-import nodemailer from 'nodemailer';
 
 // Daily cost caps per tier (USD). Free is excluded from automation entirely
 // (see toolsForTier), so its cap is 0.
@@ -251,9 +250,8 @@ async function sendDigestEmail(
   const ran = Object.entries(runResults);
   if (ran.length === 0) return false;
 
-  const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_APP_PASSWORD;
-  if (!emailUser || !emailPass) return false;
+  const { sendMail, emailConfigured } = await import('@/lib/mailer');
+  if (!emailConfigured()) return false;
 
   let to: string | null = null;
   try {
@@ -345,24 +343,14 @@ async function sendDigestEmail(
   <div style="padding:20px 32px;text-align:center;border-top:1px solid #27272a;color:#52525b;font-size:11px;">© ${new Date().getFullYear()} L8EntSpace. All rights reserved.</div>
 </div>`;
 
-  try {
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: { user: emailUser, pass: emailPass },
-    });
-    await transporter.sendMail({
-      from: `"L8EntSpace Autopilot" <${emailUser}>`,
-      to,
-      subject: `GEO Autopilot ran ${ran.length} tool${ran.length > 1 ? 's' : ''} for ${brand}`,
-      html,
-    });
-    return true;
-  } catch (e) {
-    console.error('[run-automations] digest email failed:', e);
-    return false;
-  }
+  const r = await sendMail({
+    to,
+    fromName: 'L8EntSpace Autopilot',
+    subject: `GEO Autopilot ran ${ran.length} tool${ran.length > 1 ? 's' : ''} for ${brand}`,
+    html,
+  });
+  if (!r.ok) console.error('[run-automations] digest email failed:', r.error);
+  return r.ok;
 }
 
 export async function POST(req: NextRequest) {

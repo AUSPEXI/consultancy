@@ -15,7 +15,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
-import nodemailer from 'nodemailer';
+import { sendEmail } from './lib/mailer.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 config({ path: path.join(__dir, '.env') });
@@ -29,10 +29,11 @@ if (!experimentDir) {
 const user = (process.env.EMAIL_USER || '').trim();
 const pass = (process.env.EMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
 const toEmail = (process.env.REPORT_EMAIL || user).trim();
-console.log(`[send-report] Gmail auth as "${user}" (app-password length after stripping spaces: ${pass.length}; a valid Gmail app password is 16)`);
+const usingResend = !!process.env.RESEND_API_KEY;
+console.log(`[send-report] provider=${usingResend ? 'resend' : 'gmail-smtp'} from="${(process.env.EMAIL_FROM || user)}" to="${toEmail}"${usingResend ? '' : ` (app-password length: ${pass.length}; expected 16)`}`);
 
-if (!user || !pass) {
-  console.error('EMAIL_USER and EMAIL_APP_PASSWORD must be set');
+if (!usingResend && (!user || !pass)) {
+  console.error('Set RESEND_API_KEY, or EMAIL_USER and EMAIL_APP_PASSWORD');
   process.exit(1);
 }
 
@@ -136,16 +137,15 @@ const html = `
   </div>
 </div>`;
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: { user, pass },
-});
-
-await transporter.sendMail({
-  from: `"GEO Lab" <${user}>`,
+const sent = await sendEmail({
   to: toEmail,
+  fromName: 'GEO Lab',
   subject: `GEO Lab #${expId} ready to film — ${topTitle || expSlug}`,
   html,
 });
 
+if (!sent.ok) {
+  console.error(`Report email failed: ${sent.error}`);
+  process.exit(1);
+}
 console.log(`Report emailed to ${toEmail}`);

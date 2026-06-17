@@ -22,7 +22,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
-import nodemailer from 'nodemailer';
+import { sendEmail } from './lib/mailer.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '..');
@@ -144,26 +144,22 @@ async function sendDigestEmail() {
   const user = (process.env.EMAIL_USER || '').trim();
   const pass = (process.env.EMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
   const toEmail = (process.env.REPORT_EMAIL || user).trim();
-  if (!user || !pass) {
-    console.log('EMAIL_USER / EMAIL_APP_PASSWORD not set — skipping digest email (non-fatal).');
+  if (!process.env.RESEND_API_KEY && (!user || !pass)) {
+    console.log('No email provider set (RESEND_API_KEY or EMAIL_USER/EMAIL_APP_PASSWORD) — skipping digest email (non-fatal).');
     return;
   }
   const eff = finding.topEffect;
   const effLine = eff
     ? `${eff.diffPp > 0 ? '+' : ''}${eff.diffPp.toFixed(1)}pp on ${eff.platform} (p=${eff.pValue.toFixed(3)})`
     : 'significant effect detected';
-  try {
-    const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user, pass } });
-    await transporter.sendMail({
-      from: `"GEO Lab" <${user}>`,
-      to: toEmail,
-      subject: `New GEO Lab result: ${headline}`,
-      text: `New significant GEO Lab finding.\n\n${headline}\nEffect: ${effLine}\nLever: ${lever}\n\nRecommendation: ${recommendation}\n\nSee the dashboard GEO Lab page for full details.`,
-    });
-    console.log(`Digest email sent to ${toEmail}.`);
-  } catch (err) {
-    console.error('Digest email error (non-fatal):', err.message);
-  }
+  const sent = await sendEmail({
+    to: toEmail,
+    fromName: 'GEO Lab',
+    subject: `New GEO Lab result: ${headline}`,
+    text: `New significant GEO Lab finding.\n\n${headline}\nEffect: ${effLine}\nLever: ${lever}\n\nRecommendation: ${recommendation}\n\nSee the dashboard GEO Lab page for full details.`,
+  });
+  if (sent.ok) console.log(`Digest email sent to ${toEmail}.`);
+  else console.error('Digest email error (non-fatal):', sent.error);
 }
 
 const dashboardUrl = (process.env.DASHBOARD_URL || '').trim().replace(/\/+$/, '');

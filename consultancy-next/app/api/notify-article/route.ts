@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { dbAdmin } from '@/lib/firebase-admin';
 import admin from '@/lib/firebase-admin';
-import nodemailer from 'nodemailer';
 import { requireTier } from '@/lib/api-auth';
 
 function buildArticleEmail(topic: string, brand: string, article: string, schema: string, timestamp: string): string {
@@ -93,29 +92,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Could not resolve user email' }, { status: 400 });
     }
 
-    const emailUser = process.env.EMAIL_USER;
-    const emailPass = process.env.EMAIL_APP_PASSWORD;
-
-    if (!emailUser || !emailPass) {
+    const { sendMail, emailConfigured } = await import('@/lib/mailer');
+    if (!emailConfigured()) {
       // No email config — still return success (article is already in Firestore)
-      return NextResponse.json({ success: true, emailed: false, note: 'Email not configured (EMAIL_USER / EMAIL_APP_PASSWORD missing)' });
+      return NextResponse.json({ success: true, emailed: false, note: 'Email not configured (set RESEND_API_KEY or EMAIL_USER/EMAIL_APP_PASSWORD)' });
     }
 
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: { user: emailUser, pass: emailPass },
-    });
-
-    await transporter.sendMail({
-      from: `"L8EntSpace" <${emailUser}>`,
+    const r = await sendMail({
       to: recipientEmail,
       subject: `New GEO Article Ready: "${topic}"`,
       html: buildArticleEmail(topic, brand || '', article, schema || '', timestamp || new Date().toISOString()),
     });
 
-    return NextResponse.json({ success: true, emailed: true, to: recipientEmail });
+    return NextResponse.json({ success: true, emailed: r.ok, error: r.error, to: recipientEmail });
   } catch (err: any) {
     console.error('[notify-article] Error:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
