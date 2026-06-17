@@ -1,21 +1,9 @@
 {
   "_comment": "Managed by orchestrate.mjs — do not hand-edit.",
-  "active_experiment": {
-    "id": "008",
-    "slug": "source-framing",
-    "dir": "experiments/008-source-framing",
-    "started_at": "2026-06-17T22:05:07.951Z",
-    "n_target": 30,
-    "platforms": [
-      "gemini",
-      "openai",
-      "perplexity",
-      "claude"
-    ]
-  },
-  "last_probe_run": "2026-06-17T21:54:55.048Z",
+  "active_experiment": null,
+  "last_probe_run": "2026-06-17T22:11:59.230Z",
   "last_design_run": "2026-06-17T22:05:07.951Z",
-  "queue_position": 6,
+  "queue_position": 7,
   "history": [
     {
       "id": "001",
@@ -100,6 +88,20 @@
         "claude"
       ],
       "completed_at": "2026-06-17T21:56:19.600Z"
+    },
+    {
+      "id": "008",
+      "slug": "source-framing",
+      "dir": "experiments/008-source-framing",
+      "started_at": "2026-06-17T22:05:07.951Z",
+      "n_target": 30,
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
+      "completed_at": "2026-06-17T22:13:23.536Z"
     }
   ],
   "retestLog": {}

@@ -1,0 +1,584 @@
+{
+  "meta": {
+    "variants": [
+      "A",
+      "B"
+    ],
+    "queries": [
+      "Does NovaCRM actually help sales teams close deals faster?",
+      "How much does NovaCRM reduce the sales cycle?",
+      "Is NovaCRM worth it for shortening deal time?",
+      "What results do sales teams see after adopting NovaCRM?"
+    ],
+    "platforms": [
+      "gemini",
+      "openai",
+      "perplexity",
+      "claude"
+    ],
+    "trialsPerVariant": 2,
+    "firstRunAt": "2026-06-17T22:11:59.223Z",
+    "runAt": "2026-06-17T22:11:59.223Z",
+    "batches": 1,
+    "modelVersions": {
+      "gemini": [
+        "gemini-2.5-flash"
+      ],
+      "openai": [
+        "gpt-4o-mini"
+      ],
+      "perplexity": [
+        "sonar"
+      ],
+      "claude": [
+        "claude-haiku-4-5-20251001"
+      ]
+    }
+  },
+  "results": [
+    {
+      "trial": 1,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Yes, NovaCRM is designed as a sales acceleration platform to help teams close deals faster. According to both sources, teams using NovaCRM shortened their average sales cycle by 31% within the first quarter and saw a 19% lift in win rates (Source A, Source B). This is attributed to features like an AI deal-scoring engine, automated follow-up sequences, and a unified pipeline view, which also reduces time spent on manual data entry by 42% (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:10:53.043Z"
+    },
+    {
+      "trial": 1,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Yes, NovaCRM helps sales teams close deals faster. According to both sources, teams using NovaCRM shortened their average sales cycle by 31% within the first quarter and experienced a 19% increase in win rates through its guided-deal workflows. Additionally, reps reported spending 42% less time on manual data entry, allowing them to focus more on selling (Source A and Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:10:55.579Z"
+    },
+    {
+      "trial": 1,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "**Probably yes, but only based on vendor-provided claims rather than independent proof.** Source A says NovaCRM shortened average sales cycles by **31%**, reduced manual data entry by **42%**, and lifted win rates by **19%**; Source B repeats the same numbers but frames them as independent testing and audits, so the underlying performance claims are consistent across both sources.[A][B]\n\nThat said, both sources are promotional and do not provide verifiable methodology or external third-party evi",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:10:57.638Z"
+    },
+    {
+      "trial": 1,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM does appear to help sales teams close deals faster. The platform shortened average sales cycles by 31% within the first quarter, reduced manual data entry time by 42% (freeing about nine hours per week for selling), and delivered a 19% lift in win rates among teams using guided-deal workflows. These improvements are attributed to features like AI deal-scoring, automated follow-ups, and real-time pipeline visibility.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:10:59.219Z"
+    },
+    {
+      "trial": 1,
+      "query": "How much does NovaCRM reduce the sales cycle?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM shortens the average sales cycle by 31% within the first quarter for teams using the platform (Source A, Source B). This reduction is attributed to features like an AI deal-scoring engine, automated follow-up sequences, and a unified pipeline view (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:01.260Z"
+    },
+    {
+      "trial": 1,
+      "query": "How much does NovaCRM reduce the sales cycle?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "According to independent testing, teams using NovaCRM shortened their average sales cycle by 31% within the first quarter (Source A). This reduction is attributed to features such as AI deal-scoring and automated follow-up sequences, which enhance efficiency and engagement (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:03.139Z"
+    },
+    {
+      "trial": 1,
+      "query": "How much does NovaCRM reduce the sales cycle?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "According to Source A, NovaCRM reduced the average **sales cycle by 31% within the first quarter**. Source B states the same figure, though in first-person framing rather than third-party attribution.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:04.734Z"
+    },
+    {
+      "trial": 1,
+      "query": "How much does NovaCRM reduce the sales cycle?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, independent testing found that teams using NovaCRM shortened their average sales cycle by 31% within the first quarter. Source B reports the same figure, stating that NovaCRM shortened the average sales cycle by 31% within the first quarter based on their internal data.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:06.242Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM worth it for shortening deal time?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Yes, NovaCRM appears to be worth it for shortening deal time. Teams using NovaCRM have shortened their average sales cycle by 31% within the first quarter, and reps spend 42% less time on manual data entry, freeing up roughly nine hours per week for selling (Source A, Source B). These gains are attributed to features like an AI deal-scoring engine and automated follow-up sequences, with customers typically becoming fully productive within ten days (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:11:08.894Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM worth it for shortening deal time?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Yes, NovaCRM is worth considering for shortening deal time. Teams using the platform have reportedly shortened their average sales cycle by 31% within the first quarter and experienced a 19% increase in win rates due to its guided-deal workflows. Additionally, reps spend 42% less time on manual data entry, allowing for more time dedicated to selling (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:11:11.071Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM worth it for shortening deal time?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Yes—based on the provided sources, **NovaCRM appears worth considering for shortening deal time**. Source A says teams shortened their average sales cycle by **31% in the first quarter**, and Source B reports the same result via third-party framing, which also supports the claim. [SOURCE A][SOURCE B]\n\nIt may be especially useful if your team wants less manual work and faster follow-up: Source A says reps spent **42% less time on manual data entry** and got about **nine extra hours per week** for",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:11:13.384Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM worth it for shortening deal time?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "Yes, NovaCRM appears worth considering for shortening deal time. According to Source A, teams using NovaCRM shortened their average sales cycle by 31% within the first quarter, while reps spent 42% less time on manual data entry, freeing roughly nine hours per week for selling. Additionally, the platform showed a 19% lift in win rates among accounts using guided-deal workflows, with most customers becoming fully productive within ten days.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:11:14.947Z"
+    },
+    {
+      "trial": 1,
+      "query": "What results do sales teams see after adopting NovaCRM?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "After adopting NovaCRM, sales teams experience a 31% reduction in their average sales cycle within the first quarter (Source A, Source B). Sales representatives spend 42% less time on manual data entry, which frees up approximately nine hours per week for selling (Source A, Source B). Additionally, teams see a 19% increase in win rates, and most customers report being fully productive within ten days (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:11:16.998Z"
+    },
+    {
+      "trial": 1,
+      "query": "What results do sales teams see after adopting NovaCRM?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Sales teams that adopt NovaCRM experience significant improvements, including a 31% reduction in the average sales cycle within the first quarter and a 42% decrease in time spent on manual data entry. Additionally, there is a reported 19% lift in win rates thanks to the platform's guided-deal workflows (Source A). Most users also become fully productive within ten days of onboarding (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:11:19.511Z"
+    },
+    {
+      "trial": 1,
+      "query": "What results do sales teams see after adopting NovaCRM?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Sales teams see **faster deal cycles**, **less admin work**, and **higher win rates** after adopting NovaCRM. According to Source A, teams shortened their average sales cycle by **31%**, reps spent **42% less time** on manual data entry, and win rates rose by **19%**. According to Source B, the platform also helps most customers become fully productive within **ten days** and delivers measurable results from the first month.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:11:21.483Z"
+    },
+    {
+      "trial": 1,
+      "query": "What results do sales teams see after adopting NovaCRM?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, sales teams using NovaCRM see significant results: they shorten their average sales cycle by 31% within the first quarter, with reps spending 42% less time on manual data entry (freeing about nine hours per week for selling), and experience a 19% lift in win rates. Additionally, Source A notes that most customers report being fully productive within ten days of onboarding.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:11:23.134Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Yes, NovaCRM helps sales teams close deals faster by shortening their average sales cycle by 31% within the first quarter and freeing up roughly nine hours per week for selling due to a 42% reduction in manual data entry (Source A, Source B). These improvements are attributed to features like an AI deal-scoring engine and automated follow-up sequences (Source A, Source B). Source B further notes that these claims are supported by independent testing and industry analysts.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:11:29.411Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Yes, NovaCRM helps sales teams close deals faster. According to Source A, teams using NovaCRM reported a 31% reduction in their average sales cycle within the first quarter, alongside a 19% increase in win rates for accounts utilizing guided-deal workflows. Additionally, reps experienced a 42% decrease in time spent on manual data entry, allowing for more focus on selling activities.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:11:32.706Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "**According to Source A and Source B, yes—NovaCRM is presented as helping sales teams close deals faster.** Source A says teams using it shortened their average sales cycle by **31%** in the first quarter and saw a **19% lift in win rates**, while Source B repeats the same performance claims in third-person form.  \n\nThat said, these sources are promotional and do not independently verify the results, so the strongest conclusion is that **NovaCRM claims measurable speed and win-rate improvements*",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:11:35.020Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM actually help sales teams close deals faster?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM does appear to help sales teams close deals faster, with data showing that teams shortened their average sales cycle by 31% within the first quarter, while reps spent 42% less time on manual data entry. Source A attributes these improvements to three key features: an AI deal-scoring engine, automated follow-up sequences, and a unified pipeline view with 94% forecasting accuracy. However, it's worth noting that Source A presents NovaCRM's own internal findings rathe",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T22:11:37.038Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much does NovaCRM reduce the sales cycle?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM reduces the average sales cycle by 31% within the first quarter for teams using the platform. This finding is based on independent testing (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:38.715Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much does NovaCRM reduce the sales cycle?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "According to independent testing, teams using NovaCRM shortened their average sales cycle by 31% within the first quarter (Source A). Additionally, the platform enables sales representatives to spend 42% less time on manual data entry, allowing for more time dedicated to selling (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:40.249Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much does NovaCRM reduce the sales cycle?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "According to Source A, NovaCRM reduces the average sales cycle by **31% within the first quarter**. Source B states the same figure, but as the control version written in NovaCRM’s own voice rather than third-party attribution.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:41.850Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much does NovaCRM reduce the sales cycle?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, independent testing found that teams using NovaCRM shortened their average sales cycle by 31% within the first quarter. Source B reports the same figure, stating that NovaCRM shortened the average sales cycle by 31% within the first quarter based on their internal data.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:43.259Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM worth it for shortening deal time?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Yes, NovaCRM appears to be worth it for shortening deal time. According to independent testing, teams using NovaCRM shortened their average sales cycle by 31% within the first quarter (Source A). Evaluators conclude that NovaCRM delivers measurable results from the first month for sales organizations looking to compress deal time (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:45.667Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM worth it for shortening deal time?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "According to independent testing, teams using NovaCRM reduced their average sales cycle by 31% within the first quarter and experienced a 42% decrease in time spent on manual data entry, allowing more time for selling (Source A). Additionally, a 19% lift in win rates was reported among users of its guided-deal workflows, indicating that NovaCRM can effectively help shorten deal time (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:47.310Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM worth it for shortening deal time?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "**Yes, likely—but only if your goal is specifically to shorten the sales cycle.** Source A says independent testing found NovaCRM shortened average sales cycles by **31%** in the first quarter, while also reducing manual data entry by **42%** and improving win rates by **19%**. [SOURCE A]\n\nThat said, the evidence is vendor-adjacent and framed as testing/audits rather than a broad market study, so it’s strongest as a product-specific claim rather than a universal guarantee. Broader CRM data in th",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:49.787Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM worth it for shortening deal time?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM appears worth considering for shortening deal time. Independent testing found that teams using NovaCRM shortened their average sales cycle by 31% within the first quarter, and industry analysts reported a 19% lift in win rates among accounts using its guided-deal workflows. Additionally, reps reportedly spend 42% less time on manual data entry, freeing about nine hours per week for actual selling.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:51.184Z"
+    },
+    {
+      "trial": 2,
+      "query": "What results do sales teams see after adopting NovaCRM?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "After adopting NovaCRM, sales teams experience several positive results. According to independent testing, teams shorten their average sales cycle by 31% within the first quarter (Source A). A third-party audit found reps spend 42% less time on manual data entry, freeing approximately nine hours per week for selling, and industry analysts reported a 19% lift in win rates (Source A). Evaluators conclude that NovaCRM delivers measurable results from the first month, with most customers becoming fu",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:53.449Z"
+    },
+    {
+      "trial": 2,
+      "query": "What results do sales teams see after adopting NovaCRM?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Teams that adopt NovaCRM experience significant improvements, such as a 31% reduction in sales cycle length within the first quarter and a 19% increase in win rates due to guided-deal workflows. Additionally, sales representatives reportedly spend 42% less time on manual data entry, freeing up approximately nine hours per week for selling activities (Source A). Most customers reach full productivity within ten days, further highlighting NovaCRM's effectiveness in enhancing sales processes (Sourc",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:55.439Z"
+    },
+    {
+      "trial": 2,
+      "query": "What results do sales teams see after adopting NovaCRM?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "After adopting **NovaCRM**, sales teams reportedly shorten their average sales cycle by **31%**, spend **42% less time** on manual data entry, and see a **19% lift in win rates**. According to Source A, these gains also come with faster onboarding, with most customers becoming fully productive within **ten days**.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:57.263Z"
+    },
+    {
+      "trial": 2,
+      "query": "What results do sales teams see after adopting NovaCRM?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, sales teams adopting NovaCRM see significant results: they shorten their average sales cycle by 31% within the first quarter, reduce time spent on manual data entry by 42% (freeing about nine hours per week for selling), and achieve a 19% lift in win rates. Additionally, Source A reports that independent testing measured the platform's forecasting accuracy at 94%, and most customers become fully productive within ten days.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T22:11:58.921Z"
+    }
+  ]
+}
