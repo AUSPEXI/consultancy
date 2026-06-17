@@ -1,8 +1,20 @@
 {
   "_comment": "Managed by orchestrate.mjs — do not hand-edit.",
-  "active_experiment": null,
+  "active_experiment": {
+    "id": "005",
+    "slug": "list-vs-prose",
+    "dir": "experiments/005-list-vs-prose",
+    "started_at": "2026-06-17T21:34:51.687Z",
+    "n_target": 30,
+    "platforms": [
+      "gemini",
+      "openai",
+      "perplexity",
+      "claude"
+    ]
+  },
   "last_probe_run": "2026-06-17T21:15:39.808Z",
-  "last_design_run": "2026-06-17T20:13:16.163Z",
+  "last_design_run": "2026-06-17T21:34:51.688Z",
   "queue_position": 5,
   "history": [
     {

@@ -125,8 +125,9 @@
       ],
       "n_per_variant": 30,
       "priority": 6,
-      "status": "queued",
-      "youtube_angle": "Instantly actionable. Everyone can restructure their content as bullets today."
+      "status": "running",
+      "youtube_angle": "Instantly actionable. Everyone can restructure their content as bullets today.",
+      "started_at": "2026-06-17T21:34:51.687Z"
     },
     {
       "id": "008",
