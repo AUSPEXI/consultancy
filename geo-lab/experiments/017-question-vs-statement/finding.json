@@ -1,0 +1,54 @@
+{
+  "runAt": "2026-06-17T21:15:39.801Z",
+  "firstRunAt": "2026-06-17T21:15:39.801Z",
+  "collectionSpanDays": 0,
+  "collectionDays": [
+    {
+      "date": "2026-06-17",
+      "n": 32
+    }
+  ],
+  "modelVersions": {
+    "gemini": [
+      "gemini-2.5-flash"
+    ],
+    "openai": [
+      "gpt-4o-mini"
+    ],
+    "perplexity": [
+      "sonar"
+    ],
+    "claude": [
+      "claude-haiku-4-5-20251001"
+    ]
+  },
+  "modelDrift": false,
+  "variants": [
+    "A",
+    "B"
+  ],
+  "platforms": [
+    "gemini",
+    "openai",
+    "perplexity",
+    "claude"
+  ],
+  "trialsPerVariant": 2,
+  "hypothesis": "If content opens by restating the query as a direct question instead of opening with the answer, then citation rate will be lower for how-to and definitional queries, because LLMs prefer answer-mode sources that present extractable claims over question-mode sources that defer the answer.",
+  "aggregate": {
+    "A": {
+      "cited": 12,
+      "total": 32,
+      "rate": 37.5
+    },
+    "B": {
+      "cited": 8,
+      "total": 32,
+      "rate": 25
+    }
+  },
+  "significant": [],
+  "verdict": "null",
+  "bestVariant": null,
+  "topEffect": null
+}

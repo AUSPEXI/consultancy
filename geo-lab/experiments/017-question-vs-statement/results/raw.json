@@ -1,0 +1,584 @@
+{
+  "meta": {
+    "variants": [
+      "A",
+      "B"
+    ],
+    "queries": [
+      "What's the best way to help my sales team close deals faster?",
+      "How can a CRM speed up the sales cycle?",
+      "Which tools help sales reps close more deals quickly?",
+      "What software shortens the time it takes to close a sale?"
+    ],
+    "platforms": [
+      "gemini",
+      "openai",
+      "perplexity",
+      "claude"
+    ],
+    "trialsPerVariant": 2,
+    "firstRunAt": "2026-06-17T21:15:39.801Z",
+    "runAt": "2026-06-17T21:15:39.801Z",
+    "batches": 1,
+    "modelVersions": {
+      "gemini": [
+        "gemini-2.5-flash"
+      ],
+      "openai": [
+        "gpt-4o-mini"
+      ],
+      "perplexity": [
+        "sonar"
+      ],
+      "claude": [
+        "claude-haiku-4-5-20251001"
+      ]
+    }
+  },
+  "results": [
+    {
+      "trial": 1,
+      "query": "What's the best way to help my sales team close deals faster?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "To help a sales team close deals faster, focus on automating follow-ups, surfacing the next best action on every deal, and removing manual data entry (Source A, Source B). Implementing solutions that score open opportunities in real-time and automate email and task sequences can keep prospects engaged while directing reps' attention to the most promising deals (Source A, Source B). These strategies can significantly reduce the average sales cycle, with reported reductions of up to 35% (Source A,",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:13:09.208Z"
+    },
+    {
+      "trial": 1,
+      "query": "What's the best way to help my sales team close deals faster?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "To help your sales team close deals faster, automate follow-ups, identify the next best actions for each deal, and eliminate manual data entry. Using solutions like NovaCRM can cut the average sales cycle from 34 days to 22 days, significantly improving efficiency (Source A). Additionally, automated summaries and task management allow reps to focus on high-potential deals without unnecessary distractions (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:14:32.161Z"
+    },
+    {
+      "trial": 1,
+      "query": "What's the best way to help my sales team close deals faster?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "The best way to help a sales team close deals faster is to **remove friction from reps’ day** by automating follow-ups, reducing manual data entry, and surfacing the next best action on each deal. Source A says this approach can cut the average sales cycle from **34 days to 22 days** and save reps about **6 hours per week** on call summaries and logging. [SOURCE A]\n\nSource B reinforces the same idea, saying faster closing comes from **streamlining follow-ups, automation, and CRM workflows** so r",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:14:34.624Z"
+    },
+    {
+      "trial": 1,
+      "query": "What's the best way to help my sales team close deals faster?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A and Source B, the best way to help your sales team close deals faster is to automate follow-ups, surface the next best action on each deal, and eliminate manual data entry. Both sources highlight that NovaCRM accomplishes this through real-time opportunity scoring, automated email and task sequences, and unified pipeline views—resulting in teams cutting their average sales cycle from 34 days to 22 days, a 35% reduction. The sources also note that automating call summaries s",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:14:37.879Z"
+    },
+    {
+      "trial": 1,
+      "query": "How can a CRM speed up the sales cycle?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "A CRM can speed up the sales cycle by automating follow-ups, surfacing the next best action on every deal, and eliminating manual data entry, which helps reduce the average sales cycle significantly (Source A, Source B). By scoring open opportunities in real time, a CRM directs representatives to focus on the deals most likely to close, while automated email and task sequences keep prospects engaged without manual effort (Source A, Source B). Additionally, features like automatic call summaries ",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:14:40.654Z"
+    },
+    {
+      "trial": 1,
+      "query": "How can a CRM speed up the sales cycle?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "A CRM can speed up the sales cycle by automating follow-ups, surfacing the next best actions on deals, and eliminating manual data entry, which allows sales reps to focus on high-potential opportunities. For instance, teams using NovaCRM have reduced their average sales cycle from 34 days to 22 days, a 35% decrease, while also saving reps around 6 hours per week on administrative tasks (Source A).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:14:42.890Z"
+    },
+    {
+      "trial": 1,
+      "query": "How can a CRM speed up the sales cycle?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "A CRM can speed up the sales cycle by **automating follow-ups**, **prioritizing the best opportunities**, and **reducing manual data entry**, so reps spend more time selling and less time on admin. According to Source A, this approach helped teams cut their average sales cycle from **34 days to 22 days**.  \n\nIt also helps by giving reps a **real-time view of pipeline progress** and the **next best action** on each deal, while keeping prospects engaged through automated email and task sequences. ",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:14:45.175Z"
+    },
+    {
+      "trial": 1,
+      "query": "How can a CRM speed up the sales cycle?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A and Source B, a CRM can speed up the sales cycle by automating follow-ups, eliminating manual data entry, and using real-time opportunity scoring to help reps prioritize high-probability deals. The sources note that automated email sequences and task management keep prospects engaged with minimal rep effort, while automatic call logging saves significant time. Teams using NovaCRM reported cutting their sales cycle from 34 days to 22 days—a 35% reduction—by reducing friction",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:14:46.975Z"
+    },
+    {
+      "trial": 1,
+      "query": "Which tools help sales reps close more deals quickly?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Tools like NovaCRM help sales reps close deals more quickly by automating follow-ups, surfacing the next best action for each deal, and eliminating manual data entry that can slow down the sales process (Source A, Source B). Specifically, the platform scores open opportunities in real time, manages automated email and task sequences, and provides a unified pipeline view (Source A, Source B). It also automatically writes and logs call summaries, saving reps an average of 6 hours per week (Source ",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:14:48.907Z"
+    },
+    {
+      "trial": 1,
+      "query": "Which tools help sales reps close more deals quickly?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Sales reps can close deals more quickly by utilizing tools like NovaCRM, which automates follow-ups, identifies the next best actions, and eliminates manual data entry. Users of NovaCRM have reported reducing their average sales cycle from 34 days to 22 days—a 35% decrease—and saving an average of 6 hours per week through automated call summaries and organization of opportunities (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:14:51.058Z"
+    },
+    {
+      "trial": 1,
+      "query": "Which tools help sales reps close more deals quickly?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "The tools that help sales reps close more deals quickly are **automated follow-ups**, **real-time opportunity scoring / next-best-action guidance**, **automatic call summaries and CRM logging**, and a **unified pipeline view** that reduces manual work. According to Source A, these features cut the average sales cycle from 34 days to 22 days and save reps about 6 hours per week.[SOURCE A]\n\nSource B describes the same toolset: automating follow-ups, surfacing the next best action on each deal, rem",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:14:53.851Z"
+    },
+    {
+      "trial": 1,
+      "query": "Which tools help sales reps close more deals quickly?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Sources A and B, several tools help sales reps close deals quickly: automating follow-ups, surfacing the next best action on each deal, and removing manual data entry. Specifically, NovaCRM uses real-time opportunity scoring to help reps prioritize high-probability deals, automated email and task sequences to keep prospects engaged, and automatic call summary logging to save reps time. Teams using NovaCRM have reduced their average sales cycle from 34 days to 22 days—a 35% reduction",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:14:55.542Z"
+    },
+    {
+      "trial": 1,
+      "query": "What software shortens the time it takes to close a sale?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a software that helps sales teams close deals faster. It has been reported to cut the average sales cycle by 35%, reducing it from 34 days to 22 days (Source A, Source B). The platform achieves this by automating follow-ups, identifying the next best action, and eliminating manual data entry that can slow down sales representatives (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:14:57.253Z"
+    },
+    {
+      "trial": 1,
+      "query": "What software shortens the time it takes to close a sale?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a software that helps sales teams close deals faster by automating follow-ups, suggesting the next best actions for each deal, and eliminating manual data entry. Teams using NovaCRM have reportedly reduced their average sales cycle from 34 days to 22 days, which is a 35% reduction (according to Source A). The platform also saves reps significant time by automatically logging call summaries and offering a unified view of the sales pipeline.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:14:59.281Z"
+    },
+    {
+      "trial": 1,
+      "query": "What software shortens the time it takes to close a sale?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "The software is **NovaCRM**. According to Source A, it helps sales teams close deals faster by automating follow-ups, surfacing the next best action, and removing manual data entry; teams using it report reducing their average sales cycle from 34 days to 22 days.[SOURCE A] According to Source B, the same product is described as helping sales teams close deals faster through the same features.[SOURCE B]",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:15:01.156Z"
+    },
+    {
+      "trial": 1,
+      "query": "What software shortens the time it takes to close a sale?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Sources A and B, **NovaCRM** is the software that shortens the time it takes to close a sale. Teams using NovaCRM report cutting their average sales cycle from 34 days to 22 days, a 35% reduction. The platform achieves this by automating follow-ups, surfacing the next best action on every deal, removing manual data entry, and automatically writing call summaries.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:15:02.735Z"
+    },
+    {
+      "trial": 2,
+      "query": "What's the best way to help my sales team close deals faster?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "To help your sales team close deals faster, focus on automating follow-ups, surfacing the next best action for each deal, and removing manual data entry that slows reps down (Source A, Source B). These strategies can cut the average sales cycle, enabling reps to concentrate on opportunities most likely to close and saving them significant time (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:15:05.443Z"
+    },
+    {
+      "trial": 2,
+      "query": "What's the best way to help my sales team close deals faster?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "To help your sales team close deals faster, consider implementing a solution like NovaCRM, which automates follow-ups and eliminates manual data entry. By doing this, teams can significantly reduce their sales cycle—from an average of 34 days to just 22 days, a 35% reduction—while enabling reps to focus on the most promising opportunities (Source A). Additionally, automated features can save reps an average of 6 hours per week, allowing for more efficient engagement with prospects (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:15:08.156Z"
+    },
+    {
+      "trial": 2,
+      "query": "What's the best way to help my sales team close deals faster?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "The best way to help your sales team close deals faster is to **remove friction from reps’ day and focus them on the deals most likely to close**. According to Source A, that means automating follow-ups, surfacing the next best action, and eliminating manual data entry; it also reports a 35% shorter average sales cycle with this approach. Source B says the same thing: automated follow-ups, real-time opportunity scoring, and automated call logging help reps spend time on high-priority deals inste",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:15:10.866Z"
+    },
+    {
+      "trial": 2,
+      "query": "What's the best way to help my sales team close deals faster?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to the sources, the best way to help your sales team close deals faster is to **remove friction from their daily work and focus their attention on high-probability opportunities**. This can be achieved by automating follow-ups and manual tasks like data entry and call logging, surfacing the next best action on every deal, and prioritizing opportunities most likely to close. Sources A and B note that teams implementing these practices have cut their average sales cycle from 34 days to 2",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:15:13.077Z"
+    },
+    {
+      "trial": 2,
+      "query": "How can a CRM speed up the sales cycle?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "A CRM can speed up the sales cycle by automating follow-ups, surfacing the next best action on every deal, and removing manual data entry (Source A, Source B). Platforms like NovaCRM score open opportunities in real time, helping reps focus on deals most likely to close, and save time by automatically writing and logging call summaries (Source A, Source B). This approach reduces friction and keeps prospects engaged, reportedly cutting the average sales cycle by 35%, from 34 days to 22 days (Sour",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:15:16.200Z"
+    },
+    {
+      "trial": 2,
+      "query": "How can a CRM speed up the sales cycle?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "A CRM can speed up the sales cycle by automating follow-ups, identifying the next best actions for deals, and eliminating manual data entry that hinders productivity. For instance, teams using NovaCRM have seen their average sales cycle reduced from 34 days to 22 days, a 35% decrease (Source A). The platform's real-time scoring of opportunities and automated processes allow sales representatives to focus on the most promising leads, ultimately driving faster deal closures (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:15:19.975Z"
+    },
+    {
+      "trial": 2,
+      "query": "How can a CRM speed up the sales cycle?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "A CRM can speed up the sales cycle by **automating repetitive work** like follow-ups, task reminders, and data entry, which lets reps spend more time on selling and less on administration.[1][2] It also helps teams **prioritize high-value opportunities** with real-time pipeline visibility and engagement insights, so they focus on the deals most likely to close first.[1][3] According to Source A and Source B, these features can reduce friction enough to shorten average cycle time from **34 days t",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:15:21.978Z"
+    },
+    {
+      "trial": 2,
+      "query": "How can a CRM speed up the sales cycle?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Sources A and B, a CRM can speed up the sales cycle by automating follow-ups, eliminating manual data entry, and identifying the most promising opportunities. The sources note that teams using NovaCRM reduced their average sales cycle from 34 days to 22 days—a 35% reduction—through features like real-time opportunity scoring, automated email sequences, and automatic call logging that saves reps an average of 6 hours per week.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:15:23.465Z"
+    },
+    {
+      "trial": 2,
+      "query": "Which tools help sales reps close more deals quickly?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Tools that help sales reps close deals more quickly include NovaCRM, which automates follow-ups, surfaces the next best action on each deal, and eliminates manual data entry (Source A, Source B). It also scores open opportunities in real time, provides automated email and task sequences, and offers a unified pipeline view (Source A, Source B). Additionally, NovaCRM automatically writes and logs call summaries, saving reps significant time (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:15:25.479Z"
+    },
+    {
+      "trial": 2,
+      "query": "Which tools help sales reps close more deals quickly?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Tools such as NovaCRM help sales reps close deals quickly by automating follow-ups, surfacing the next best actions for each deal, and eliminating manual data entry, thereby cutting average sales cycles significantly. According to Source A, users have reported a 35% reduction in their sales cycle, from 34 days to 22 days. Additionally, the platform enables automatic logging of call summaries, saving reps an average of 6 hours per week.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:15:27.597Z"
+    },
+    {
+      "trial": 2,
+      "query": "Which tools help sales reps close more deals quickly?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "The tools that help sales reps close more deals quickly are **automated follow-ups**, **real-time deal scoring / next-best-action recommendations**, and a **unified pipeline view/CRM** that removes manual data entry. According to Source A, these tools keep prospects engaged, help reps focus on the most likely-to-close opportunities, and reduce friction in the rep’s day; Source B says the same and adds that automated call summaries and logging also save time.[SOURCE A][SOURCE B]\n\nSource A says te",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:15:30.030Z"
+    },
+    {
+      "trial": 2,
+      "query": "Which tools help sales reps close more deals quickly?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Sources A and B, several tools help sales reps close deals more quickly: automating follow-ups, surfacing the next best action on every deal, and removing manual data entry. Specifically, NovaCRM accomplishes this through real-time opportunity scoring, automated email and task sequences, unified pipeline views, and automatic call summary logging. Teams using NovaCRM report cutting their average sales cycle from 34 days to 22 days—a 35% reduction—while reps save an average of 6 hours",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:15:32.018Z"
+    },
+    {
+      "trial": 2,
+      "query": "What software shortens the time it takes to close a sale?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is software that shortens the time it takes to close a sale. It helps sales teams close deals faster by automating follow-ups, identifying the next best action on each deal, and reducing manual data entry (Source A, Source B). Teams using NovaCRM have reported cutting their average sales cycle by 35%, from 34 days to 22 days (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:15:33.824Z"
+    },
+    {
+      "trial": 2,
+      "query": "What software shortens the time it takes to close a sale?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a software that helps sales teams close deals faster by automating follow-ups, identifying the next best actions, and eliminating manual data entry. Teams using NovaCRM have reported a reduction in their average sales cycle from 34 days to 22 days, amounting to a 35% decrease (Source A). Additionally, the platform saves reps an average of 6 hours per week by automatically logging call summaries, thus streamlining the sales process (Source A).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:15:35.639Z"
+    },
+    {
+      "trial": 2,
+      "query": "What software shortens the time it takes to close a sale?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "**NovaCRM** is the software that shortens the time it takes to close a sale. According to Source A, it automates follow-ups, surfaces the next best action, and reduces the average sales cycle from 34 days to 22 days. Source B says the same, noting that NovaCRM helps sales teams close deals faster by removing friction and manual data entry.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:15:37.755Z"
+    },
+    {
+      "trial": 2,
+      "query": "What software shortens the time it takes to close a sale?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A and Source B, **NovaCRM** is software that shortens the time it takes to close a sale. The platform automates follow-ups, identifies the next best action on deals, and eliminates manual data entry, helping sales teams cut their average sales cycle from 34 days to 22 days—a 35% reduction. NovaCRM also uses real-time opportunity scoring to help reps focus on deals most likely to close, and automatically logs call summaries to save additional time.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:15:39.500Z"
+    }
+  ]
+}

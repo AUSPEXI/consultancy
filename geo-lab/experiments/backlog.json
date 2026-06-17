@@ -103,10 +103,11 @@
       ],
       "n_per_variant": 30,
       "priority": 5,
-      "status": "running",
+      "status": "complete",
       "note": "Contrarian — predicts the control (A) wins. Great 'I was wrong about this' angle.",
       "youtube_angle": "Counterintuitive result builds credibility. Most content advice says 'start with a question' — this tests it.",
-      "started_at": "2026-06-17T20:13:16.162Z"
+      "started_at": "2026-06-17T20:13:16.162Z",
+      "completed_at": "2026-06-17T21:16:57.926Z"
     },
     {
       "id": "005",

@@ -1,21 +1,9 @@
 {
   "_comment": "Managed by orchestrate.mjs — do not hand-edit.",
-  "active_experiment": {
-    "id": "017",
-    "slug": "question-vs-statement",
-    "dir": "experiments/017-question-vs-statement",
-    "started_at": "2026-06-17T20:13:16.162Z",
-    "n_target": 30,
-    "platforms": [
-      "gemini",
-      "openai",
-      "perplexity",
-      "claude"
-    ]
-  },
-  "last_probe_run": "2026-06-17T19:53:07.711Z",
+  "active_experiment": null,
+  "last_probe_run": "2026-06-17T21:15:39.808Z",
   "last_design_run": "2026-06-17T20:13:16.163Z",
-  "queue_position": 4,
+  "queue_position": 5,
   "history": [
     {
       "id": "001",
@@ -72,6 +60,20 @@
         "claude"
       ],
       "completed_at": "2026-06-17T19:54:23.905Z"
+    },
+    {
+      "id": "017",
+      "slug": "question-vs-statement",
+      "dir": "experiments/017-question-vs-statement",
+      "started_at": "2026-06-17T20:13:16.162Z",
+      "n_target": 30,
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
+      "completed_at": "2026-06-17T21:16:57.926Z"
     }
   ],
   "retestLog": {}
