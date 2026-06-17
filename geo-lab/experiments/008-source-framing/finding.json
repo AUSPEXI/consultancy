@@ -1,0 +1,74 @@
+{
+  "runAt": "2026-06-17T22:11:59.223Z",
+  "firstRunAt": "2026-06-17T22:11:59.223Z",
+  "collectionSpanDays": 0,
+  "collectionDays": [
+    {
+      "date": "2026-06-17",
+      "n": 32
+    }
+  ],
+  "modelVersions": {
+    "gemini": [
+      "gemini-2.5-flash"
+    ],
+    "openai": [
+      "gpt-4o-mini"
+    ],
+    "perplexity": [
+      "sonar"
+    ],
+    "claude": [
+      "claude-haiku-4-5-20251001"
+    ]
+  },
+  "modelDrift": false,
+  "variants": [
+    "A",
+    "B"
+  ],
+  "platforms": [
+    "gemini",
+    "openai",
+    "perplexity",
+    "claude"
+  ],
+  "trialsPerVariant": 2,
+  "hypothesis": "If claims are framed as third-party attributions (\"According to independent testing…\") instead of first-person brand claims (\"We found that…\"), then citation rate will be higher for product-evaluation queries, because LLMs trust attributed neutral claims over apparent self-promotion.",
+  "aggregate": {
+    "A": {
+      "cited": 5,
+      "total": 32,
+      "rate": 15.6
+    },
+    "B": {
+      "cited": 16,
+      "total": 32,
+      "rate": 50
+    }
+  },
+  "significant": [
+    {
+      "platform": "gemini",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 50,
+      "pValue": 0.0389
+    },
+    {
+      "platform": "openai",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 100,
+      "pValue": 0.0001
+    }
+  ],
+  "verdict": "significant",
+  "bestVariant": "B",
+  "topEffect": {
+    "platform": "openai",
+    "treatment": "B",
+    "diffPp": 100,
+    "pValue": 0.0001
+  }
+}
