@@ -140,7 +140,7 @@ export class LLMOrchestrator {
         console.log('[llm-orchestrator] Gemini quota exceeded. Auto-falling back to perplexity sonar');
         try {
           rawOutput = await callWithExponentialBackoff(
-            async () => this.callPerplexity('llama-3.1-sonar-large-128k-online', finalPrompt, temperature),
+            async () => this.callPerplexity('llama-3.1-sonar-large-128k-online', finalPrompt, temperature, logCtx),
             'perplexity',
             maxRetries,
             500
@@ -351,19 +351,19 @@ export class LLMOrchestrator {
   ): Promise<string> {
     switch (provider) {
       case 'openai':
-        return this.callOpenAI(model, prompt, temperature, requiresJson);
+        return this.callOpenAI(model, prompt, temperature, requiresJson, logCtx);
       case 'anthropic':
         return this.callAnthropic(model, prompt, temperature);
       case 'gemini':
         return this.callGemini(model, prompt, temperature, contents, logCtx);
       case 'perplexity':
-        return this.callPerplexity(model, prompt, temperature);
+        return this.callPerplexity(model, prompt, temperature, logCtx);
       default:
         throw new Error(`Unknown provider: ${provider}`);
     }
   }
 
-  private async callOpenAI(model: string, prompt: string, temperature: number, requiresJson?: boolean): Promise<string> {
+  private async callOpenAI(model: string, prompt: string, temperature: number, requiresJson?: boolean, logCtx?: LogCtx): Promise<string> {
     const key = process.env.OPENAI_API_KEY;
     if (!key) throw new Error('OPENAI_API_KEY is not set');
 
@@ -374,6 +374,8 @@ export class LLMOrchestrator {
       temperature,
       ...(requiresJson ? { response_format: { type: 'json_object' } } : {}),
     });
+    const u = response.usage;
+    this.recordCost(logCtx, 'openai', model, u?.prompt_tokens || 0, u?.completion_tokens || 0).catch(() => {});
     return response.choices[0].message.content || '';
   }
 
@@ -382,7 +384,7 @@ export class LLMOrchestrator {
   }
 
   // Perplexity uses the OpenAI-compatible chat completions API
-  async callPerplexity(model: string, prompt: string, temperature: number): Promise<string> {
+  async callPerplexity(model: string, prompt: string, temperature: number, logCtx?: LogCtx): Promise<string> {
     const key = process.env.PERPLEXITY_API_KEY;
     if (!key) throw new Error('PERPLEXITY_API_KEY is not set');
 
@@ -392,6 +394,8 @@ export class LLMOrchestrator {
       messages: [{ role: 'user', content: prompt }],
       temperature,
     });
+    const u = response.usage;
+    this.recordCost(logCtx, 'perplexity', model, u?.prompt_tokens || 0, u?.completion_tokens || 0).catch(() => {});
     return response.choices[0].message.content || '';
   }
 
@@ -420,25 +424,41 @@ export class LLMOrchestrator {
     if (logCtx && result.usageMetadata) {
       const inputTokens = result.usageMetadata.promptTokenCount || 0;
       const outputTokens = result.usageMetadata.candidatesTokenCount || 0;
-      this.writeCostEntry(logCtx.userId, logCtx.feature, modelName, inputTokens, outputTokens).catch(() => {});
+      this.recordCost(logCtx, 'gemini', modelName, inputTokens, outputTokens).catch(() => {});
     }
 
     return result.text || '';
   }
 
-  private async writeCostEntry(userId: string, feature: string, model: string, inputTokens: number, outputTokens: number): Promise<void> {
+  // Per-provider/model rate card (USD). Token rates are per 1M tokens; perRequest
+  // is a flat per-call fee (Perplexity bills a per-request fee on sonar).
+  private rateFor(provider: string, model: string): { input: number; output: number; perRequest: number } {
+    const m = (model || '').toLowerCase();
+    switch (provider) {
+      case 'gemini':     return { input: m.includes('flash') ? 0.10 : 0.35, output: m.includes('flash') ? 0.40 : 1.05, perRequest: 0 };
+      case 'openai':     return m.includes('mini') ? { input: 0.15, output: 0.60, perRequest: 0 } : { input: 0.50, output: 1.50, perRequest: 0 };
+      case 'perplexity': return { input: 1.0, output: 1.0, perRequest: 0.005 };
+      case 'anthropic':  return { input: 0.80, output: 4.0, perRequest: 0 };
+      default:           return { input: 0, output: 0, perRequest: 0 };
+    }
+  }
+
+  // Record an LLM call's cost to cost_audit for all providers. Best-effort — never throws.
+  private async recordCost(logCtx: LogCtx | undefined, provider: string, model: string, inputTokens: number, outputTokens: number): Promise<void> {
+    if (!logCtx) return;
     try {
       const { dbAdmin } = await import('./firebase-admin');
       if (!dbAdmin) return;
-      // Gemini 2.0 Flash pricing (per million tokens)
-      const rateInput = model.includes('flash') ? 0.10 : 0.35;
-      const rateOutput = model.includes('flash') ? 0.40 : 1.05;
-      const estimatedCostUsd = (inputTokens / 1_000_000) * rateInput + (outputTokens / 1_000_000) * rateOutput;
+      const rate = this.rateFor(provider, model);
+      const estimatedCostUsd =
+        (inputTokens / 1_000_000) * rate.input +
+        (outputTokens / 1_000_000) * rate.output +
+        rate.perRequest;
       await dbAdmin.collection('cost_audit').add({
-        userId,
-        feature,
+        userId: logCtx.userId,
+        feature: logCtx.feature,
         model,
-        provider: 'gemini',
+        provider,
         inputTokens,
         outputTokens,
         estimatedCostUsd,

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { dbAdmin } from '@/lib/firebase-admin';
 import { computeAttribution } from '@/lib/attribution';
 import { requireAuth } from '@/lib/api-auth';
+import { perplexityBudget } from '@/lib/perplexity-budget';
 import { buildQueries, runCitationProbe, probeBrandRate, ENGINE_MODEL_VERSIONS } from '@/lib/cite-probe-core';
 import { normalizeTier, checkTierAccess } from '@/constants/tiers';
 import { embeddingService } from '@/lib/embeddings';
@@ -143,6 +144,16 @@ export async function POST(request: Request) {
   const auth = await requireAuth(request);
   if (auth instanceof NextResponse) return auth;
   const { userId } = auth;
+
+  // Daily Perplexity spend guard — hard-stop probes once over the configured cap.
+  const budget = await perplexityBudget(dbAdmin);
+  if (budget.over) {
+    return NextResponse.json(
+      { error: `Daily Perplexity budget reached ($${budget.spentToday.toFixed(2)} of $${budget.cap}). Probes resume tomorrow.` },
+      { status: 429 }
+    );
+  }
+
   try {
     const {
       brand, domain, queries, keywords = [],
