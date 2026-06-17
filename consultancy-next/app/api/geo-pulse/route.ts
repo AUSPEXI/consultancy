@@ -3,6 +3,7 @@ import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
 import { dbAdmin } from '@/lib/firebase-admin';
 import { requireAuth } from '@/lib/api-auth';
+import { perplexityBudget } from '@/lib/perplexity-budget';
 
 // ── Gemini probe (existing logic, kept intact) ──────────────────────────────
 async function probeQuery(query: string, apiKey: string, openaiKey: string): Promise<string> {
@@ -145,6 +146,16 @@ export async function POST(request: Request) {
   const auth = await requireAuth(request);
   if (auth instanceof NextResponse) return auth;
   const { userId } = auth;
+
+  // Daily Perplexity spend guard — hard-stop probes once over the configured cap.
+  const budget = await perplexityBudget(dbAdmin);
+  if (budget.over) {
+    return NextResponse.json(
+      { error: `Daily Perplexity budget reached ($${budget.spentToday.toFixed(2)} of $${budget.cap}). Probes resume tomorrow.` },
+      { status: 429 }
+    );
+  }
+
   try {
     const { keyword, brand: brandParam = '', domain: domainParam = '' } = await request.json();
     if (!keyword?.trim()) {
