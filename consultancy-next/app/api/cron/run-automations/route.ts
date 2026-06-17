@@ -167,6 +167,8 @@ async function callTool(
     'Authorization': `Bearer ${idToken}`,
     'Content-Type': 'application/json',
     'X-Automation-Run': '1', // signals this is a scheduled call, not a user click
+    // requireAuth only trusts the automation token when this matches CRON_SECRET.
+    'x-cron-secret': process.env.CRON_SECRET ?? '',
   };
 
   try {
@@ -253,12 +255,17 @@ async function sendDigestEmail(
   const { sendMail, emailConfigured } = await import('@/lib/mailer');
   if (!emailConfigured()) return false;
 
-  let to: string | null = null;
-  try {
-    to = (await admin.auth().getUser(userId)).email || null;
-  } catch {
-    const snap = await dbAdmin?.collection('users').doc(userId).get();
-    to = snap?.data()?.email || null;
+  // DIGEST_EMAIL overrides the recipient (e.g. send ops digests to
+  // sales@l8entspace.com instead of the account's login email). Falls back to
+  // the user's own email when unset.
+  let to: string | null = (process.env.DIGEST_EMAIL || '').trim() || null;
+  if (!to) {
+    try {
+      to = (await admin.auth().getUser(userId)).email || null;
+    } catch {
+      const snap = await dbAdmin?.collection('users').doc(userId).get();
+      to = snap?.data()?.email || null;
+    }
   }
   if (!to) return false;
 

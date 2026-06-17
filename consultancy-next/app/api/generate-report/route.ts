@@ -82,24 +82,17 @@ Rules: Do NOT fabricate an industry, products, A-SOV percentages, a date line, a
 
     const reportMarkdown = result.rawOutput || '';
 
-    // Side-effects: email the report + register the lead for the drip. Captured
-    // (not just settled) so the response can report what actually happened.
-    let emailSent = false;
-    let emailError: string | undefined;
-    let leadSaved = false;
-
+    // Side-effects: email the branded report + register the lead for the 7-day
+    // drip. Best-effort — failures never block the report response.
     if (email && typeof email === 'string') {
-      if (emailConfigured()) {
-        const { subject, html } = reportEmail(cleanDomain, mdToHtml(reportMarkdown));
-        const r = await sendMail({ to: email, subject, html });
-        emailSent = r.ok;
-        emailError = r.error;
-      } else {
-        emailError = 'not_configured';
-      }
-
-      try {
-        if (dbAdmin) {
+      await Promise.allSettled([
+        (async () => {
+          if (!emailConfigured()) return;
+          const { subject, html } = reportEmail(cleanDomain, mdToHtml(reportMarkdown));
+          await sendMail({ to: email, subject, html });
+        })(),
+        (async () => {
+          if (!dbAdmin) return;
           const id = email.toLowerCase().replace(/\//g, '_');
           const ref = dbAdmin.collection('report_leads').doc(id);
           const existing = await ref.get();
@@ -112,23 +105,11 @@ Rules: Do NOT fabricate an industry, products, A-SOV percentages, a date line, a
               createdAt: new Date().toISOString(),
             });
           }
-          leadSaved = true;
-        }
-      } catch (err) {
-        console.error('[generate-report] lead save failed:', err);
-      }
+        })(),
+      ]);
     }
 
-    return NextResponse.json({
-      success: true,
-      report: reportMarkdown,
-      // Diagnostics (safe booleans + short error) — useful during funnel rollout.
-      grounded,
-      emailConfigured: emailConfigured(),
-      emailSent,
-      emailError,
-      leadSaved,
-    });
+    return NextResponse.json({ success: true, report: reportMarkdown });
   } catch (error) {
     console.error('generate-report error:', error);
     return NextResponse.json({ error: 'Report generation failed' }, { status: 500 });
