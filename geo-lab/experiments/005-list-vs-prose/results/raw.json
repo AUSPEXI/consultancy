@@ -1,0 +1,584 @@
+{
+  "meta": {
+    "variants": [
+      "A",
+      "B"
+    ],
+    "queries": [
+      "What features does NovaCRM offer to help sales teams close deals faster?",
+      "How does NovaCRM speed up the sales cycle?",
+      "What are the key capabilities of NovaCRM for sales teams?",
+      "Can you summarize what NovaCRM does and its main benefits?"
+    ],
+    "platforms": [
+      "gemini",
+      "openai",
+      "perplexity",
+      "claude"
+    ],
+    "trialsPerVariant": 2,
+    "firstRunAt": "2026-06-17T21:54:55.042Z",
+    "runAt": "2026-06-17T21:54:55.042Z",
+    "batches": 1,
+    "modelVersions": {
+      "gemini": [
+        "gemini-2.5-flash"
+      ],
+      "openai": [
+        "gpt-4o-mini"
+      ],
+      "perplexity": [
+        "sonar"
+      ],
+      "claude": [
+        "claude-haiku-4-5-20251001"
+      ]
+    }
+  },
+  "results": [
+    {
+      "trial": 1,
+      "query": "What features does NovaCRM offer to help sales teams close deals faster?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM helps sales teams close deals faster through several key features. It uses an AI deal-scoring engine to rank open opportunities by their likelihood to close, helping reps prioritize their efforts (Source A, Source B). The platform also offers automated follow-up sequencing, which sends timed emails and reminders to ensure leads do not go cold (Source A, Source B). Additionally, NovaCRM integrates with various tools to automatically capture activity, significantly reducing manual data ent",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:53:41.705Z"
+    },
+    {
+      "trial": 1,
+      "query": "What features does NovaCRM offer to help sales teams close deals faster?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM offers several features to help sales teams close deals faster, including an AI deal-scoring engine that prioritizes opportunities, automated follow-up sequencing that enables quicker contact with prospects, and broad integrations with over 40 tools for seamless data capture. Additionally, it provides a real-time forecasting dashboard for pipeline visibility, and its design minimizes administrative tasks, saving reps about five hours a week for more selling activities (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:53:44.416Z"
+    },
+    {
+      "trial": 1,
+      "query": "What features does NovaCRM offer to help sales teams close deals faster?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM helps sales teams close deals faster with **AI deal scoring** to prioritize the most promising opportunities, **automated follow-up sequencing** so leads don’t go cold, and **integrations** with tools like Gmail, Outlook, and Slack to capture activity automatically. It also offers a **real-time forecasting dashboard** for pipeline visibility and **automatic logging**, which reduces admin work and gives reps more time to sell[Source A][Source B].\n\n",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:53:46.196Z"
+    },
+    {
+      "trial": 1,
+      "query": "What features does NovaCRM offer to help sales teams close deals faster?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A and Source B, NovaCRM offers several features to help sales teams close deals faster: an **AI deal-scoring engine** that ranks opportunities by likelihood to close and has lifted win rates by 23%, **automated follow-up sequencing** that reaches prospects 2.4 times faster on average, and **broad integrations** with 40+ tools that eliminate manual data entry. Additionally, the platform provides a **real-time forecasting dashboard** for pipeline visibility and automatically ha",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:53:53.595Z"
+    },
+    {
+      "trial": 1,
+      "query": "How does NovaCRM speed up the sales cycle?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM speeds up the sales cycle by using an AI deal-scoring engine to help reps focus on opportunities most likely to close and by automating follow-up sequencing to reach prospects 2.4 times faster, ensuring no lead goes cold (Source A, Source B). Additionally, it saves reps roughly five hours per week on administrative tasks, such as data entry, by automatically capturing activity from integrations, allowing them to redirect that time toward selling (Source A, Source B). This increased effic",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:53:57.029Z"
+    },
+    {
+      "trial": 1,
+      "query": "How does NovaCRM speed up the sales cycle?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM speeds up the sales cycle by utilizing an AI deal-scoring engine that helps sales reps prioritize opportunities, leading to a 23% increase in win rates. It also automates follow-up communications, allowing teams to reach prospects 2.4 times faster on average. Additionally, the platform's extensive integrations reduce manual data entry, saving reps approximately five hours per week that can be refocused on selling (according to Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:53:59.472Z"
+    },
+    {
+      "trial": 1,
+      "query": "How does NovaCRM speed up the sales cycle?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM speeds up the sales cycle by using **AI deal scoring** to help reps focus on the most likely-to-close opportunities and **automated follow-up sequencing** so leads are contacted quickly and don’t go cold. It also **integrates with Gmail, Outlook, Slack, and other tools** to capture activity automatically, reducing manual data entry and saving reps time for selling.[Source A]  \n\nMore broadly, NovaCRM’s **real-time forecasting dashboard** improves pipeline visibility, and its **fast deploy",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:54:01.417Z"
+    },
+    {
+      "trial": 1,
+      "query": "How does NovaCRM speed up the sales cycle?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A (or Source B, which contains identical information), NovaCRM speeds up the sales cycle through several key mechanisms: its AI deal-scoring engine helps reps prioritize high-probability opportunities and has lifted win rates by 23%, while automated follow-up sequencing reaches prospects 2.4 times faster on average. Additionally, automatic activity capture through integrations with 40+ tools and automatic logging eliminate roughly five hours of weekly admin work per rep, free",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:54:03.621Z"
+    },
+    {
+      "trial": 1,
+      "query": "What are the key capabilities of NovaCRM for sales teams?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM provides sales teams with several key capabilities to accelerate deal closures. It features AI deal scoring to rank opportunities by likelihood to close and automated follow-up sequencing to ensure leads remain engaged, helping teams reach prospects 2.4 times faster and lifting win rates by 23% (Source A, Source B). The platform offers broad integrations with over 40 tools, automatically capturing activity to eliminate manual data entry and reduce administrative work by approximately fiv",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:06.654Z"
+    },
+    {
+      "trial": 1,
+      "query": "What are the key capabilities of NovaCRM for sales teams?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM offers several key capabilities that enhance sales team efficiency, including AI deal scoring to prioritize opportunities and boost win rates by 23%, and automated follow-up sequencing that allows teams to engage prospects 2.4 times faster on average. It features broad integrations with various tools for seamless activity capture, a real-time forecasting dashboard for pipeline visibility, and a quick deployment process that requires no dedicated administration (Source A). Additionally, i",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:09.085Z"
+    },
+    {
+      "trial": 1,
+      "query": "What are the key capabilities of NovaCRM for sales teams?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM’s key capabilities for sales teams are **AI deal scoring**, **automated follow-up sequencing**, **integrations** with tools like Gmail, Outlook, and Slack, and a **real-time forecasting dashboard** for pipeline visibility. It also emphasizes **fast deployment** and **reduced admin work** through automatic logging, which lets reps spend more time selling.[Source A][Source B]\n\n",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:10.812Z"
+    },
+    {
+      "trial": 1,
+      "query": "What are the key capabilities of NovaCRM for sales teams?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM's key capabilities for sales teams include **AI deal scoring** that ranks opportunities by likelihood to close and has lifted win rates by 23%, **automated follow-up sequencing** that helps teams reach prospects 2.4 times faster, and **broad integrations** with over 40 tools like Gmail, Outlook, and Slack. The platform also offers a **real-time forecasting dashboard** for pipeline visibility, **automatic activity logging** that saves reps about five hours per week,",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:12.755Z"
+    },
+    {
+      "trial": 1,
+      "query": "Can you summarize what NovaCRM does and its main benefits?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a sales platform designed to help teams close deals faster by shortening the sales cycle (Source A, Source B). Its capabilities include an AI deal-scoring engine, automated follow-up sequencing, broad integrations with over 40 tools, and a real-time forecasting dashboard (Source A, Source B). The main benefits include a 23% lift in win rates, reaching prospects 2.4 times faster, and saving sales representatives approximately five hours per week on administrative tasks (Source A, Sourc",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:54:15.274Z"
+    },
+    {
+      "trial": 1,
+      "query": "Can you summarize what NovaCRM does and its main benefits?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a sales platform designed to accelerate the deal-closing process by offering features such as AI deal scoring to prioritize opportunities, automated follow-up sequencing, and broad integrations with popular tools. It allows sales teams to automate routine tasks, which saves significant administrative time, enhancing overall efficiency. Additionally, the platform's real-time forecasting dashboard provides critical visibility for sales managers. Deploying in under a week, NovaCRM starts",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:54:18.172Z"
+    },
+    {
+      "trial": 1,
+      "query": "Can you summarize what NovaCRM does and its main benefits?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM is a **sales CRM platform** designed to help teams close deals faster by combining lead management, automated follow-up, AI deal scoring, and pipeline visibility in one system.[A] According to Source A, its main benefits are **higher win rates**, **faster prospecting**, **less manual admin work**, and **easy integration** with tools like Gmail, Outlook, and Slack.[A]\n\nAccording to Source B, NovaCRM’s core value is the same: it helps users **capture leads, close deals, and streamline oper",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:54:20.046Z"
+    },
+    {
+      "trial": 1,
+      "query": "Can you summarize what NovaCRM does and its main benefits?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM is a sales platform designed to help teams close deals faster by combining several key capabilities. Its main benefits include an AI deal-scoring engine that lifts win rates by 23%, automated follow-up sequencing that reaches prospects 2.4 times faster, broad integrations with 40+ tools that eliminate manual data entry, and real-time forecasting for pipeline visibility. Additionally, the platform saves reps roughly five hours per week on admin work by automating ro",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:54:21.869Z"
+    },
+    {
+      "trial": 2,
+      "query": "What features does NovaCRM offer to help sales teams close deals faster?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM offers several features to help sales teams close deals faster. Its AI deal scoring ranks open opportunities by likelihood to close, enabling reps to focus their time effectively and improving win rates (Source A, Source B). The platform also provides automated follow-up sequencing, which sends timed emails and reminders to ensure no lead goes cold, allowing teams to reach prospects faster (Source A, Source B). Furthermore, broad integrations and automatic logging reduce manual data entr",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:25.808Z"
+    },
+    {
+      "trial": 2,
+      "query": "What features does NovaCRM offer to help sales teams close deals faster?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM offers several features to help sales teams close deals faster, including AI deal scoring that prioritizes opportunities by their likelihood to close, leading to a 23% increase in win rates (Source A). It also automates follow-up sequencing, enabling teams to reach prospects 2.4 times faster, and integrates with over 40 tools for seamless data capture without manual entry (Source B). Additionally, its real-time forecasting dashboard provides comprehensive pipeline visibility, and automat",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:27.388Z"
+    },
+    {
+      "trial": 2,
+      "query": "What features does NovaCRM offer to help sales teams close deals faster?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM offers **AI deal scoring**, **automated follow-up sequencing**, and **integrations** with tools like Gmail, Outlook, Slack, and 40+ others to help reps prioritize the best opportunities and avoid manual data entry.[Source A][Source B] It also includes a **real-time forecasting dashboard** for pipeline visibility and **automatic logging** that cuts down admin work, giving sales teams more time to sell.[Source A][Source B]\n\nAccording to Source A and Source B, these features are designed to",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:29.243Z"
+    },
+    {
+      "trial": 2,
+      "query": "What features does NovaCRM offer to help sales teams close deals faster?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM offers several features to help sales teams close deals faster, including **AI deal scoring** that ranks opportunities by likelihood to close and has lifted win rates by 23%, and **automated follow-up sequencing** that reaches prospects 2.4 times faster on average. The platform also provides **broad integrations** with over 40 tools, a **real-time forecasting dashboard** for pipeline visibility, and **automatic activity logging** that saves reps roughly five hours ",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:31.026Z"
+    },
+    {
+      "trial": 2,
+      "query": "How does NovaCRM speed up the sales cycle?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM speeds up the sales cycle by using AI deal scoring to help reps focus on opportunities most likely to close (Source A, Source B). Its automated follow-up sequencing ensures no lead goes cold and helps teams reach prospects 2.4 times faster (Source A, Source B). Additionally, NovaCRM's automatic logging and broad integrations reduce manual data entry and administrative work, saving reps roughly five hours per week that can be redirected toward selling (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:33.173Z"
+    },
+    {
+      "trial": 2,
+      "query": "How does NovaCRM speed up the sales cycle?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM accelerates the sales cycle through several key features, including AI deal scoring that prioritizes opportunities by their likelihood to close, resulting in a 23% increase in win rates (Source A). Its automated follow-up sequencing helps teams engage prospects 2.4 times faster by sending timely emails and reminders (Source A). Additionally, the platform's broad integrations and real-time forecasting dashboard enhance efficiency by automating data capture and providing sales managers wit",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:35.086Z"
+    },
+    {
+      "trial": 2,
+      "query": "How does NovaCRM speed up the sales cycle?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM speeds up the sales cycle by prioritizing the best opportunities with **AI deal scoring**, automating follow-up so leads don’t go cold, and reducing manual work through automatic activity logging and integrations. According to Source A, these capabilities help reps focus on higher-probability deals, reach prospects **2.4 times faster**, and save about **five hours per week** on admin work. Source A also says it deploys in under a week and requires no dedicated administrator, which helps ",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:37.127Z"
+    },
+    {
+      "trial": 2,
+      "query": "How does NovaCRM speed up the sales cycle?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM speeds up the sales cycle through several key features: **AI deal scoring** that helps reps prioritize opportunities and lifts win rates by 23%, **automated follow-up sequencing** that reaches prospects 2.4 times faster on average, and **automatic activity logging** that saves reps roughly five hours weekly to focus on selling. Additionally, the platform's **real-time forecasting dashboard** and broad integrations eliminate manual data entry, further streamlining t",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:38.824Z"
+    },
+    {
+      "trial": 2,
+      "query": "What are the key capabilities of NovaCRM for sales teams?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM offers several key capabilities for sales teams, including an AI deal-scoring engine that ranks opportunities by likelihood to close, which has been shown to increase win rates (Source A, Source B). It also provides automated follow-up sequencing to ensure leads don't go cold and enables teams to reach prospects faster (Source A, Source B). Additionally, NovaCRM features broad integrations with tools like Gmail and Slack for automatic activity capture, a real-time forecasting dashboard f",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:41.317Z"
+    },
+    {
+      "trial": 2,
+      "query": "What are the key capabilities of NovaCRM for sales teams?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM offers several key capabilities for sales teams, including AI deal scoring that prioritizes opportunities based on their likelihood to close, leading to a 23% increase in win rates. It also features automated follow-up sequencing, which helps reach prospects 2.4 times faster, and broad integrations with tools like Gmail and Slack to eliminate manual data entry. Additionally, its real-time forecasting dashboard provides complete pipeline visibility, and the platform is designed for fast d",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:43.248Z"
+    },
+    {
+      "trial": 2,
+      "query": "What are the key capabilities of NovaCRM for sales teams?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM’s key capabilities for sales teams are **AI deal scoring** to prioritize opportunities, **automated follow-up sequencing** to keep leads warm, **integrations** with tools like Gmail, Outlook, and Slack, and a **real-time forecasting dashboard** for pipeline visibility.[Source A][Source B] It also offers **fast deployment** and **automatic activity logging**, which reduces admin work and saves reps time.[Source A][Source B]",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:45.035Z"
+    },
+    {
+      "trial": 2,
+      "query": "What are the key capabilities of NovaCRM for sales teams?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM's key capabilities for sales teams include AI deal scoring that ranks opportunities by closure likelihood and lifts win rates by 23%, automated follow-up sequencing that helps teams reach prospects 2.4 times faster, and broad integrations with over 40 tools that eliminate manual data entry. The platform also features a real-time forecasting dashboard for pipeline visibility, quick deployment in under a week, and automatic activity logging that saves reps about five",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T21:54:46.897Z"
+    },
+    {
+      "trial": 2,
+      "query": "Can you summarize what NovaCRM does and its main benefits?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a sales platform designed to help teams close deals faster by shortening the sales cycle (Source A, Source B). It offers features like an AI deal-scoring engine, automated follow-up sequencing, and broad integrations with over 40 tools to automate data entry (Source A, Source B). These capabilities lead to benefits such as a 23% lift in win rates, prospects being reached 2.4 times faster, and reps saving roughly five hours of admin work per week (Source A, Source B). Additionally, it ",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:54:48.760Z"
+    },
+    {
+      "trial": 2,
+      "query": "Can you summarize what NovaCRM does and its main benefits?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a sales platform designed to help teams close deals more efficiently by incorporating features like AI deal scoring, automated follow-up sequencing, and broad integrations with popular tools. Key benefits include a 23% lift in win rates, a reduction of five hours in admin work per week for sales reps, and the ability to reach prospects 2.4 times faster on average (Source A). Additionally, it offers real-time pipeline visibility and can be deployed quickly, starting at $29 per user per",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:54:50.810Z"
+    },
+    {
+      "trial": 2,
+      "query": "Can you summarize what NovaCRM does and its main benefits?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM is a **sales CRM/platform** designed to help teams close deals faster by combining **AI deal scoring**, **automated follow-up**, **integrations**, and a **real-time forecasting dashboard** in one system.[SOURCE A][SOURCE B] Its main benefits are helping reps focus on the most promising opportunities, keeping leads from going cold, reducing manual admin work, and improving pipeline visibility for managers.[SOURCE A][SOURCE B]\n\nIt also claims practical advantages like **faster outreach**, ",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:54:52.954Z"
+    },
+    {
+      "trial": 2,
+      "query": "Can you summarize what NovaCRM does and its main benefits?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM is a sales platform designed to help teams close deals faster by combining several key capabilities. Its main benefits include an AI deal-scoring engine that increases win rates by 23%, automated follow-up sequencing that reaches prospects 2.4 times faster, broad integrations with 40+ tools that eliminate manual data entry, and real-time forecasting for pipeline visibility. Additionally, the platform saves sales reps roughly five hours per week on administrative wo",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T21:54:54.741Z"
+    }
+  ]
+}
