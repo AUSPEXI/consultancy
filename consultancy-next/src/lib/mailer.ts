@@ -25,8 +25,11 @@ function getTransporter(): nodemailer.Transporter | null {
       port: 465,
       secure: true,
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_APP_PASSWORD,
+        // Trim the user and strip whitespace from the app password — Gmail shows
+        // app passwords as "abcd efgh ijkl mnop", and a stray/trailing space in
+        // the env var causes a 535 BadCredentials auth failure.
+        user: (process.env.EMAIL_USER || '').trim(),
+        pass: (process.env.EMAIL_APP_PASSWORD || '').replace(/\s+/g, ''),
       },
     });
   }
@@ -47,7 +50,7 @@ export async function sendMail(opts: { to: string; subject: string; html: string
     // Send From the verified mailbox by default (EMAIL_USER = sales@auspexi.com),
     // which is guaranteed to send. To present the public l8entspace.com alias,
     // set EMAIL_FROM=sales@l8entspace.com once Gmail "send mail as" is verified.
-    const from = process.env.EMAIL_FROM || process.env.EMAIL_USER;
+    const from = (process.env.EMAIL_FROM || process.env.EMAIL_USER || '').trim();
     // Fill the per-recipient unsubscribe link placeholder used by the templates.
     const html = opts.html.replace(/__UNSUB_EMAIL__/g, encodeURIComponent(opts.to));
     await transporter.sendMail({
