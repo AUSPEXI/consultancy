@@ -1,0 +1,584 @@
+{
+  "meta": {
+    "variants": [
+      "A",
+      "B"
+    ],
+    "queries": [
+      "What is NovaCRM?",
+      "Can you explain what NovaCRM does for sales teams?",
+      "What kind of software is NovaCRM and who is it for?",
+      "I keep hearing about NovaCRM — what exactly is it?"
+    ],
+    "platforms": [
+      "gemini",
+      "openai",
+      "perplexity",
+      "claude"
+    ],
+    "trialsPerVariant": 2,
+    "firstRunAt": "2026-06-17T19:53:07.704Z",
+    "runAt": "2026-06-17T19:53:07.704Z",
+    "batches": 1,
+    "modelVersions": {
+      "gemini": [
+        "gemini-2.5-flash"
+      ],
+      "openai": [
+        "gpt-4o-mini"
+      ],
+      "perplexity": [
+        "sonar"
+      ],
+      "claude": [
+        "claude-haiku-4-5-20251001"
+      ]
+    }
+  },
+  "results": [
+    {
+      "trial": 1,
+      "query": "What is NovaCRM?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a sales-automation platform and customer relationship management (CRM) tool designed to help sales teams, particularly in growing companies, work through deals more efficiently and close them faster (Source A, Source B). It consolidates customer conversations, emails, and pipeline updates into a single workspace (Source A, Source B). The platform also offers automation for follow-ups and reminders to reduce manual data entry, and provides reporting features to identify where deals may",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:51:50.437Z"
+    },
+    {
+      "trial": 1,
+      "query": "What is NovaCRM?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a sales-automation platform designed to help sales teams close deals more efficiently by consolidating customer conversations, emails, and pipeline updates into a single workspace. It offers automated follow-ups and reminders to reduce manual data entry and provides reporting features that highlight where deals may stall, enabling teams to intervene effectively (Source A, Source B). Overall, it serves as a comprehensive tool for growing sales organizations by streamlining workflow and",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:51:53.369Z"
+    },
+    {
+      "trial": 1,
+      "query": "What is NovaCRM?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM is a sales-automation and customer relationship management (CRM) platform that helps sales teams close deals faster by consolidating customer conversations, emails, and pipeline updates into a single workspace[SOURCE B]. It is designed specifically for growing sales organizations and real estate professionals, offering automated follow-ups, reminders, and pipeline tracking to reduce manual data entry[SOURCE B][1][3]. At its core, NovaCRM functions as a deal-acceleration platform that com",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:51:56.679Z"
+    },
+    {
+      "trial": 1,
+      "query": "What is NovaCRM?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source B, NovaCRM is a sales-automation platform that helps sales teams close deals faster by consolidating customer conversations, emails, and pipeline updates into a single workspace. It is designed for growing sales organizations and functions as a pipeline-management system that tracks deals from first contact to close, while automating repetitive tasks like follow-ups and reminders. According to Source A, the platform also offers reporting features that help identify where deal",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:51:58.541Z"
+    },
+    {
+      "trial": 1,
+      "query": "Can you explain what NovaCRM does for sales teams?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a sales-automation platform designed to help sales teams close deals faster by consolidating customer conversations, emails, and pipeline updates into a single workspace (Source A). It reduces manual data entry through automated follow-ups and reminders, and tracks every deal from first contact to close (Source A). Additionally, NovaCRM acts as a reporting tool, showing sales managers where deals stall so teams can intervene before opportunities are lost (Source A).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:52:03.364Z"
+    },
+    {
+      "trial": 1,
+      "query": "Can you explain what NovaCRM does for sales teams?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a sales-automation platform designed to help sales teams close deals faster by consolidating customer conversations, emails, and pipeline updates into a single workspace. It automates routine tasks, reducing manual data entry and providing reporting features that identify where deals may stall, allowing teams to intervene proactively (Source A). This makes it a valuable tool for growing sales organizations looking to enhance efficiency and effectiveness in their sales processes (Sourc",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:52:05.282Z"
+    },
+    {
+      "trial": 1,
+      "query": "Can you explain what NovaCRM does for sales teams?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM is a **sales-automation and CRM platform** that helps sales teams manage deals more efficiently and close them faster. According to Source A, it brings customer conversations, emails, pipeline updates, follow-ups, reminders, reporting, and workflow automation into one workspace, so reps spend less time on manual data entry and more time selling. Source B says it is aimed at sales teams and can help organize deal work and reduce effort, though its wording is more cautious.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:52:07.059Z"
+    },
+    {
+      "trial": 1,
+      "query": "Can you explain what NovaCRM does for sales teams?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM is a sales-automation platform that helps sales teams close deals faster by consolidating customer conversations, emails, and pipeline updates into a single workspace. It functions as a pipeline-management system that tracks deals from first contact to close, automates repetitive tasks like follow-ups and reminders to reduce manual data entry, and provides reporting tools that help sales managers identify where deals stall. Source A describes it as a deal-accelerat",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:52:08.714Z"
+    },
+    {
+      "trial": 1,
+      "query": "What kind of software is NovaCRM and who is it for?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a sales-automation platform and a customer relationship management (CRM) tool (Source A). It is also described as a pipeline-management system, a reporting tool, and a workflow engine (Source A). NovaCRM is designed for growing sales organizations and fast-moving sales teams that want to close deals faster and reduce manual data entry (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:52:11.472Z"
+    },
+    {
+      "trial": 1,
+      "query": "What kind of software is NovaCRM and who is it for?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a sales-automation platform designed for growing sales organizations, helping them close deals faster by consolidating customer conversations, emails, and pipeline updates into a single workspace (Source A). It serves as a customer relationship management tool that automates repetitive tasks and provides reporting features to track and manage sales pipelines effectively (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:52:13.297Z"
+    },
+    {
+      "trial": 1,
+      "query": "What kind of software is NovaCRM and who is it for?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM is a **sales-automation / CRM platform** that combines pipeline tracking, customer conversations, emails, reporting, and automated follow-ups in one workspace. According to Source A, it is built for **growing sales organisations** and **sales teams** that want to reduce manual data entry and close deals faster, while Source B says it is generally aimed at **sales teams, particularly in growing companies**.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:52:19.011Z"
+    },
+    {
+      "trial": 1,
+      "query": "What kind of software is NovaCRM and who is it for?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM is a sales-automation and customer relationship management platform designed for growing sales organizations. It consolidates customer conversations, emails, and pipeline updates into a single workspace, and functions as a pipeline-management system with automated follow-ups, reporting tools, and workflow automation to help sales teams close deals faster and reduce manual data entry.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:52:20.663Z"
+    },
+    {
+      "trial": 1,
+      "query": "I keep hearing about NovaCRM — what exactly is it?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a sales-automation platform and customer relationship management (CRM) tool designed to help sales teams, particularly in growing companies, close deals faster and more efficiently (Source B, Source A). It consolidates customer conversations, emails, and pipeline updates into a single workspace (Source B, Source A). The platform offers automation for follow-ups and reminders to reduce manual data entry, and includes reporting features to help identify where deals might stall (Source B",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:52:23.903Z"
+    },
+    {
+      "trial": 1,
+      "query": "I keep hearing about NovaCRM — what exactly is it?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a sales-automation platform designed to help sales teams close deals more efficiently by consolidating customer conversations, emails, and pipeline updates into a single workspace. It automates follow-ups and reminders, reducing manual data entry, and provides reporting tools to identify where deals may stall (according to Source B). Overall, it serves as a unified system that enhances workflow and enables better deal management for growing sales organizations (as mentioned in Source ",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:52:26.245Z"
+    },
+    {
+      "trial": 1,
+      "query": "I keep hearing about NovaCRM — what exactly is it?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM is a **real estate CRM** and **sales automation platform** built for agents, teams, and brokerages to manage leads, track deals, and automate follow-ups and marketing. It centralizes customer conversations, emails, pipeline updates, and related workflows in one place. [8][5]\n\nAccording to the sources, it also includes features like **AI-powered communication**, batch texting, email/social media marketing, and pipeline reporting to help users close deals more efficiently. [8][2][4]",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:52:28.795Z"
+    },
+    {
+      "trial": 1,
+      "query": "I keep hearing about NovaCRM — what exactly is it?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source B, NovaCRM is a sales-automation platform that helps sales teams close deals faster by consolidating customer conversations, emails, and pipeline updates into a single workspace. According to Source A, it's designed for growing sales organizations and offers features like automated follow-ups, reminders to reduce manual data entry, and reporting tools that help identify where deals tend to stall. In essence, it's a customer relationship management tool that combines pipeline ",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:52:30.424Z"
+    },
+    {
+      "trial": 2,
+      "query": "What is NovaCRM?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a sales-automation platform and customer relationship management (CRM) tool designed to help sales teams close deals faster (Source A). It consolidates customer conversations, emails, and pipeline updates into a single workspace, while automating follow-ups and reminders to reduce manual data entry (Source A, Source B). Primarily aimed at growing sales organizations, it functions as a pipeline-management system, reporting tool, and workflow engine that tracks deals from first contact ",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:52:35.161Z"
+    },
+    {
+      "trial": 2,
+      "query": "What is NovaCRM?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a sales-automation platform designed to help sales teams close deals faster by consolidating customer conversations, emails, and pipeline updates into a single workspace. It automates repetitive tasks to reduce manual data entry and provides reporting tools to track deal progress from initial contact to close, enabling teams to intervene when deals stall (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:52:37.238Z"
+    },
+    {
+      "trial": 2,
+      "query": "What is NovaCRM?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM is a **sales-automation and customer relationship management (CRM) platform** built for sales teams. According to Source A, it consolidates customer conversations, emails, and pipeline updates into one workspace, while also automating follow-ups, reminders, reporting, and pipeline tracking. Source B describes it more cautiously, but still characterizes it as a tool aimed at helping sales organizations work through deals more efficiently and manage customer/pipeline information in one pla",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:52:39.130Z"
+    },
+    {
+      "trial": 2,
+      "query": "What is NovaCRM?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM is a sales-automation platform that helps sales teams close deals faster by consolidating customer conversations, emails, and pipeline updates into a single workspace. It functions as a customer relationship management tool designed for growing sales organizations, combining pipeline tracking, automation, and reporting to reduce manual data entry and free sales reps to focus on selling.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:52:40.462Z"
+    },
+    {
+      "trial": 2,
+      "query": "Can you explain what NovaCRM does for sales teams?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM helps sales teams work through deals more efficiently by consolidating customer conversations, emails, and pipeline updates into a single workspace (Source A, Source B). It offers automation for follow-ups and reminders, which reduces manual data entry and frees representatives to focus on selling (Source A, Source B). Additionally, NovaCRM provides reporting features that help sales managers identify exactly where deals stall, allowing teams to intervene before opportunities are lost (S",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:52:44.065Z"
+    },
+    {
+      "trial": 2,
+      "query": "Can you explain what NovaCRM does for sales teams?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a sales-automation platform designed to help sales teams close deals more efficiently by consolidating customer conversations, emails, and pipeline updates into a single workspace (Source B). It also offers automation features for follow-ups and reminders to reduce manual data entry, along with reporting tools that help identify where deals stall (Source A and Source B). Overall, it serves as a unified system that enhances productivity and focuses on deal acceleration for growing sale",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:52:45.969Z"
+    },
+    {
+      "trial": 2,
+      "query": "Can you explain what NovaCRM does for sales teams?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM appears to be a **sales CRM and automation tool** for sales teams: it brings customer conversations, emails, and pipeline updates into one workspace, and it can automate follow-ups, reminders, and some repetitive data entry. According to Source B, it also helps teams track deals through the pipeline and spot where opportunities stall so managers can intervene earlier.  \n\nSource A describes the same core value in more cautious terms, saying it is used by sales organizations to work deals ",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:52:47.993Z"
+    },
+    {
+      "trial": 2,
+      "query": "Can you explain what NovaCRM does for sales teams?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source B, NovaCRM is a sales-automation platform that helps sales teams close deals faster by consolidating customer conversations, emails, and pipeline updates into a single workspace. It automates repetitive tasks like follow-ups and reminders to reduce manual data entry, and includes reporting features that help sales managers identify where deals are stalling. Source A adds that it's particularly aimed at growing companies and how much value it delivers depends on how each organ",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:52:49.639Z"
+    },
+    {
+      "trial": 2,
+      "query": "What kind of software is NovaCRM and who is it for?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a sales-automation platform and customer relationship management (CRM) tool, functioning as a pipeline-management and reporting system (Source B). It is designed for sales teams, particularly in growing or fast-moving companies, to help them close deals faster and work more efficiently (Source A, Source B). The software consolidates customer conversations, emails, and pipeline updates, and offers automation for follow-ups and reminders to reduce manual data entry (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:52:54.271Z"
+    },
+    {
+      "trial": 2,
+      "query": "What kind of software is NovaCRM and who is it for?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a sales-automation platform designed for growing sales organizations, aimed at helping teams close deals faster by consolidating customer conversations, emails, and pipeline updates into a single workspace. It reduces manual data entry through automated follow-ups and reminders, and provides reporting tools to identify where deals may stall (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:52:55.754Z"
+    },
+    {
+      "trial": 2,
+      "query": "What kind of software is NovaCRM and who is it for?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM is a **sales-automation / CRM platform** that combines pipeline tracking, customer conversation and email management, reporting, and automated follow-ups in one workspace.[SOURCE B] It is aimed at **sales teams**, especially **growing or fast-moving sales organizations** that want to reduce manual data entry and manage deals more efficiently.[SOURCE A][SOURCE B]",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:52:57.477Z"
+    },
+    {
+      "trial": 2,
+      "query": "What kind of software is NovaCRM and who is it for?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source B, NovaCRM is a sales-automation platform and customer relationship management tool designed for growing sales organizations. It consolidates customer conversations, emails, and pipeline updates into a single workspace and helps sales teams close deals faster through automated follow-ups, reminders, and pipeline tracking. According to Source A, it is particularly aimed at sales teams in growing companies who want to work through deals more efficiently and reduce manual data e",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-17T19:52:59.000Z"
+    },
+    {
+      "trial": 2,
+      "query": "I keep hearing about NovaCRM — what exactly is it?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a sales-automation platform and customer relationship management tool designed for growing sales organizations (Source A). It consolidates customer conversations, emails, and pipeline updates into a single workspace, and reduces manual data entry through automated follow-ups and reminders (Source A). At its core, it is a pipeline-management system that tracks deals from first contact to close, and a reporting tool to identify where deals stall (Source A). NovaCRM aims to help sales te",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:53:01.650Z"
+    },
+    {
+      "trial": 2,
+      "query": "I keep hearing about NovaCRM — what exactly is it?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a sales-automation platform designed to help sales teams close deals more efficiently by consolidating customer conversations, emails, and pipeline updates into a single workspace. It automates repetitive tasks, reducing manual data entry and providing reporting features that help identify stalled deals, making it a comprehensive tool for growing sales organizations (Source A). Users have found it handy for streamlining workflows and improving deal tracking (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:53:03.187Z"
+    },
+    {
+      "trial": 2,
+      "query": "I keep hearing about NovaCRM — what exactly is it?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM is a **customer relationship management (CRM)** platform, and the sources describe it mainly as an **AI-powered real estate CRM** for agents, teams, and brokerages.[4][5][8] It is designed to help users manage leads and deals, automate follow-ups and marketing, and keep customer communication, pipeline tracking, and related tasks in one place.[1][2][4]\n\nSome sources also describe it more generally as a sales-automation and workflow tool that reduces manual data entry and helps teams spot",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:53:05.879Z"
+    },
+    {
+      "trial": 2,
+      "query": "I keep hearing about NovaCRM — what exactly is it?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM is a sales-automation platform that helps sales teams close deals faster by consolidating customer conversations, emails, and pipeline updates into a single workspace. It combines pipeline tracking, automation for follow-ups and reminders, and reporting features to help sales managers identify where deals stall. Source A describes it as designed for growing sales organizations that want to reduce manual data entry and free up sales reps to focus on selling rather t",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-17T19:53:07.402Z"
+    }
+  ]
+}

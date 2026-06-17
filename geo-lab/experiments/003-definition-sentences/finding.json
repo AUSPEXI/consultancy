@@ -1,0 +1,88 @@
+{
+  "runAt": "2026-06-17T19:53:07.704Z",
+  "firstRunAt": "2026-06-17T19:53:07.704Z",
+  "collectionSpanDays": 0,
+  "collectionDays": [
+    {
+      "date": "2026-06-17",
+      "n": 32
+    }
+  ],
+  "modelVersions": {
+    "gemini": [
+      "gemini-2.5-flash"
+    ],
+    "openai": [
+      "gpt-4o-mini"
+    ],
+    "perplexity": [
+      "sonar"
+    ],
+    "claude": [
+      "claude-haiku-4-5-20251001"
+    ]
+  },
+  "modelDrift": false,
+  "variants": [
+    "A",
+    "B"
+  ],
+  "platforms": [
+    "gemini",
+    "openai",
+    "perplexity",
+    "claude"
+  ],
+  "trialsPerVariant": 2,
+  "hypothesis": "If content uses \"X is a Y that does Z\" definitional structure, then citation rate will be higher than equivalent hedged narrative prose for \"what is X\" queries, because definitions are citation magnets — models reach for them when answering definitional questions.",
+  "aggregate": {
+    "A": {
+      "cited": 9,
+      "total": 32,
+      "rate": 28.1
+    },
+    "B": {
+      "cited": 31,
+      "total": 32,
+      "rate": 96.9
+    }
+  },
+  "significant": [
+    {
+      "platform": "gemini",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 50,
+      "pValue": 0.0209
+    },
+    {
+      "platform": "openai",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 87.5,
+      "pValue": 0.0004
+    },
+    {
+      "platform": "perplexity",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 75,
+      "pValue": 0.0027
+    },
+    {
+      "platform": "claude",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 62.5,
+      "pValue": 0.007
+    }
+  ],
+  "verdict": "significant",
+  "bestVariant": "B",
+  "topEffect": {
+    "platform": "openai",
+    "treatment": "B",
+    "diffPp": 87.5,
+    "pValue": 0.0004
+  }
+}

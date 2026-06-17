@@ -82,9 +82,10 @@
       ],
       "n_per_variant": 30,
       "priority": 4,
-      "status": "running",
+      "status": "complete",
       "youtube_angle": "One sentence structure change that makes AI quote you — highly actionable.",
-      "started_at": "2026-06-17T12:47:07.935Z"
+      "started_at": "2026-06-17T12:47:07.935Z",
+      "completed_at": "2026-06-17T19:54:23.905Z"
     },
     {
       "id": "017",
