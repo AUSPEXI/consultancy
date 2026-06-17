@@ -18,6 +18,7 @@ jobs:
           SITE_URL: ${{ secrets.DASHBOARD_URL }}
         run: |
           BASE="${SITE_URL:-https://l8entspace.com}"
+          BASE="${BASE//[[:space:]]/}"
           URL="${BASE%/}/api/cron/email-funnel"
           echo "POST $URL"
           RESPONSE=$(curl -sL -w "\nHTTP_STATUS:%{http_code}" \
