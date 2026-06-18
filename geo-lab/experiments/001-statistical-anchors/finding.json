@@ -1,5 +1,19 @@
 {
   "runAt": "2026-06-11T22:03:00.720Z",
+  "firstRunAt": "2026-06-10T12:17:03.476Z",
+  "collectionSpanDays": 1.4,
+  "collectionDays": [
+    {
+      "date": "2026-06-10",
+      "n": 32
+    },
+    {
+      "date": "2026-06-11",
+      "n": 32
+    }
+  ],
+  "modelVersions": {},
+  "modelDrift": false,
   "variants": [
     "A",
     "B"

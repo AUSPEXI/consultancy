@@ -3,6 +3,7 @@
 **Hypothesis**: If the opening sentence contains a specific number ("cut latency 43%"), then citation rate will be higher than a version with vague language ("improved latency significantly") for product-performance queries, because LLMs weight precise, citable data points as credibility signals.
 
 **Run at**: 2026-06-11T22:03:00.720Z
+**Collection window**: 1.4 days (2026-06-10 → 2026-06-11)
 **Variants**: A, B
 **Platforms**: gemini, openai, perplexity, claude
 **Trials per variant**: 2
@@ -15,8 +16,8 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 0 | 16 | 0.0% | [0%, 0%] |
-| B | 5 | 16 | 31.3% | [8.5%, 54%] |
+| A | 0 | 16 | 0.0% | [0%, 19.4%] |
+| B | 5 | 16 | 31.3% | [14.2%, 55.6%] |
 
 **B vs A**: +31.3pp, z=2.434, p=0.0149 — ✓ significant (p < 0.05)
 
@@ -24,8 +25,8 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 0 | 16 | 0.0% | [0%, 0%] |
-| B | 3 | 16 | 18.8% | [0%, 37.9%] |
+| A | 0 | 16 | 0.0% | [0%, 19.4%] |
+| B | 3 | 16 | 18.8% | [6.6%, 43%] |
 
 **B vs A**: +18.8pp, z=1.819, p=0.0688 — ✗ not significant
 
@@ -33,8 +34,8 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 8 | 16 | 50.0% | [25.5%, 74.5%] |
-| B | 11 | 16 | 68.8% | [46%, 91.5%] |
+| A | 8 | 16 | 50.0% | [28%, 72%] |
+| B | 11 | 16 | 68.8% | [44.4%, 85.8%] |
 
 **B vs A**: +18.8pp, z=1.08, p=0.2802 — ✗ not significant
 
@@ -42,19 +43,21 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 4 | 16 | 25.0% | [3.8%, 46.2%] |
-| B | 16 | 16 | 100.0% | [100%, 100%] |
+| A | 4 | 16 | 25.0% | [10.2%, 49.5%] |
+| B | 16 | 16 | 100.0% | [80.6%, 100%] |
 
 **B vs A**: +75.0pp, z=4.382, p=0 — ✓ significant (p < 0.05)
 
 ---
 
-## Aggregate (all platforms pooled)
+## Aggregate (all platforms pooled) — PRIMARY ENDPOINT
 
 | Variant | Cited | n | Citation Rate |
 |---------|-------|---|---------------|
 | A | 12 | 64 | 18.8% |
 | B | 35 | 64 | 54.7% |
+
+**Aggregate B vs A** (primary): +35.9pp, z=4.217, p=0 — ✓ significant
 
 ---
 
@@ -68,8 +71,10 @@
 
 ## Threats to Validity
 
-- **Model versioning**: Results reflect platform behaviour at time of run. Model updates may change these outcomes.
+- **⚠ Low temporal coverage**: All 64 trials collected over 1.4 days. Results reflect a narrow snapshot of model behaviour. Target ≥ 10 days for robust temporal coverage.
+  - Trials per day: 2026-06-10: 32, 2026-06-11: 32
+- **Model versions stable**: No model version changes detected across batches ().
 - **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.
-- **n=2 per variant**: ⚠ Below the lab minimum of 30 — treat as preliminary.
+- **Sample size**: 16 trials per platform-variant (64 pooled per variant). ⚠ Below the lab minimum of 30 per platform-variant — treat as preliminary.
 - **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.
-- **Multiple comparisons**: 2 simultaneous tests inflate the false-positive rate. Treat findings as exploratory unless pre-registered.
+- **Multiple comparisons**: 4 per-platform tests run alongside the primary aggregate test. Bonferroni-corrected α for per-platform comparisons = 0.0125. Per-platform results with p > 0.0125 are exploratory.

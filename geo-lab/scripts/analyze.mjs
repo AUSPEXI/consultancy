@@ -50,9 +50,15 @@ function normalCDF(z) {
 
 function ci95(p, n) {
   if (n === 0) return [0, 0];
-  const z = 1.96;
-  const margin = z * Math.sqrt((p * (1 - p)) / n);
-  return [+(Math.max(0, p - margin) * 100).toFixed(1), +(Math.min(1, p + margin) * 100).toFixed(1)];
+  // Wilson score interval — correct at the boundaries (a normal-approx CI
+  // wrongly collapses to [0,0] at p=0 and [100,100] at p=1).
+  const z = 1.96, z2 = z * z;
+  const denom = 1 + z2 / n;
+  const centre = p + z2 / (2 * n);
+  const margin = z * Math.sqrt((p * (1 - p) + z2 / (4 * n)) / n);
+  const lo = Math.max(0, (centre - margin) / denom);
+  const hi = Math.min(1, (centre + margin) / denom);
+  return [+(lo * 100).toFixed(1), +(hi * 100).toFixed(1)];
 }
 
 // ── Aggregate citations ──────────────────────────────────────────────────────
@@ -221,7 +227,12 @@ report += `- **Fast-mode vs live index**: This experiment tests in-context retri
 if (raw.attribution?.lowSensitivity) {
   report += `- **⚠ Low attribution sensitivity**: the variants share almost all text (smallest unique-fingerprint set = ${raw.attribution.minUniqueFingerprints}). The content-fingerprint scorer can barely tell them apart, so a null result here may be a measurement artifact rather than a true no-effect. Treat any null with extreme caution; make the variants more distinct on the tested dimension.\n`;
 }
-report += `- **n=${meta.trialsPerVariant} per variant**: ${meta.trialsPerVariant >= 30 ? 'Meets the lab minimum.' : '⚠ Below the lab minimum of 30 — treat as preliminary.'}\n`;
+{
+  const fv = variants[0];
+  const perPlatformN = stats[platforms[0]]?.[fv]?.total ?? 0;
+  const pooledN = platforms.reduce((sum, p) => sum + (stats[p]?.[fv]?.total ?? 0), 0);
+  report += `- **Sample size**: ${perPlatformN} trials per platform-variant (${pooledN} pooled per variant). ${perPlatformN >= 30 ? 'Meets the lab minimum of 30 per platform-variant.' : '⚠ Below the lab minimum of 30 per platform-variant — treat as preliminary.'}\n`;
+}
 report += `- **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.\n`;
 report += `- **Multiple comparisons**: ${kTests} per-platform tests run alongside the primary aggregate test. Bonferroni-corrected α for per-platform comparisons = ${bonferroniAlpha}. Per-platform results with p > ${bonferroniAlpha} are exploratory.\n`;
 
