@@ -47,6 +47,16 @@
       "rate": 25
     }
   },
+  "cmh": [
+    {
+      "treatment": "B",
+      "control": "A",
+      "chi2": 0.643,
+      "pValue": 0.4227,
+      "oddsRatio": 0.56,
+      "strata": 4
+    }
+  ],
   "significant": [],
   "verdict": "null",
   "bestVariant": null,

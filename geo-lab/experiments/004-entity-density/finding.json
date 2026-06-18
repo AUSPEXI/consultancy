@@ -47,6 +47,16 @@
       "rate": 56.3
     }
   },
+  "cmh": [
+    {
+      "treatment": "B",
+      "control": "A",
+      "chi2": 11.958,
+      "pValue": 0.0005,
+      "oddsRatio": 10.33,
+      "strata": 4
+    }
+  ],
   "significant": [
     {
       "platform": "claude",

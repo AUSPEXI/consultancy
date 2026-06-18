@@ -48,6 +48,34 @@ function normalCDF(z) {
   return z >= 0 ? cdf : 1 - cdf;
 }
 
+// ── Cochran–Mantel–Haenszel ──────────────────────────────────────────────────
+// Tests a common treatment-vs-control effect across strata (engines) while
+// controlling for the stratum. Unlike naive pooling of proportions, it is immune
+// to Simpson's paradox. Returns the χ²(1) statistic (continuity-corrected), its
+// two-sided p-value, and the Mantel–Haenszel common odds ratio (effect size).
+// strata: [{ a, b, c, d }] with a=treatment cited, b=treatment not, c=control
+// cited, d=control not.
+function cochranMantelHaenszel(strata) {
+  let sumA = 0, sumE = 0, sumV = 0, numOR = 0, denOR = 0, usable = 0;
+  for (const { a, b, c, d } of strata) {
+    const N = a + b + c + d;
+    if (N <= 1) continue;
+    usable++;
+    const row1 = a + b, col1 = a + c, row2 = c + d, col2 = b + d;
+    sumA += a;
+    sumE += (row1 * col1) / N;
+    sumV += (row1 * row2 * col1 * col2) / (N * N * (N - 1));
+    numOR += (a * d) / N;
+    denOR += (b * c) / N;
+  }
+  if (usable === 0 || sumV === 0) return { chi2: 0, pValue: 1, oddsRatio: null, strata: usable };
+  const cc = Math.max(0, Math.abs(sumA - sumE) - 0.5); // Yates continuity correction
+  const chi2 = (cc * cc) / sumV;
+  const pValue = +(2 * (1 - normalCDF(Math.sqrt(chi2)))).toFixed(4);
+  const oddsRatio = denOR > 0 ? +(numOR / denOR).toFixed(2) : null;
+  return { chi2: +chi2.toFixed(3), pValue, oddsRatio, strata: usable };
+}
+
 function ci95(p, n) {
   if (n === 0) return [0, 0];
   // Wilson score interval — correct at the boundaries (a normal-approx CI
@@ -161,7 +189,7 @@ for (const platform of platforms) {
 // The aggregate test is pre-registered as the PRIMARY endpoint. Per-platform
 // tests are exploratory and subject to multiple-comparisons inflation.
 // Bonferroni-corrected threshold for k per-platform tests: α_adj = 0.05 / k.
-report += `---\n\n## Aggregate (all platforms pooled) — PRIMARY ENDPOINT\n\n`;
+report += `---\n\n## Combined effect across engines\n\nPrimary endpoint is the Cochran–Mantel–Haenszel stratified test (below). The pooled counts here are descriptive only.\n\n`;
 report += `| Variant | Cited | n | Citation Rate |\n`;
 report += `|---------|-------|---|---------------|\n`;
 
@@ -177,17 +205,31 @@ for (const v of variants) {
 }
 report += '\n';
 
-// Aggregate significance test (primary endpoint)
+// Aggregate test. The PRIMARY endpoint is the Cochran–Mantel–Haenszel stratified
+// test (controls for engine, immune to Simpson's). Naive pooling of proportions
+// is reported as descriptive context only — it can mislead when base rates differ.
 const [aggControl, ...aggTreatments] = variants;
+const cmhResults = [];
 for (const trt of aggTreatments) {
+  const strata = platforms.map(p => ({
+    a: stats[p][trt].cited,
+    b: stats[p][trt].total - stats[p][trt].cited,
+    c: stats[p][aggControl].cited,
+    d: stats[p][aggControl].total - stats[p][aggControl].cited,
+  }));
+  const cmh = cochranMantelHaenszel(strata);
+  cmhResults.push({ treatment: trt, control: aggControl, ...cmh });
+  const cmhSig = cmh.pValue < 0.05;
+  report += `**PRIMARY — Cochran–Mantel–Haenszel (stratified by engine)**, ${trt} vs ${aggControl}: χ²(1)=${cmh.chi2}, p=${cmh.pValue}${cmh.oddsRatio != null ? `, common odds ratio=${cmh.oddsRatio}` : ''} — ${cmhSig ? '✓ significant' : '✗ not significant'}\n\n`;
+
+  // Descriptive only — naive pooling, shown for context (susceptible to Simpson's).
   const ctrl = agg[aggControl];
   const trtS = agg[trt];
   const ctrlRate = ctrl.total > 0 ? ctrl.cited / ctrl.total : 0;
   const trtRate  = trtS.total  > 0 ? trtS.cited  / trtS.total  : 0;
   const { z: aggZ, pValue: aggP } = twoProportionZ(trtRate, trtS.total, ctrlRate, ctrl.total);
   const aggDiff = +((trtRate - ctrlRate) * 100).toFixed(1);
-  const aggSig = aggP < 0.05;
-  report += `**Aggregate ${trt} vs ${aggControl}** (primary): ${aggDiff > 0 ? '+' : ''}${aggDiff}pp, z=${aggZ}, p=${aggP} — ${aggSig ? '✓ significant' : '✗ not significant'}\n\n`;
+  report += `_Descriptive (naive pooled, not the primary test): ${trt} vs ${aggControl} ${aggDiff > 0 ? '+' : ''}${aggDiff}pp, z=${aggZ}, p=${aggP}._\n\n`;
 }
 
 // ── Holm–Bonferroni step-down across the k per-engine tests ──────────────────
@@ -324,6 +366,7 @@ const findingJson = {
   trialsPerVariant: meta.trialsPerVariant,
   hypothesis,
   aggregate,
+  cmh: cmhResults,
   significant: allSignificant.map(s => ({
     platform: s.platform,
     control: s.control,

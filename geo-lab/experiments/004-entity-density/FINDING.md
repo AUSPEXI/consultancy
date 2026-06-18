@@ -50,14 +50,18 @@
 
 ---
 
-## Aggregate (all platforms pooled) — PRIMARY ENDPOINT
+## Combined effect across engines
+
+Primary endpoint is the Cochran–Mantel–Haenszel stratified test (below). The pooled counts here are descriptive only.
 
 | Variant | Cited | n | Citation Rate |
 |---------|-------|---|---------------|
 | A | 4 | 32 | 12.5% |
 | B | 18 | 32 | 56.3% |
 
-**Aggregate B vs A** (primary): +43.8pp, z=3.685, p=0.0002 — ✓ significant
+**PRIMARY — Cochran–Mantel–Haenszel (stratified by engine)**, B vs A: χ²(1)=11.958, p=0.0005, common odds ratio=10.33 — ✓ significant
+
+_Descriptive (naive pooled, not the primary test): B vs A +43.8pp, z=3.685, p=0.0002._
 
 ---
 

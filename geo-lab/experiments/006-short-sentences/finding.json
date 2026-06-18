@@ -47,6 +47,16 @@
       "rate": 37.5
     }
   },
+  "cmh": [
+    {
+      "treatment": "B",
+      "control": "A",
+      "chi2": 11.419,
+      "pValue": 0.0007,
+      "oddsRatio": 0.1,
+      "strata": 4
+    }
+  ],
   "significant": [
     {
       "platform": "perplexity",

@@ -47,6 +47,16 @@
       "rate": 96.9
     }
   },
+  "cmh": [
+    {
+      "treatment": "B",
+      "control": "A",
+      "chi2": 28.761,
+      "pValue": 0,
+      "oddsRatio": 177,
+      "strata": 4
+    }
+  ],
   "significant": [
     {
       "platform": "gemini",
