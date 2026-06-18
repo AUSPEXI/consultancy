@@ -16,8 +16,8 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 2 | 8 | 25.0% | [0%, 55%] |
-| B | 2 | 8 | 25.0% | [0%, 55%] |
+| A | 2 | 8 | 25.0% | [7.1%, 59.1%] |
+| B | 2 | 8 | 25.0% | [7.1%, 59.1%] |
 
 **B vs A**: 0.0pp, z=0, p=1 — ✗ not significant
 
@@ -25,8 +25,8 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 0 | 8 | 0.0% | [0%, 0%] |
-| B | 0 | 8 | 0.0% | [0%, 0%] |
+| A | 0 | 8 | 0.0% | [0%, 32.4%] |
+| B | 0 | 8 | 0.0% | [0%, 32.4%] |
 
 **B vs A**: 0.0pp, z=0, p=1 — ✗ not significant
 
@@ -34,8 +34,8 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 0 | 8 | 0.0% | [0%, 0%] |
-| B | 0 | 8 | 0.0% | [0%, 0%] |
+| A | 0 | 8 | 0.0% | [0%, 32.4%] |
+| B | 0 | 8 | 0.0% | [0%, 32.4%] |
 
 **B vs A**: 0.0pp, z=0, p=1 — ✗ not significant
 
@@ -43,8 +43,8 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 2 | 8 | 25.0% | [0%, 55%] |
-| B | 2 | 8 | 25.0% | [0%, 55%] |
+| A | 2 | 8 | 25.0% | [7.1%, 59.1%] |
+| B | 2 | 8 | 25.0% | [7.1%, 59.1%] |
 
 **B vs A**: 0.0pp, z=0, p=1 — ✗ not significant
 
@@ -75,6 +75,6 @@ This is a valid null result. The tested variable does not appear to affect citat
   - Trials per day: 2026-06-18: 32
 - **Model versions stable**: No model version changes detected across batches (gemini: gemini-2.5-flash, openai: gpt-4o-mini, perplexity: sonar, claude: claude-haiku-4-5-20251001).
 - **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.
-- **n=2 per variant**: ⚠ Below the lab minimum of 30 — treat as preliminary.
+- **Sample size**: 8 trials per platform-variant (32 pooled per variant). ⚠ Below the lab minimum of 30 per platform-variant — treat as preliminary.
 - **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.
 - **Multiple comparisons**: 4 per-platform tests run alongside the primary aggregate test. Bonferroni-corrected α for per-platform comparisons = 0.0125. Per-platform results with p > 0.0125 are exploratory.

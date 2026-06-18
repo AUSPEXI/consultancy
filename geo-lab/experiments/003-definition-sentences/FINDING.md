@@ -16,8 +16,8 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 4 | 8 | 50.0% | [15.4%, 84.6%] |
-| B | 8 | 8 | 100.0% | [100%, 100%] |
+| A | 4 | 8 | 50.0% | [21.5%, 78.5%] |
+| B | 8 | 8 | 100.0% | [67.6%, 100%] |
 
 **B vs A**: +50.0pp, z=2.309, p=0.0209 — ✓ significant (p < 0.05)
 
@@ -25,8 +25,8 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 1 | 8 | 12.5% | [0%, 35.4%] |
-| B | 8 | 8 | 100.0% | [100%, 100%] |
+| A | 1 | 8 | 12.5% | [2.2%, 47.1%] |
+| B | 8 | 8 | 100.0% | [67.6%, 100%] |
 
 **B vs A**: +87.5pp, z=3.528, p=0.0004 — ✓ significant (p < 0.05)
 
@@ -34,8 +34,8 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 1 | 8 | 12.5% | [0%, 35.4%] |
-| B | 7 | 8 | 87.5% | [64.6%, 100%] |
+| A | 1 | 8 | 12.5% | [2.2%, 47.1%] |
+| B | 7 | 8 | 87.5% | [52.9%, 97.8%] |
 
 **B vs A**: +75.0pp, z=3, p=0.0027 — ✓ significant (p < 0.05)
 
@@ -43,8 +43,8 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 3 | 8 | 37.5% | [4%, 71%] |
-| B | 8 | 8 | 100.0% | [100%, 100%] |
+| A | 3 | 8 | 37.5% | [13.7%, 69.4%] |
+| B | 8 | 8 | 100.0% | [67.6%, 100%] |
 
 **B vs A**: +62.5pp, z=2.697, p=0.007 — ✓ significant (p < 0.05)
 
@@ -77,6 +77,6 @@
   - Trials per day: 2026-06-17: 32
 - **Model versions stable**: No model version changes detected across batches (gemini: gemini-2.5-flash, openai: gpt-4o-mini, perplexity: sonar, claude: claude-haiku-4-5-20251001).
 - **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.
-- **n=2 per variant**: ⚠ Below the lab minimum of 30 — treat as preliminary.
+- **Sample size**: 8 trials per platform-variant (32 pooled per variant). ⚠ Below the lab minimum of 30 per platform-variant — treat as preliminary.
 - **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.
 - **Multiple comparisons**: 4 per-platform tests run alongside the primary aggregate test. Bonferroni-corrected α for per-platform comparisons = 0.0125. Per-platform results with p > 0.0125 are exploratory.
