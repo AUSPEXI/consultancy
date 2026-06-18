@@ -1,0 +1,54 @@
+{
+  "runAt": "2026-06-18T01:05:43.039Z",
+  "firstRunAt": "2026-06-18T01:05:43.039Z",
+  "collectionSpanDays": 0,
+  "collectionDays": [
+    {
+      "date": "2026-06-18",
+      "n": 32
+    }
+  ],
+  "modelVersions": {
+    "gemini": [
+      "gemini-2.5-flash"
+    ],
+    "openai": [
+      "gpt-4o-mini"
+    ],
+    "perplexity": [
+      "sonar"
+    ],
+    "claude": [
+      "claude-haiku-4-5-20251001"
+    ]
+  },
+  "modelDrift": false,
+  "variants": [
+    "A",
+    "B"
+  ],
+  "platforms": [
+    "gemini",
+    "openai",
+    "perplexity",
+    "claude"
+  ],
+  "trialsPerVariant": 2,
+  "hypothesis": "If content includes explicit date markers (\"As of 2026…\", \"Updated June 2026\"), then citation rate will be higher than undated equivalent content for factual queries, because LLMs prefer temporally anchored sources for factual queries.",
+  "aggregate": {
+    "A": {
+      "cited": 4,
+      "total": 32,
+      "rate": 12.5
+    },
+    "B": {
+      "cited": 4,
+      "total": 32,
+      "rate": 12.5
+    }
+  },
+  "significant": [],
+  "verdict": "null",
+  "bestVariant": null,
+  "topEffect": null
+}

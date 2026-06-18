@@ -1,0 +1,584 @@
+{
+  "meta": {
+    "variants": [
+      "A",
+      "B"
+    ],
+    "queries": [
+      "What is the latest version of NovaCRM and what does it do for sales teams?",
+      "How current is NovaCRM's pricing and feature set?",
+      "Is NovaCRM up to date for 2026 sales workflows?",
+      "What are NovaCRM's most recent performance numbers for closing deals?"
+    ],
+    "platforms": [
+      "gemini",
+      "openai",
+      "perplexity",
+      "claude"
+    ],
+    "trialsPerVariant": 2,
+    "firstRunAt": "2026-06-18T01:05:43.039Z",
+    "runAt": "2026-06-18T01:05:43.039Z",
+    "batches": 1,
+    "modelVersions": {
+      "gemini": [
+        "gemini-2.5-flash"
+      ],
+      "openai": [
+        "gpt-4o-mini"
+      ],
+      "perplexity": [
+        "sonar"
+      ],
+      "claude": [
+        "claude-haiku-4-5-20251001"
+      ]
+    }
+  },
+  "results": [
+    {
+      "trial": 1,
+      "query": "What is the latest version of NovaCRM and what does it do for sales teams?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "As of June 2026, NovaCRM is a sales CRM that helps sales teams close deals faster by combining pipeline tracking, automated follow-ups, and AI deal scoring in one workspace (Source B). It enables sales reps to identify opportunities most likely to close and where deals are stalling. The platform's AI assistant also drafts follow-up emails, summarizes call notes, and flags deals that have gone quiet (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:04:29.523Z"
+    },
+    {
+      "trial": 1,
+      "query": "What is the latest version of NovaCRM and what does it do for sales teams?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "The latest version of NovaCRM, updated in June 2026, is designed to help sales teams close deals faster through features like pipeline tracking, automated follow-ups, and AI deal scoring. It offers a Deal Velocity dashboard that highlights stuck opportunities and suggests next actions, resulting in a reported 31% reduction in sales cycle length and a 22% increase in win rate. NovaCRM also integrates with various tools and includes an AI assistant for drafting emails and summarizing notes (Source",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:04:32.946Z"
+    },
+    {
+      "trial": 1,
+      "query": "What is the latest version of NovaCRM and what does it do for sales teams?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "The provided sources do not state a specific \"latest version\" number for NovaCRM, but they describe it as a sales CRM updated as of June 2026 that helps sales teams close deals faster by combining pipeline tracking, automated follow-ups, and AI deal scoring in one workspace[SOURCE B]. Sales teams use NovaCRM to identify which opportunities are most likely to close and to see where each deal is stalling, with its Deal Velocity dashboard surfacing stuck opportunities and recommending next best act",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:04:35.436Z"
+    },
+    {
+      "trial": 1,
+      "query": "What is the latest version of NovaCRM and what does it do for sales teams?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source B, as of 2026, the latest version of NovaCRM helps sales teams close deals faster by combining pipeline tracking, automated follow-ups, and AI deal scoring in one workspace. The platform's Deal Velocity dashboard identifies stuck opportunities and recommends next steps, while its AI assistant drafts follow-up emails, summarizes call notes, and flags inactive deals. Teams using NovaCRM report a 31% reduction in sales cycle length and a 22% lift in win rate after their first qu",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:04:37.166Z"
+    },
+    {
+      "trial": 1,
+      "query": "How current is NovaCRM's pricing and feature set?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM's pricing and feature set are current as of June 2026. As of that date, pricing starts at $29 per user per month for the Starter plan, and the Growth plan is $59 per user per month (Source B). Features like the Deal Velocity dashboard, AI assistant, and integrations with Gmail, Outlook, and Slack are also current as of 2026 (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:04:39.028Z"
+    },
+    {
+      "trial": 1,
+      "query": "How current is NovaCRM's pricing and feature set?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM's pricing and feature set is current as of June 2026, with pricing starting at $29 per user per month for the Starter plan and $59 per user per month for the Growth plan, which includes additional features like forecasting. The platform offers a variety of tools for sales teams, including pipeline tracking and AI deal scoring, to enhance sales performance (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:04:40.719Z"
+    },
+    {
+      "trial": 1,
+      "query": "How current is NovaCRM's pricing and feature set?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM’s pricing and feature set appear **inconsistent across sources**, so the safest answer is that the publicly available information is **not fully current or uniform**. One source says pricing starts at **$29/user/month** with a Starter plan and **$59/user/month** for Growth, plus features like pipeline tracking, automated follow-ups, AI deal scoring, forecasting, and custom reporting[Source A].\n\nBut other 2026-era listings show a different picture: Capterra says pricing is **“Contact vend",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:04:43.155Z"
+    },
+    {
+      "trial": 1,
+      "query": "How current is NovaCRM's pricing and feature set?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source B, NovaCRM's pricing and feature set are current as of June 2026. The platform offers a Starter plan at $29 per user per month and a Growth plan at $59 per user per month, with the Growth plan including forecasting capabilities. Source B also indicates that the platform includes pipeline tracking, AI deal scoring, automated follow-ups, integrations with 40+ tools, and an AI assistant for email drafting and deal monitoring.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:04:44.740Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM up to date for 2026 sales workflows?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Yes, NovaCRM is up to date for 2026 sales workflows. The information regarding the platform, including its features and pricing, was \"Updated June 2026\" and is explicitly noted as current \"As of 2026\" (Source A). This indicates that its offerings, such as pipeline tracking, automated follow-ups, and AI deal scoring, reflect the state of the system for 2026 (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T01:04:48.080Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM up to date for 2026 sales workflows?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Yes, NovaCRM is up to date for 2026 sales workflows. As of 2026, it features enhancements like the Deal Velocity dashboard for tracking stuck opportunities, and teams have reported a 31% reduction in sales cycle length and a 22% increase in win rate after adopting the platform. It also integrates with various tools and offers pricing starting at $29 per user per month (according to Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T01:04:50.649Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM up to date for 2026 sales workflows?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Yes—**Source A** is explicitly updated for **June 2026** and describes NovaCRM with 2026-specific pricing, features, and usage claims, so it appears current for 2026 sales workflows. **Source B** covers the same product but lacks any freshness markers, so **Source A** is the better indicator that NovaCRM is up to date.[SOURCE A][SOURCE B]",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T01:04:52.750Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM up to date for 2026 sales workflows?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM is up to date for 2026 sales workflows. The platform was updated as of June 2026 and includes modern features like an AI-powered Deal Velocity dashboard, AI-assisted email drafting, and integration with 40+ tools that support current sales processes. Teams adopting NovaCRM in 2026 report significant improvements, including a 31% reduction in sales cycle length and a 22% lift in win rate.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T01:04:54.548Z"
+    },
+    {
+      "trial": 1,
+      "query": "What are NovaCRM's most recent performance numbers for closing deals?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "As of 2026, teams that adopted NovaCRM report a 31% reduction in average sales cycle length and a 22% lift in win rate after the first quarter of use (Source B). These figures indicate NovaCRM's impact on improving deal-closing efficiency and success rates (Source B).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:04:58.677Z"
+    },
+    {
+      "trial": 1,
+      "query": "What are NovaCRM's most recent performance numbers for closing deals?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "As of 2026, teams using NovaCRM report a 22% increase in win rate and a 31% reduction in average sales cycle length after the first quarter of use (Source B). This performance indicates significant improvements in closing deals for sales teams that adopt the platform.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:05:00.215Z"
+    },
+    {
+      "trial": 1,
+      "query": "What are NovaCRM's most recent performance numbers for closing deals?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "According to Source B, NovaCRM’s most recent reported performance numbers are a **31% reduction in average sales cycle length** and a **22% lift in win rate** after the first quarter of use. Source A reports the same numbers, so both sources agree on the latest closing-deals results.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:05:01.968Z"
+    },
+    {
+      "trial": 1,
+      "query": "What are NovaCRM's most recent performance numbers for closing deals?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A and Source B, NovaCRM's most recent performance numbers show that teams adopting the platform report a **31% reduction in average sales cycle length and a 22% lift in win rate after the first quarter of use**. Source B indicates these figures are current as of 2026. These metrics demonstrate NovaCRM's effectiveness in helping sales teams close deals faster.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:05:03.471Z"
+    },
+    {
+      "trial": 2,
+      "query": "What is the latest version of NovaCRM and what does it do for sales teams?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "The provided sources do not specify a version number for NovaCRM; however, the information about the product is noted as \"Updated June 2026\" (According to Source B). NovaCRM helps sales teams close deals faster by combining pipeline tracking, automated follow-ups, and AI deal scoring in one workspace (According to Source A and Source B). It allows sales reps to identify opportunities most likely to close, pinpoint where deals are stalling, and receive recommended next actions through its Deal Ve",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:05:10.189Z"
+    },
+    {
+      "trial": 2,
+      "query": "What is the latest version of NovaCRM and what does it do for sales teams?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "The latest version of NovaCRM, updated in June 2026, combines pipeline tracking, automated follow-ups, and AI deal scoring to help sales teams close deals faster. Its features include a Deal Velocity dashboard that identifies stuck opportunities and recommends next steps, contributing to a reported 31% reduction in average sales cycle length and a 22% uplift in win rate after the first quarter of use (Source B). Pricing starts at $29 per user per month for the Starter plan (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:05:12.252Z"
+    },
+    {
+      "trial": 2,
+      "query": "What is the latest version of NovaCRM and what does it do for sales teams?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "The latest version information in the provided sources is **“Updated June 2026”**, but no actual version number is given.[Source B] NovaCRM is a sales CRM that helps sales teams **close deals faster** by combining pipeline tracking, automated follow-ups, AI deal scoring, and a Deal Velocity dashboard that highlights stuck opportunities and recommends next steps.[Source A][Source B]",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:05:13.922Z"
+    },
+    {
+      "trial": 2,
+      "query": "What is the latest version of NovaCRM and what does it do for sales teams?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "Based on the provided sources, I cannot determine the \"latest version\" of NovaCRM, as neither source specifies a version number. However, according to Source B (updated June 2026), NovaCRM helps sales teams close deals faster by combining pipeline tracking, automated follow-ups, and AI deal scoring. The platform's Deal Velocity dashboard identifies stuck opportunities and recommends next steps, while its AI assistant drafts follow-up emails, summarizes call notes, and flags inactive deals—capabi",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:05:15.906Z"
+    },
+    {
+      "trial": 2,
+      "query": "How current is NovaCRM's pricing and feature set?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM's pricing and feature set are current as of June 2026. The platform's Deal Velocity dashboard and pricing, which starts at $29 per user per month for the Starter plan and $59 for the Growth plan, are current as of 2026 (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:05:17.555Z"
+    },
+    {
+      "trial": 2,
+      "query": "How current is NovaCRM's pricing and feature set?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "As of June 2026, NovaCRM's pricing starts at $29 per user per month for the Starter plan, with the Growth plan priced at $59 per user per month, which includes additional features like forecasting and custom reporting (Source B). The platform continues to offer features such as pipeline tracking, automated follow-ups, and AI deal scoring, which contribute to improved sales performance (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:05:19.363Z"
+    },
+    {
+      "trial": 2,
+      "query": "How current is NovaCRM's pricing and feature set?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM’s current pricing is **not fully consistent across sources**: Source A says pricing starts at **$29 per user per month** for Starter and **$59** for Growth, while Source B gives the same plans but only says “Updated June 2026” without changing the numbers. However, third-party listings are different and less specific: Capterra shows **“Contact vendor”** and a **$69 flat-rate per month** starting price, and Software Advice says pricing is **available upon request**.[SOURCE A][SOURCE B][2]",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:05:22.192Z"
+    },
+    {
+      "trial": 2,
+      "query": "How current is NovaCRM's pricing and feature set?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source B, NovaCRM's pricing and feature set were updated as of June 2026. The pricing starts at $29 per user per month for the Starter plan and $59 per user per month for the Growth plan, which includes forecasting capabilities. The platform offers core features like pipeline tracking, automated follow-ups, AI deal scoring, email integration with Gmail and Outlook, and an AI assistant for drafting follow-ups and summarizing call notes.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:05:23.832Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM up to date for 2026 sales workflows?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Yes, NovaCRM appears to be up to date for 2026 sales workflows. Source A explicitly states it was \"Updated June 2026\" and details its features, such as the Deal Velocity dashboard and AI assistant, \"As of 2026.\" It also mentions that teams adopting NovaCRM in 2026 reported a 31% reduction in average sales cycle length and a 22% lift in win rate after the first quarter of use.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T01:05:27.559Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM up to date for 2026 sales workflows?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Yes, NovaCRM is up to date for 2026 sales workflows. As of June 2026, the platform features a Deal Velocity dashboard that aids in managing sales opportunities, and users report significant improvements in sales cycle length and win rates. The CRM integrates with various tools and has competitive pricing starting at $29 per user per month (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T01:05:29.825Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM up to date for 2026 sales workflows?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "**Yes—based on Source A, NovaCRM appears up to date for 2026 sales workflows**, because it is explicitly described as “Updated June 2026” and “As of 2026” with features like AI deal scoring, Deal Velocity dashboards, inbox integrations, and automated follow-ups.[SOURCE A]\n\nBy contrast, Source B describes the same product without the 2026 freshness markers, so Source A is the stronger evidence for current relevance.[SOURCE B][SOURCE A]",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T01:05:31.717Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM up to date for 2026 sales workflows?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM appears current for 2026 sales workflows. As of 2026, the platform features a Deal Velocity dashboard that surfaces stuck opportunities and recommends next actions, and teams adopting it in 2026 report a 31% reduction in sales cycle length and a 22% lift in win rate. The platform also includes modern integrations with Gmail, Outlook, Slack, and 40+ other tools, plus an AI assistant for automating follow-ups and call summaries.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T01:05:33.519Z"
+    },
+    {
+      "trial": 2,
+      "query": "What are NovaCRM's most recent performance numbers for closing deals?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "As of June 2026, teams that adopted NovaCRM have reported a 31% reduction in average sales cycle length and a 22% lift in win rate after their first quarter of use (Source B). These performance numbers are associated with teams that started using the platform in 2026 (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:05:37.614Z"
+    },
+    {
+      "trial": 2,
+      "query": "What are NovaCRM's most recent performance numbers for closing deals?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "As of 2026, teams that adopted NovaCRM reported a 31% reduction in average sales cycle length and a 22% increase in win rate after the first quarter of use (Source B). This demonstrates the platform's effectiveness in helping sales teams close deals more efficiently.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:05:39.307Z"
+    },
+    {
+      "trial": 2,
+      "query": "What are NovaCRM's most recent performance numbers for closing deals?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "According to Source B, NovaCRM’s most recent reported performance numbers are a **31% reduction in average sales cycle length** and a **22% lift in win rate** after the first quarter of use. Source A reports the same figures, but Source B is the more recent version because it is marked *Updated June 2026*[B][A].",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:05:41.065Z"
+    },
+    {
+      "trial": 2,
+      "query": "What are NovaCRM's most recent performance numbers for closing deals?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A and Source B, NovaCRM's most recent performance numbers show that teams report a **31% reduction in average sales cycle length** and a **22% lift in win rate** after the first quarter of use. Source B indicates these figures are current as of 2026. The platform serves more than 4,000 sales teams across various industries.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T01:05:42.738Z"
+    }
+  ]
+}

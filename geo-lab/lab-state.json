@@ -1,21 +1,9 @@
 {
   "_comment": "Managed by orchestrate.mjs — do not hand-edit.",
-  "active_experiment": {
-    "id": "007",
-    "slug": "freshness-signal",
-    "dir": "experiments/007-freshness-signal",
-    "started_at": "2026-06-18T00:40:38.935Z",
-    "n_target": 30,
-    "platforms": [
-      "gemini",
-      "openai",
-      "perplexity",
-      "claude"
-    ]
-  },
-  "last_probe_run": "2026-06-18T00:30:38.935Z",
+  "active_experiment": null,
+  "last_probe_run": "2026-06-18T01:05:43.046Z",
   "last_design_run": "2026-06-18T00:40:38.936Z",
-  "queue_position": 8,
+  "queue_position": 9,
   "history": [
     {
       "id": "001",
@@ -128,6 +116,20 @@
         "claude"
       ],
       "completed_at": "2026-06-18T00:32:02.156Z"
+    },
+    {
+      "id": "007",
+      "slug": "freshness-signal",
+      "dir": "experiments/007-freshness-signal",
+      "started_at": "2026-06-18T00:40:38.935Z",
+      "n_target": 30,
+      "platforms": [
+        "gemini",
+        "openai",
+        "perplexity",
+        "claude"
+      ],
+      "completed_at": "2026-06-18T01:07:06.155Z"
     }
   ],
   "retestLog": {}
