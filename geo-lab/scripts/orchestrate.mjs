@@ -282,6 +282,15 @@ async function analyzePhase(state, backlog) {
   log('Canonically re-scoring citations from stored responses...');
   await runScript(path.join(__dir, 'rescore.mjs'), [experimentDir]);
 
+  // Independent LLM-judge attribution cross-check (semantic, robust to paraphrase
+  // and to the verbatim scorer's quotability bias). Non-fatal: skips with no key.
+  log('Running LLM-judge attribution cross-check...');
+  try {
+    await runScript(path.join(__dir, 'llm-judge.mjs'), [experimentDir]);
+  } catch (err) {
+    log(`⚠ LLM-judge cross-check failed (non-fatal): ${err.message}`);
+  }
+
   // Run statistical analysis
   log('Running statistical analysis...');
   await runScript(path.join(__dir, 'analyze.mjs'), [experimentDir]);

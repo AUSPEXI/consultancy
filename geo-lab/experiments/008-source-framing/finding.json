@@ -57,6 +57,7 @@
       "strata": 4
     }
   ],
+  "llmJudge": null,
   "significant": [
     {
       "platform": "openai",

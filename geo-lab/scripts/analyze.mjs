@@ -298,6 +298,37 @@ if (poolReversesEngines) {
   report += `> **⚠ Aggregation caution**: engines disagree in direction, so the pooled figure hides real heterogeneity. Lead with the per-engine breakdown, not the pooled number.\n\n`;
 }
 
+// ── Robustness: independent LLM-judge attribution cross-check ────────────────
+// Guards against the verbatim scorer's quotability bias. If a neutral judge,
+// scoring by meaning, agrees on direction, the effect is not a quoting artifact.
+if (raw.llmJudge && raw.llmJudge.judged > 0) {
+  const js = raw.llmJudge.summary || {};
+  let agree = 0, comparable = 0;
+  for (const r of results) {
+    if (!r.response || !r.citationsLlm || !r.citations) continue;
+    for (const v of variants) { comparable++; if (!!r.citations[v] === !!r.citationsLlm[v]) agree++; }
+  }
+  const agreePct = comparable ? (100 * agree / comparable).toFixed(1) : 'n/a';
+  const ctrlV = variants[0], trtV = variants[1];
+  const fpDir = (agg[trtV].total ? agg[trtV].cited / agg[trtV].total : 0) - (agg[ctrlV].total ? agg[ctrlV].cited / agg[ctrlV].total : 0);
+  const jTrt = js[trtV]?.n ? js[trtV].cited / js[trtV].n : 0;
+  const jCtrl = js[ctrlV]?.n ? js[ctrlV].cited / js[ctrlV].n : 0;
+  const jDir = jTrt - jCtrl;
+  const sameDir = Math.sign(fpDir) !== 0 && Math.sign(fpDir) === Math.sign(jDir);
+  report += `---\n\n## Robustness — independent LLM-judge attribution\n\n`;
+  report += `A neutral judge (${raw.llmJudge.model}) re-attributed every answer by meaning, not verbatim phrasing — this rules out a "more-quotable-variant" artifact in the primary scorer. Citation rate by method:\n\n`;
+  report += `| Variant | Verbatim scorer | LLM-judge (semantic) |\n|---------|-----------------|----------------------|\n`;
+  for (const v of variants) {
+    const fp = agg[v].total ? (100 * agg[v].cited / agg[v].total).toFixed(1) + '%' : 'n/a';
+    const jj = js[v]?.n ? (100 * js[v].cited / js[v].n).toFixed(1) + '%' : 'n/a';
+    report += `| ${v} | ${fp} | ${jj} |\n`;
+  }
+  report += `\nRecord-level agreement between the two methods: **${agreePct}%**. `;
+  report += sameDir
+    ? `Both methods show the effect in the **same direction** — the result is not a verbatim-quotability artifact.\n\n`
+    : `**⚠ The two methods disagree in direction** — the verbatim result may be a quotability artifact. Do not publish as a citation-preference finding until resolved.\n\n`;
+}
+
 // ── Threats to validity ──────────────────────────────────────────────────────
 report += `---\n\n## Threats to Validity\n\n`;
 
@@ -367,6 +398,7 @@ const findingJson = {
   hypothesis,
   aggregate,
   cmh: cmhResults,
+  llmJudge: raw.llmJudge ?? null,
   significant: allSignificant.map(s => ({
     platform: s.platform,
     control: s.control,
