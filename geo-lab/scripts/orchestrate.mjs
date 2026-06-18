@@ -29,9 +29,15 @@ const ROOT = path.resolve(__dir, '..');
 config({ path: path.join(__dir, '.env') });
 
 const DRY_RUN = process.argv.includes('--dry-run');
+const VALID_PHASES = ['design', 'probe', 'analyze', 'retest'];
 const forcePhase = (() => {
   const idx = process.argv.indexOf('--force-phase');
-  return idx !== -1 ? process.argv[idx + 1] : null;
+  const v = idx !== -1 ? process.argv[idx + 1] : null;
+  if (v && !VALID_PHASES.includes(v)) {
+    console.warn(`[orchestrate] Ignoring invalid --force-phase "${v}" (expected ${VALID_PHASES.join(' / ')}); auto-detecting phase instead.`);
+    return null;
+  }
+  return v;
 })();
 
 const MIN_N = 30;
