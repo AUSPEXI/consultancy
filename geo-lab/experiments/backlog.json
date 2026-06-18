@@ -209,8 +209,9 @@
       ],
       "n_per_variant": 30,
       "priority": 10,
-      "status": "queued",
-      "youtube_angle": "Copywriting meets GEO — cross-audience appeal with content creators and marketers."
+      "status": "running",
+      "youtube_angle": "Copywriting meets GEO — cross-audience appeal with content creators and marketers.",
+      "started_at": "2026-06-18T06:38:51.275Z"
     },
     {
       "id": "009",
