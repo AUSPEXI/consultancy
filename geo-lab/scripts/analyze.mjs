@@ -218,6 +218,9 @@ if (driftedPlatforms.length > 0) {
 }
 
 report += `- **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.\n`;
+if (raw.attribution?.lowSensitivity) {
+  report += `- **⚠ Low attribution sensitivity**: the variants share almost all text (smallest unique-fingerprint set = ${raw.attribution.minUniqueFingerprints}). The content-fingerprint scorer can barely tell them apart, so a null result here may be a measurement artifact rather than a true no-effect. Treat any null with extreme caution; make the variants more distinct on the tested dimension.\n`;
+}
 report += `- **n=${meta.trialsPerVariant} per variant**: ${meta.trialsPerVariant >= 30 ? 'Meets the lab minimum.' : '⚠ Below the lab minimum of 30 — treat as preliminary.'}\n`;
 report += `- **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.\n`;
 report += `- **Multiple comparisons**: ${kTests} per-platform tests run alongside the primary aggregate test. Bonferroni-corrected α for per-platform comparisons = ${bonferroniAlpha}. Per-platform results with p > ${bonferroniAlpha} are exploratory.\n`;

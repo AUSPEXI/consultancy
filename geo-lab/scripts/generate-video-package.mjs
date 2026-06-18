@@ -76,7 +76,8 @@ The audience: founders, marketers, and SEO/AEO practitioners who are smart, data
 
 Hard rules:
 - The number in the title MUST match the exact figure in FINDING.md.
-- Null results get honest titles (e.g. "Turns out it doesn't matter — I tested 240 prompts").
+- Null results get honest titles, BUT a null at low power is NOT proof of "no effect". If the result is null OR per-platform n is below 30 OR the finding flags low attribution sensitivity, you MUST NOT use absolute language like "did NOTHING", "doesn't matter", "zero effect", or a bare "0.0pp" as a definitive verdict. Frame it as the absence of a *detectable* effect at this power, e.g. "No measurable lift (preliminary, small sample)" or "I couldn't detect any effect — yet". Absence of evidence is not evidence of absence; say so in the script.
+- Never imply a finding is conclusive when the threats section flags low n, a <5-day window, or low attribution sensitivity. The honest hook is the limitation, not fake certainty.
 - L8EntSpace soft CTA goes at the END of the script only, using the exact approved language.
 - Spoken script target: 1,200–1,800 words (8–12 min at speaking pace).
 - Include [ON SCREEN:] cues and [B-ROLL:] suggestions throughout the script.`;

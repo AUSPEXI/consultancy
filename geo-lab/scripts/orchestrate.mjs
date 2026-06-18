@@ -40,7 +40,7 @@ const forcePhase = (() => {
   return v;
 })();
 
-const MIN_N = 30;
+const MIN_N = 120; // pooled per variant ≈ 30 per platform-variant (4 platforms); accrues over ~4 daily runs, which also spreads collection across days for temporal robustness
 const MAX_PROBES_PER_RUN = 2; // probe batches per daily run (each batch = 1 trial × all queries × all platforms)
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -218,7 +218,7 @@ Produce three outputs, each delimited exactly as shown:
     slug: nextExp.slug,
     dir: `experiments/${nextExp.id}-${nextExp.slug}`,
     started_at: nextExp.started_at,
-    n_target: nextExp.n_per_variant,
+    n_target: Math.max(nextExp.n_per_variant || 0, MIN_N),
     platforms: nextExp.platforms,
   };
   state.last_design_run = new Date().toISOString();

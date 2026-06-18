@@ -1,0 +1,48 @@
+name: GEO Lab — Send Past Reports
+
+# Manual one-shot: email the report for every experiment that already has a
+# FINDING.md. Use this to backfill reports that never arrived while email was
+# broken (001–005, etc.). Sends via Resend (same as the daily lab automation).
+on:
+  workflow_dispatch:
+
+jobs:
+  send-reports:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install geo-lab dependencies
+        working-directory: geo-lab
+        run: npm install
+
+      - name: Email every experiment that has a FINDING.md
+        working-directory: geo-lab
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
+          REPORT_EMAIL: ${{ secrets.REPORT_EMAIL }}
+        run: |
+          sent=0
+          for d in experiments/*/; do
+            if [ -f "${d}FINDING.md" ]; then
+              echo "=== Sending report for ${d} ==="
+              if node scripts/send-report.mjs "$d"; then
+                sent=$((sent+1))
+              else
+                echo "⚠ send-report failed for ${d} (continuing)"
+              fi
+              sleep 2
+            fi
+          done
+          echo "✅ Dispatched $sent past report(s)"

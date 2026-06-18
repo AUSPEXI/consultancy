@@ -94,6 +94,16 @@ if (variantsWithoutFingerprint.length > 0) {
   process.exit(1);
 }
 
+// Low-sensitivity flag: when variants are NEARLY identical (few unique phrases),
+// the scorer can barely tell them apart, so a "null" may be a measurement
+// artifact rather than a true no-effect. Surfaced to the analyst + video producer.
+const LOW_FINGERPRINT_THRESHOLD = 15;
+const minUniqueFingerprints = Math.min(...variants.map(v => fingerprints[v.id].length));
+const lowSensitivity = minUniqueFingerprints < LOW_FINGERPRINT_THRESHOLD;
+if (lowSensitivity) {
+  console.warn(`\n⚠ LOW ATTRIBUTION SENSITIVITY: smallest unique-fingerprint set is ${minUniqueFingerprints} (< ${LOW_FINGERPRINT_THRESHOLD}). The variants are nearly identical, so the scorer can barely distinguish them — a null result here may be a measurement artifact, not a true no-effect. Make the variants more distinct before trusting a null.`);
+}
+
 // ── Score each response ──────────────────────────────────────────────────────
 function score(response) {
   const cited = {};
@@ -116,7 +126,7 @@ const results = raw.results.map(r => {
   return { ...r, citations: newCitations };
 });
 
-await fs.writeFile(rawPath, JSON.stringify({ ...raw, results }, null, 2));
+await fs.writeFile(rawPath, JSON.stringify({ ...raw, results, attribution: { minUniqueFingerprints, lowSensitivity } }, null, 2));
 
 // ── Report ───────────────────────────────────────────────────────────────────
 const tally = {};
@@ -131,7 +141,11 @@ for (const r of results) {
 
 let report = `Canonical rescore — ${new Date().toISOString()}\n`;
 report += `Scored ${total} responses; ${changed} citation records changed.\n`;
-report += `Method: content-fingerprint (auto-derived unique phrases per variant)\n\n`;
+report += `Method: content-fingerprint (auto-derived unique phrases per variant)\n`;
+if (lowSensitivity) {
+  report += `⚠ LOW ATTRIBUTION SENSITIVITY: smallest unique-fingerprint set = ${minUniqueFingerprints} (< ${LOW_FINGERPRINT_THRESHOLD}). Variants nearly identical; a null may be a measurement artifact, not a true no-effect.\n`;
+}
+report += `\n`;
 report += `Variant | Cited | N | Rate\n--------|-------|---|-----\n`;
 for (const v of variants) {
   const { cited, n } = tally[v.id];
