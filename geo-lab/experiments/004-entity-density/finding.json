@@ -1,0 +1,74 @@
+{
+  "runAt": "2026-06-18T00:30:38.930Z",
+  "firstRunAt": "2026-06-18T00:30:38.930Z",
+  "collectionSpanDays": 0,
+  "collectionDays": [
+    {
+      "date": "2026-06-18",
+      "n": 32
+    }
+  ],
+  "modelVersions": {
+    "gemini": [
+      "gemini-2.5-flash"
+    ],
+    "openai": [
+      "gpt-4o-mini"
+    ],
+    "perplexity": [
+      "sonar"
+    ],
+    "claude": [
+      "claude-haiku-4-5-20251001"
+    ]
+  },
+  "modelDrift": false,
+  "variants": [
+    "A",
+    "B"
+  ],
+  "platforms": [
+    "gemini",
+    "openai",
+    "perplexity",
+    "claude"
+  ],
+  "trialsPerVariant": 2,
+  "hypothesis": "If content names 3+ concrete entities (products, people, standards, organisations) per 100 words, then citation rate will be higher for product-evaluation queries than sparse entity usage, because entity density makes content more graspable to retrieval systems.",
+  "aggregate": {
+    "A": {
+      "cited": 4,
+      "total": 32,
+      "rate": 12.5
+    },
+    "B": {
+      "cited": 18,
+      "total": 32,
+      "rate": 56.3
+    }
+  },
+  "significant": [
+    {
+      "platform": "gemini",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 50,
+      "pValue": 0.0455
+    },
+    {
+      "platform": "claude",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 75,
+      "pValue": 0.0019
+    }
+  ],
+  "verdict": "significant",
+  "bestVariant": "B",
+  "topEffect": {
+    "platform": "claude",
+    "treatment": "B",
+    "diffPp": 75,
+    "pValue": 0.0019
+  }
+}

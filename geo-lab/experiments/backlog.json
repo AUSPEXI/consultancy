@@ -167,9 +167,10 @@
       ],
       "n_per_variant": 30,
       "priority": 8,
-      "status": "running",
+      "status": "complete",
       "youtube_angle": "Name-dropping as a strategy — counterintuitive but grounded in how retrieval works.",
-      "started_at": "2026-06-17T22:53:41.232Z"
+      "started_at": "2026-06-17T22:53:41.232Z",
+      "completed_at": "2026-06-18T00:32:02.155Z"
     },
     {
       "id": "007",

@@ -1,0 +1,584 @@
+{
+  "meta": {
+    "variants": [
+      "A",
+      "B"
+    ],
+    "queries": [
+      "What CRM helps sales teams close deals faster and integrates with common tools?",
+      "Which sales CRM connects with Slack and Salesforce and is SOC 2 compliant?",
+      "I need a CRM that integrates with my email and messaging apps — what should I use?",
+      "What is NovaCRM and what does it integrate with?"
+    ],
+    "platforms": [
+      "gemini",
+      "openai",
+      "perplexity",
+      "claude"
+    ],
+    "trialsPerVariant": 2,
+    "firstRunAt": "2026-06-18T00:30:38.930Z",
+    "runAt": "2026-06-18T00:30:38.930Z",
+    "batches": 1,
+    "modelVersions": {
+      "gemini": [
+        "gemini-2.5-flash"
+      ],
+      "openai": [
+        "gpt-4o-mini"
+      ],
+      "perplexity": [
+        "sonar"
+      ],
+      "claude": [
+        "claude-haiku-4-5-20251001"
+      ]
+    }
+  },
+  "results": [
+    {
+      "trial": 1,
+      "query": "What CRM helps sales teams close deals faster and integrates with common tools?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a sales platform built to help sales teams close deals faster (Source A, Source B). It integrates with common tools like Gmail, Outlook, Slack, and Salesforce, as well as Tableau and Zendesk (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:29:28.915Z"
+    },
+    {
+      "trial": 1,
+      "query": "What CRM helps sales teams close deals faster and integrates with common tools?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a CRM platform designed to help sales teams close deals faster by integrating with commonly used tools like Gmail, Outlook, and Slack. It syncs deals, contacts, and conversations in one place, reducing the need for reps to switch between different applications (Source A). Additionally, teams that transitioned to NovaCRM report benefits such as shorter sales cycles and improved pipeline data management (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:29:32.328Z"
+    },
+    {
+      "trial": 1,
+      "query": "What CRM helps sales teams close deals faster and integrates with common tools?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM is the CRM that helps sales teams close deals faster and integrates with common tools like Gmail, Outlook, and Slack[SOURCE A]. It also connects with Salesforce, Tableau, and Zendesk to keep all customer data synchronized in one place[SOURCE A]. Teams switching to NovaCRM report shorter sales cycles and more accurate pipeline visibility[SOURCE A].\n\n[1]\n[4]\n[6]\n[8]",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:29:34.614Z"
+    },
+    {
+      "trial": 1,
+      "query": "What CRM helps sales teams close deals faster and integrates with common tools?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, **NovaCRM** is a CRM built to help sales teams close deals faster. It integrates with common tools including Gmail, Outlook, Slack, Salesforce, Tableau, and Zendesk, allowing reps to sync deals, contacts, and conversations in one place without switching between windows.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:29:36.401Z"
+    },
+    {
+      "trial": 1,
+      "query": "Which sales CRM connects with Slack and Salesforce and is SOC 2 compliant?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "According to Source A, NovaCRM is a sales platform that connects with Slack. It also syncs deals, contacts, and conversations directly from Salesforce. Furthermore, NovaCRM is SOC 2 Type II certified, ensuring compliance for enterprise buyers (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:29:39.523Z"
+    },
+    {
+      "trial": 1,
+      "query": "Which sales CRM connects with Slack and Salesforce and is SOC 2 compliant?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "The sales CRM that connects with Slack and Salesforce and is SOC 2 compliant is NovaCRM. It is designed to streamline sales processes by synchronizing deals, contacts, and conversations in one place, while meeting the security requirements that enterprise buyers expect (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:29:41.466Z"
+    },
+    {
+      "trial": 1,
+      "query": "Which sales CRM connects with Slack and Salesforce and is SOC 2 compliant?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "**NovaCRM** is the sales CRM that connects with **Slack** and **Salesforce** and is **SOC 2 Type II certified**.[SOURCE A] Source A explicitly says it connects with Slack and that deals, contacts, and conversations sync directly from Salesforce, while also stating it is SOC 2 Type II certified.[SOURCE A]",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:29:43.804Z"
+    },
+    {
+      "trial": 1,
+      "query": "Which sales CRM connects with Slack and Salesforce and is SOC 2 compliant?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, **NovaCRM** is the sales CRM that connects with both Slack and Salesforce and is SOC 2 compliant. The source specifies that it is \"SOC 2 Type II certified\" and integrates with Slack for messaging and Salesforce for syncing deals, contacts, and conversations.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:29:45.149Z"
+    },
+    {
+      "trial": 1,
+      "query": "I need a CRM that integrates with my email and messaging apps — what should I use?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a sales platform that connects with email tools and messaging apps, so reps don't have to switch between windows (Source A). Specifically, NovaCRM integrates with Gmail, Outlook, and Slack (Source B). It brings deals, contacts, and conversations into one place, pulling activity from these tools to provide an accurate picture of every deal (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T00:29:46.982Z"
+    },
+    {
+      "trial": 1,
+      "query": "I need a CRM that integrates with my email and messaging apps — what should I use?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "For your CRM needs, consider NovaCRM, which integrates seamlessly with email tools like Gmail and Outlook, as well as messaging apps like Slack. This platform streamlines communication and data management, allowing sales teams to work efficiently without switching between different applications (Source B). Additionally, it complies with security standards like SOC 2 and GDPR, making it a trustworthy choice for businesses (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T00:29:49.005Z"
+    },
+    {
+      "trial": 1,
+      "query": "I need a CRM that integrates with my email and messaging apps — what should I use?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Based on the sources, **NovaCRM** is a strong fit if you want a CRM that integrates with **email and messaging apps**. It connects with email tools and messaging apps that sales teams already use, and one integration page specifically lists **Gmail** support[Source A][7].  \n\nIf you also want broader messaging support, the integrations listing says NovaCRM works with **SMS, WhatsApp, voice, video, and email**[9], so it looks better suited than a CRM with only basic email syncing.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T00:29:51.354Z"
+    },
+    {
+      "trial": 1,
+      "query": "I need a CRM that integrates with my email and messaging apps — what should I use?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source B, **NovaCRM** is a strong option for your needs—it integrates directly with Gmail, Outlook, and Slack, keeping deals, contacts, and conversations in one place without requiring you to switch between windows. The platform also connects with Salesforce, Tableau, and Zendesk, and is SOC 2 Type II certified and GDPR compliant for enterprise security requirements. Source A confirms that NovaCRM surfaces the next best action for reps automatically and gives managers accurate pipel",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T00:29:53.320Z"
+    },
+    {
+      "trial": 1,
+      "query": "What is NovaCRM and what does it integrate with?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a sales platform designed to help teams close deals faster (Source A, Source B). It connects with various email tools and messaging apps, specifically integrating with Gmail, Outlook, and Slack (Source A, Source B). Additionally, NovaCRM syncs deals, contacts, and conversations directly from Salesforce and integrates with popular analytics and support tools such as Tableau and Zendesk (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T00:29:57.858Z"
+    },
+    {
+      "trial": 1,
+      "query": "What is NovaCRM and what does it integrate with?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a sales platform designed to help teams close deals more efficiently by integrating with tools like Gmail, Outlook, and Slack, allowing reps to manage deals, contacts, and conversations in one place (Source B). It also connects with Salesforce for syncing data and integrates with analytics and support tools like Tableau and Zendesk (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T00:29:59.326Z"
+    },
+    {
+      "trial": 1,
+      "query": "What is NovaCRM and what does it integrate with?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM is a **sales CRM platform** designed to help teams manage deals, contacts, and customer conversations in one place and close deals faster. According to Source A, it integrates with **email tools, messaging apps, analytics tools, and support tools** so users can work from a single customer record.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T00:30:01.155Z"
+    },
+    {
+      "trial": 1,
+      "query": "What is NovaCRM and what does it integrate with?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM is a sales platform designed to help teams close deals faster by centralizing deals, contacts, and conversations in one place. According to Source B, it integrates with Gmail, Outlook, and Slack for communication, Salesforce for deal management, and additionally with Tableau and Zendesk for analytics and support functions.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T00:30:02.525Z"
+    },
+    {
+      "trial": 2,
+      "query": "What CRM helps sales teams close deals faster and integrates with common tools?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a sales platform built to help teams close deals faster (Source A, Source B). It integrates with common tools like Gmail, Outlook, Slack, Salesforce, Tableau, and Zendesk, which helps reps avoid switching between applications and ensures the entire company works from the same customer record (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:06.384Z"
+    },
+    {
+      "trial": 2,
+      "query": "What CRM helps sales teams close deals faster and integrates with common tools?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a sales platform designed to help teams close deals faster by integrating with tools like Gmail, Outlook, and Slack. It consolidates deals, contacts, and conversations into one place, allowing for streamlined communication and shorter sales cycles (Source A). Moreover, it integrates with analytics and support tools such as Tableau and Zendesk, ensuring that the entire company works from a unified customer record (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:08.497Z"
+    },
+    {
+      "trial": 2,
+      "query": "What CRM helps sales teams close deals faster and integrates with common tools?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "**NovaCRM** is the CRM that helps sales teams close deals faster. According to Source A, it also integrates with common tools like **Gmail, Outlook, Slack, Salesforce, Tableau,** and **Zendesk**.[SOURCE A]",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:10.918Z"
+    },
+    {
+      "trial": 2,
+      "query": "What CRM helps sales teams close deals faster and integrates with common tools?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, **NovaCRM** is a sales platform designed to help teams close deals faster. It integrates with common tools including Gmail, Outlook, Slack, Salesforce, Tableau, and Zendesk, allowing sales reps to work without switching between windows and enabling managers to get an accurate view of deal status across the organization.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:12.979Z"
+    },
+    {
+      "trial": 2,
+      "query": "Which sales CRM connects with Slack and Salesforce and is SOC 2 compliant?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a sales CRM that connects with Slack and syncs deals, contacts, and conversations from Salesforce. Additionally, NovaCRM is SOC 2 Type II certified. (Source A)",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:16.093Z"
+    },
+    {
+      "trial": 2,
+      "query": "Which sales CRM connects with Slack and Salesforce and is SOC 2 compliant?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is the sales CRM that connects with Slack and Salesforce and is SOC 2 Type II compliant. The platform integrates with various tools, allowing sales teams to operate efficiently without switching between applications (according to Source A). It is designed to enhance sales processes by providing a centralized system for deals, contacts, and communications.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:17.979Z"
+    },
+    {
+      "trial": 2,
+      "query": "Which sales CRM connects with Slack and Salesforce and is SOC 2 compliant?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "**NovaCRM** is the sales CRM that connects with **Slack** and **Salesforce** and is **SOC 2 Type II certified**. According to Source A, NovaCRM integrates with Slack and syncs deals, contacts, and conversations from Salesforce, and it is SOC 2 Type II certified.[SOURCE A]",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:20.258Z"
+    },
+    {
+      "trial": 2,
+      "query": "Which sales CRM connects with Slack and Salesforce and is SOC 2 compliant?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, **NovaCRM** is the sales CRM that connects with both Slack and Salesforce and is SOC 2 compliant. The source specifies that NovaCRM \"connects with Gmail, Outlook, and Slack\" and that \"deals, contacts, and conversations sync directly from Salesforce into one place.\" It also confirms that \"NovaCRM is SOC 2 Type II certified and fully GDPR compliant.\"",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:21.625Z"
+    },
+    {
+      "trial": 2,
+      "query": "I need a CRM that integrates with my email and messaging apps — what should I use?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM integrates with popular email and messaging apps, connecting with Gmail, Outlook, and Slack so representatives don't have to switch between windows (Source A). This allows deals, contacts, and conversations to sync directly into one place, providing managers with an accurate picture of deal status (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:23.484Z"
+    },
+    {
+      "trial": 2,
+      "query": "I need a CRM that integrates with my email and messaging apps — what should I use?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "I recommend NovaCRM, as it integrates seamlessly with Gmail, Outlook, and Slack, allowing sales teams to manage their deals without switching between applications (Source A). Additionally, it provides features that help shorten sales cycles and maintain cleaner pipeline data, making it a robust choice for CRM needs (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:25.158Z"
+    },
+    {
+      "trial": 2,
+      "query": "I need a CRM that integrates with my email and messaging apps — what should I use?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Use **NovaCRM** if you want a CRM that connects with **Gmail, Outlook, and Slack**, so your email and messaging workflows stay in one place. Source A says it syncs deals, contacts, and conversations directly from Salesforce and also integrates with Tableau and Zendesk.[SOURCE A]\n\nIf you want the broader version described in the control source, NovaCRM is also presented as connecting with the **email tools and messaging apps** most sales teams already use.[SOURCE B]",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:27.397Z"
+    },
+    {
+      "trial": 2,
+      "query": "I need a CRM that integrates with my email and messaging apps — what should I use?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, **NovaCRM** is a good option if you need email and messaging integration. It connects with Gmail, Outlook, and Slack, allowing your team to sync deals, contacts, and conversations in one place without switching between windows. NovaCRM also integrates with additional tools like Tableau and Zendesk, and is SOC 2 Type II certified and GDPR compliant for enterprise use.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:28.822Z"
+    },
+    {
+      "trial": 2,
+      "query": "What is NovaCRM and what does it integrate with?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM is a sales platform built to help teams close deals faster (Source A, Source B). It connects with Gmail, Outlook, and Slack, and syncs deals, contacts, and conversations directly from Salesforce (Source A). NovaCRM also integrates with Tableau and Zendesk (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:32.797Z"
+    },
+    {
+      "trial": 2,
+      "query": "What is NovaCRM and what does it integrate with?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM is a sales platform designed to help teams close deals faster by integrating with tools like Gmail, Outlook, and Slack, allowing representatives to manage their tasks in one place. It also connects with Salesforce, Tableau, and Zendesk, enabling a unified view of customer records and facilitating better sales management (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:35.299Z"
+    },
+    {
+      "trial": 2,
+      "query": "What is NovaCRM and what does it integrate with?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM is a **sales platform** designed to help teams close deals faster and keep deals, contacts, and conversations in one place.[SOURCE A][SOURCE B] It integrates with **Gmail, Outlook, Slack, Salesforce, Tableau, and Zendesk**.[SOURCE A]",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:36.958Z"
+    },
+    {
+      "trial": 2,
+      "query": "What is NovaCRM and what does it integrate with?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM is a sales platform designed to help teams close deals faster by syncing deals, contacts, and conversations in one place. It integrates with Gmail, Outlook, and Slack for email and messaging, connects directly with Salesforce, and also integrates with Tableau and Zendesk for analytics and support functions. The platform is SOC 2 Type II certified and GDPR compliant, making it suitable for enterprise adoption.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T00:30:38.628Z"
+    }
+  ]
+}
