@@ -149,16 +149,11 @@ for (const platform of platforms) {
     const ctrl = rates[control];
     const trt = rates[treatment];
     const { z, pValue } = twoProportionZ(trt.rate, trt.n, ctrl.rate, ctrl.n);
-    const diff = ((trt.rate - ctrl.rate) * 100).toFixed(1);
-    let tier, sigLabel;
-    if (pValue < bonferroniAlpha) { tier = 'significant'; sigLabel = `✓ significant (survives Bonferroni α=${bonferroniAlpha})`; }
-    else if (pValue < 0.05) { tier = 'suggestive'; sigLabel = `≈ suggestive (nominal p<0.05, fails Bonferroni α=${bonferroniAlpha})`; }
-    else { tier = 'ns'; sigLabel = '✗ not significant'; }
-    report += `**${treatment} vs ${control}**: ${diff > 0 ? '+' : ''}${diff}pp, z=${z}, p=${pValue} — ${sigLabel}\n\n`;
-    const rec = { platform, control, treatment, diff, pValue, tier };
-    allComparisons.push(rec);
-    if (tier === 'significant') allSignificant.push(rec);
-    else allNonSignificant.push(rec);
+    const diffNum = (trt.rate - ctrl.rate) * 100;
+    const diff = diffNum.toFixed(1);
+    // Verdict assigned AFTER the loop via Holm step-down (printed in Conclusion).
+    report += `**${treatment} vs ${control}**: ${diffNum > 0 ? '+' : ''}${diff}pp, z=${z}, p=${pValue}\n\n`;
+    allComparisons.push({ platform, control, treatment, diff, diffNum, pValue, z });
   }
 }
 
@@ -195,9 +190,46 @@ for (const trt of aggTreatments) {
   report += `**Aggregate ${trt} vs ${aggControl}** (primary): ${aggDiff > 0 ? '+' : ''}${aggDiff}pp, z=${aggZ}, p=${aggP} — ${aggSig ? '✓ significant' : '✗ not significant'}\n\n`;
 }
 
+// ── Holm–Bonferroni step-down across the k per-engine tests ──────────────────
+// Controls the family-wise error rate like Bonferroni but is uniformly more
+// powerful (fewer false negatives). Reject p(i) while p(i) ≤ α/(m−i) and every
+// smaller p has been rejected; the first failure stops all further rejections.
+{
+  const sorted = [...allComparisons].sort((a, b) => a.pValue - b.pValue);
+  const m = sorted.length;
+  let rejecting = true;
+  sorted.forEach((c, i) => {
+    const thresh = 0.05 / (m - i);
+    if (rejecting && c.pValue <= thresh) {
+      c.tier = 'significant';
+    } else {
+      rejecting = false;
+      c.tier = c.pValue < 0.05 ? 'suggestive' : 'ns';
+    }
+  });
+}
+for (const c of allComparisons) {
+  if (c.tier === 'significant') allSignificant.push(c);
+  else allNonSignificant.push(c);
+}
+
+// ── Simpson's-paradox / aggregation guard ────────────────────────────────────
+// The pooled number can mislead when engines disagree in direction or have very
+// different base rates. Flag when the per-engine effects aren't all the same
+// sign as the pooled effect, so the pooled figure is never read in isolation.
+const pooledDiffNum = aggTreatments.length
+  ? (() => { const t = agg[aggTreatments[0]], c = agg[aggControl];
+      const tr = t.total ? t.cited / t.total : 0, cr = c.total ? c.cited / c.total : 0;
+      return (tr - cr) * 100; })()
+  : 0;
+const engineSigns = allComparisons.map(c => Math.sign(c.diffNum));
+const pooledSign = Math.sign(pooledDiffNum);
+const mixedDirections = new Set(engineSigns.filter(s => s !== 0)).size > 1;
+const poolReversesEngines = pooledSign !== 0 && engineSigns.some(s => s !== 0 && s !== pooledSign);
+
 // ── Plain-English conclusion ─────────────────────────────────────────────────
 report += `---\n\n## Conclusion\n\n`;
-report += `Per-engine verdicts, multiple-comparison corrected (Bonferroni α = ${bonferroniAlpha} for ${kTests} engine tests). Every engine is listed, significant or not:\n\n`;
+report += `Per-engine verdicts, family-wise-error controlled via the **Holm–Bonferroni step-down** (${kTests} engine tests; more powerful than plain Bonferroni, same false-positive guarantee). Every engine is listed, significant or not:\n\n`;
 for (const c of allComparisons) {
   const label = c.tier === 'significant'
     ? '✓ significant (survives correction)'
@@ -215,6 +247,13 @@ if (nSig > 0) {
   report += `**Bottom line**: no engine survives multiple-comparison correction; ${nSug} show only a nominal (uncorrected) signal. This is NOT a confirmed effect — re-run at higher n before claiming it.\n\n`;
 } else {
   report += `**Bottom line**: no significant effect on any engine. Valid null result under these conditions.\n\n`;
+}
+
+// Simpson's-paradox / aggregation caution.
+if (poolReversesEngines) {
+  report += `> **⚠ Simpson's-paradox warning**: the pooled effect points ${pooledSign > 0 ? 'positive' : 'negative'} while one or more engines point the opposite way. The pooled number is misleading here — **report per engine, not the aggregate.**\n\n`;
+} else if (mixedDirections) {
+  report += `> **⚠ Aggregation caution**: engines disagree in direction, so the pooled figure hides real heterogeneity. Lead with the per-engine breakdown, not the pooled number.\n\n`;
 }
 
 // ── Threats to validity ──────────────────────────────────────────────────────
@@ -250,7 +289,8 @@ if (raw.attribution?.lowSensitivity) {
   report += `- **Sample size**: ${perPlatformN} trials per platform-variant (${pooledN} pooled per variant). ${perPlatformN >= 30 ? 'Meets the lab minimum of 30 per platform-variant.' : '⚠ Below the lab minimum of 30 per platform-variant — treat as preliminary.'}\n`;
 }
 report += `- **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.\n`;
-report += `- **Multiple comparisons**: ${kTests} per-platform tests run alongside the primary aggregate test. Bonferroni-corrected α for per-platform comparisons = ${bonferroniAlpha}. Per-platform results with p > ${bonferroniAlpha} are exploratory.\n`;
+report += `- **Multiple comparisons**: ${kTests} per-engine tests are family-wise-error controlled via Holm–Bonferroni step-down (more powerful than plain Bonferroni, whose fixed threshold would be α=${bonferroniAlpha}). The aggregate is the single pre-registered primary endpoint.\n`;
+report += `- **Cross-experiment error rate**: significance within one experiment does not correct for the whole research programme — across many experiments, ~1 in 20 nominal positives is expected by chance. Replicate before treating any single result as settled.\n`;
 
 // ── Machine-readable finding ─────────────────────────────────────────────────
 // Consumed by publish-finding.mjs to push results into the dashboard's

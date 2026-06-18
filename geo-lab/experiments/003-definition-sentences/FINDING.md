@@ -19,7 +19,7 @@
 | A | 4 | 8 | 50.0% | [21.5%, 78.5%] |
 | B | 8 | 8 | 100.0% | [67.6%, 100%] |
 
-**B vs A**: +50.0pp, z=2.309, p=0.0209 — ≈ suggestive (nominal p<0.05, fails Bonferroni α=0.0125)
+**B vs A**: +50.0pp, z=2.309, p=0.0209
 
 ### OPENAI
 
@@ -28,7 +28,7 @@
 | A | 1 | 8 | 12.5% | [2.2%, 47.1%] |
 | B | 8 | 8 | 100.0% | [67.6%, 100%] |
 
-**B vs A**: +87.5pp, z=3.528, p=0.0004 — ✓ significant (survives Bonferroni α=0.0125)
+**B vs A**: +87.5pp, z=3.528, p=0.0004
 
 ### PERPLEXITY
 
@@ -37,7 +37,7 @@
 | A | 1 | 8 | 12.5% | [2.2%, 47.1%] |
 | B | 7 | 8 | 87.5% | [52.9%, 97.8%] |
 
-**B vs A**: +75.0pp, z=3, p=0.0027 — ✓ significant (survives Bonferroni α=0.0125)
+**B vs A**: +75.0pp, z=3, p=0.0027
 
 ### CLAUDE
 
@@ -46,7 +46,7 @@
 | A | 3 | 8 | 37.5% | [13.7%, 69.4%] |
 | B | 8 | 8 | 100.0% | [67.6%, 100%] |
 
-**B vs A**: +62.5pp, z=2.697, p=0.007 — ✓ significant (survives Bonferroni α=0.0125)
+**B vs A**: +62.5pp, z=2.697, p=0.007
 
 ---
 
@@ -63,14 +63,14 @@
 
 ## Conclusion
 
-Per-engine verdicts, multiple-comparison corrected (Bonferroni α = 0.0125 for 4 engine tests). Every engine is listed, significant or not:
+Per-engine verdicts, family-wise-error controlled via the **Holm–Bonferroni step-down** (4 engine tests; more powerful than plain Bonferroni, same false-positive guarantee). Every engine is listed, significant or not:
 
-- **GEMINI**: B vs A: +50.0pp (p=0.0209) — ≈ suggestive (nominal p<0.05 only — does NOT survive correction)
+- **GEMINI**: B vs A: +50.0pp (p=0.0209) — ✓ significant (survives correction)
 - **OPENAI**: B vs A: +87.5pp (p=0.0004) — ✓ significant (survives correction)
 - **PERPLEXITY**: B vs A: +75.0pp (p=0.0027) — ✓ significant (survives correction)
 - **CLAUDE**: B vs A: +62.5pp (p=0.007) — ✓ significant (survives correction)
 
-**Bottom line**: the effect survives multiple-comparison correction on 3 of 4 engines, with a nominal-only (uncorrected) signal on 1 more. Treat the corrected engine(s) as the real finding; everything else is directional and needs more data.
+**Bottom line**: the effect survives multiple-comparison correction on 4 of 4 engines. Treat the corrected engine(s) as the real finding; everything else is directional and needs more data.
 
 ---
 
@@ -82,4 +82,5 @@ Per-engine verdicts, multiple-comparison corrected (Bonferroni α = 0.0125 for 4
 - **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.
 - **Sample size**: 8 trials per platform-variant (32 pooled per variant). ⚠ Below the lab minimum of 30 per platform-variant — treat as preliminary.
 - **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.
-- **Multiple comparisons**: 4 per-platform tests run alongside the primary aggregate test. Bonferroni-corrected α for per-platform comparisons = 0.0125. Per-platform results with p > 0.0125 are exploratory.
+- **Multiple comparisons**: 4 per-engine tests are family-wise-error controlled via Holm–Bonferroni step-down (more powerful than plain Bonferroni, whose fixed threshold would be α=0.0125). The aggregate is the single pre-registered primary endpoint.
+- **Cross-experiment error rate**: significance within one experiment does not correct for the whole research programme — across many experiments, ~1 in 20 nominal positives is expected by chance. Replicate before treating any single result as settled.

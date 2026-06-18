@@ -40,6 +40,13 @@
   },
   "significant": [
     {
+      "platform": "gemini",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 31.3,
+      "pValue": 0.0149
+    },
+    {
       "platform": "claude",
       "control": "A",
       "treatment": "B",

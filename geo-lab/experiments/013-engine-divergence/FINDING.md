@@ -19,7 +19,7 @@
 | A | 1 | 16 | 6.3% | [1.1%, 28.3%] |
 | B | 13 | 16 | 81.3% | [57%, 93.4%] |
 
-**B vs A**: +75.0pp, z=4.276, p=0 — ✓ significant (survives Bonferroni α=0.0125)
+**B vs A**: +75.0pp, z=4.276, p=0
 
 ### OPENAI
 
@@ -28,7 +28,7 @@
 | A | 1 | 16 | 6.3% | [1.1%, 28.3%] |
 | B | 15 | 16 | 93.8% | [71.7%, 98.9%] |
 
-**B vs A**: +87.5pp, z=4.95, p=0 — ✓ significant (survives Bonferroni α=0.0125)
+**B vs A**: +87.5pp, z=4.95, p=0
 
 ### PERPLEXITY
 
@@ -37,7 +37,7 @@
 | A | 3 | 16 | 18.8% | [6.6%, 43%] |
 | B | 12 | 16 | 75.0% | [50.5%, 89.8%] |
 
-**B vs A**: +56.3pp, z=3.188, p=0.0014 — ✓ significant (survives Bonferroni α=0.0125)
+**B vs A**: +56.3pp, z=3.188, p=0.0014
 
 ### CLAUDE
 
@@ -46,7 +46,7 @@
 | A | 0 | 16 | 0.0% | [0%, 19.4%] |
 | B | 16 | 16 | 100.0% | [80.6%, 100%] |
 
-**B vs A**: +100.0pp, z=5.657, p=0 — ✓ significant (survives Bonferroni α=0.0125)
+**B vs A**: +100.0pp, z=5.657, p=0
 
 ---
 
@@ -63,7 +63,7 @@
 
 ## Conclusion
 
-Per-engine verdicts, multiple-comparison corrected (Bonferroni α = 0.0125 for 4 engine tests). Every engine is listed, significant or not:
+Per-engine verdicts, family-wise-error controlled via the **Holm–Bonferroni step-down** (4 engine tests; more powerful than plain Bonferroni, same false-positive guarantee). Every engine is listed, significant or not:
 
 - **GEMINI**: B vs A: +75.0pp (p=0) — ✓ significant (survives correction)
 - **OPENAI**: B vs A: +87.5pp (p=0) — ✓ significant (survives correction)
@@ -82,4 +82,5 @@ Per-engine verdicts, multiple-comparison corrected (Bonferroni α = 0.0125 for 4
 - **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.
 - **Sample size**: 16 trials per platform-variant (64 pooled per variant). ⚠ Below the lab minimum of 30 per platform-variant — treat as preliminary.
 - **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.
-- **Multiple comparisons**: 4 per-platform tests run alongside the primary aggregate test. Bonferroni-corrected α for per-platform comparisons = 0.0125. Per-platform results with p > 0.0125 are exploratory.
+- **Multiple comparisons**: 4 per-engine tests are family-wise-error controlled via Holm–Bonferroni step-down (more powerful than plain Bonferroni, whose fixed threshold would be α=0.0125). The aggregate is the single pre-registered primary endpoint.
+- **Cross-experiment error rate**: significance within one experiment does not correct for the whole research programme — across many experiments, ~1 in 20 nominal positives is expected by chance. Replicate before treating any single result as settled.

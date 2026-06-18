@@ -19,7 +19,7 @@
 | A | 2 | 8 | 25.0% | [7.1%, 59.1%] |
 | B | 3 | 8 | 37.5% | [13.7%, 69.4%] |
 
-**B vs A**: +12.5pp, z=0.539, p=0.5896 — ✗ not significant
+**B vs A**: +12.5pp, z=0.539, p=0.5896
 
 ### OPENAI
 
@@ -28,7 +28,7 @@
 | A | 1 | 8 | 12.5% | [2.2%, 47.1%] |
 | B | 0 | 8 | 0.0% | [0%, 32.4%] |
 
-**B vs A**: -12.5pp, z=-1.033, p=0.3017 — ✗ not significant
+**B vs A**: -12.5pp, z=-1.033, p=0.3017
 
 ### PERPLEXITY
 
@@ -37,7 +37,7 @@
 | A | 2 | 8 | 25.0% | [7.1%, 59.1%] |
 | B | 0 | 8 | 0.0% | [0%, 32.4%] |
 
-**B vs A**: -25.0pp, z=-1.512, p=0.1306 — ✗ not significant
+**B vs A**: -25.0pp, z=-1.512, p=0.1306
 
 ### CLAUDE
 
@@ -46,7 +46,7 @@
 | A | 2 | 8 | 25.0% | [7.1%, 59.1%] |
 | B | 0 | 8 | 0.0% | [0%, 32.4%] |
 
-**B vs A**: -25.0pp, z=-1.512, p=0.1306 — ✗ not significant
+**B vs A**: -25.0pp, z=-1.512, p=0.1306
 
 ---
 
@@ -63,7 +63,7 @@
 
 ## Conclusion
 
-Per-engine verdicts, multiple-comparison corrected (Bonferroni α = 0.0125 for 4 engine tests). Every engine is listed, significant or not:
+Per-engine verdicts, family-wise-error controlled via the **Holm–Bonferroni step-down** (4 engine tests; more powerful than plain Bonferroni, same false-positive guarantee). Every engine is listed, significant or not:
 
 - **GEMINI**: B vs A: +12.5pp (p=0.5896) — ✗ no significant effect
 - **OPENAI**: B vs A: -12.5pp (p=0.3017) — ✗ no significant effect
@@ -71,6 +71,8 @@ Per-engine verdicts, multiple-comparison corrected (Bonferroni α = 0.0125 for 4
 - **CLAUDE**: B vs A: -25.0pp (p=0.1306) — ✗ no significant effect
 
 **Bottom line**: no significant effect on any engine. Valid null result under these conditions.
+
+> **⚠ Simpson's-paradox warning**: the pooled effect points negative while one or more engines point the opposite way. The pooled number is misleading here — **report per engine, not the aggregate.**
 
 ---
 
@@ -82,4 +84,5 @@ Per-engine verdicts, multiple-comparison corrected (Bonferroni α = 0.0125 for 4
 - **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.
 - **Sample size**: 8 trials per platform-variant (32 pooled per variant). ⚠ Below the lab minimum of 30 per platform-variant — treat as preliminary.
 - **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.
-- **Multiple comparisons**: 4 per-platform tests run alongside the primary aggregate test. Bonferroni-corrected α for per-platform comparisons = 0.0125. Per-platform results with p > 0.0125 are exploratory.
+- **Multiple comparisons**: 4 per-engine tests are family-wise-error controlled via Holm–Bonferroni step-down (more powerful than plain Bonferroni, whose fixed threshold would be α=0.0125). The aggregate is the single pre-registered primary endpoint.
+- **Cross-experiment error rate**: significance within one experiment does not correct for the whole research programme — across many experiments, ~1 in 20 nominal positives is expected by chance. Replicate before treating any single result as settled.

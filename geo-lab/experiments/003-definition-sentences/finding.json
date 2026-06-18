@@ -49,6 +49,13 @@
   },
   "significant": [
     {
+      "platform": "gemini",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": 50,
+      "pValue": 0.0209
+    },
+    {
       "platform": "openai",
       "control": "A",
       "treatment": "B",
