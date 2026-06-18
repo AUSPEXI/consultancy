@@ -1,0 +1,73 @@
+name: GEO Lab — Backfill LLM-Judge Cross-Check
+
+# Manual one-shot: re-score every existing experiment, run the LLM-judge
+# attribution cross-check, re-analyze (so FINDING.md/finding.json gain the
+# Robustness section + corrected stats), commit the updated findings, then email
+# them. Use this to bring 001–008 up to the current methodology before filming.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install geo-lab dependencies
+        working-directory: geo-lab
+        run: npm install
+
+      - name: Re-score + LLM-judge + re-analyze every experiment
+        working-directory: geo-lab
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          for d in experiments/*/; do
+            if [ -f "${d}results/raw.json" ]; then
+              echo "=== ${d} ==="
+              node scripts/rescore.mjs "$d" || echo "rescore skip ${d}"
+              node scripts/llm-judge.mjs "$d" || echo "llm-judge skip ${d}"
+              node scripts/analyze.mjs "$d" || echo "analyze skip ${d}"
+            fi
+          done
+
+      - name: Commit updated findings
+        run: |
+          git config user.name "GEO Lab Bot"
+          git config user.email "geo-lab@l8entspace.com"
+          git add geo-lab/experiments/
+          if git diff --cached --quiet; then
+            echo "No finding changes to commit"
+          else
+            git commit -m "geo-lab: backfill LLM-judge cross-check across experiments"
+            git push origin HEAD:main
+          fi
+
+      - name: Email the updated reports
+        working-directory: geo-lab
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
+          REPORT_EMAIL: ${{ secrets.REPORT_EMAIL }}
+        run: |
+          for d in experiments/*/; do
+            if [ -f "${d}FINDING.md" ]; then
+              echo "=== emailing ${d} ==="
+              node scripts/send-report.mjs "$d" || echo "send skip ${d}"
+              sleep 2
+            fi
+          done
+          echo "✅ Backfill + delivery complete"
