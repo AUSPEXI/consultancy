@@ -121,6 +121,11 @@ report += `---\n\n## Results by Platform\n\n`;
 
 const allSignificant = [];
 const allNonSignificant = [];
+const allComparisons = [];
+// Bonferroni correction for the per-platform tests (the aggregate is the single
+// pre-registered primary endpoint and is not corrected).
+const kTests = platforms.length;
+const bonferroniAlpha = +(0.05 / kTests).toFixed(4);
 
 for (const platform of platforms) {
   report += `### ${platform.toUpperCase()}\n\n`;
@@ -145,11 +150,15 @@ for (const platform of platforms) {
     const trt = rates[treatment];
     const { z, pValue } = twoProportionZ(trt.rate, trt.n, ctrl.rate, ctrl.n);
     const diff = ((trt.rate - ctrl.rate) * 100).toFixed(1);
-    const sig = pValue < 0.05;
-    const sigLabel = sig ? '✓ significant (p < 0.05)' : '✗ not significant';
+    let tier, sigLabel;
+    if (pValue < bonferroniAlpha) { tier = 'significant'; sigLabel = `✓ significant (survives Bonferroni α=${bonferroniAlpha})`; }
+    else if (pValue < 0.05) { tier = 'suggestive'; sigLabel = `≈ suggestive (nominal p<0.05, fails Bonferroni α=${bonferroniAlpha})`; }
+    else { tier = 'ns'; sigLabel = '✗ not significant'; }
     report += `**${treatment} vs ${control}**: ${diff > 0 ? '+' : ''}${diff}pp, z=${z}, p=${pValue} — ${sigLabel}\n\n`;
-    if (sig) allSignificant.push({ platform, control, treatment, diff, pValue });
-    else allNonSignificant.push({ platform, control, treatment, diff, pValue });
+    const rec = { platform, control, treatment, diff, pValue, tier };
+    allComparisons.push(rec);
+    if (tier === 'significant') allSignificant.push(rec);
+    else allNonSignificant.push(rec);
   }
 }
 
@@ -157,8 +166,6 @@ for (const platform of platforms) {
 // The aggregate test is pre-registered as the PRIMARY endpoint. Per-platform
 // tests are exploratory and subject to multiple-comparisons inflation.
 // Bonferroni-corrected threshold for k per-platform tests: α_adj = 0.05 / k.
-const kTests = platforms.length;
-const bonferroniAlpha = +(0.05 / kTests).toFixed(4);
 report += `---\n\n## Aggregate (all platforms pooled) — PRIMARY ENDPOINT\n\n`;
 report += `| Variant | Cited | n | Citation Rate |\n`;
 report += `|---------|-------|---|---------------|\n`;
@@ -190,15 +197,24 @@ for (const trt of aggTreatments) {
 
 // ── Plain-English conclusion ─────────────────────────────────────────────────
 report += `---\n\n## Conclusion\n\n`;
-if (allSignificant.length > 0) {
-  report += `**Significant effects found** in ${allSignificant.length} comparison(s):\n`;
-  for (const s of allSignificant) {
-    report += `- On ${s.platform.toUpperCase()}: ${s.treatment} vs ${s.control}: ${s.diff > 0 ? '+' : ''}${s.diff}pp (p=${s.pValue})\n`;
-  }
-  report += '\n';
+report += `Per-engine verdicts, multiple-comparison corrected (Bonferroni α = ${bonferroniAlpha} for ${kTests} engine tests). Every engine is listed, significant or not:\n\n`;
+for (const c of allComparisons) {
+  const label = c.tier === 'significant'
+    ? '✓ significant (survives correction)'
+    : c.tier === 'suggestive'
+      ? '≈ suggestive (nominal p<0.05 only — does NOT survive correction)'
+      : '✗ no significant effect';
+  report += `- **${c.platform.toUpperCase()}**: ${c.treatment} vs ${c.control}: ${c.diff > 0 ? '+' : ''}${c.diff}pp (p=${c.pValue}) — ${label}\n`;
+}
+report += '\n';
+const nSig = allComparisons.filter(c => c.tier === 'significant').length;
+const nSug = allComparisons.filter(c => c.tier === 'suggestive').length;
+if (nSig > 0) {
+  report += `**Bottom line**: the effect survives multiple-comparison correction on ${nSig} of ${kTests} engines${nSug ? `, with a nominal-only (uncorrected) signal on ${nSug} more` : ''}. Treat the corrected engine(s) as the real finding; everything else is directional and needs more data.\n\n`;
+} else if (nSug > 0) {
+  report += `**Bottom line**: no engine survives multiple-comparison correction; ${nSug} show only a nominal (uncorrected) signal. This is NOT a confirmed effect — re-run at higher n before claiming it.\n\n`;
 } else {
-  report += `**No significant effects found** across any platform at α=0.05.\n\n`;
-  report += `This is a valid null result. The tested variable does not appear to affect citation rates under these conditions.\n\n`;
+  report += `**Bottom line**: no significant effect on any engine. Valid null result under these conditions.\n\n`;
 }
 
 // ── Threats to validity ──────────────────────────────────────────────────────

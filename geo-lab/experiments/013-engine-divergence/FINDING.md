@@ -19,7 +19,7 @@
 | A | 1 | 16 | 6.3% | [1.1%, 28.3%] |
 | B | 13 | 16 | 81.3% | [57%, 93.4%] |
 
-**B vs A**: +75.0pp, z=4.276, p=0 — ✓ significant (p < 0.05)
+**B vs A**: +75.0pp, z=4.276, p=0 — ✓ significant (survives Bonferroni α=0.0125)
 
 ### OPENAI
 
@@ -28,7 +28,7 @@
 | A | 1 | 16 | 6.3% | [1.1%, 28.3%] |
 | B | 15 | 16 | 93.8% | [71.7%, 98.9%] |
 
-**B vs A**: +87.5pp, z=4.95, p=0 — ✓ significant (p < 0.05)
+**B vs A**: +87.5pp, z=4.95, p=0 — ✓ significant (survives Bonferroni α=0.0125)
 
 ### PERPLEXITY
 
@@ -37,7 +37,7 @@
 | A | 3 | 16 | 18.8% | [6.6%, 43%] |
 | B | 12 | 16 | 75.0% | [50.5%, 89.8%] |
 
-**B vs A**: +56.3pp, z=3.188, p=0.0014 — ✓ significant (p < 0.05)
+**B vs A**: +56.3pp, z=3.188, p=0.0014 — ✓ significant (survives Bonferroni α=0.0125)
 
 ### CLAUDE
 
@@ -46,7 +46,7 @@
 | A | 0 | 16 | 0.0% | [0%, 19.4%] |
 | B | 16 | 16 | 100.0% | [80.6%, 100%] |
 
-**B vs A**: +100.0pp, z=5.657, p=0 — ✓ significant (p < 0.05)
+**B vs A**: +100.0pp, z=5.657, p=0 — ✓ significant (survives Bonferroni α=0.0125)
 
 ---
 
@@ -63,11 +63,14 @@
 
 ## Conclusion
 
-**Significant effects found** in 4 comparison(s):
-- On GEMINI: B vs A: +75.0pp (p=0)
-- On OPENAI: B vs A: +87.5pp (p=0)
-- On PERPLEXITY: B vs A: +56.3pp (p=0.0014)
-- On CLAUDE: B vs A: +100.0pp (p=0)
+Per-engine verdicts, multiple-comparison corrected (Bonferroni α = 0.0125 for 4 engine tests). Every engine is listed, significant or not:
+
+- **GEMINI**: B vs A: +75.0pp (p=0) — ✓ significant (survives correction)
+- **OPENAI**: B vs A: +87.5pp (p=0) — ✓ significant (survives correction)
+- **PERPLEXITY**: B vs A: +56.3pp (p=0.0014) — ✓ significant (survives correction)
+- **CLAUDE**: B vs A: +100.0pp (p=0) — ✓ significant (survives correction)
+
+**Bottom line**: the effect survives multiple-comparison correction on 4 of 4 engines. Treat the corrected engine(s) as the real finding; everything else is directional and needs more data.
 
 ---
 

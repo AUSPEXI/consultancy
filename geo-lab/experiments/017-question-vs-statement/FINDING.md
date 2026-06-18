@@ -63,9 +63,14 @@
 
 ## Conclusion
 
-**No significant effects found** across any platform at α=0.05.
+Per-engine verdicts, multiple-comparison corrected (Bonferroni α = 0.0125 for 4 engine tests). Every engine is listed, significant or not:
 
-This is a valid null result. The tested variable does not appear to affect citation rates under these conditions.
+- **GEMINI**: B vs A: -37.5pp (p=0.1306) — ✗ no significant effect
+- **OPENAI**: B vs A: -25.0pp (p=0.3017) — ✗ no significant effect
+- **PERPLEXITY**: B vs A: 0.0pp (p=1) — ✗ no significant effect
+- **CLAUDE**: B vs A: +12.5pp (p=0.5218) — ✗ no significant effect
+
+**Bottom line**: no significant effect on any engine. Valid null result under these conditions.
 
 ---
 

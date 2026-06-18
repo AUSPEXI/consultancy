@@ -54,13 +54,6 @@
       "treatment": "B",
       "diffPp": 62.5,
       "pValue": 0.0117
-    },
-    {
-      "platform": "claude",
-      "control": "A",
-      "treatment": "B",
-      "diffPp": 50,
-      "pValue": 0.0209
     }
   ],
   "verdict": "significant",

@@ -19,7 +19,7 @@
 | A | 4 | 8 | 50.0% | [21.5%, 78.5%] |
 | B | 8 | 8 | 100.0% | [67.6%, 100%] |
 
-**B vs A**: +50.0pp, z=2.309, p=0.0209 — ✓ significant (p < 0.05)
+**B vs A**: +50.0pp, z=2.309, p=0.0209 — ≈ suggestive (nominal p<0.05, fails Bonferroni α=0.0125)
 
 ### OPENAI
 
@@ -28,7 +28,7 @@
 | A | 1 | 8 | 12.5% | [2.2%, 47.1%] |
 | B | 8 | 8 | 100.0% | [67.6%, 100%] |
 
-**B vs A**: +87.5pp, z=3.528, p=0.0004 — ✓ significant (p < 0.05)
+**B vs A**: +87.5pp, z=3.528, p=0.0004 — ✓ significant (survives Bonferroni α=0.0125)
 
 ### PERPLEXITY
 
@@ -37,7 +37,7 @@
 | A | 1 | 8 | 12.5% | [2.2%, 47.1%] |
 | B | 7 | 8 | 87.5% | [52.9%, 97.8%] |
 
-**B vs A**: +75.0pp, z=3, p=0.0027 — ✓ significant (p < 0.05)
+**B vs A**: +75.0pp, z=3, p=0.0027 — ✓ significant (survives Bonferroni α=0.0125)
 
 ### CLAUDE
 
@@ -46,7 +46,7 @@
 | A | 3 | 8 | 37.5% | [13.7%, 69.4%] |
 | B | 8 | 8 | 100.0% | [67.6%, 100%] |
 
-**B vs A**: +62.5pp, z=2.697, p=0.007 — ✓ significant (p < 0.05)
+**B vs A**: +62.5pp, z=2.697, p=0.007 — ✓ significant (survives Bonferroni α=0.0125)
 
 ---
 
@@ -63,11 +63,14 @@
 
 ## Conclusion
 
-**Significant effects found** in 4 comparison(s):
-- On GEMINI: B vs A: +50.0pp (p=0.0209)
-- On OPENAI: B vs A: +87.5pp (p=0.0004)
-- On PERPLEXITY: B vs A: +75.0pp (p=0.0027)
-- On CLAUDE: B vs A: +62.5pp (p=0.007)
+Per-engine verdicts, multiple-comparison corrected (Bonferroni α = 0.0125 for 4 engine tests). Every engine is listed, significant or not:
+
+- **GEMINI**: B vs A: +50.0pp (p=0.0209) — ≈ suggestive (nominal p<0.05 only — does NOT survive correction)
+- **OPENAI**: B vs A: +87.5pp (p=0.0004) — ✓ significant (survives correction)
+- **PERPLEXITY**: B vs A: +75.0pp (p=0.0027) — ✓ significant (survives correction)
+- **CLAUDE**: B vs A: +62.5pp (p=0.007) — ✓ significant (survives correction)
+
+**Bottom line**: the effect survives multiple-comparison correction on 3 of 4 engines, with a nominal-only (uncorrected) signal on 1 more. Treat the corrected engine(s) as the real finding; everything else is directional and needs more data.
 
 ---
 

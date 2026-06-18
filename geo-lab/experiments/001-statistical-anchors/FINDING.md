@@ -19,7 +19,7 @@
 | A | 0 | 16 | 0.0% | [0%, 19.4%] |
 | B | 5 | 16 | 31.3% | [14.2%, 55.6%] |
 
-**B vs A**: +31.3pp, z=2.434, p=0.0149 — ✓ significant (p < 0.05)
+**B vs A**: +31.3pp, z=2.434, p=0.0149 — ≈ suggestive (nominal p<0.05, fails Bonferroni α=0.0125)
 
 ### OPENAI
 
@@ -46,7 +46,7 @@
 | A | 4 | 16 | 25.0% | [10.2%, 49.5%] |
 | B | 16 | 16 | 100.0% | [80.6%, 100%] |
 
-**B vs A**: +75.0pp, z=4.382, p=0 — ✓ significant (p < 0.05)
+**B vs A**: +75.0pp, z=4.382, p=0 — ✓ significant (survives Bonferroni α=0.0125)
 
 ---
 
@@ -63,9 +63,14 @@
 
 ## Conclusion
 
-**Significant effects found** in 2 comparison(s):
-- On GEMINI: B vs A: +31.3pp (p=0.0149)
-- On CLAUDE: B vs A: +75.0pp (p=0)
+Per-engine verdicts, multiple-comparison corrected (Bonferroni α = 0.0125 for 4 engine tests). Every engine is listed, significant or not:
+
+- **GEMINI**: B vs A: +31.3pp (p=0.0149) — ≈ suggestive (nominal p<0.05 only — does NOT survive correction)
+- **OPENAI**: B vs A: +18.8pp (p=0.0688) — ✗ no significant effect
+- **PERPLEXITY**: B vs A: +18.8pp (p=0.2802) — ✗ no significant effect
+- **CLAUDE**: B vs A: +75.0pp (p=0) — ✓ significant (survives correction)
+
+**Bottom line**: the effect survives multiple-comparison correction on 1 of 4 engines, with a nominal-only (uncorrected) signal on 1 more. Treat the corrected engine(s) as the real finding; everything else is directional and needs more data.
 
 ---
 
