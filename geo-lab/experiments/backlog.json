@@ -188,8 +188,9 @@
       ],
       "n_per_variant": 30,
       "priority": 9,
-      "status": "queued",
-      "youtube_angle": "Does adding a year to your content make AI cite it more? Simple test, big implications."
+      "status": "running",
+      "youtube_angle": "Does adding a year to your content make AI cite it more? Simple test, big implications.",
+      "started_at": "2026-06-18T00:40:38.935Z"
     },
     {
       "id": "006",
