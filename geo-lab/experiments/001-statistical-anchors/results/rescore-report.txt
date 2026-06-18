@@ -1,6 +1,7 @@
-Canonical rescore — 2026-06-11T22:03:00.763Z
-Scored 56 responses; 19 citation records changed.
+Canonical rescore — 2026-06-18T16:35:52.498Z
+Scored 56 responses; 0 citation records changed.
 Method: content-fingerprint (auto-derived unique phrases per variant)
+⚠ LOW ATTRIBUTION SENSITIVITY: smallest unique-fingerprint set = 6 (< 15). Variants nearly identical; a null may be a measurement artifact, not a true no-effect.
 
 Variant | Cited | N | Rate
 --------|-------|---|-----

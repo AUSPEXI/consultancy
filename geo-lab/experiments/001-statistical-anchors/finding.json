@@ -48,7 +48,22 @@
       "strata": 4
     }
   ],
-  "llmJudge": null,
+  "llmJudge": {
+    "model": "claude-haiku-4-5-20251001",
+    "judged": 56,
+    "failed": 0,
+    "summary": {
+      "A": {
+        "cited": 12,
+        "n": 56
+      },
+      "B": {
+        "cited": 53,
+        "n": 56
+      }
+    },
+    "scoredAt": "2026-06-18T16:36:38.879Z"
+  },
   "significant": [
     {
       "platform": "gemini",

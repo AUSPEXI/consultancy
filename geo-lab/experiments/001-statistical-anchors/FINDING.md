@@ -78,12 +78,26 @@ Per-engine verdicts, family-wise-error controlled via the **Holm–Bonferroni st
 
 ---
 
+## Robustness — independent LLM-judge attribution
+
+A neutral judge (claude-haiku-4-5-20251001) re-attributed every answer by meaning, not verbatim phrasing — this rules out a "more-quotable-variant" artifact in the primary scorer. Citation rate by method:
+
+| Variant | Verbatim scorer | LLM-judge (semantic) |
+|---------|-----------------|----------------------|
+| A | 18.8% | 21.4% |
+| B | 54.7% | 94.6% |
+
+Record-level agreement between the two methods: **60.7%**. Both methods show the effect in the **same direction** — the result is not a verbatim-quotability artifact.
+
+---
+
 ## Threats to Validity
 
 - **⚠ Low temporal coverage**: All 64 trials collected over 1.4 days. Results reflect a narrow snapshot of model behaviour. Target ≥ 10 days for robust temporal coverage.
   - Trials per day: 2026-06-10: 32, 2026-06-11: 32
 - **Model versions stable**: No model version changes detected across batches ().
 - **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.
+- **⚠ Low attribution sensitivity**: the variants share almost all text (smallest unique-fingerprint set = 6). The content-fingerprint scorer can barely tell them apart, so a null result here may be a measurement artifact rather than a true no-effect. Treat any null with extreme caution; make the variants more distinct on the tested dimension.
 - **Sample size**: 16 trials per platform-variant (64 pooled per variant). ⚠ Below the lab minimum of 30 per platform-variant — treat as preliminary.
 - **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.
 - **Multiple comparisons**: 4 per-engine tests are family-wise-error controlled via Holm–Bonferroni step-down (more powerful than plain Bonferroni, whose fixed threshold would be α=0.0125). The aggregate is the single pre-registered primary endpoint.

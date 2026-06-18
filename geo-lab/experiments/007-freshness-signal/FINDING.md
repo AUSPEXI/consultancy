@@ -78,6 +78,19 @@ Per-engine verdicts, family-wise-error controlled via the **Holm–Bonferroni st
 
 ---
 
+## Robustness — independent LLM-judge attribution
+
+A neutral judge (claude-haiku-4-5-20251001) re-attributed every answer by meaning, not verbatim phrasing — this rules out a "more-quotable-variant" artifact in the primary scorer. Citation rate by method:
+
+| Variant | Verbatim scorer | LLM-judge (semantic) |
+|---------|-----------------|----------------------|
+| A | 12.5% | 43.8% |
+| B | 12.5% | 93.8% |
+
+Record-level agreement between the two methods: **37.5%**. **⚠ The two methods disagree in direction** — the verbatim result may be a quotability artifact. Do not publish as a citation-preference finding until resolved.
+
+---
+
 ## Threats to Validity
 
 - **⚠ Low temporal coverage**: All 32 trials collected over < 1 day. Results reflect a narrow snapshot of model behaviour. Target ≥ 10 days for robust temporal coverage.

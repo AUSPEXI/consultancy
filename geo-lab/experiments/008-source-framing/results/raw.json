@@ -51,7 +51,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:10:53.043Z"
+      "timestamp": "2026-06-17T22:10:53.043Z",
+      "citationsLlm": {
+        "A": true,
+        "B": true
+      }
     },
     {
       "trial": 1,
@@ -68,7 +72,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:10:55.579Z"
+      "timestamp": "2026-06-17T22:10:55.579Z",
+      "citationsLlm": {
+        "A": true,
+        "B": true
+      }
     },
     {
       "trial": 1,
@@ -85,7 +93,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:10:57.638Z"
+      "timestamp": "2026-06-17T22:10:57.638Z",
+      "citationsLlm": {
+        "A": true,
+        "B": true
+      }
     },
     {
       "trial": 1,
@@ -102,7 +114,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:10:59.219Z"
+      "timestamp": "2026-06-17T22:10:59.219Z",
+      "citationsLlm": {
+        "A": true,
+        "B": false
+      }
     },
     {
       "trial": 1,
@@ -119,7 +135,11 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:01.260Z"
+      "timestamp": "2026-06-17T22:11:01.260Z",
+      "citationsLlm": {
+        "A": true,
+        "B": true
+      }
     },
     {
       "trial": 1,
@@ -136,7 +156,11 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:03.139Z"
+      "timestamp": "2026-06-17T22:11:03.139Z",
+      "citationsLlm": {
+        "A": true,
+        "B": false
+      }
     },
     {
       "trial": 1,
@@ -153,7 +177,11 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:04.734Z"
+      "timestamp": "2026-06-17T22:11:04.734Z",
+      "citationsLlm": {
+        "A": false,
+        "B": false
+      }
     },
     {
       "trial": 1,
@@ -170,7 +198,11 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:06.242Z"
+      "timestamp": "2026-06-17T22:11:06.242Z",
+      "citationsLlm": {
+        "A": false,
+        "B": false
+      }
     },
     {
       "trial": 1,
@@ -187,7 +219,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:11:08.894Z"
+      "timestamp": "2026-06-17T22:11:08.894Z",
+      "citationsLlm": {
+        "A": true,
+        "B": true
+      }
     },
     {
       "trial": 1,
@@ -204,7 +240,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:11:11.071Z"
+      "timestamp": "2026-06-17T22:11:11.071Z",
+      "citationsLlm": {
+        "A": true,
+        "B": false
+      }
     },
     {
       "trial": 1,
@@ -221,7 +261,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:11:13.384Z"
+      "timestamp": "2026-06-17T22:11:13.384Z",
+      "citationsLlm": {
+        "A": true,
+        "B": true
+      }
     },
     {
       "trial": 1,
@@ -238,7 +282,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:11:14.947Z"
+      "timestamp": "2026-06-17T22:11:14.947Z",
+      "citationsLlm": {
+        "A": true,
+        "B": false
+      }
     },
     {
       "trial": 1,
@@ -255,7 +303,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:11:16.998Z"
+      "timestamp": "2026-06-17T22:11:16.998Z",
+      "citationsLlm": {
+        "A": false,
+        "B": false
+      }
     },
     {
       "trial": 1,
@@ -272,7 +324,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:11:19.511Z"
+      "timestamp": "2026-06-17T22:11:19.511Z",
+      "citationsLlm": {
+        "A": true,
+        "B": true
+      }
     },
     {
       "trial": 1,
@@ -289,7 +345,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:11:21.483Z"
+      "timestamp": "2026-06-17T22:11:21.483Z",
+      "citationsLlm": {
+        "A": true,
+        "B": true
+      }
     },
     {
       "trial": 1,
@@ -306,7 +366,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:11:23.134Z"
+      "timestamp": "2026-06-17T22:11:23.134Z",
+      "citationsLlm": {
+        "A": true,
+        "B": false
+      }
     },
     {
       "trial": 2,
@@ -323,7 +387,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:11:29.411Z"
+      "timestamp": "2026-06-17T22:11:29.411Z",
+      "citationsLlm": {
+        "A": true,
+        "B": true
+      }
     },
     {
       "trial": 2,
@@ -340,7 +408,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:11:32.706Z"
+      "timestamp": "2026-06-17T22:11:32.706Z",
+      "citationsLlm": {
+        "A": true,
+        "B": false
+      }
     },
     {
       "trial": 2,
@@ -357,7 +429,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:11:35.020Z"
+      "timestamp": "2026-06-17T22:11:35.020Z",
+      "citationsLlm": {
+        "A": true,
+        "B": true
+      }
     },
     {
       "trial": 2,
@@ -374,7 +450,11 @@
         "A",
         "B"
       ],
-      "timestamp": "2026-06-17T22:11:37.038Z"
+      "timestamp": "2026-06-17T22:11:37.038Z",
+      "citationsLlm": {
+        "A": true,
+        "B": false
+      }
     },
     {
       "trial": 2,
@@ -391,7 +471,11 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:38.715Z"
+      "timestamp": "2026-06-17T22:11:38.715Z",
+      "citationsLlm": {
+        "A": false,
+        "B": true
+      }
     },
     {
       "trial": 2,
@@ -408,7 +492,11 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:40.249Z"
+      "timestamp": "2026-06-17T22:11:40.249Z",
+      "citationsLlm": {
+        "A": false,
+        "B": true
+      }
     },
     {
       "trial": 2,
@@ -425,7 +513,11 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:41.850Z"
+      "timestamp": "2026-06-17T22:11:41.850Z",
+      "citationsLlm": {
+        "A": false,
+        "B": false
+      }
     },
     {
       "trial": 2,
@@ -442,7 +534,11 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:43.259Z"
+      "timestamp": "2026-06-17T22:11:43.259Z",
+      "citationsLlm": {
+        "A": false,
+        "B": false
+      }
     },
     {
       "trial": 2,
@@ -459,7 +555,11 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:45.667Z"
+      "timestamp": "2026-06-17T22:11:45.667Z",
+      "citationsLlm": {
+        "A": true,
+        "B": true
+      }
     },
     {
       "trial": 2,
@@ -476,7 +576,11 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:47.310Z"
+      "timestamp": "2026-06-17T22:11:47.310Z",
+      "citationsLlm": {
+        "A": true,
+        "B": false
+      }
     },
     {
       "trial": 2,
@@ -493,7 +597,11 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:49.787Z"
+      "timestamp": "2026-06-17T22:11:49.787Z",
+      "citationsLlm": {
+        "A": true,
+        "B": false
+      }
     },
     {
       "trial": 2,
@@ -510,7 +618,11 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:51.184Z"
+      "timestamp": "2026-06-17T22:11:51.184Z",
+      "citationsLlm": {
+        "A": false,
+        "B": true
+      }
     },
     {
       "trial": 2,
@@ -527,7 +639,11 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:53.449Z"
+      "timestamp": "2026-06-17T22:11:53.449Z",
+      "citationsLlm": {
+        "A": false,
+        "B": true
+      }
     },
     {
       "trial": 2,
@@ -544,7 +660,11 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:55.439Z"
+      "timestamp": "2026-06-17T22:11:55.439Z",
+      "citationsLlm": {
+        "A": true,
+        "B": false
+      }
     },
     {
       "trial": 2,
@@ -561,7 +681,11 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:57.263Z"
+      "timestamp": "2026-06-17T22:11:57.263Z",
+      "citationsLlm": {
+        "A": true,
+        "B": false
+      }
     },
     {
       "trial": 2,
@@ -578,7 +702,31 @@
         "B",
         "A"
       ],
-      "timestamp": "2026-06-17T22:11:58.921Z"
+      "timestamp": "2026-06-17T22:11:58.921Z",
+      "citationsLlm": {
+        "A": true,
+        "B": false
+      }
     }
-  ]
+  ],
+  "attribution": {
+    "minUniqueFingerprints": 88,
+    "lowSensitivity": false
+  },
+  "llmJudge": {
+    "model": "claude-haiku-4-5-20251001",
+    "judged": 32,
+    "failed": 0,
+    "summary": {
+      "A": {
+        "cited": 23,
+        "n": 32
+      },
+      "B": {
+        "cited": 15,
+        "n": 32
+      }
+    },
+    "scoredAt": "2026-06-18T16:40:10.723Z"
+  }
 }

@@ -1,5 +1,5 @@
-Canonical rescore — 2026-06-18T12:19:59.973Z
-Scored 32 responses; 28 citation records changed.
+Canonical rescore — 2026-06-18T16:38:37.261Z
+Scored 32 responses; 0 citation records changed.
 Method: content-fingerprint (auto-derived unique phrases per variant)
 
 Variant | Cited | N | Rate
