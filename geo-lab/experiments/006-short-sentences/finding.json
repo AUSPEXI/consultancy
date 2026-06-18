@@ -1,0 +1,67 @@
+{
+  "runAt": "2026-06-18T12:19:59.926Z",
+  "firstRunAt": "2026-06-18T12:19:59.926Z",
+  "collectionSpanDays": 0,
+  "collectionDays": [
+    {
+      "date": "2026-06-18",
+      "n": 32
+    }
+  ],
+  "modelVersions": {
+    "gemini": [
+      "gemini-2.5-flash"
+    ],
+    "openai": [
+      "gpt-4o-mini"
+    ],
+    "perplexity": [
+      "sonar"
+    ],
+    "claude": [
+      "claude-haiku-4-5-20251001"
+    ]
+  },
+  "modelDrift": false,
+  "variants": [
+    "A",
+    "B"
+  ],
+  "platforms": [
+    "gemini",
+    "openai",
+    "perplexity",
+    "claude"
+  ],
+  "trialsPerVariant": 2,
+  "hypothesis": "If each claim is expressed as a single short sentence (≤15 words), then citation rate will be higher than the same claims expressed in long compound sentences (30+ words), because short standalone sentences are more quote-able in LLM answers.",
+  "aggregate": {
+    "A": {
+      "cited": 26,
+      "total": 32,
+      "rate": 81.3
+    },
+    "B": {
+      "cited": 12,
+      "total": 32,
+      "rate": 37.5
+    }
+  },
+  "significant": [
+    {
+      "platform": "perplexity",
+      "control": "A",
+      "treatment": "B",
+      "diffPp": -62.5,
+      "pValue": 0.0117
+    }
+  ],
+  "verdict": "significant",
+  "bestVariant": "A",
+  "topEffect": {
+    "platform": "perplexity",
+    "treatment": "B",
+    "diffPp": -62.5,
+    "pValue": 0.0117
+  }
+}

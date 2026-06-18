@@ -1,0 +1,588 @@
+{
+  "meta": {
+    "variants": [
+      "A",
+      "B"
+    ],
+    "queries": [
+      "How does NovaCRM help sales teams close deals faster?",
+      "What features does NovaCRM offer for improving sales conversion?",
+      "Is NovaCRM good for shortening the sales cycle?",
+      "What measurable results do teams get using NovaCRM?"
+    ],
+    "platforms": [
+      "gemini",
+      "openai",
+      "perplexity",
+      "claude"
+    ],
+    "trialsPerVariant": 2,
+    "firstRunAt": "2026-06-18T12:19:59.926Z",
+    "runAt": "2026-06-18T12:19:59.926Z",
+    "batches": 1,
+    "modelVersions": {
+      "gemini": [
+        "gemini-2.5-flash"
+      ],
+      "openai": [
+        "gpt-4o-mini"
+      ],
+      "perplexity": [
+        "sonar"
+      ],
+      "claude": [
+        "claude-haiku-4-5-20251001"
+      ]
+    }
+  },
+  "results": [
+    {
+      "trial": 1,
+      "query": "How does NovaCRM help sales teams close deals faster?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM helps sales teams close deals faster by automating manual tasks, such as logging every email, call, and meeting, which saves reps roughly five hours per week (Source A, Source B). Its built-in pipeline view identifies stalled deals in real time, allowing them to be rescued before they go cold, and automated follow-up sequences ensure every lead receives a timely touchpoint (Source A, Source B). According to NovaCRM's 2026 customer survey, teams using the platform shortened their average ",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:18:40.581Z"
+    },
+    {
+      "trial": 1,
+      "query": "How does NovaCRM help sales teams close deals faster?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM helps sales teams close deals faster by automatically logging every email, call, and meeting, saving reps about five hours each week (Source A). Its built-in pipeline view highlights stalled deals in real time, allowing teams to act quickly and improve forecast reliability (Source A). A 2026 customer survey revealed that teams shortened their average sales cycle by 31% shortly after implementation due to automated follow-up sequences, ensuring no lead is forgotten (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:18:43.462Z"
+    },
+    {
+      "trial": 1,
+      "query": "How does NovaCRM help sales teams close deals faster?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovacRM helps sales teams close deals faster by automatically logging every email, call, and meeting, which saves reps roughly five hours each week that would otherwise be lost to manual data entry [SOURCE A][SOURCE B]. Its built-in pipeline view surfaces stalled deals in real time, allowing teams to rescue them before they go cold and make forecasts more reliable [SOURCE A][SOURCE B]. Additionally, NovaCRM shortened the average sales cycle by 31% within the first ninety days because automated f",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:18:47.640Z"
+    },
+    {
+      "trial": 1,
+      "query": "How does NovaCRM help sales teams close deals faster?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM helps sales teams close deals faster through several key mechanisms: it automatically logs communications to save reps about five hours weekly on data entry, surfaces stalled deals in real time so they can be rescued before going cold, and uses automated follow-up sequences to ensure no lead is forgotten. Source A also notes that NovaCRM's 2026 customer survey found teams shortened their average sales cycle by 31% within the first ninety days of adoption.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:18:49.286Z"
+    },
+    {
+      "trial": 1,
+      "query": "What features does NovaCRM offer for improving sales conversion?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM offers several features to improve sales conversion, primarily through a built-in pipeline view that surfaces stalled deals in real time, allowing them to be rescued before they go cold (Source A, Source B). The platform also provides automated follow-up sequences to ensure no lead is forgotten and every prospect receives a timely, relevant touchpoint (Source A, Source B). These features, combined with automatic logging of interactions and integrations with common tools like Slack and Gm",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:18:53.735Z"
+    },
+    {
+      "trial": 1,
+      "query": "What features does NovaCRM offer for improving sales conversion?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM offers several features to improve sales conversion, including automatic logging of emails, calls, and meetings, which saves reps about five hours each week (Source A). The built-in pipeline view helps identify stalled deals in real time, while automated follow-up sequences ensure that no lead is forgotten (Source B). According to a customer survey, teams also shortened their average sales cycle by 31% within the first ninety days of using the platform (Source A).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:18:55.406Z"
+    },
+    {
+      "trial": 1,
+      "query": "What features does NovaCRM offer for improving sales conversion?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM offers **automatic activity logging** for emails, calls, and meetings, plus a **built-in pipeline view** that surfaces stalled deals in real time so reps can rescue them before they go cold[Source A][Source B]. It also includes **automated follow-up sequences**, which help ensure no lead is forgotten and improve sales cycle speed; Source A says teams shortened their average sales cycle by **31%** within 90 days[Source A].  \n\nIt also integrates with **Slack, Gmail, and Outlook**, reducing",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:18:57.277Z"
+    },
+    {
+      "trial": 1,
+      "query": "What features does NovaCRM offer for improving sales conversion?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM offers several key features for improving sales conversion: a built-in pipeline view that surfaces stalled deals in real time to rescue them before they go cold, and automated follow-up sequences that ensure no lead is forgotten with timely, relevant touchpoints for every prospect. Source A also notes that the platform automatically logs emails, calls, and meetings, freeing up roughly five hours per week that reps would otherwise spend on manual data entry. Additio",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:19:00.512Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM good for shortening the sales cycle?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Yes, NovaCRM is effective for shortening the sales cycle. According to NovaCRM's 2026 customer survey, teams using the platform shortened their average sales cycle by 31% within the first ninety days (Source A, Source B). This is achieved through features such as automatic logging of communications, a pipeline view that surfaces stalled deals, and automated follow-up sequences (Source A, Source B). These features help sales teams close deals faster and ensure no lead is forgotten (Source A, Sour",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:19:04.227Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM good for shortening the sales cycle?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Yes, NovaCRM is effective for shortening the sales cycle. According to their 2026 customer survey, teams using the platform reduced their average sales cycle by 31% within the first ninety days. This improvement is attributed to features like automated follow-up sequences and real-time visibility into stalled deals (Source A).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:19:05.737Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM good for shortening the sales cycle?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Yes—based on the provided sources, NovaCRM appears **good for shortening the sales cycle**. Source A says teams shortened their average sales cycle by **31% within the first ninety days**, and Source B gives the same claim, attributing it to automated follow-ups and less manual admin. [SOURCE A][SOURCE B]\n\nThe broader CRM sources also support the mechanism: CRM automation can reduce sales cycles by **8–14%** and save reps about **4–5 hours per week** by cutting manual data entry, which can speed",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:19:08.103Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM good for shortening the sales cycle?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "Yes, NovaCRM is good for shortening the sales cycle. According to Source A, NovaCRM's 2026 customer survey reported that \"teams shortened their average sales cycle by 31% within the first ninety days.\" This improvement is driven by the platform's automated features, including automatic logging of communications and automated follow-up sequences that ensure no leads are forgotten, allowing deals to be rescued before they go cold.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:19:10.074Z"
+    },
+    {
+      "trial": 1,
+      "query": "What measurable results do teams get using NovaCRM?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Teams using NovaCRM achieve several measurable results. Reps save approximately five hours each week by eliminating manual data entry (Source A, Source B). Additionally, teams shortened their average sales cycle by 31% within the first ninety days of adopting the platform, according to NovaCRM's 2026 customer survey (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T12:19:11.920Z"
+    },
+    {
+      "trial": 1,
+      "query": "What measurable results do teams get using NovaCRM?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Teams using NovaCRM reported a 31% reduction in their average sales cycle within the first ninety days of adoption, according to a customer survey conducted in 2026 (Source A). Additionally, sales representatives save about five hours each week thanks to the platform's automatic logging of emails, calls, and meetings (Source B). This efficiency, combined with improved deal tracking and timely follow-ups, contributes to better sales outcomes for teams.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T12:19:13.820Z"
+    },
+    {
+      "trial": 1,
+      "query": "What measurable results do teams get using NovaCRM?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Teams using NovaCRM shorten their average sales cycle by **31%** within the first 90 days, according to the platform's 2026 customer survey [SOURCE A][SOURCE B]. Additionally, reps save roughly **five hours per week** because the system automatically logs emails, calls, and meetings, eliminating manual data entry [SOURCE A][SOURCE B]. Sales managers also benefit from more **reliable forecasts** as the built-in pipeline view surfaces stalled deals in real time, allowing them to be rescued before ",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T12:19:18.349Z"
+    },
+    {
+      "trial": 1,
+      "query": "What measurable results do teams get using NovaCRM?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A and Source B, teams using NovaCRM achieve several measurable results: they shorten their average sales cycle by 31% within the first ninety days, and individual reps save roughly five hours each week by eliminating manual data entry. Additionally, the platform's real-time pipeline view helps rescue stalled deals before they go cold, making sales forecasts far more reliable across the quarter.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T12:19:20.686Z"
+    },
+    {
+      "trial": 2,
+      "query": "How does NovaCRM help sales teams close deals faster?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM helps sales teams close deals faster by automatically logging every email, call, and meeting, saving reps approximately five hours each week that would otherwise be spent on manual data entry (Source A). The platform's built-in pipeline view surfaces stalled deals in real-time, allowing them to be rescued before they go cold, and automated follow-up sequences ensure every prospect receives a timely touchpoint (Source A). According to NovaCRM's 2026 customer survey, these features helped ",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:19:23.744Z"
+    },
+    {
+      "trial": 2,
+      "query": "How does NovaCRM help sales teams close deals faster?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM helps sales teams close deals faster by automatically logging emails, calls, and meetings, saving reps roughly five hours each week. Its built-in pipeline view allows for real-time insights on stalled deals, and automated follow-up sequences ensure no lead is forgotten, leading to a reported 31% reduction in the average sales cycle within the first ninety days (Source A). Additionally, the platform's integration with tools like Slack, Gmail, and Outlook enhances user adoption while minim",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:19:25.378Z"
+    },
+    {
+      "trial": 2,
+      "query": "How does NovaCRM help sales teams close deals faster?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM helps sales teams close deals faster by **automatically logging** emails, calls, and meetings, which saves reps about five hours a week and cuts manual data entry.[Source A] It also uses a **real-time pipeline view** to surface stalled deals, plus **automated follow-up sequences** so leads are not forgotten, helping prevent deals from going cold.[Source A]\n\nAccording to NovaCRM’s 2026 customer survey, teams using the platform shortened their average sales cycle by **31% within 90 days**.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:19:27.767Z"
+    },
+    {
+      "trial": 2,
+      "query": "How does NovaCRM help sales teams close deals faster?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM helps sales teams close deals faster through several key mechanisms: it automatically logs communications to save reps about five hours weekly on data entry, its pipeline view identifies stalled deals in real time so they can be rescued before going cold, and automated follow-up sequences ensure no leads are forgotten. Source A also notes that NovaCRM's 2026 customer survey found teams shortened their average sales cycle by 31% within the first ninety days of adopt",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:19:29.336Z"
+    },
+    {
+      "trial": 2,
+      "query": "What features does NovaCRM offer for improving sales conversion?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "NovaCRM offers several features designed to improve sales conversion. It automatically logs every email, call, and meeting, saving reps time spent on manual data entry (Source A, Source B). The platform's built-in pipeline view surfaces stalled deals in real time, enabling them to be rescued before going cold, and automated follow-up sequences ensure every lead receives a timely, relevant touchpoint (Source A, Source B). These features contribute to teams shortening their average sales cycle by ",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:19:32.858Z"
+    },
+    {
+      "trial": 2,
+      "query": "What features does NovaCRM offer for improving sales conversion?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "NovaCRM offers features that significantly improve sales conversion, such as automatic logging of every email, call, and meeting, saving reps about five hours each week on manual data entry (Source A). Its built-in pipeline view identifies stalled deals in real-time, enabling timely interventions and more reliable forecasts (Source A). Additionally, automated follow-up sequences ensure that no lead is overlooked, providing prospects with relevant touchpoints (Source A). According to a 2026 surve",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:19:34.888Z"
+    },
+    {
+      "trial": 2,
+      "query": "What features does NovaCRM offer for improving sales conversion?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "NovaCRM offers **automatic activity logging** for emails, calls, and meetings, plus a **pipeline view** that surfaces stalled deals in real time so reps can follow up before opportunities go cold[Source B]. It also includes **automated follow-up sequences** and integrations with **Slack, Gmail, and Outlook**, which help ensure timely outreach and reduce friction for sales teams[Source B].  \n\nThe sources also say these features save reps about **five hours per week** and helped teams shorten thei",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:19:36.982Z"
+    },
+    {
+      "trial": 2,
+      "query": "What features does NovaCRM offer for improving sales conversion?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, NovaCRM offers several features to improve sales conversion: automated logging of emails, calls, and meetings to free up rep time; a built-in pipeline view that surfaces stalled deals in real time to prevent deals from going cold; and automated follow-up sequences that ensure no lead is forgotten and every prospect receives timely, relevant touchpoints. Source A also notes that NovaCRM's 2026 customer survey reported teams shortened their average sales cycle by 31% within ",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": true
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-18T12:19:38.893Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM good for shortening the sales cycle?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Yes, NovaCRM is effective for shortening the sales cycle. According to NovaCRM's 2026 customer survey, teams using the platform shortened their average sales cycle by 31% within the first ninety days (Source A, Source B). This is largely due to automated follow-up sequences that ensure every lead receives a timely and relevant touchpoint (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T12:19:41.235Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM good for shortening the sales cycle?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Yes, NovaCRM is effective for shortening the sales cycle. According to a 2026 customer survey, teams using the platform reduced their average sales cycle by 31% within the first ninety days, largely due to automated follow-up sequences that ensure no leads are overlooked (Source A). Additionally, the integration with popular tools enhances user adoption and reduces training time, further facilitating quicker sales processes (Source B).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T12:19:43.465Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM good for shortening the sales cycle?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Yes—**NovaCRM appears good for shortening the sales cycle**. According to Source A, teams that adopted it shortened their average sales cycle by **31% within 90 days**, and Source B repeats the same result.  \n\nThe sources attribute that improvement to **automated follow-up sequences**, automatic activity logging, and a pipeline view that helps reps catch stalled deals sooner, all of which can speed up deal progression[Source A][Source B].",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T12:19:45.500Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM good for shortening the sales cycle?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "Yes, NovaCRM appears to be effective for shortening the sales cycle. According to Source A, \"teams that adopted the platform shortened their average sales cycle by 31% within the first ninety days, largely because automated follow-up sequences ensure that no lead is forgotten and every prospect receives a timely, relevant touchpoint.\" Additionally, Source A notes that the platform's real-time pipeline view helps sales managers rescue stalled deals before they go cold, which further contributes t",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T12:19:47.878Z"
+    },
+    {
+      "trial": 2,
+      "query": "What measurable results do teams get using NovaCRM?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "response": "Teams using NovaCRM experience several measurable benefits. Reps save approximately five hours each week by eliminating manual data entry (Source A, Source B). Additionally, teams that adopted NovaCRM shortened their average sales cycle by 31% within the first ninety days (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T12:19:49.664Z"
+    },
+    {
+      "trial": 2,
+      "query": "What measurable results do teams get using NovaCRM?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "response": "Teams using NovaCRM experience measurable results such as a 31% reduction in their average sales cycle within the first ninety days after adoption. Additionally, reps save approximately five hours each week due to automated logging of emails, calls, and meetings, which eliminates manual data entry (Source A). This efficiency leads to more reliable sales forecasts and timely follow-up with prospects (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T12:19:55.052Z"
+    },
+    {
+      "trial": 2,
+      "query": "What measurable results do teams get using NovaCRM?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "response": "Teams using NovaCRM shorten their average sales cycle by **31%** within the first ninety days, according to the platform's 2026 customer survey [SOURCE A][SOURCE B]. Additionally, reps save roughly **five hours each week** by automating the logging of emails, calls, and meetings, which eliminates manual data entry [SOURCE A][SOURCE B]. Sales managers also benefit from more **reliable forecasts** across the quarter because the built-in pipeline view surfaces stalled deals in real time, allowing t",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T12:19:58.097Z"
+    },
+    {
+      "trial": 2,
+      "query": "What measurable results do teams get using NovaCRM?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "response": "According to Source A, teams using NovaCRM achieved measurable results including a 31% reduction in average sales cycle length within the first ninety days, and reps saved roughly five hours per week by eliminating manual data entry. Source A also notes that sales managers benefit from real-time visibility into stalled deals, enabling them to rescue deals before they go cold and achieve more reliable forecasts.",
+      "error": null,
+      "citations": {
+        "A": true,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-18T12:19:59.624Z"
+    }
+  ],
+  "attribution": {
+    "minUniqueFingerprints": 92,
+    "lowSensitivity": false
+  }
+}
