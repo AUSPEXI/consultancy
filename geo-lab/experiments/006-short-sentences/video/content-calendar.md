@@ -1,0 +1,5 @@
+- **Shorts (Day 1):** Post the 45–60s vertical hook — "Short sentences got cited LESS." Result card (81.3% vs 37.5%) as the visual payoff; tease the full breakdown.
+- **Long-form (Day 2–3):** Publish the full 10-min experiment video with the ranked title #1. Pin the raw-data comment immediately.
+- **LinkedIn (Day 3):** One paragraph — "Everyone says write short, quotable sentences for AI. I ran the test across 4 engines and long compound sentences got cited 81.3% vs 37.5%. Mechanism: facts need their context. Preliminary, but here's the data." + link.
+- **X/Twitter thread (Day 4):** 5 tweets — (1) hook: shorter ≠ more cited; (2) method: same facts, two packagings, 4 engines, n=8/cell; (3) result: 81.3% vs 37.5%, confirmed on Perplexity; (4) implication: don't orphan your stats; (5) CTA: full video + raw data link.
+- **Community post (Day 5):** Highlight raw-data availability and invite replication — "Run it at n=30 over 10 days and post your numbers."
