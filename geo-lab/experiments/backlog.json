@@ -230,8 +230,9 @@
       ],
       "n_per_variant": 30,
       "priority": 11,
-      "status": "queued",
-      "youtube_angle": "The 'myth-busting' content strategy tested with data."
+      "status": "running",
+      "youtube_angle": "The 'myth-busting' content strategy tested with data.",
+      "started_at": "2026-06-19T12:42:32.362Z"
     },
     {
       "id": "015",
