@@ -1,0 +1,53 @@
+<svg width="2560" height="1440" viewBox="0 0 2560 1440" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="vig" cx="50%" cy="50%" r="78%">
+      <stop offset="55%" stop-color="#0b0b10"/>
+      <stop offset="100%" stop-color="#050507"/>
+    </radialGradient>
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0H0V64" fill="none" stroke="#16202b" stroke-width="1.2"/>
+    </pattern>
+  </defs>
+
+  <rect width="2560" height="1440" fill="url(#vig)"/>
+  <rect width="2560" height="1440" fill="url(#grid)" opacity="0.5"/>
+
+  <g transform="translate(44,0)">
+  <!-- ===== LOGO LOCKUP (compact, inside safe area) ~ centre (740,720) ===== -->
+  <g>
+    <!-- orbital rings (may bleed outside safe area — decorative) -->
+    <ellipse cx="740" cy="720" rx="360" ry="226" fill="none" stroke="#9aa0a8" stroke-width="6"
+             transform="rotate(-26 740 720)" opacity="0.85"/>
+    <ellipse cx="740" cy="720" rx="360" ry="226" fill="none" stroke="#ff1493" stroke-width="7"
+             transform="rotate(26 740 720)"/>
+    <circle cx="560" cy="588" r="11" fill="#ff1493"/>
+    <circle cx="1086" cy="784" r="11" fill="#ffffff"/>
+
+    <!-- L8 -->
+    <text x="566" y="806" font-family="Arial, Helvetica, sans-serif" font-weight="800"
+          font-size="240" fill="#ffffff">L8</text>
+
+    <!-- Ent key (solid pink) with enter/return arrow -->
+    <rect x="884" y="648" width="196" height="78" rx="14" fill="#ff1493"/>
+    <text x="906" y="702" font-family="Arial, Helvetica, sans-serif" font-weight="800"
+          font-size="40" fill="#0a0a0a">Ent</text>
+    <path d="M1044 668 V702 H1008" fill="none" stroke="#0a0a0a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M1008 702 l15 -10 v20 z" fill="#0a0a0a"/>
+
+    <!-- SPACE key (outlined pink) -->
+    <rect x="884" y="740" width="214" height="66" rx="12" fill="none" stroke="#ff1493" stroke-width="4"/>
+    <text x="908" y="785" font-family="Arial, Helvetica, sans-serif" font-weight="700"
+          font-size="32" letter-spacing="5" fill="#ff1493">SPACE</text>
+  </g>
+
+  <!-- ===== HEADLINE (inside safe area) ===== -->
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="1180" y="650" font-weight="800" font-size="84" letter-spacing="1">
+      <tspan fill="#ffffff">GET CITED BY </tspan><tspan fill="#ff1493" dx="18">AI</tspan>
+    </text>
+    <text x="1184" y="716" font-weight="700" font-size="44" fill="#e9eef5" letter-spacing="0.5">Generative Engine Optimization</text>
+    <text x="1184" y="772" font-weight="400" font-size="34" fill="#9aa0a8">Measure · Test · Lift AI visibility</text>
+    <text x="1184" y="846" font-weight="700" font-size="46" fill="#ff1493">l8entspace.com</text>
+  </g>
+  </g>
+</svg>
