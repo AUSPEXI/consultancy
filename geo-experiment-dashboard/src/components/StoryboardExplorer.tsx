@@ -1831,6 +1831,24 @@ export default function StoryboardExplorer() {
         }
       } catch (err) {}
     } else {
+      // Step 0: Enter fullscreen WITHIN the click gesture. This MUST happen before
+      // the getDisplayMedia await — that await consumes the user activation, so a
+      // requestFullscreen() afterwards silently rejects (the "no fullscreen" bug).
+      if (autoFullscreenOnRecord) {
+        const stage = document.getElementById('recording-viewport-stage');
+        if (stage) {
+          try {
+            if (stage.requestFullscreen) {
+              await stage.requestFullscreen();
+            } else if ((stage as any).webkitRequestFullscreen) {
+              await (stage as any).webkitRequestFullscreen();
+            }
+          } catch (fsErr) {
+            console.warn("Fullscreen request bypassed:", fsErr);
+          }
+        }
+      }
+
       // 1. Crucial synchronous AudioContext activation triggers to prevent browser suspension state silent locks
       try {
         synth.init();
@@ -1857,23 +1875,9 @@ export default function StoryboardExplorer() {
       } catch (err: any) {
         console.warn("Display media stream capture rejected or aborted:", err);
         setRecordingError(err?.message || "Screen capture selection was dismissed.");
+        // User dismissed the share picker — drop out of fullscreen so we aren't stuck.
+        try { if (document.fullscreenElement) await document.exitFullscreen(); } catch (e) {}
         return;
-      }
-
-      // Step 2: Auto Fullscreen for isolation tracking mode (guarantees perfect, uncropped 16:9 ratio)
-      if (autoFullscreenOnRecord) {
-        const stage = document.getElementById('recording-viewport-stage');
-        if (stage) {
-          try {
-            if (stage.requestFullscreen) {
-              await stage.requestFullscreen();
-            } else if ((stage as any).webkitRequestFullscreen) {
-              await (stage as any).webkitRequestFullscreen();
-            }
-          } catch (fsErr) {
-            console.warn("Fullscreen request bypassed:", fsErr);
-          }
-        }
       }
 
       try {
@@ -1995,9 +1999,17 @@ export default function StoryboardExplorer() {
         mediaRecorderRef.current = mediaRecorder;
         setIsRecording(true);
         
-        // Immediately switch player mode to simulation and reset playhead time
+        // Rewind to the very start so the take records the full programme:
+        // intro → storyboard (narration + b-roll) → outro. Without resetting the
+        // sequence to 'intro', playback would resume mid-storyboard and skip the intro.
         setPlayerMode('simulation');
+        setCameraMode('auto');
+        setSelectedPanelId(1);
+        setIntroTimeElapsed(0);
         setCurrentTimeSec(0);
+        setCurrentSequence(customIntroUrl ? 'intro' : 'storyboard');
+        if (introVideoRef.current) { try { introVideoRef.current.currentTime = 0; } catch (e) {} }
+        if (outroVideoRef.current) { try { outroVideoRef.current.currentTime = 0; } catch (e) {} }
         
         // Allow a 300ms window for state changes and Fullscreen zoom to settle comfortably 
         setTimeout(() => {
