@@ -608,7 +608,12 @@ export default function StoryboardExplorer() {
         // The handleVideoEnded callback will automatically zoom out when the B-Roll video finishes its playback.
         const hasBrollVideo = !!customBrollUrls[selectedPanel.panelId]?.url && !!customBrollUrls[selectedPanel.panelId]?.isVideo;
 
-        if (cameraMode === 'auto' && brollPlaying && hasBrollVideo) {
+        // Keep the camera zoomed while a B-roll video is mid zoom-in delay (a play
+        // timer is still pending) OR actively playing — handleVideoEnded performs
+        // the zoom-out when the clip really finishes. Without checking the pending
+        // timer, a B-roll that deactivates during the 800ms zoom-in delay would
+        // cancel the play timer and zoom straight back out without ever playing.
+        if (cameraMode === 'auto' && hasBrollVideo && (brollPlaying || brollTransitionTimeoutRef.current !== null)) {
           // Do nothing! Wait for handleVideoEnded
         } else {
           setBrollPlaying(false);
