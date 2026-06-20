@@ -1831,17 +1831,33 @@ export default function StoryboardExplorer() {
         }
       } catch (err) {}
     } else {
-      // Step 0: Enter fullscreen WITHIN the click gesture. This MUST happen before
-      // the getDisplayMedia await — that await consumes the user activation, so a
-      // requestFullscreen() afterwards silently rejects (the "no fullscreen" bug).
+      // 1. Resume the AudioContext synchronously inside the click gesture so the
+      // recorded mix isn't silently suspended. Do NOT await here — awaiting would
+      // burn the click's transient activation that getDisplayMedia still needs.
+      try {
+        synth.init();
+        if (synth.ctx && synth.ctx.state === 'suspended') {
+          synth.ctx.resume().catch(() => {});
+        }
+      } catch (audioActivationErr) {
+        console.warn("AudioContext early click handler resume bypassed:", audioActivationErr);
+      }
+
+      // 2. Fire the fullscreen request AND the share picker in the SAME synchronous
+      // tick, before any await. Both APIs require the click's transient activation.
+      // The previous version awaited requestFullscreen() first, which dropped the
+      // activation so the getDisplayMedia() picker could silently reject (capture
+      // "did nothing"). Firing fullscreen without awaiting keeps the activation
+      // alive for the picker, so the stage goes fullscreen AND the picker opens.
+      let fullscreenPromise: Promise<void> | null = null;
       if (autoFullscreenOnRecord) {
         const stage = document.getElementById('recording-viewport-stage');
         if (stage) {
           try {
             if (stage.requestFullscreen) {
-              await stage.requestFullscreen();
+              fullscreenPromise = stage.requestFullscreen();
             } else if ((stage as any).webkitRequestFullscreen) {
-              await (stage as any).webkitRequestFullscreen();
+              fullscreenPromise = (stage as any).webkitRequestFullscreen();
             }
           } catch (fsErr) {
             console.warn("Fullscreen request bypassed:", fsErr);
@@ -1849,21 +1865,12 @@ export default function StoryboardExplorer() {
         }
       }
 
-      // 1. Crucial synchronous AudioContext activation triggers to prevent browser suspension state silent locks
-      try {
-        synth.init();
-        if (synth.ctx && synth.ctx.state === 'suspended') {
-          await synth.ctx.resume();
-        }
-      } catch (audioActivationErr) {
-        console.warn("AudioContext early click handler resume bypassed:", audioActivationErr);
-      }
-
       let displayStream: MediaStream | null = null;
       let finalStream: MediaStream | null = null;
-      
+
       try {
-        // Step 1: Prompt system screenshare with requested custom sound support
+        // Prompt the system screen-share picker (with audio), fired in the same
+        // synchronous tick as the fullscreen request above.
         displayStream = await navigator.mediaDevices.getDisplayMedia({
           video: {
             width: { ideal: 1920 },
@@ -1875,10 +1882,15 @@ export default function StoryboardExplorer() {
       } catch (err: any) {
         console.warn("Display media stream capture rejected or aborted:", err);
         setRecordingError(err?.message || "Screen capture selection was dismissed.");
-        // User dismissed the share picker — drop out of fullscreen so we aren't stuck.
+        // User dismissed the share picker — swallow the fullscreen promise and drop
+        // back out of fullscreen so the app isn't left stuck or stranded.
+        if (fullscreenPromise) { fullscreenPromise.catch(() => {}); }
         try { if (document.fullscreenElement) await document.exitFullscreen(); } catch (e) {}
         return;
       }
+
+      // Picker resolved — settle the fullscreen transition before wiring the recorder.
+      if (fullscreenPromise) { try { await fullscreenPromise; } catch (e) {} }
 
       try {
         const tracks: MediaStreamTrack[] = [];
@@ -2007,7 +2019,8 @@ export default function StoryboardExplorer() {
         setSelectedPanelId(1);
         setIntroTimeElapsed(0);
         setCurrentTimeSec(0);
-        setCurrentSequence(customIntroUrl ? 'intro' : 'storyboard');
+        setOutroTimeElapsed(0);
+        setCurrentSequence(isIntroEnabled ? 'intro' : 'storyboard');
         if (introVideoRef.current) { try { introVideoRef.current.currentTime = 0; } catch (e) {} }
         if (outroVideoRef.current) { try { outroVideoRef.current.currentTime = 0; } catch (e) {} }
         
