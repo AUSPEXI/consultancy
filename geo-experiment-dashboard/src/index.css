@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Lora", "Georgia", serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Brand Override: Convert all cyan classes dynamically to high-fidelity Hot Pink */
+  --color-cyan-50: #fff0f5;
+  --color-cyan-100: #ffe1ed;
+  --color-cyan-200: #ffb8d7;
+  --color-cyan-300: #ff85be;
+  --color-cyan-400: #ff007f;   /* Key Brand Hot Pink */
+  --color-cyan-500: #e6006c;   /* Darker accent */
+  --color-cyan-600: #b30554;
+  --color-cyan-700: #8c003c;
+  --color-cyan-800: #590026;
+  --color-cyan-900: #330013;
+  --color-cyan-950: #1a0009;
+}
+
+/* Custom fade animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Editorial Glass Card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes barPulse1 {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
+@keyframes barPulse2 {
+  0%, 100% { height: 8px; }
+  50% { height: 24px; }
+}
+@keyframes barPulse3 {
+  0%, 100% { height: 14px; }
+  50% { height: 6px; }
+}
+@keyframes barPulse4 {
+  0%, 100% { height: 20px; }
+  50% { height: 10px; }
+}
+
+/* Fullscreen Recording Adaptive 16:9 Viewport Stage styling */
+#recording-viewport-stage {
+  container-type: size !important;
+}
+
+#recording-viewport-stage:fullscreen {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #000000 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+#recording-viewport-stage:fullscreen .storyboard-stage-viewport-internal-content {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  width: 100vw !important;
+  height: 56.25vw !important; /* 16:9 aspect ratio box */
+  max-width: 177.78vh !important;
+  max-height: 100vh !important;
+  margin: 0 !important;
+}
+
+#recording-viewport-stage:-webkit-full-screen {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #000000 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+#recording-viewport-stage:-webkit-full-screen .storyboard-stage-viewport-internal-content {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  width: 100vw !important;
+  height: 56.25vw !important;
+  max-width: 177.78vh !important;
+  max-height: 100vh !important;
+  margin: 0 !important;
+}
+
+/* HIGH FIDELITY CONTAINER-BASED RESPONSIVE TEXT COUPLER */
+#recording-viewport-stage .text-\[8px\] { font-size: clamp(8px, 1.62cqi, 34px) !important; }
+#recording-viewport-stage .text-\[8\.5px\] { font-size: clamp(8.5px, 1.72cqi, 36px) !important; }
+#recording-viewport-stage .text-\[10px\] { font-size: clamp(10px, 2.0cqi, 40px) !important; }
+#recording-viewport-stage .text-\[9px\] { font-size: clamp(9px, 1.82cqi, 38px) !important; }
+#recording-viewport-stage .text-\[9\.5px\] { font-size: clamp(9.5px, 1.9cqi, 39px) !important; }
+#recording-viewport-stage .text-\[7px\] { font-size: clamp(7px, 1.4cqi, 30px) !important; }
+#recording-viewport-stage .text-\[7\.5px\] { font-size: clamp(7.5px, 1.5cqi, 32px) !important; }
+#recording-viewport-stage .text-\[6\.5px\] { font-size: clamp(6.5px, 1.3cqi, 28px) !important; }
+#recording-viewport-stage .text-\[5\.5px\] { font-size: clamp(5.5px, 1.1cqi, 24px) !important; }
+
+#recording-viewport-stage .text-xs { font-size: clamp(12px, 2.1cqi, 42px) !important; }
+#recording-viewport-stage .text-sm { font-size: clamp(14px, 2.5cqi, 46px) !important; }
+#recording-viewport-stage .text-base { font-size: clamp(16px, 2.9cqi, 52px) !important; }
+#recording-viewport-stage .text-lg { font-size: clamp(18px, 3.4cqi, 60px) !important; }
+#recording-viewport-stage .text-xl { font-size: clamp(20px, 3.8cqi, 68px) !important; }
+#recording-viewport-stage .text-2xl { font-size: clamp(24px, 4.6cqi, 80px) !important; }
+#recording-viewport-stage .text-3xl { font-size: clamp(30px, 5.5cqi, 96px) !important; }
+
+/* Dynamic max-width and layout structure scaling for elements */
+#recording-viewport-stage .max-w-sm { max-width: 75cqi !important; }
+#recording-viewport-stage .max-w-xs { max-width: 60cqi !important; }
+#recording-viewport-stage .max-w-md { max-width: 85cqi !important; }
+
+#recording-viewport-stage .w-24 { width: clamp(96px, 18.5cqi, 360px) !important; }
+#recording-viewport-stage .w-20 { width: clamp(80px, 15cqi, 300px) !important; }
+#recording-viewport-stage .w-16 { width: clamp(64px, 12cqi, 240px) !important; }
+#recording-viewport-stage .h-16 { height: clamp(64px, 12cqi, 240px) !important; }
+#recording-viewport-stage .w-14 { width: clamp(56px, 10.5cqi, 210px) !important; }
+#recording-viewport-stage .h-14 { height: clamp(56px, 10.5cqi, 210px) !important; }
+#recording-viewport-stage .w-7 { width: clamp(28px, 5.2cqi, 100px) !important; }
+#recording-viewport-stage .h-7 { height: clamp(28px, 5.2cqi, 100px) !important; }
+#recording-viewport-stage .w-6 { width: clamp(24px, 4.5cqi, 90px) !important; }
+#recording-viewport-stage .h-6 { height: clamp(24px, 4.5cqi, 90px) !important; }
+
+#recording-viewport-stage .gap-2 { gap: 1.5cqi !important; }
+#recording-viewport-stage .gap-3 { gap: 2cqi !important; }
+#recording-viewport-stage .gap-4 { gap: 2.5cqi !important; }
+
+#recording-viewport-stage .p-4 { padding: 3cqi !important; }
+#recording-viewport-stage .p-3 { padding: 2.2cqi !important; }
+#recording-viewport-stage .p-2\.5 { padding: 1.8cqi !important; }
+#recording-viewport-stage .p-2 { padding: 1.5cqi !important; }
+#recording-viewport-stage .p-1\.5 { padding: 1.1cqi !important; }
+
+/* Spotlight Glow */
+#recording-viewport-stage .w-\[500px\] { width: 55cqi !important; }
+#recording-viewport-stage .h-\[500px\] { height: 55cqi !important; }
+
+

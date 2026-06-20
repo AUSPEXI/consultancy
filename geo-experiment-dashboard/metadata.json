@@ -1,0 +1,6 @@
+{
+  "name": "GEO Experiment Dashboard",
+  "description": "Interactive dashboard and video storyboard analyzer for Generative Engine Optimization (GEO) experiments, comparing specific numbers versus vague phrasing.",
+  "requestFramePermissions": ["display-capture"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
