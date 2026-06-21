@@ -23,6 +23,35 @@ export const ENGINE_MODEL_VERSIONS: Record<PlatformKey, string> = {
   google_aio: 'serpapi-google-ai-overview',
 };
 
+// ── Citation pathway (WS1) ───────────────────────────────────────────────────
+// A bare query measures PARAMETRIC recall (does the model know the brand from
+// training?); a query run with the engine's web tool measures GROUNDED retrieval
+// (does it cite the brand when it searches the live web?). These are different
+// questions and must be labelled — a young brand reading "not cited (parametric)"
+// is expected, not a failing grade.
+export type Pathway = 'parametric' | 'grounded';
+export type ProbeMode = 'parametric' | 'grounded';
+
+// What each engine can do TODAY in this codebase. Grounded for Gemini/Grok is a
+// follow-up slice; until implemented they're listed parametric-only so we never
+// label a result "grounded" that wasn't.
+export const ENGINE_PATHWAYS: Record<PlatformKey, Pathway[]> = {
+  gemini: ['parametric'],            // grounded (googleSearch tool): slice 2
+  chatgpt: ['parametric', 'grounded'],
+  claude: ['parametric', 'grounded'],
+  grok: ['parametric'],              // grounded (xAI live search): slice 2
+  perplexity: ['grounded'],          // sonar always retrieves
+  deepseek: ['parametric'],          // no native web tool today
+  google_aio: ['grounded'],          // SerpAPI = real Google AI Overview
+};
+
+// Resolve the pathway an engine will actually run given the requested mode: honour
+// the request when the engine supports it, else fall back to its only capability.
+export function resolvePathway(engine: PlatformKey, requested: ProbeMode): Pathway {
+  const caps = ENGINE_PATHWAYS[engine];
+  return caps.includes(requested) ? requested : caps[0];
+}
+
 export interface PlatformResult {
   cited: boolean;
   accurate: boolean;
@@ -38,6 +67,14 @@ export interface PlatformResult {
   // Normalised position of the first brand mention in the answer (0–100; lower =
   // earlier = more prominent). null when not cited.
   positionPct?: number | null;
+  // WS1: which pathway actually produced THIS result (reflects what ran, not what
+  // was requested — a failed grounded call falls back to parametric and says so).
+  pathway?: Pathway;
+  // Structured citations the engine returned (grounded only); null otherwise.
+  sourceUrls?: string[] | null;
+  // True when the brand's own domain appears in sourceUrls — the strongest
+  // "cited as a source" signal for GEO.
+  citedInSources?: boolean;
   error?: string;
   skipped?: boolean;
 }
@@ -209,7 +246,68 @@ export function checkCitation(
 
 const SKIPPED: PlatformResult = { cited: false, accurate: true, misinformation: null, excerpt: null, skipped: true };
 
-async function probeGemini(query: string, brand: string, domain: string, knownFalses: string[]): Promise<PlatformResult> {
+// ── Grounded-mode helpers (WS1) ──────────────────────────────────────────────
+// Does the brand's own domain appear among the engine's returned source URLs?
+function domainInSources(domain: string, sourceUrls: string[] | null | undefined): boolean {
+  if (!sourceUrls || sourceUrls.length === 0) return false;
+  const d = String(domain).toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+  if (!d) return false;
+  return sourceUrls.some(u => (u || '').toLowerCase().includes(d));
+}
+
+// Build a grounded PlatformResult: the brand counts as cited if it's named in the
+// answer text OR its domain appears in the returned sources.
+function finalizeGrounded(
+  text: string, brand: string, domain: string, knownFalses: string[], sourceUrls: string[],
+): PlatformResult {
+  const base = checkCitation(text, brand, domain, knownFalses);
+  const citedInSources = domainInSources(domain, sourceUrls);
+  return {
+    ...base,
+    cited: base.cited || citedInSources,
+    rawResponse: text,
+    pathway: 'grounded',
+    sourceUrls: sourceUrls.length ? [...new Set(sourceUrls)] : null,
+    citedInSources,
+  };
+}
+
+// Extract answer text from an OpenAI Responses API result (best-effort across SDK shapes).
+function extractResponsesText(r: any): string {
+  if (typeof r?.output_text === 'string' && r.output_text) return r.output_text;
+  const parts: string[] = [];
+  for (const item of r?.output ?? []) {
+    for (const c of item?.content ?? []) {
+      if (typeof c?.text === 'string') parts.push(c.text);
+    }
+  }
+  return parts.join('\n');
+}
+// Extract url_citation annotations from an OpenAI Responses API result.
+function extractResponsesCitations(r: any): string[] {
+  const urls: string[] = [];
+  for (const item of r?.output ?? []) {
+    for (const c of item?.content ?? []) {
+      for (const ann of c?.annotations ?? []) {
+        if (ann?.type === 'url_citation' && ann?.url) urls.push(ann.url);
+      }
+    }
+  }
+  return urls;
+}
+// Extract cited URLs from an Anthropic messages response that used the web_search tool.
+function extractClaudeCitations(data: any): string[] {
+  const urls: string[] = [];
+  for (const block of data?.content ?? []) {
+    if (block?.type === 'web_search_tool_result') {
+      for (const r of block?.content ?? []) if (r?.url) urls.push(r.url);
+    }
+    for (const cit of block?.citations ?? []) if (cit?.url) urls.push(cit.url);
+  }
+  return urls;
+}
+
+async function probeGemini(query: string, brand: string, domain: string, knownFalses: string[], _pathway: Pathway = 'parametric'): Promise<PlatformResult> {
   const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
   if (!apiKey) return SKIPPED;
   try {
@@ -220,17 +318,34 @@ async function probeGemini(query: string, brand: string, domain: string, knownFa
       config: { temperature: 0.3, maxOutputTokens: 600 },
     });
     const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text };
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text, pathway: 'parametric', sourceUrls: null, citedInSources: false };
   } catch (e: any) {
-    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message, pathway: 'parametric' };
   }
 }
 
-async function probeChatGPT(query: string, brand: string, domain: string, knownFalses: string[]): Promise<PlatformResult> {
+async function probeChatGPT(query: string, brand: string, domain: string, knownFalses: string[], pathway: Pathway = 'parametric'): Promise<PlatformResult> {
   const apiKey = process.env.OPENAI_API_KEY || '';
   if (!apiKey) return SKIPPED;
+  const client = new OpenAI({ apiKey });
+
+  if (pathway === 'grounded') {
+    // Responses API with the web-search tool. Cast through `any` so this compiles
+    // across SDK versions; on any failure we fall back to the parametric call and
+    // label the result honestly. (Verify the tool string against current docs.)
+    try {
+      const r: any = await (client as any).responses.create({
+        model: 'gpt-4o-mini',
+        tools: [{ type: 'web_search' }],
+        input: query,
+        temperature: 0.3,
+      });
+      const text = extractResponsesText(r);
+      if (text) return finalizeGrounded(text, brand, domain, knownFalses, extractResponsesCitations(r));
+    } catch { /* fall through to parametric */ }
+  }
+
   try {
-    const client = new OpenAI({ apiKey });
     const response = await client.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: query }],
@@ -238,33 +353,49 @@ async function probeChatGPT(query: string, brand: string, domain: string, knownF
       temperature: 0.3,
     });
     const text = response.choices[0]?.message?.content || '';
-    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text };
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text, pathway: 'parametric', sourceUrls: null, citedInSources: false };
   } catch (e: any) {
-    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message, pathway: 'parametric' };
   }
 }
 
-async function probePerplexity(query: string, brand: string, domain: string, knownFalses: string[]): Promise<PlatformResult> {
+async function probePerplexity(query: string, brand: string, domain: string, knownFalses: string[], _pathway: Pathway = 'grounded'): Promise<PlatformResult> {
   const apiKey = process.env.PERPLEXITY_API_KEY || '';
   if (!apiKey) return SKIPPED;
   try {
     const client = new OpenAI({ apiKey, baseURL: 'https://api.perplexity.ai' });
-    const response = await client.chat.completions.create({
+    const response: any = await client.chat.completions.create({
       model: 'sonar',
       messages: [{ role: 'user', content: query }],
       max_tokens: 600,
     } as any);
     const text = response.choices[0]?.message?.content || '';
-    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text };
+    // sonar always retrieves — pull its source list (shape varies by API version).
+    const sourceUrls: string[] = (
+      response.citations
+      ?? response.search_results?.map((s: any) => s?.url)
+      ?? []
+    ).filter((u: any) => typeof u === 'string');
+    return finalizeGrounded(text, brand, domain, knownFalses, sourceUrls);
   } catch (e: any) {
-    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message, pathway: 'grounded' };
   }
 }
 
-async function probeClaude(query: string, brand: string, domain: string, knownFalses: string[]): Promise<PlatformResult> {
+async function probeClaude(query: string, brand: string, domain: string, knownFalses: string[], pathway: Pathway = 'parametric'): Promise<PlatformResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY || '';
   if (!apiKey) return SKIPPED;
+  const grounded = pathway === 'grounded';
   try {
+    const body: any = {
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 600,
+      messages: [{ role: 'user', content: query }],
+    };
+    // Add the web-search tool for grounded mode. (Verify the tool version string
+    // against current Anthropic docs at maintenance time — these move.)
+    if (grounded) body.tools = [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }];
+
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -272,22 +403,27 @@ async function probeClaude(query: string, brand: string, domain: string, knownFa
         'anthropic-version': '2023-06-01',
         'content-type': 'application/json',
       },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 600,
-        messages: [{ role: 'user', content: query }],
-      }),
+      body: JSON.stringify(body),
     });
     const data = await res.json();
-    const text = data.content?.[0]?.text || '';
-    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text };
+    const text = (data.content ?? [])
+      .filter((b: any) => b?.type === 'text' && typeof b.text === 'string')
+      .map((b: any) => b.text).join('\n') || data.content?.[0]?.text || '';
+
+    if (grounded) {
+      const sourceUrls = extractClaudeCitations(data);
+      // Only claim "grounded" if the tool actually engaged (returned sources);
+      // otherwise label parametric so we never overstate the pathway.
+      if (sourceUrls.length > 0) return finalizeGrounded(text, brand, domain, knownFalses, sourceUrls);
+    }
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text, pathway: 'parametric', sourceUrls: null, citedInSources: false };
   } catch (e: any) {
-    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message, pathway };
   }
 }
 
 // Grok (x.ai) and DeepSeek are OpenAI-compatible — same pattern as Perplexity.
-async function probeGrok(query: string, brand: string, domain: string, knownFalses: string[]): Promise<PlatformResult> {
+async function probeGrok(query: string, brand: string, domain: string, knownFalses: string[], _pathway: Pathway = 'parametric'): Promise<PlatformResult> {
   const apiKey = process.env.XAI_API_KEY || process.env.GROK_API_KEY || '';
   if (!apiKey) return SKIPPED;
   try {
@@ -298,13 +434,13 @@ async function probeGrok(query: string, brand: string, domain: string, knownFals
       max_tokens: 600, temperature: 0.3,
     } as any);
     const text = response.choices[0]?.message?.content || '';
-    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text };
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text, pathway: 'parametric', sourceUrls: null, citedInSources: false };
   } catch (e: any) {
-    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message, pathway: 'parametric' };
   }
 }
 
-async function probeDeepSeek(query: string, brand: string, domain: string, knownFalses: string[]): Promise<PlatformResult> {
+async function probeDeepSeek(query: string, brand: string, domain: string, knownFalses: string[], _pathway: Pathway = 'parametric'): Promise<PlatformResult> {
   const apiKey = process.env.DEEPSEEK_API_KEY || '';
   if (!apiKey) return SKIPPED;
   try {
@@ -315,9 +451,9 @@ async function probeDeepSeek(query: string, brand: string, domain: string, known
       max_tokens: 600, temperature: 0.3,
     } as any);
     const text = response.choices[0]?.message?.content || '';
-    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text };
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text, pathway: 'parametric', sourceUrls: null, citedInSources: false };
   } catch (e: any) {
-    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message, pathway: 'parametric' };
   }
 }
 
@@ -356,7 +492,7 @@ function flattenAioText(aio: any): string {
   return parts.join('\n');
 }
 
-async function probeGoogleAIO(query: string, brand: string, domain: string, knownFalses: string[]): Promise<PlatformResult> {
+async function probeGoogleAIO(query: string, brand: string, domain: string, knownFalses: string[], _pathway: Pathway = 'grounded'): Promise<PlatformResult> {
   const apiKey = process.env.SERPAPI_KEY || process.env.SERPAPI_API_KEY || '';
   if (!apiKey) return SKIPPED;
   try {
@@ -375,13 +511,16 @@ async function probeGoogleAIO(query: string, brand: string, domain: string, know
 
     // No AI Overview shown for this query — a genuine "not cited" result.
     if (!aio || (!aio.text_blocks && !aio.references)) {
-      return { cited: false, accurate: true, misinformation: null, excerpt: null, sentiment: null, position: null, positionPct: null };
+      return { cited: false, accurate: true, misinformation: null, excerpt: null, sentiment: null, position: null, positionPct: null, pathway: 'grounded', sourceUrls: null, citedInSources: false };
     }
 
     const text = flattenAioText(aio);
-    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text };
+    const sourceUrls: string[] = (aio.references || [])
+      .map((ref: any) => ref?.link)
+      .filter((u: any) => typeof u === 'string');
+    return finalizeGrounded(text, brand, domain, knownFalses, sourceUrls);
   } catch (e: any) {
-    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message };
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message, pathway: 'grounded' };
   }
 }
 
@@ -389,15 +528,18 @@ async function probeGoogleAIO(query: string, brand: string, domain: string, know
 // returned as skipped without making (or paying for) an API call.
 async function probeQuery(
   query: string, brand: string, domain: string, knownFalses: string[], engines: Set<PlatformKey>,
+  mode: ProbeMode = 'parametric',
 ): Promise<Record<PlatformKey, PlatformResult>> {
+  // Each engine runs the pathway it actually supports for the requested mode.
+  const pw = (e: PlatformKey) => resolvePathway(e, mode);
   const [gemini, chatgpt, perplexity, claude, grok, deepseek, google_aio] = await Promise.all([
-    engines.has('gemini') ? probeGemini(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
-    engines.has('chatgpt') ? probeChatGPT(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
-    engines.has('perplexity') ? probePerplexity(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
-    engines.has('claude') ? probeClaude(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
-    engines.has('grok') ? probeGrok(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
-    engines.has('deepseek') ? probeDeepSeek(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
-    engines.has('google_aio') ? probeGoogleAIO(query, brand, domain, knownFalses) : Promise.resolve(SKIPPED),
+    engines.has('gemini') ? probeGemini(query, brand, domain, knownFalses, pw('gemini')) : Promise.resolve(SKIPPED),
+    engines.has('chatgpt') ? probeChatGPT(query, brand, domain, knownFalses, pw('chatgpt')) : Promise.resolve(SKIPPED),
+    engines.has('perplexity') ? probePerplexity(query, brand, domain, knownFalses, pw('perplexity')) : Promise.resolve(SKIPPED),
+    engines.has('claude') ? probeClaude(query, brand, domain, knownFalses, pw('claude')) : Promise.resolve(SKIPPED),
+    engines.has('grok') ? probeGrok(query, brand, domain, knownFalses, pw('grok')) : Promise.resolve(SKIPPED),
+    engines.has('deepseek') ? probeDeepSeek(query, brand, domain, knownFalses, pw('deepseek')) : Promise.resolve(SKIPPED),
+    engines.has('google_aio') ? probeGoogleAIO(query, brand, domain, knownFalses, pw('google_aio')) : Promise.resolve(SKIPPED),
   ]);
   return { gemini, chatgpt, perplexity, claude, grok, deepseek, google_aio };
 }
@@ -440,16 +582,17 @@ export interface ProbeAggregate {
 // Run a full citation probe for one brand across a query set and aggregate it.
 export async function runCitationProbe(opts: {
   brand: string; domain: string; queries: string[];
-  knownFalses?: string[]; engines?: Set<PlatformKey>;
+  knownFalses?: string[]; engines?: Set<PlatformKey>; mode?: ProbeMode;
 }): Promise<ProbeAggregate> {
   const { brand, domain, queries } = opts;
   const knownFalses = opts.knownFalses ?? [];
   const engines = opts.engines ?? new Set(ALL_ENGINES);
+  const mode = opts.mode ?? 'parametric';
   const timestamp = new Date().toISOString();
 
   const queryResults = await Promise.all(
     queries.map(async (query) => {
-      const platforms = await probeQuery(query, brand, domain, knownFalses, engines);
+      const platforms = await probeQuery(query, brand, domain, knownFalses, engines, mode);
       const active = Object.values(platforms).filter(p => !p.skipped);
       const citedOnAny = active.some(p => p.cited);
       const hasMisinformation = active.some(p => p.cited && !p.accurate);
@@ -508,10 +651,11 @@ export async function runCitationProbe(opts: {
 // Lightweight cited-only probe used for competitor head-to-head comparison.
 export async function probeBrandRate(
   queries: string[], brand: string, domain: string, engines: Set<PlatformKey> = new Set(ALL_ENGINES),
+  mode: ProbeMode = 'parametric',
 ): Promise<{ rate: number; perQuery: { query: string; cited: boolean }[] }> {
   const perQuery = await Promise.all(
     queries.map(async (query) => {
-      const platforms = await probeQuery(query, brand, domain, [], engines);
+      const platforms = await probeQuery(query, brand, domain, [], engines, mode);
       const active = Object.values(platforms).filter(p => !p.skipped);
       return { query, cited: active.some(p => p.cited) };
     })
@@ -523,7 +667,18 @@ export async function probeBrandRate(
 
 // Estimate USD cost of a probe pass. Mirrors the per-engine pricing used in the
 // cost_audit writes. `passes` = number of brands probed (brand + competitors).
-export function estimateProbeCost(numQueries: number, engines: Set<PlatformKey>, passes = 1): number {
+// `mode` = grounded runs cost more because each query triggers a billed web
+// search on top of generation (WS1 cost guard).
+export function estimateProbeCost(numQueries: number, engines: Set<PlatformKey>, passes = 1, mode: ProbeMode = 'parametric'): number {
+  // Per-query surcharge for the web-search step when an engine runs grounded.
+  // Rough provider search pricing; tune as real usage data comes in.
+  const GROUNDED_SEARCH_USD: Partial<Record<PlatformKey, number>> = {
+    chatgpt: 0.010, claude: 0.010, gemini: 0.000, grok: 0.005,
+  };
+  const groundedSurcharge = mode === 'grounded'
+    ? [...engines].reduce((sum, e) =>
+        resolvePathway(e, 'grounded') === 'grounded' ? sum + (GROUNDED_SEARCH_USD[e] ?? 0) * numQueries : sum, 0)
+    : 0;
   const perPass =
     (engines.has('gemini') ? (numQueries * 500 / 1_000_000) * 0.40 : 0) +
     (engines.has('chatgpt') ? (numQueries * 800 / 1_000_000) * 0.60 : 0) +
@@ -533,6 +688,7 @@ export function estimateProbeCost(numQueries: number, engines: Set<PlatformKey>,
     (engines.has('deepseek') ? (numQueries * 800 / 1_000_000) * 0.28 : 0) +
     // SerpAPI bills per search (~$0.01 on the $50/5k plan); ~1.3× to cover the
     // occasional page_token redemption that needs a second search call.
-    (engines.has('google_aio') ? numQueries * 0.013 : 0);
+    (engines.has('google_aio') ? numQueries * 0.013 : 0) +
+    groundedSurcharge;
   return perPass * passes;
 }

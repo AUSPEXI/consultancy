@@ -3,7 +3,7 @@ import { dbAdmin } from '@/lib/firebase-admin';
 import { computeAttribution } from '@/lib/attribution';
 import { requireAuth } from '@/lib/api-auth';
 import { perplexityBudget } from '@/lib/perplexity-budget';
-import { buildQueries, runCitationProbe, probeBrandRate, ENGINE_MODEL_VERSIONS } from '@/lib/cite-probe-core';
+import { buildQueries, runCitationProbe, probeBrandRate, ENGINE_MODEL_VERSIONS, type ProbeMode } from '@/lib/cite-probe-core';
 import { normalizeTier, checkTierAccess } from '@/constants/tiers';
 import { embeddingService } from '@/lib/embeddings';
 import { computeQueryGeometry, loadEmbeddedFacts, GEOMETRY_SIM_THRESHOLD } from '@/lib/fact-geometry';
@@ -160,11 +160,16 @@ export async function POST(request: Request) {
       negativeStatements: clientFalses = [],
       competitorBrand = '', competitorDomain = '',
       competitors: competitorDomains = [],
+      pathwayMode = 'parametric',
     } = await request.json();
 
     if (!brand || !domain) {
       return NextResponse.json({ error: 'brand and domain are required' }, { status: 400 });
     }
+
+    // WS1: parametric (training recall) vs grounded (live retrieval). Defaults to
+    // parametric so existing behaviour is unchanged.
+    const probeMode: ProbeMode = pathwayMode === 'grounded' ? 'grounded' : 'parametric';
 
     // Free-tier monthly meter (paid tiers + admins pass through).
     const meterBlock = await enforceFreeProbeMeter(userId);
@@ -222,7 +227,7 @@ export async function POST(request: Request) {
       queryResults, platformRates, citationRate, ci95,
       citedCount, misinformationCount, activePlatforms,
       sentimentBreakdown, avgPositionPct,
-    } = await runCitationProbe({ brand, domain, queries: testQueries, knownFalses });
+    } = await runCitationProbe({ brand, domain, queries: testQueries, knownFalses, mode: probeMode });
 
     // S7.1: competitor comparison — run the SAME queries for each competitor and
     // compute per-query winners so the user gets a concrete head-to-head benchmark.
@@ -244,7 +249,7 @@ export async function POST(request: Request) {
 
     const competitors = await Promise.all(
       cappedTargets.map(async ({ brand: cBrand, domain: cDomain }) => {
-        const compProbe = await probeBrandRate(testQueries, cBrand, cDomain);
+        const compProbe = await probeBrandRate(testQueries, cBrand, cDomain, undefined, probeMode);
         const compByQuery = new Map(compProbe.perQuery.map(r => [r.query, r.cited]));
         const comparison = queryResults.map(r => {
           const youCited = r.cited;
@@ -331,6 +336,7 @@ export async function POST(request: Request) {
       engineVersions: ENGINE_MODEL_VERSIONS,
       attribution,
       mode: isCompetitorMode ? 'competitor' : 'standard',
+      pathwayMode: probeMode,
       competitorDomain: competitor?.domain ?? null,
       competitor,
       competitors,
