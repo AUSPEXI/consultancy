@@ -427,44 +427,68 @@ export default function StoryboardExplorer() {
   const totalDuration = (scaleTimingsToAudio && userAudioUrl && audioDuration > 0) ? audioDuration : 330;
   const selectedPanel = STORYBOARD_DATA.find(p => p.panelId === selectedPanelId) || STORYBOARD_DATA[0];
 
-  const getPanelTimings = (panel: typeof STORYBOARD_DATA[0]) => {
-    // Tap-synced absolute boundaries win once calibration is committed. Each panel
-    // runs from its captured start to the next captured start, so the boundaries are
-    // contiguous by construction and land exactly on the voiceover.
-    const hasManual = !syncCalibrating && Object.keys(manualPanelStarts).length > 0;
-    if (hasManual && manualPanelStarts[panel.panelId] !== undefined) {
-      const start = manualPanelStarts[panel.panelId];
-      const idx = STORYBOARD_DATA.findIndex(p => p.panelId === panel.panelId);
-      let end = totalDuration;
-      for (let j = idx + 1; j < STORYBOARD_DATA.length; j++) {
-        const ns = manualPanelStarts[STORYBOARD_DATA[j].panelId];
-        if (ns !== undefined) { end = ns; break; }
-      }
-      return {
-        start: Number(start.toFixed(2)),
-        end: Number(Math.max(start + 0.5, end).toFixed(2))
-      };
-    }
-
+  // The auto-scaled (or offset-nudged) start for a panel — the baseline before
+  // any manual edit.
+  const scaledPanelStart = (panel: StoryboardPanel) => {
     const originalStart = timeToSeconds(panel.startTime);
-    const originalEnd = timeToSeconds(panel.endTime);
-
-    // Apply slide-specific fine-tuning delay/advance offset
     const activeOffset = panelOffsets[panel.panelId] ?? 0;
-    const shiftedStart = Math.max(0, originalStart + activeOffset);
-    const shiftedEnd = Math.max(shiftedStart + 1, originalEnd + activeOffset);
-
+    const shifted = Math.max(0, originalStart + activeOffset);
     if (scaleTimingsToAudio && userAudioUrl && audioDuration > 0) {
-      const scale = audioDuration / 330;
-      return {
-        start: Number((shiftedStart * scale).toFixed(1)),
-        end: Number((shiftedEnd * scale).toFixed(1))
-      };
+      return Number((shifted * (audioDuration / 330)).toFixed(2));
     }
-    return {
-      start: shiftedStart,
-      end: shiftedEnd
-    };
+    return Number(shifted.toFixed(2));
+  };
+
+  // The effective start of a panel: a manually-edited time wins; otherwise the
+  // auto-scaled baseline. Editing only a few panels is fine — the rest stay on the
+  // baseline and everything remains contiguous (see getPanelTimings).
+  const resolvePanelStart = (panel: StoryboardPanel) => {
+    if (!syncCalibrating && manualPanelStarts[panel.panelId] !== undefined) {
+      return Number(manualPanelStarts[panel.panelId].toFixed(2));
+    }
+    return scaledPanelStart(panel);
+  };
+
+  const getPanelTimings = (panel: StoryboardPanel) => {
+    // Each panel runs from its own (possibly edited) start to the NEXT panel's
+    // start, so boundaries are always contiguous no matter how many were edited.
+    const idx = STORYBOARD_DATA.findIndex(p => p.panelId === panel.panelId);
+    const start = resolvePanelStart(panel);
+    let end = (idx >= 0 && idx < STORYBOARD_DATA.length - 1)
+      ? resolvePanelStart(STORYBOARD_DATA[idx + 1])
+      : totalDuration;
+    if (!(end > start)) end = start + 0.5;
+    return { start: Number(start.toFixed(2)), end: Number(end.toFixed(2)) };
+  };
+
+  // ── Editable panel start times (the relaxed sync) ────────────────────────
+  // Set/override a panel's start explicitly. No clock pressure — type it, nudge
+  // it, or snap it to wherever the audio is paused.
+  const setPanelStart = (panelId: number, seconds: number) => {
+    if (!isFinite(seconds)) return;
+    const v = Math.max(0, Number(seconds.toFixed(2)));
+    setManualPanelStarts(prev => ({ ...prev, [panelId]: v }));
+  };
+
+  const nudgePanelStart = (panel: StoryboardPanel, deltaSec: number) => {
+    const base = resolvePanelStart(panel);
+    setPanelStart(panel.panelId, base + deltaSec);
+    if (isSynthEnabled) synth.playBeep(deltaSec > 0 ? 660 : 520, 0.04);
+  };
+
+  const setPanelStartToPlayhead = (panel: StoryboardPanel) => {
+    const t = audioRef.current ? audioRef.current.currentTime : currentTimeSec;
+    setPanelStart(panel.panelId, t);
+    if (isSynthEnabled) synth.playBeep(760, 0.06);
+  };
+
+  const clearPanelStart = (panelId: number) => {
+    setManualPanelStarts(prev => {
+      const copy = { ...prev };
+      delete copy[panelId];
+      return copy;
+    });
+    if (isSynthEnabled) synth.playBeep(440, 0.05);
   };
 
   // Smooth transitioning delay for B-Roll assets to prevent jarring content flashes
@@ -1645,6 +1669,12 @@ export default function StoryboardExplorer() {
   // giving frame-accurate panel↔voiceover sync in a single pass.
   const beginSyncCalibration = () => {
     if (!userAudioUrl) return;
+    // Guard: a live tap pass overwrites every panel start, so don't silently wipe
+    // any hand-edited times.
+    if (Object.keys(manualPanelStarts).length > 0 &&
+        !window.confirm('Start a fresh tap-sync pass? This replaces ALL current panel start times (including any you edited by hand).')) {
+      return;
+    }
     synth.init();
     if (synth.ctx && synth.ctx.state === 'suspended') {
       synth.ctx.resume().catch(() => {});
@@ -2987,6 +3017,71 @@ export default function StoryboardExplorer() {
           </div>
 
           <div className="space-y-4 bg-black/40 border border-white/5 p-3 rounded">
+            {/* Editable panel start time — the relaxed sync */}
+            <div className="space-y-1.5 pb-3 border-b border-white/5">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-zinc-200 font-bold flex items-center gap-1">
+                  🎯 Panel #{selectedPanel.panelId} start time
+                </span>
+                <span className={`font-black uppercase tracking-wide px-1.5 py-0.5 rounded text-[10px] ${
+                  manualPanelStarts[selectedPanel.panelId] !== undefined
+                    ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-500/20'
+                    : 'bg-zinc-900 text-zinc-500'
+                }`}>
+                  {manualPanelStarts[selectedPanel.panelId] !== undefined ? 'EDITED' : 'AUTO'} · {secondsToTime(resolvePanelStart(selectedPanel))}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => nudgePanelStart(selectedPanel, -0.5)}
+                  className="text-[11px] font-bold px-2 py-2 rounded bg-zinc-900 border border-white/10 text-zinc-300 hover:text-white transition cursor-pointer"
+                  title="Pull this panel half a second earlier"
+                >−0.5</button>
+                <input
+                  key={`pstart-${selectedPanel.panelId}-${manualPanelStarts[selectedPanel.panelId] ?? 'auto'}`}
+                  type="text"
+                  inputMode="decimal"
+                  defaultValue={resolvePanelStart(selectedPanel).toFixed(1)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const v = parseFloat((e.target as HTMLInputElement).value);
+                      if (isFinite(v)) setPanelStart(selectedPanel.panelId, v);
+                      (e.target as HTMLInputElement).blur();
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const v = parseFloat(e.target.value);
+                    if (isFinite(v)) setPanelStart(selectedPanel.panelId, v);
+                  }}
+                  className="w-14 text-center bg-zinc-950 border border-white/10 rounded py-1.5 text-[12px] font-mono text-white focus:border-[#ff007f]/50 outline-none"
+                  title="Type the exact start in seconds, then Enter"
+                />
+                <span className="text-[10px] text-zinc-500 font-mono">sec</span>
+                <button
+                  onClick={() => nudgePanelStart(selectedPanel, 0.5)}
+                  className="text-[11px] font-bold px-2 py-2 rounded bg-zinc-900 border border-white/10 text-zinc-300 hover:text-white transition cursor-pointer"
+                  title="Push this panel half a second later"
+                >+0.5</button>
+                <button
+                  onClick={() => setPanelStartToPlayhead(selectedPanel)}
+                  className="flex-1 text-[10px] uppercase tracking-wider font-black px-2 py-2 rounded bg-[#ff007f] text-zinc-950 hover:brightness-110 transition cursor-pointer whitespace-nowrap"
+                  title="Snap this panel's start to where the voiceover is right now"
+                >
+                  ⏺ Set to playhead · {secondsToTime(currentTimeSec)}
+                </button>
+                {manualPanelStarts[selectedPanel.panelId] !== undefined && (
+                  <button
+                    onClick={() => clearPanelStart(selectedPanel.panelId)}
+                    className="text-[9px] uppercase px-2 py-2 rounded bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white transition cursor-pointer"
+                    title="Revert this panel to the auto-scaled start"
+                  >↺ Auto</button>
+                )}
+              </div>
+              <p className="text-[10px]/1.35 text-zinc-500 font-sans">
+                Play/scrub the voiceover, then click <span className="text-[#ff007f] font-bold">Set to playhead</span> when you reach where panel #{selectedPanel.panelId} should begin. Pause, fix, redo freely — only the panels that drift need editing.
+              </p>
+            </div>
+
             {/* Vocal Sync Timing Offset control */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-[11px]">
@@ -3107,16 +3202,16 @@ export default function StoryboardExplorer() {
             <div className="pt-2 border-t border-white/5 font-mono space-y-2">
               <div className="flex items-center justify-between text-[11px]">
                 <span className="text-zinc-300 font-bold flex items-center gap-1">
-                  🎯 Tap-Sync Panels to Voiceover
+                  🎯 Tap-Sync (optional quick pass)
                 </span>
                 {Object.keys(manualPanelStarts).length > 0 && (
                   <span className="text-[9px] uppercase font-black px-1.5 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-500/20">
-                    {Object.keys(manualPanelStarts).length}/{STORYBOARD_DATA.length} locked
+                    {Object.keys(manualPanelStarts).length}/{STORYBOARD_DATA.length} edited
                   </span>
                 )}
               </div>
               <p className="text-[10px]/1.35 text-zinc-500 font-sans">
-                Plays your voiceover once. Tap <span className="text-zinc-300 font-bold">Space</span> (or the big button) the instant each panel's line begins — every panel then switches exactly on the narration, regardless of pacing or pauses.
+                Most of the time you won't need this — use the per-panel <span className="text-[#ff007f] font-bold">Set to playhead</span> / time editor above, which has no time pressure. This is just a one-shot pass: it plays the voiceover and you tap <span className="text-zinc-300 font-bold">Space</span> at each panel's start. Whatever it captures, you can still fine-tune by editing any panel afterwards.
               </p>
               <div className="flex items-center gap-2">
                 <button
@@ -3595,9 +3690,34 @@ export default function StoryboardExplorer() {
                           <span className={`text-[8.5px] font-black ${isSelected ? 'text-[#ff007f]' : 'text-zinc-500'}`}>
                             PANEL ID #{panel.panelId}
                           </span>
-                          <span className="text-[8.5px] font-bold text-[#ff007f] bg-black/40 px-1 py-0.2 rounded border border-white/5" title="Audio Scaled Start Time">
-                            {secondsToTime(timings.start)}
-                          </span>
+                          <div className="flex items-center gap-1 interactive-card-control">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setPanelStartToPlayhead(panel); }}
+                              className="text-[7.5px] font-black uppercase px-1 py-0.5 rounded bg-[#ff007f]/15 border border-[#ff007f]/30 text-[#ff007f] hover:bg-[#ff007f] hover:text-zinc-950 transition leading-none"
+                              title="Set this panel's start to the current playhead position"
+                            >
+                              ⏺ here
+                            </button>
+                            {manualPanelStarts[panel.panelId] !== undefined && (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); clearPanelStart(panel.panelId); }}
+                                className="text-[7px] px-1 py-0.5 rounded bg-zinc-900 border border-emerald-500/30 text-emerald-400 hover:text-white leading-none"
+                                title="Edited start — click to revert this panel to auto"
+                              >
+                                ✎
+                              </button>
+                            )}
+                            <span
+                              className={`text-[8.5px] font-bold px-1 py-0.2 rounded border ${
+                                manualPanelStarts[panel.panelId] !== undefined
+                                  ? 'text-emerald-400 bg-emerald-950/30 border-emerald-500/20'
+                                  : 'text-[#ff007f] bg-black/40 border-white/5'
+                              }`}
+                              title={manualPanelStarts[panel.panelId] !== undefined ? 'Edited start time' : 'Auto-scaled start time'}
+                            >
+                              {secondsToTime(timings.start)}
+                            </span>
+                          </div>
                         </div>
 
                         {/* Details Block */}
