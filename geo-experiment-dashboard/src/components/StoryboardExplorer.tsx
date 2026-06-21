@@ -296,6 +296,19 @@ export default function StoryboardExplorer() {
   const [autoFullscreenOnRecord, setAutoFullscreenOnRecord] = useState<boolean>(true);
   const [customBrollUrls, setCustomBrollUrls] = useState<Record<number, { url: string; isVideo: boolean }>>({});
   const [panelOffsets, setPanelOffsets] = useState<Record<number, number>>({});
+  // Tap-to-sync calibration: absolute panel start times (seconds) captured live
+  // against the actual voiceover. When populated, these override the scaled timings
+  // so every panel switches exactly where the narrator reaches it.
+  const [manualPanelStarts, setManualPanelStarts] = useState<Record<number, number>>(() => {
+    try {
+      const s = localStorage.getItem('manualPanelStarts');
+      return s ? JSON.parse(s) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+  const [syncCalibrating, setSyncCalibrating] = useState<boolean>(false);
+  const [syncMarkIndex, setSyncMarkIndex] = useState<number>(0);
   const [isBRollFeedEnabled, setIsBRollFeedEnabled] = useState<boolean>(true);
   const [cameraTarget, setCameraTarget] = useState<'main' | 'broll'>('main');
   const [copiedBrollId, setCopiedBrollId] = useState<string | null>(null);
@@ -401,9 +414,27 @@ export default function StoryboardExplorer() {
   const selectedPanel = STORYBOARD_DATA.find(p => p.panelId === selectedPanelId) || STORYBOARD_DATA[0];
 
   const getPanelTimings = (panel: typeof STORYBOARD_DATA[0]) => {
+    // Tap-synced absolute boundaries win once calibration is committed. Each panel
+    // runs from its captured start to the next captured start, so the boundaries are
+    // contiguous by construction and land exactly on the voiceover.
+    const hasManual = !syncCalibrating && Object.keys(manualPanelStarts).length > 0;
+    if (hasManual && manualPanelStarts[panel.panelId] !== undefined) {
+      const start = manualPanelStarts[panel.panelId];
+      const idx = STORYBOARD_DATA.findIndex(p => p.panelId === panel.panelId);
+      let end = totalDuration;
+      for (let j = idx + 1; j < STORYBOARD_DATA.length; j++) {
+        const ns = manualPanelStarts[STORYBOARD_DATA[j].panelId];
+        if (ns !== undefined) { end = ns; break; }
+      }
+      return {
+        start: Number(start.toFixed(2)),
+        end: Number(Math.max(start + 0.5, end).toFixed(2))
+      };
+    }
+
     const originalStart = timeToSeconds(panel.startTime);
     const originalEnd = timeToSeconds(panel.endTime);
-    
+
     // Apply slide-specific fine-tuning delay/advance offset
     const activeOffset = panelOffsets[panel.panelId] ?? 0;
     const shiftedStart = Math.max(0, originalStart + activeOffset);
@@ -427,6 +458,12 @@ export default function StoryboardExplorer() {
   const prevSelectedPanelIdRef = useRef<number>(-1);
   const brollDisplayTimeoutRef = useRef<number | null>(null);
   const brollTransitionTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('manualPanelStarts', JSON.stringify(manualPanelStarts));
+    } catch (e) {}
+  }, [manualPanelStarts]);
 
   useEffect(() => {
     try {
@@ -1586,7 +1623,98 @@ export default function StoryboardExplorer() {
         synth.playBeep(440 + matchingPanel.panelId * 10, 0.08);
       }
     }
-  }, [currentTimeSec, scaleTimingsToAudio, userAudioUrl, audioDuration]);
+  }, [currentTimeSec, scaleTimingsToAudio, userAudioUrl, audioDuration, manualPanelStarts, syncCalibrating]);
+
+  // ── Tap-to-sync calibration ──────────────────────────────────────────────
+  // Play the voiceover once and tap (Space / the big button) the instant each
+  // panel's narration begins. We record the audio timestamp as that panel's start,
+  // giving frame-accurate panel↔voiceover sync in a single pass.
+  const beginSyncCalibration = () => {
+    if (!userAudioUrl) return;
+    synth.init();
+    if (synth.ctx && synth.ctx.state === 'suspended') {
+      synth.ctx.resume().catch(() => {});
+    }
+    const first = STORYBOARD_DATA[0];
+    // Panel 1 always starts at 0; the user taps the START of panels 2..N.
+    setManualPanelStarts({ [first.panelId]: 0 });
+    setSyncMarkIndex(1);
+    setCurrentSequence('storyboard');
+    setSelectedPanelId(first.panelId);
+    setCurrentTimeSec(0);
+    if (audioRef.current) {
+      try {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(() => {});
+      } catch (e) {}
+    }
+    setSyncCalibrating(true);
+    setIsPlaying(true);
+  };
+
+  const markSyncPanel = () => {
+    if (!syncCalibrating) return;
+    const idx = syncMarkIndex;
+    if (idx >= STORYBOARD_DATA.length) return;
+    const panel = STORYBOARD_DATA[idx];
+    const t = audioRef.current ? audioRef.current.currentTime : currentTimeSec;
+    setManualPanelStarts(prev => ({ ...prev, [panel.panelId]: Number(t.toFixed(2)) }));
+    setSelectedPanelId(panel.panelId);
+    if (isSynthEnabled) synth.playBeep(720, 0.05);
+    const next = idx + 1;
+    if (next >= STORYBOARD_DATA.length) {
+      // Last panel marked — calibration complete.
+      setSyncCalibrating(false);
+      setIsPlaying(false);
+      if (audioRef.current) { try { audioRef.current.pause(); } catch (e) {} }
+    } else {
+      setSyncMarkIndex(next);
+    }
+  };
+
+  const undoLastSyncMark = () => {
+    if (syncMarkIndex <= 1) return; // panel 1's 0s baseline stays
+    const prevIdx = syncMarkIndex - 1;
+    const panel = STORYBOARD_DATA[prevIdx];
+    setManualPanelStarts(prev => {
+      const copy = { ...prev };
+      delete copy[panel.panelId];
+      return copy;
+    });
+    setSyncMarkIndex(prevIdx);
+    if (isSynthEnabled) synth.playBeep(360, 0.05);
+  };
+
+  const cancelSyncCalibration = () => {
+    setSyncCalibrating(false);
+    setIsPlaying(false);
+    if (audioRef.current) { try { audioRef.current.pause(); } catch (e) {} }
+  };
+
+  const clearManualSync = () => {
+    setManualPanelStarts({});
+    setSyncMarkIndex(0);
+    if (isSynthEnabled) synth.playBeep(300, 0.1);
+  };
+
+  // Keyboard: Space/→/Enter = mark, Backspace = undo, Esc = cancel (during calibration)
+  useEffect(() => {
+    if (!syncCalibrating) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.code === 'Space' || e.code === 'ArrowRight' || e.code === 'Enter') {
+        e.preventDefault();
+        markSyncPanel();
+      } else if (e.code === 'Backspace') {
+        e.preventDefault();
+        undoLastSyncMark();
+      } else if (e.code === 'Escape') {
+        e.preventDefault();
+        cancelSyncCalibration();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [syncCalibrating, syncMarkIndex, currentTimeSec]);
 
   const handleAudioLoad = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1597,6 +1725,9 @@ export default function StoryboardExplorer() {
       setUserAudioUrl(url);
       setCurrentTimeSec(0);
       setIsPlaying(false);
+      // A new track invalidates any previously captured tap-sync marks.
+      setManualPanelStarts({});
+      setSyncMarkIndex(0);
       // Automatically toggle simulation on to preview and run with user voice track
       setPlayerMode('simulation');
       synth.playBeep(880, 0.15);
@@ -2078,6 +2209,68 @@ export default function StoryboardExplorer() {
         className="hidden"
         preload="auto"
       />
+
+      {/* TAP-TO-SYNC CALIBRATION OVERLAY */}
+      {syncCalibrating && (() => {
+        const nextPanel = STORYBOARD_DATA[syncMarkIndex] || STORYBOARD_DATA[STORYBOARD_DATA.length - 1];
+        const nowAt = audioRef.current ? audioRef.current.currentTime : currentTimeSec;
+        const pct = Math.min(100, Math.round((syncMarkIndex / STORYBOARD_DATA.length) * 100));
+        return (
+          <div
+            className="fixed inset-0 z-[9999] bg-black/92 backdrop-blur-sm flex flex-col items-center justify-center px-6 select-none cursor-pointer"
+            onClick={markSyncPanel}
+          >
+            <div className="absolute top-6 left-0 right-0 px-8 flex items-center justify-between text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+              <span>🎯 Tap-Sync Calibration</span>
+              <span>Panel {syncMarkIndex} of {STORYBOARD_DATA.length} · {pct}%</span>
+            </div>
+
+            <div className="w-full max-w-2xl mx-auto text-center" onClick={(e) => e.stopPropagation()}>
+              <p className="text-[11px] font-mono uppercase tracking-widest text-[#ff007f] mb-3">
+                Tap the instant you hear panel #{nextPanel.panelId} begin
+              </p>
+              <div className="bg-zinc-950 border border-[#ff007f]/30 rounded-lg px-6 py-5 mb-6 shadow-[0_0_40px_rgba(255,0,127,0.15)]">
+                <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 mb-2">
+                  {nextPanel.phase} · Panel {nextPanel.panelId}
+                </div>
+                <p className="text-xl/relaxed text-white font-medium">
+                  “{nextPanel.audio}”
+                </p>
+              </div>
+
+              <button
+                onClick={(e) => { e.stopPropagation(); markSyncPanel(); }}
+                className="w-full bg-[#ff007f] text-zinc-950 font-black text-lg uppercase tracking-widest px-8 py-5 rounded-lg hover:brightness-110 active:scale-[0.99] transition cursor-pointer shadow-[0_0_30px_rgba(255,0,127,0.4)]"
+              >
+                ⏺ Mark Panel {nextPanel.panelId}  ·  {nowAt.toFixed(1)}s
+              </button>
+              <p className="text-[11px] font-mono text-zinc-500 mt-3">
+                Press <span className="text-white font-bold">Space</span> / <span className="text-white font-bold">→</span> to mark · <span className="text-white font-bold">Backspace</span> to undo · <span className="text-white font-bold">Esc</span> to cancel
+              </p>
+
+              <div className="flex items-center justify-center gap-3 mt-7" onClick={(e) => e.stopPropagation()}>
+                <button
+                  onClick={(e) => { e.stopPropagation(); undoLastSyncMark(); }}
+                  disabled={syncMarkIndex <= 1}
+                  className={`text-[10px] uppercase tracking-wider px-4 py-2 rounded border transition ${
+                    syncMarkIndex <= 1
+                      ? 'bg-zinc-900 border-white/5 text-zinc-600 cursor-not-allowed'
+                      : 'bg-zinc-900 border-white/10 text-zinc-300 hover:text-white cursor-pointer'
+                  }`}
+                >
+                  ↶ Undo last
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); cancelSyncCalibration(); }}
+                  className="text-[10px] uppercase tracking-wider px-4 py-2 rounded bg-red-950/30 border border-red-500/20 text-red-400 hover:text-red-300 transition cursor-pointer"
+                >
+                  ✕ Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* DUAL SELECTOR SWITCH HUB */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-zinc-950 border border-white/5 p-3.5 rounded-sm select-none">
@@ -2739,6 +2932,46 @@ export default function StoryboardExplorer() {
                   Auto-scale slide timings to perfectly fill loaded audio track length ({Math.round(audioDuration)} seconds)
                 </span>
               </label>
+            </div>
+
+            {/* Tap-to-sync calibration */}
+            <div className="pt-2 border-t border-white/5 font-mono space-y-2">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-zinc-300 font-bold flex items-center gap-1">
+                  🎯 Tap-Sync Panels to Voiceover
+                </span>
+                {Object.keys(manualPanelStarts).length > 0 && (
+                  <span className="text-[9px] uppercase font-black px-1.5 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-500/20">
+                    {Object.keys(manualPanelStarts).length}/{STORYBOARD_DATA.length} locked
+                  </span>
+                )}
+              </div>
+              <p className="text-[10px]/1.35 text-zinc-500 font-sans">
+                Plays your voiceover once. Tap <span className="text-zinc-300 font-bold">Space</span> (or the big button) the instant each panel's line begins — every panel then switches exactly on the narration, regardless of pacing or pauses.
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={beginSyncCalibration}
+                  disabled={!userAudioUrl}
+                  className={`flex-1 text-[10px] uppercase tracking-wider font-black px-3 py-2 rounded transition ${
+                    userAudioUrl
+                      ? 'bg-[#ff007f] text-zinc-950 hover:brightness-110 cursor-pointer'
+                      : 'bg-zinc-900 text-zinc-600 border border-white/5 cursor-not-allowed'
+                  }`}
+                  title={userAudioUrl ? "Start the live tap-sync pass" : "Load a voiceover track first"}
+                >
+                  {Object.keys(manualPanelStarts).length > 0 ? 'Re-run Tap-Sync' : 'Start Tap-Sync'}
+                </button>
+                {Object.keys(manualPanelStarts).length > 0 && (
+                  <button
+                    onClick={clearManualSync}
+                    className="text-[9px] uppercase tracking-wider px-2 py-2 rounded bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white transition"
+                    title="Discard tap-sync marks and fall back to auto-scaled timings"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
