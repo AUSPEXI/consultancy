@@ -36,10 +36,10 @@ export type ProbeMode = 'parametric' | 'grounded';
 // follow-up slice; until implemented they're listed parametric-only so we never
 // label a result "grounded" that wasn't.
 export const ENGINE_PATHWAYS: Record<PlatformKey, Pathway[]> = {
-  gemini: ['parametric'],            // grounded (googleSearch tool): slice 2
+  gemini: ['parametric', 'grounded'],   // grounded = googleSearch grounding tool
   chatgpt: ['parametric', 'grounded'],
   claude: ['parametric', 'grounded'],
-  grok: ['parametric'],              // grounded (xAI live search): slice 2
+  grok: ['parametric', 'grounded'],      // grounded = xAI live search
   perplexity: ['grounded'],          // sonar always retrieves
   deepseek: ['parametric'],          // no native web tool today
   google_aio: ['grounded'],          // SerpAPI = real Google AI Overview
@@ -295,6 +295,16 @@ function extractResponsesCitations(r: any): string[] {
   }
   return urls;
 }
+// Extract grounded source URLs from a Gemini response that used googleSearch.
+function extractGeminiCitations(response: any): string[] {
+  const urls: string[] = [];
+  const meta = response?.candidates?.[0]?.groundingMetadata;
+  for (const chunk of meta?.groundingChunks ?? []) {
+    if (chunk?.web?.uri) urls.push(chunk.web.uri);
+  }
+  return urls;
+}
+
 // Extract cited URLs from an Anthropic messages response that used the web_search tool.
 function extractClaudeCitations(data: any): string[] {
   const urls: string[] = [];
@@ -307,11 +317,28 @@ function extractClaudeCitations(data: any): string[] {
   return urls;
 }
 
-async function probeGemini(query: string, brand: string, domain: string, knownFalses: string[], _pathway: Pathway = 'parametric'): Promise<PlatformResult> {
+async function probeGemini(query: string, brand: string, domain: string, knownFalses: string[], pathway: Pathway = 'parametric'): Promise<PlatformResult> {
   const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
   if (!apiKey) return SKIPPED;
+  const ai = new GoogleGenAI({ apiKey });
+
+  if (pathway === 'grounded') {
+    // Google Search grounding tool. Cast config through `any` so it compiles across
+    // SDK versions; fall back to the parametric call (labelled honestly) on failure.
+    try {
+      const response: any = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: query,
+        config: { temperature: 0.3, tools: [{ googleSearch: {} }] } as any,
+      });
+      const text = (response.candidates?.[0]?.content?.parts ?? [])
+        .map((p: any) => p?.text).filter((t: any) => typeof t === 'string').join('') || '';
+      const sourceUrls = extractGeminiCitations(response);
+      if (sourceUrls.length > 0) return finalizeGrounded(text, brand, domain, knownFalses, sourceUrls);
+    } catch { /* fall through to parametric */ }
+  }
+
   try {
-    const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: query,
@@ -423,11 +450,30 @@ async function probeClaude(query: string, brand: string, domain: string, knownFa
 }
 
 // Grok (x.ai) and DeepSeek are OpenAI-compatible — same pattern as Perplexity.
-async function probeGrok(query: string, brand: string, domain: string, knownFalses: string[], _pathway: Pathway = 'parametric'): Promise<PlatformResult> {
+async function probeGrok(query: string, brand: string, domain: string, knownFalses: string[], pathway: Pathway = 'parametric'): Promise<PlatformResult> {
   const apiKey = process.env.XAI_API_KEY || process.env.GROK_API_KEY || '';
   if (!apiKey) return SKIPPED;
+  const client = new OpenAI({ apiKey, baseURL: 'https://api.x.ai/v1' });
+
+  if (pathway === 'grounded') {
+    // xAI Live Search via search_parameters (passed through the OpenAI-compatible
+    // body). Fall back to the parametric call (labelled honestly) on failure.
+    try {
+      const response: any = await client.chat.completions.create({
+        model: 'grok-2-latest',
+        messages: [{ role: 'user', content: query }],
+        max_tokens: 600, temperature: 0.3,
+        search_parameters: { mode: 'auto', return_citations: true },
+      } as any);
+      const text = response.choices[0]?.message?.content || '';
+      const sourceUrls: string[] = (response.citations ?? [])
+        .map((c: any) => (typeof c === 'string' ? c : c?.url))
+        .filter((u: any) => typeof u === 'string');
+      if (sourceUrls.length > 0) return finalizeGrounded(text, brand, domain, knownFalses, sourceUrls);
+    } catch { /* fall through to parametric */ }
+  }
+
   try {
-    const client = new OpenAI({ apiKey, baseURL: 'https://api.x.ai/v1' });
     const response = await client.chat.completions.create({
       model: 'grok-2-latest',
       messages: [{ role: 'user', content: query }],

@@ -15,6 +15,9 @@ interface PlatformResult {
   accurate: boolean;
   misinformation: string | null;
   excerpt: string | null;
+  pathway?: 'parametric' | 'grounded';
+  sourceUrls?: string[] | null;
+  citedInSources?: boolean;
   error?: string;
   skipped?: boolean;
 }
@@ -46,6 +49,7 @@ interface ProbeRun {
   timestamp: string;
   attribution?: Attribution | null;
   mode?: 'standard' | 'competitor';
+  pathwayMode?: 'parametric' | 'grounded';
   competitorDomain?: string | null;
   competitor?: CompetitorComparison | null;
   competitors?: CompetitorComparison[];
@@ -145,6 +149,10 @@ export default function CiteProbePage() {
   const [showCompetitorPanel, setShowCompetitorPanel] = useState(false);
   const [competitorBrand, setCompetitorBrand] = useState('');
   const [competitorDomain, setCompetitorDomain] = useState('');
+
+  // WS1: parametric (does the model know you from training?) vs grounded (does it
+  // cite you when it searches the live web?). Different questions — label both.
+  const [pathwayMode, setPathwayMode] = useState<'parametric' | 'grounded'>('parametric');
   // S7.2: industry benchmark
   const [benchmark, setBenchmark] = useState<{ industry: string; averageRate: number; medianRate: number; sampleSize: number } | null>(null);
 
@@ -240,6 +248,7 @@ export default function CiteProbePage() {
         method: 'POST',
         body: JSON.stringify({
           brand, domain,
+          pathwayMode,
           keywords: userData?.keywords || [],
           negativeStatements,
           // Head-to-head against ALL saved competitors by default — zero extra
@@ -293,21 +302,45 @@ export default function CiteProbePage() {
             Sends 7 GEO-space questions to <span className="text-white font-medium">{activePlatformsCount > 1 ? `${activePlatformsCount} AI platforms` : 'Gemini'}</span> simultaneously and checks if <span className="text-white font-medium">{brand}</span> gets cited accurately.
           </p>
         </div>
-        <button
-          onClick={runProbe}
-          disabled={isRunning || isReadOnly}
-          title={isReadOnly ? 'Upgrade to Starter to use this feature' : undefined}
-          className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 shrink-0"
-        >
-          {isRunning ? (
-            <><Loader2 className="w-4 h-4 animate-spin" />Running Probe...</>
-          ) : probeData ? (
-            <><RefreshCw className="w-4 h-4" />Run Again</>
-          ) : (
-            <><Zap className="w-4 h-4" />Run Citation Probe</>
-          )}
-        </button>
+        <div className="flex flex-col items-stretch sm:items-end gap-2 shrink-0">
+          {/* Pathway toggle: two genuinely different questions. */}
+          <div className="inline-flex rounded-lg border border-zinc-800 bg-zinc-900/60 p-0.5 text-xs font-semibold self-end">
+            <button
+              onClick={() => setPathwayMode('parametric')}
+              title="Bare query, no web search — does the model recall you from its training data?"
+              className={`px-3 py-1.5 rounded-md transition-colors ${pathwayMode === 'parametric' ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}
+            >
+              Parametric
+            </button>
+            <button
+              onClick={() => setPathwayMode('grounded')}
+              title="Engine searches the live web — does it cite you when it retrieves?"
+              className={`px-3 py-1.5 rounded-md transition-colors ${pathwayMode === 'grounded' ? 'bg-pink-600 text-white' : 'text-zinc-400 hover:text-white'}`}
+            >
+              Grounded
+            </button>
+          </div>
+          <button
+            onClick={runProbe}
+            disabled={isRunning || isReadOnly}
+            title={isReadOnly ? 'Upgrade to Starter to use this feature' : undefined}
+            className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 justify-center"
+          >
+            {isRunning ? (
+              <><Loader2 className="w-4 h-4 animate-spin" />Running Probe...</>
+            ) : probeData ? (
+              <><RefreshCw className="w-4 h-4" />Run Again</>
+            ) : (
+              <><Zap className="w-4 h-4" />Run {pathwayMode === 'grounded' ? 'Grounded' : 'Parametric'} Probe</>
+            )}
+          </button>
+        </div>
       </div>
+      {pathwayMode === 'parametric' && (
+        <p className="text-xs text-zinc-500 -mt-2">
+          <span className="text-zinc-400 font-medium">Parametric</span> measures whether the engines recall {brand} from training. A new brand reading 0% here is expected — switch to <span className="text-pink-400 font-medium">Grounded</span> to test what your content can actually influence when the engine searches the web.
+        </p>
+      )}
 
       {/* Brand Truth Control — pre-enter known falsehoods so every probe can
           detect them. New falsehoods can also be added directly from a result
@@ -633,16 +666,32 @@ export default function CiteProbePage() {
           {/* Per-platform rates */}
           {probeData.platformRates && (
             <div>
-              <h3 className="text-sm font-semibold text-white mb-3">Platform Breakdown</h3>
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <h3 className="text-sm font-semibold text-white">Platform Breakdown</h3>
+                <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border ${
+                  (probeData.pathwayMode ?? 'parametric') === 'grounded'
+                    ? 'bg-pink-500/10 border-pink-500/30 text-pink-300'
+                    : 'bg-zinc-700/30 border-zinc-700 text-zinc-300'
+                }`}>
+                  {(probeData.pathwayMode ?? 'parametric') === 'grounded' ? 'Grounded · live retrieval' : 'Parametric · training recall'}
+                </span>
+              </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {(Object.keys(PLATFORM_META) as PlatformKey[]).map(p => {
                   const rate = probeData.platformRates?.[p];
                   const meta = PLATFORM_META[p];
                   const isConfigured = rate !== null && rate !== undefined;
+                  // Pathway this engine actually ran (reflects fallbacks honestly).
+                  const enginePathway = probeData.results?.find(r => r.platforms?.[p]?.pathway)?.platforms?.[p]?.pathway;
                   return (
                     <div key={p} className={`rounded-xl border p-4 ${isConfigured ? `${meta.bg} ${meta.border}` : 'bg-zinc-900/30 border-zinc-800'}`}>
-                      <p className={`text-xs font-semibold mb-2 ${isConfigured ? meta.text : 'text-zinc-600'}`}>
-                        {meta.label}
+                      <p className={`text-xs font-semibold mb-2 ${isConfigured ? meta.text : 'text-zinc-600'} flex items-center justify-between gap-1`}>
+                        <span>{meta.label}</span>
+                        {isConfigured && enginePathway && (
+                          <span className="text-[9px] font-bold uppercase tracking-wide text-zinc-500" title={enginePathway === 'grounded' ? 'Live web retrieval' : 'Training recall (no web search)'}>
+                            {enginePathway === 'grounded' ? '🌐' : '🧠'}
+                          </span>
+                        )}
                       </p>
                       {isConfigured ? (
                         <>
