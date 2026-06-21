@@ -32,6 +32,8 @@ export const STORYBOARD_DATA: StoryboardPanel[] = [
     visual: 'Text banner slides in from bottom: "Exploring the 4 Engine Split". Gwylym to camera, looking skeptical but intrigued.',
     audio: 'Let me show you what actually happened when we put this to a rigorous statistical test across four different engines.',
     bRoll: 'Camera raw: Head-and-shoulders frame, professional ring studio lighting.',
+    bRollComedic: 'Over-the-top "serious science" gag — safety goggles + lab coat to type one sentence — undercutting the gravitas.',
+    hasBRoll: true,
     startTime: '0:14',
     endTime: '0:20'
   },
@@ -122,6 +124,8 @@ export const STORYBOARD_DATA: StoryboardPanel[] = [
     visual: 'Diagram showing a scale tipping erratically. Text banner: "The Simpson\'s Paradox Trap".',
     audio: 'Because we are pulling data from entirely unique environments, naively pooling these numbers introduces a massive mathematical trap.',
     bRoll: 'Vector animation: Grouped data clusters mixing together incorrectly.',
+    bRollComedic: 'Slapstick see-saw gag — the "scale" tips so hard it flings a tiny figure offscreen. Simpson\'s Paradox as physical comedy.',
+    hasBRoll: true,
     startTime: '1:20',
     endTime: '1:30'
   },
@@ -214,6 +218,8 @@ export const STORYBOARD_DATA: StoryboardPanel[] = [
     visual: 'Pan over to the Gemini data panel: 0% stepping up to 31.3%. Text tag shows p=0.0149.',
     audio: 'Gemini shows a similar clean path. Absolute zero citations for the vague text, climbing up to over 31 percent for the numbers.',
     bRoll: 'Bar chart animation showing vertical level step expansion.',
+    bRollComedic: 'Gemini glow-up gag — flatlined zero suddenly does a triumphant little fist-pump as the bar shoots up.',
+    hasBRoll: true,
     startTime: '2:35',
     endTime: '2:45'
   },
@@ -269,6 +275,8 @@ export const STORYBOARD_DATA: StoryboardPanel[] = [
     visual: 'Text pop-up card appears centered: "Variant B is ~10x more likely to be cited".',
     audio: 'The result? A massive common odds ratio of 10.2. The effect is real, significant, and completely immune to Simpson\'s Paradox.',
     bRoll: 'Bold accent text card presentation element over dark interface template.',
+    bRollComedic: '"10x" gag — a single lonely citation hits the gym and bench-presses a giant glowing "10x" odds ratio.',
+    hasBRoll: true,
     startTime: '3:25',
     endTime: '3:35'
   },
@@ -315,6 +323,8 @@ export const STORYBOARD_DATA: StoryboardPanel[] = [
     visual: 'Split card display. Left: Verbatim Scorer. Right: Semantic LLM-Judge (Claude Haiku).',
     audio: 'Then we attacked our next major vulnerability: the quotability confound. Was our code just matching strings, or measuring real preference?',
     bRoll: 'Dual brand graphic icon layout using contrasting white and gray backgrounds.',
+    bRollComedic: 'Detective bit — a magnifying-glass sleuth squints suspiciously at "strings" vs. "meaning", milking the confound for laughs.',
+    hasBRoll: true,
     startTime: '4:05',
     endTime: '4:15'
   },
@@ -361,6 +371,8 @@ export const STORYBOARD_DATA: StoryboardPanel[] = [
     visual: 'Text highlights explicitly on-screen: "In-Context Retrieval Only (Fast-Mode)".',
     audio: 'This remains a fast-mode test of in-context retrieval preference. It checks what a model does with text right in front of it, not live-index production.',
     bRoll: 'Diagram displaying a document fed directly into an LLM window block.',
+    bRollComedic: 'Fast-food gag — a document literally shoved into the model\'s "mouth" like a drive-thru order. "In-context", served hot.',
+    hasBRoll: true,
     startTime: '4:45',
     endTime: '4:52'
   },
@@ -405,7 +417,26 @@ export const STORYBOARD_DATA: StoryboardPanel[] = [
     visual: 'End card display with a clean pinned comment box preview text lines: "Raw Data & Replication Steps Pinned".',
     audio: 'I am an experimenter building this out in public, not a traditionally trained data scientist. Check out the raw logs, tell me what we missed, and subscribe for the next test.',
     bRoll: 'Overlay animation displaying comment frame graphics and subscription prompt.',
+    bRollComedic: 'Earnest, self-aware "please subscribe" bit — indie-experimenter charm dialled to eleven, winking at the convention.',
+    hasBRoll: true,
     startTime: '5:20',
     endTime: '5:30'
   }
 ];
+
+import { StoryboardProject } from '../types';
+
+// The shipped default project (experiment 001). Acts as the app's built-in
+// template and the canonical example of the interchange schema. Loading another
+// experiment's project JSON replaces these panels at runtime.
+export const DEFAULT_PROJECT: StoryboardProject = {
+  schemaVersion: 1,
+  experimentId: '001-statistical-anchors',
+  title: 'The Number Anchor Theory',
+  subtitle: 'Testing whether search-engine LLMs prioritise precise statistics over qualitative descriptions.',
+  headlineStat: '100%',
+  headlineStatLabel: 'Claude Citations Lift',
+  baselineDurationSec: 330,
+  panels: STORYBOARD_DATA,
+  createdAt: '2026-06-21',
+};

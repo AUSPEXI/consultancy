@@ -1,15 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Play, Pause, Video, Volume2, Upload, Check, 
-  Laptop, Film, ExternalLink, Sliders, Music, 
+import {
+  Play, Pause, Video, Volume2, Upload, Check,
+  Laptop, Film, ExternalLink, Sliders, Music,
   Download, Clipboard, HelpCircle, Eye, EyeOff
 } from 'lucide-react';
-import { STORYBOARD_DATA } from '../data/storyboard';
+import { STORYBOARD_DATA as BASE_STORYBOARD, DEFAULT_PROJECT } from '../data/storyboard';
+import { StoryboardPanel, StoryboardProject } from '../types';
+import {
+  loadActiveProject,
+  saveActiveProject,
+  validateProject,
+  deriveAutoBroll,
+  CURRENT_SCHEMA_VERSION,
+} from '../utils/project';
 import { 
-  saveAudioFile, 
-  getAudioFile, 
-  saveBrollFile, 
-  getAllBrollFiles, 
+  saveAudioFile,
+  getAudioFile,
+  deleteAudioFile,
+  saveBrollFile,
+  getAllBrollFiles,
   deleteBrollFile,
   saveGenericFile,
   getGenericFile,
@@ -261,6 +270,15 @@ function BRollVideoPlayer({ src, isActive, onVideoEnded, className, style }: BRo
 }
 
 export default function StoryboardExplorer() {
+  // ── Active project (data-driven storyboard) ──────────────────────────────
+  // The whole app is driven by the loaded experiment's panels. Defaults to the
+  // shipped experiment-001 project; importing another project swaps it at runtime.
+  const [activeProject, setActiveProject] = useState<StoryboardProject>(() => loadActiveProject() ?? DEFAULT_PROJECT);
+  const storyboard = activeProject.panels ?? BASE_STORYBOARD;
+  // Alias so every existing `STORYBOARD_DATA.*` reference reads the live storyboard.
+  const STORYBOARD_DATA = storyboard;
+  const projectFileInputRef = useRef<HTMLInputElement | null>(null);
+
   const [selectedPanelId, setSelectedPanelId] = useState<number>(1);
   const [currentTimeSec, setCurrentTimeSec] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -339,17 +357,13 @@ export default function StoryboardExplorer() {
 
   const [customIntroUrl, setCustomIntroUrl] = useState<{ url: string; isVideo: boolean } | null>(null);
   const [customOutroUrl, setCustomOutroUrl] = useState<{ url: string; isVideo: boolean } | null>(null);
-  const [autoBrollPanels, setAutoBrollPanels] = useState<Record<number, boolean>>({
-    3: true,
-    11: true,
-    19: true,
-    24: true,
-    28: true,
-    32: true,
-    36: true
-  });
+  // Seeded from the active project: explicit autoBrollPanels if exported, else the
+  // panels flagged hasBRoll in the storyboard. No longer a hardcoded magic list.
+  const [autoBrollPanels, setAutoBrollPanels] = useState<Record<number, boolean>>(
+    () => activeProject.autoBrollPanels ?? deriveAutoBroll(activeProject.panels)
+  );
 
-  const [brollDisplayPanel, setBrollDisplayPanel] = useState<typeof STORYBOARD_DATA[0]>(STORYBOARD_DATA[0]);
+  const [brollDisplayPanel, setBrollDisplayPanel] = useState<StoryboardPanel>(STORYBOARD_DATA[0]);
   const [brollZoomed, setBrollZoomed] = useState<boolean>(false);
   const [brollPlaying, setBrollPlaying] = useState<boolean>(false);
   const [isBrollActiveState, setIsBrollActiveState] = useState<boolean>(false);
@@ -1716,6 +1730,116 @@ export default function StoryboardExplorer() {
     return () => window.removeEventListener('keydown', onKey);
   }, [syncCalibrating, syncMarkIndex, currentTimeSec]);
 
+  // ── Project import / export ──────────────────────────────────────────────
+  // Persist the active experiment so a reload restores the right storyboard.
+  useEffect(() => {
+    saveActiveProject(activeProject);
+  }, [activeProject]);
+
+  // Gather the live editing state into a single portable project file.
+  const buildCurrentProject = (): StoryboardProject => ({
+    ...activeProject,
+    schemaVersion: CURRENT_SCHEMA_VERSION,
+    panels: storyboard,
+    manualPanelStarts,
+    panelOffsets,
+    autoBrollPanels,
+    isIntroEnabled,
+    isOutroEnabled,
+    createdAt: activeProject.createdAt ?? new Date().toISOString().slice(0, 10),
+  });
+
+  const handleExportProject = () => {
+    try {
+      const project = buildCurrentProject();
+      const blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${project.experimentId || 'storyboard'}.project.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      synth.playBeep(880, 0.12);
+    } catch (err) {
+      console.warn('Project export failed:', err);
+    }
+  };
+
+  // Wipe all runtime-uploaded media (b-roll/voiceover/intro/outro) from state +
+  // IndexedDB so a new experiment starts with a clean slate.
+  const clearAllRuntimeMedia = () => {
+    Object.values(customBrollUrls).forEach(b => { try { URL.revokeObjectURL(b.url); } catch (e) {} });
+    getAllBrollFiles()
+      .then(all => all.forEach(b => deleteBrollFile(b.panelId).catch(() => {})))
+      .catch(() => {});
+    setCustomBrollUrls({});
+
+    if (userAudioUrl) { try { URL.revokeObjectURL(userAudioUrl); } catch (e) {} }
+    setUserAudioUrl(null);
+    setUserAudioFile(null);
+    deleteAudioFile().catch(() => {});
+
+    setCustomIntroUrl(null);
+    setCustomOutroUrl(null);
+    deleteGenericFile('custom_intro_media').catch(() => {});
+    deleteGenericFile('custom_outro_media').catch(() => {});
+  };
+
+  const applyProject = (project: StoryboardProject, clearMedia: boolean) => {
+    setActiveProject(project);
+    setAutoBrollPanels(project.autoBrollPanels ?? deriveAutoBroll(project.panels));
+    setManualPanelStarts(project.manualPanelStarts ?? {});
+    setSyncMarkIndex(0);
+    setPanelOffsets(project.panelOffsets ?? {});
+    if (typeof project.isIntroEnabled === 'boolean') setIsIntroEnabled(project.isIntroEnabled);
+    if (typeof project.isOutroEnabled === 'boolean') setIsOutroEnabled(project.isOutroEnabled);
+    // Rewind to a clean starting state.
+    setIsPlaying(false);
+    setCurrentSequence('storyboard');
+    setCurrentTimeSec(0);
+    setSelectedPanelId(project.panels[0]?.panelId ?? 1);
+    if (clearMedia) clearAllRuntimeMedia();
+  };
+
+  const handleImportProjectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result));
+        const res = validateProject(parsed);
+        if (!res.ok || !res.project) {
+          window.alert(`Couldn't load project: ${res.error || 'invalid file.'}`);
+          return;
+        }
+        const differentExperiment = res.project.experimentId !== activeProject.experimentId;
+        const clearMedia = differentExperiment
+          ? window.confirm(
+              `Load "${res.project.title}" (experiment ${res.project.experimentId}).\n\n` +
+              `This is a different experiment. Clear the b-roll, voiceover, intro and outro currently uploaded so you start fresh?\n\n` +
+              `OK = clear media   ·   Cancel = keep current media`
+            )
+          : false;
+        applyProject(res.project, clearMedia);
+        synth.playBeep(660, 0.12);
+      } catch (err) {
+        window.alert('That file is not valid JSON.');
+      } finally {
+        if (projectFileInputRef.current) projectFileInputRef.current.value = '';
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleResetToDefaultProject = () => {
+    if (window.confirm('Reset to the built-in experiment-001 storyboard? Current panel edits are replaced (uploaded media is kept).')) {
+      applyProject(DEFAULT_PROJECT, false);
+    }
+  };
+
   const handleAudioLoad = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -2271,6 +2395,51 @@ export default function StoryboardExplorer() {
           </div>
         );
       })()}
+
+      {/* PROJECT BAR — active experiment + import/export */}
+      <input
+        ref={projectFileInputRef}
+        type="file"
+        accept="application/json,.json"
+        onChange={handleImportProjectFile}
+        className="sr-only"
+      />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-zinc-950 border border-[#ff007f]/15 p-3 rounded-sm select-none">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="text-[8.5px] uppercase tracking-widest font-black font-mono px-1.5 py-0.5 rounded bg-[#ff007f]/10 text-[#ff007f] border border-[#ff007f]/20">
+              Experiment {activeProject.experimentId}
+            </span>
+            <span className="text-[9px] uppercase tracking-widest text-zinc-500 font-mono">
+              {storyboard.length} panels
+            </span>
+          </div>
+          <h3 className="text-sm font-bold text-white truncate mt-1 font-serif">{activeProject.title}</h3>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => projectFileInputRef.current?.click()}
+            className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-bold px-3 py-2 rounded bg-zinc-900 border border-white/10 text-zinc-300 hover:text-white hover:border-[#ff007f]/40 transition cursor-pointer"
+            title="Load a different experiment's storyboard.project.json"
+          >
+            <Upload className="w-3 h-3" /> Load Project
+          </button>
+          <button
+            onClick={handleExportProject}
+            className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-bold px-3 py-2 rounded bg-zinc-900 border border-white/10 text-zinc-300 hover:text-white hover:border-[#ff007f]/40 transition cursor-pointer"
+            title="Download this project (panels + timing + settings) as JSON"
+          >
+            <Download className="w-3 h-3" /> Export
+          </button>
+          <button
+            onClick={handleResetToDefaultProject}
+            className="text-[10px] uppercase tracking-wider font-bold px-3 py-2 rounded bg-zinc-900 border border-white/10 text-zinc-500 hover:text-zinc-300 transition cursor-pointer"
+            title="Reset to the built-in experiment-001 storyboard"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
 
       {/* DUAL SELECTOR SWITCH HUB */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-zinc-950 border border-white/5 p-3.5 rounded-sm select-none">
