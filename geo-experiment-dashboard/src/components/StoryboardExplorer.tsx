@@ -314,12 +314,20 @@ export default function StoryboardExplorer() {
   const [autoFullscreenOnRecord, setAutoFullscreenOnRecord] = useState<boolean>(true);
   const [customBrollUrls, setCustomBrollUrls] = useState<Record<number, { url: string; isVideo: boolean }>>({});
   const [panelOffsets, setPanelOffsets] = useState<Record<number, number>>({});
-  // Tap-to-sync calibration: absolute panel start times (seconds) captured live
-  // against the actual voiceover. When populated, these override the scaled timings
-  // so every panel switches exactly where the narrator reaches it.
+  // Editable per-panel timing overrides (seconds). A panel's start/end default to
+  // the auto-scaled timeline; type a value here to pin it exactly. Stored separately
+  // so you can edit just the panels that drift.
   const [manualPanelStarts, setManualPanelStarts] = useState<Record<number, number>>(() => {
     try {
       const s = localStorage.getItem('manualPanelStarts');
+      return s ? JSON.parse(s) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+  const [manualPanelEnds, setManualPanelEnds] = useState<Record<number, number>>(() => {
+    try {
+      const s = localStorage.getItem('manualPanelEnds');
       return s ? JSON.parse(s) : {};
     } catch (e) {
       return {};
@@ -439,9 +447,17 @@ export default function StoryboardExplorer() {
     return Number(shifted.toFixed(2));
   };
 
-  // The effective start of a panel: a manually-edited time wins; otherwise the
-  // auto-scaled baseline. Editing only a few panels is fine — the rest stay on the
-  // baseline and everything remains contiguous (see getPanelTimings).
+  const scaledPanelEnd = (panel: StoryboardPanel) => {
+    const originalEnd = timeToSeconds(panel.endTime);
+    const activeOffset = panelOffsets[panel.panelId] ?? 0;
+    const shifted = Math.max(0, originalEnd + activeOffset);
+    if (scaleTimingsToAudio && userAudioUrl && audioDuration > 0) {
+      return Number((shifted * (audioDuration / 330)).toFixed(2));
+    }
+    return Number(shifted.toFixed(2));
+  };
+
+  // The effective start of a panel: an edited value wins; otherwise the baseline.
   const resolvePanelStart = (panel: StoryboardPanel) => {
     if (!syncCalibrating && manualPanelStarts[panel.panelId] !== undefined) {
       return Number(manualPanelStarts[panel.panelId].toFixed(2));
@@ -449,31 +465,53 @@ export default function StoryboardExplorer() {
     return scaledPanelStart(panel);
   };
 
-  const getPanelTimings = (panel: StoryboardPanel) => {
-    // Each panel runs from its own (possibly edited) start to the NEXT panel's
-    // start, so boundaries are always contiguous no matter how many were edited.
+  // The effective end: an edited value wins; otherwise the next panel's start
+  // (keeps panels back-to-back by default), falling back to the panel's own scaled
+  // end for the last panel.
+  const resolvePanelEnd = (panel: StoryboardPanel) => {
+    if (!syncCalibrating && manualPanelEnds[panel.panelId] !== undefined) {
+      return Number(manualPanelEnds[panel.panelId].toFixed(2));
+    }
     const idx = STORYBOARD_DATA.findIndex(p => p.panelId === panel.panelId);
+    if (idx >= 0 && idx < STORYBOARD_DATA.length - 1) {
+      return resolvePanelStart(STORYBOARD_DATA[idx + 1]);
+    }
+    return scaledPanelEnd(panel);
+  };
+
+  const getPanelTimings = (panel: StoryboardPanel) => {
     const start = resolvePanelStart(panel);
-    let end = (idx >= 0 && idx < STORYBOARD_DATA.length - 1)
-      ? resolvePanelStart(STORYBOARD_DATA[idx + 1])
-      : totalDuration;
+    let end = resolvePanelEnd(panel);
     if (!(end > start)) end = start + 0.5;
     return { start: Number(start.toFixed(2)), end: Number(end.toFixed(2)) };
   };
 
-  // ── Editable panel start times (the relaxed sync) ────────────────────────
-  // Set/override a panel's start explicitly. No clock pressure — type it, nudge
-  // it, or snap it to wherever the audio is paused.
+  // ── Editable panel start / end times ─────────────────────────────────────
+  // Parse "90", "1:30" or "1:30.5" into seconds.
+  const parseTimeInput = (raw: string): number | null => {
+    const s = (raw || '').trim();
+    if (!s) return null;
+    if (s.includes(':')) {
+      const parts = s.split(':').map(x => parseFloat(x));
+      if (parts.some(n => isNaN(n))) return null;
+      const m = parts.length === 2 ? parts[0] : 0;
+      const sec = parts.length === 2 ? parts[1] : parts[0];
+      return m * 60 + sec;
+    }
+    const v = parseFloat(s);
+    return isNaN(v) ? null : v;
+  };
+
   const setPanelStart = (panelId: number, seconds: number) => {
     if (!isFinite(seconds)) return;
     const v = Math.max(0, Number(seconds.toFixed(2)));
     setManualPanelStarts(prev => ({ ...prev, [panelId]: v }));
   };
 
-  const nudgePanelStart = (panel: StoryboardPanel, deltaSec: number) => {
-    const base = resolvePanelStart(panel);
-    setPanelStart(panel.panelId, base + deltaSec);
-    if (isSynthEnabled) synth.playBeep(deltaSec > 0 ? 660 : 520, 0.04);
+  const setPanelEnd = (panelId: number, seconds: number) => {
+    if (!isFinite(seconds)) return;
+    const v = Math.max(0, Number(seconds.toFixed(2)));
+    setManualPanelEnds(prev => ({ ...prev, [panelId]: v }));
   };
 
   const setPanelStartToPlayhead = (panel: StoryboardPanel) => {
@@ -482,13 +520,20 @@ export default function StoryboardExplorer() {
     if (isSynthEnabled) synth.playBeep(760, 0.06);
   };
 
+  const setPanelEndToPlayhead = (panel: StoryboardPanel) => {
+    const t = audioRef.current ? audioRef.current.currentTime : currentTimeSec;
+    setPanelEnd(panel.panelId, t);
+    if (isSynthEnabled) synth.playBeep(700, 0.06);
+  };
+
   const clearPanelStart = (panelId: number) => {
-    setManualPanelStarts(prev => {
-      const copy = { ...prev };
-      delete copy[panelId];
-      return copy;
-    });
+    setManualPanelStarts(prev => { const c = { ...prev }; delete c[panelId]; return c; });
     if (isSynthEnabled) synth.playBeep(440, 0.05);
+  };
+
+  const clearPanelEnd = (panelId: number) => {
+    setManualPanelEnds(prev => { const c = { ...prev }; delete c[panelId]; return c; });
+    if (isSynthEnabled) synth.playBeep(420, 0.05);
   };
 
   // Smooth transitioning delay for B-Roll assets to prevent jarring content flashes
@@ -502,6 +547,12 @@ export default function StoryboardExplorer() {
       localStorage.setItem('manualPanelStarts', JSON.stringify(manualPanelStarts));
     } catch (e) {}
   }, [manualPanelStarts]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('manualPanelEnds', JSON.stringify(manualPanelEnds));
+    } catch (e) {}
+  }, [manualPanelEnds]);
 
   useEffect(() => {
     try {
@@ -1671,8 +1722,8 @@ export default function StoryboardExplorer() {
     if (!userAudioUrl) return;
     // Guard: a live tap pass overwrites every panel start, so don't silently wipe
     // any hand-edited times.
-    if (Object.keys(manualPanelStarts).length > 0 &&
-        !window.confirm('Start a fresh tap-sync pass? This replaces ALL current panel start times (including any you edited by hand).')) {
+    if ((Object.keys(manualPanelStarts).length > 0 || Object.keys(manualPanelEnds).length > 0) &&
+        !window.confirm('Start a fresh tap-sync pass? This replaces ALL current panel start/end times (including any you edited by hand).')) {
       return;
     }
     synth.init();
@@ -1680,8 +1731,10 @@ export default function StoryboardExplorer() {
       synth.ctx.resume().catch(() => {});
     }
     const first = STORYBOARD_DATA[0];
-    // Panel 1 always starts at 0; the user taps the START of panels 2..N.
+    // Panel 1 always starts at 0; the user taps the START of panels 2..N. A fresh
+    // pass is purely start-driven, so drop any manual end overrides too.
     setManualPanelStarts({ [first.panelId]: 0 });
+    setManualPanelEnds({});
     setSyncMarkIndex(1);
     setCurrentSequence('storyboard');
     setSelectedPanelId(first.panelId);
@@ -1737,6 +1790,7 @@ export default function StoryboardExplorer() {
 
   const clearManualSync = () => {
     setManualPanelStarts({});
+    setManualPanelEnds({});
     setSyncMarkIndex(0);
     if (isSynthEnabled) synth.playBeep(300, 0.1);
   };
@@ -1772,6 +1826,7 @@ export default function StoryboardExplorer() {
     schemaVersion: CURRENT_SCHEMA_VERSION,
     panels: storyboard,
     manualPanelStarts,
+    manualPanelEnds,
     panelOffsets,
     autoBrollPanels,
     isIntroEnabled,
@@ -1821,6 +1876,7 @@ export default function StoryboardExplorer() {
     setActiveProject(project);
     setAutoBrollPanels(project.autoBrollPanels ?? deriveAutoBroll(project.panels));
     setManualPanelStarts(project.manualPanelStarts ?? {});
+    setManualPanelEnds(project.manualPanelEnds ?? {});
     setSyncMarkIndex(0);
     setPanelOffsets(project.panelOffsets ?? {});
     if (typeof project.isIntroEnabled === 'boolean') setIsIntroEnabled(project.isIntroEnabled);
@@ -1879,8 +1935,9 @@ export default function StoryboardExplorer() {
       setUserAudioUrl(url);
       setCurrentTimeSec(0);
       setIsPlaying(false);
-      // A new track invalidates any previously captured tap-sync marks.
+      // A new track invalidates any previously captured panel timings.
       setManualPanelStarts({});
+      setManualPanelEnds({});
       setSyncMarkIndex(0);
       // Automatically toggle simulation on to preview and run with user voice track
       setPlayerMode('simulation');
@@ -3017,68 +3074,72 @@ export default function StoryboardExplorer() {
           </div>
 
           <div className="space-y-4 bg-black/40 border border-white/5 p-3 rounded">
-            {/* Editable panel start time — the relaxed sync */}
-            <div className="space-y-1.5 pb-3 border-b border-white/5">
+            {/* Editable panel start + end times */}
+            <div className="space-y-2 pb-3 border-b border-white/5">
               <div className="flex items-center justify-between text-[11px]">
                 <span className="text-zinc-200 font-bold flex items-center gap-1">
-                  🎯 Panel #{selectedPanel.panelId} start time
+                  ⏱ Panel #{selectedPanel.panelId} timing
                 </span>
-                <span className={`font-black uppercase tracking-wide px-1.5 py-0.5 rounded text-[10px] ${
-                  manualPanelStarts[selectedPanel.panelId] !== undefined
-                    ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-500/20'
-                    : 'bg-zinc-900 text-zinc-500'
-                }`}>
-                  {manualPanelStarts[selectedPanel.panelId] !== undefined ? 'EDITED' : 'AUTO'} · {secondsToTime(resolvePanelStart(selectedPanel))}
+                <span className="text-[10px] text-zinc-500 font-mono">
+                  duration {(getPanelTimings(selectedPanel).end - getPanelTimings(selectedPanel).start).toFixed(1)}s
                 </span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => nudgePanelStart(selectedPanel, -0.5)}
-                  className="text-[11px] font-bold px-2 py-2 rounded bg-zinc-900 border border-white/10 text-zinc-300 hover:text-white transition cursor-pointer"
-                  title="Pull this panel half a second earlier"
-                >−0.5</button>
-                <input
-                  key={`pstart-${selectedPanel.panelId}-${manualPanelStarts[selectedPanel.panelId] ?? 'auto'}`}
-                  type="text"
-                  inputMode="decimal"
-                  defaultValue={resolvePanelStart(selectedPanel).toFixed(1)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      const v = parseFloat((e.target as HTMLInputElement).value);
-                      if (isFinite(v)) setPanelStart(selectedPanel.panelId, v);
-                      (e.target as HTMLInputElement).blur();
-                    }
-                  }}
-                  onBlur={(e) => {
-                    const v = parseFloat(e.target.value);
-                    if (isFinite(v)) setPanelStart(selectedPanel.panelId, v);
-                  }}
-                  className="w-14 text-center bg-zinc-950 border border-white/10 rounded py-1.5 text-[12px] font-mono text-white focus:border-[#ff007f]/50 outline-none"
-                  title="Type the exact start in seconds, then Enter"
-                />
-                <span className="text-[10px] text-zinc-500 font-mono">sec</span>
-                <button
-                  onClick={() => nudgePanelStart(selectedPanel, 0.5)}
-                  className="text-[11px] font-bold px-2 py-2 rounded bg-zinc-900 border border-white/10 text-zinc-300 hover:text-white transition cursor-pointer"
-                  title="Push this panel half a second later"
-                >+0.5</button>
-                <button
-                  onClick={() => setPanelStartToPlayhead(selectedPanel)}
-                  className="flex-1 text-[10px] uppercase tracking-wider font-black px-2 py-2 rounded bg-[#ff007f] text-zinc-950 hover:brightness-110 transition cursor-pointer whitespace-nowrap"
-                  title="Snap this panel's start to where the voiceover is right now"
-                >
-                  ⏺ Set to playhead · {secondsToTime(currentTimeSec)}
-                </button>
-                {manualPanelStarts[selectedPanel.panelId] !== undefined && (
-                  <button
-                    onClick={() => clearPanelStart(selectedPanel.panelId)}
-                    className="text-[9px] uppercase px-2 py-2 rounded bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white transition cursor-pointer"
-                    title="Revert this panel to the auto-scaled start"
-                  >↺ Auto</button>
-                )}
+              <div className="grid grid-cols-2 gap-2">
+                {/* START */}
+                <div className="space-y-1">
+                  <label className="text-[9px] uppercase tracking-wider font-bold text-zinc-400 flex items-center justify-between">
+                    <span>Start (sec)</span>
+                    {manualPanelStarts[selectedPanel.panelId] !== undefined && (
+                      <button onClick={() => clearPanelStart(selectedPanel.panelId)} className="text-[8px] text-emerald-400 hover:text-white" title="Revert to auto">↺ auto</button>
+                    )}
+                  </label>
+                  <div className="flex items-center gap-1">
+                    <input
+                      key={`pstart-${selectedPanel.panelId}-${manualPanelStarts[selectedPanel.panelId] ?? 'auto'}`}
+                      type="text"
+                      inputMode="decimal"
+                      defaultValue={resolvePanelStart(selectedPanel).toFixed(1)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { const v = parseTimeInput((e.target as HTMLInputElement).value); if (v !== null) setPanelStart(selectedPanel.panelId, v); (e.target as HTMLInputElement).blur(); } }}
+                      onBlur={(e) => { const v = parseTimeInput(e.target.value); if (v !== null) setPanelStart(selectedPanel.panelId, v); }}
+                      className={`w-full text-center bg-zinc-950 border rounded py-1.5 text-[13px] font-mono text-white outline-none focus:border-[#ff007f]/60 ${manualPanelStarts[selectedPanel.panelId] !== undefined ? 'border-emerald-500/40' : 'border-white/10'}`}
+                      title="Type seconds (e.g. 12.4) or m:ss (e.g. 0:12), then Enter"
+                    />
+                    <button
+                      onClick={() => setPanelStartToPlayhead(selectedPanel)}
+                      className="shrink-0 text-[9px] font-black uppercase px-1.5 py-2 rounded bg-[#ff007f]/15 border border-[#ff007f]/30 text-[#ff007f] hover:bg-[#ff007f] hover:text-zinc-950 transition"
+                      title="Set start to the current playhead"
+                    >⏺</button>
+                  </div>
+                </div>
+                {/* END */}
+                <div className="space-y-1">
+                  <label className="text-[9px] uppercase tracking-wider font-bold text-zinc-400 flex items-center justify-between">
+                    <span>End (sec)</span>
+                    {manualPanelEnds[selectedPanel.panelId] !== undefined && (
+                      <button onClick={() => clearPanelEnd(selectedPanel.panelId)} className="text-[8px] text-emerald-400 hover:text-white" title="Revert to auto">↺ auto</button>
+                    )}
+                  </label>
+                  <div className="flex items-center gap-1">
+                    <input
+                      key={`pend-${selectedPanel.panelId}-${manualPanelEnds[selectedPanel.panelId] ?? 'auto'}`}
+                      type="text"
+                      inputMode="decimal"
+                      defaultValue={resolvePanelEnd(selectedPanel).toFixed(1)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { const v = parseTimeInput((e.target as HTMLInputElement).value); if (v !== null) setPanelEnd(selectedPanel.panelId, v); (e.target as HTMLInputElement).blur(); } }}
+                      onBlur={(e) => { const v = parseTimeInput(e.target.value); if (v !== null) setPanelEnd(selectedPanel.panelId, v); }}
+                      className={`w-full text-center bg-zinc-950 border rounded py-1.5 text-[13px] font-mono text-white outline-none focus:border-[#ff007f]/60 ${manualPanelEnds[selectedPanel.panelId] !== undefined ? 'border-emerald-500/40' : 'border-white/10'}`}
+                      title="Type seconds (e.g. 19.0) or m:ss (e.g. 0:19), then Enter"
+                    />
+                    <button
+                      onClick={() => setPanelEndToPlayhead(selectedPanel)}
+                      className="shrink-0 text-[9px] font-black uppercase px-1.5 py-2 rounded bg-[#ff007f]/15 border border-[#ff007f]/30 text-[#ff007f] hover:bg-[#ff007f] hover:text-zinc-950 transition"
+                      title="Set end to the current playhead"
+                    >⏺</button>
+                  </div>
+                </div>
               </div>
               <p className="text-[10px]/1.35 text-zinc-500 font-sans">
-                Play/scrub the voiceover, then click <span className="text-[#ff007f] font-bold">Set to playhead</span> when you reach where panel #{selectedPanel.panelId} should begin. Pause, fix, redo freely — only the panels that drift need editing.
+                Type the start and end (seconds, or <span className="font-mono text-zinc-400">m:ss</span>) and press Enter — or hit <span className="text-[#ff007f] font-bold">⏺</span> to grab the current playhead ({secondsToTime(currentTimeSec)}). By default a panel ends where the next one starts; only edit what drifts.
               </p>
             </div>
 
@@ -3226,13 +3287,13 @@ export default function StoryboardExplorer() {
                 >
                   {Object.keys(manualPanelStarts).length > 0 ? 'Re-run Tap-Sync' : 'Start Tap-Sync'}
                 </button>
-                {Object.keys(manualPanelStarts).length > 0 && (
+                {(Object.keys(manualPanelStarts).length > 0 || Object.keys(manualPanelEnds).length > 0) && (
                   <button
                     onClick={clearManualSync}
                     className="text-[9px] uppercase tracking-wider px-2 py-2 rounded bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white transition whitespace-nowrap"
-                    title="Discard all tap-sync marks and snap every panel back to the original auto-scaled timing"
+                    title="Discard all edited start/end times and snap every panel back to the original auto-scaled timing"
                   >
-                    ↺ Reset to Original
+                    ↺ Reset all to Original
                   </button>
                 )}
               </div>
@@ -3685,38 +3746,53 @@ export default function StoryboardExplorer() {
                         {/* Hover visual panel border glow */}
                         <div className="absolute inset-x-0 top-0 h-[1.5px] bg-[#ff007f] opacity-0 group-hover/item:opacity-40 transition-opacity" />
 
-                        {/* Top timings line */}
-                        <div className="flex items-center justify-between w-full border-b border-white/5 pb-1 select-none font-mono">
-                          <span className={`text-[8.5px] font-black ${isSelected ? 'text-[#ff007f]' : 'text-zinc-500'}`}>
-                            PANEL ID #{panel.panelId}
-                          </span>
-                          <div className="flex items-center gap-1 interactive-card-control">
-                            <button
-                              onClick={(e) => { e.stopPropagation(); setPanelStartToPlayhead(panel); }}
-                              className="text-[7.5px] font-black uppercase px-1 py-0.5 rounded bg-[#ff007f]/15 border border-[#ff007f]/30 text-[#ff007f] hover:bg-[#ff007f] hover:text-zinc-950 transition leading-none"
-                              title="Set this panel's start to the current playhead position"
-                            >
-                              ⏺ here
-                            </button>
-                            {manualPanelStarts[panel.panelId] !== undefined && (
-                              <button
-                                onClick={(e) => { e.stopPropagation(); clearPanelStart(panel.panelId); }}
-                                className="text-[7px] px-1 py-0.5 rounded bg-zinc-900 border border-emerald-500/30 text-emerald-400 hover:text-white leading-none"
-                                title="Edited start — click to revert this panel to auto"
-                              >
-                                ✎
-                              </button>
-                            )}
-                            <span
-                              className={`text-[8.5px] font-bold px-1 py-0.2 rounded border ${
-                                manualPanelStarts[panel.panelId] !== undefined
-                                  ? 'text-emerald-400 bg-emerald-950/30 border-emerald-500/20'
-                                  : 'text-[#ff007f] bg-black/40 border-white/5'
-                              }`}
-                              title={manualPanelStarts[panel.panelId] !== undefined ? 'Edited start time' : 'Auto-scaled start time'}
-                            >
-                              {secondsToTime(timings.start)}
+                        {/* Top: panel id + editable start/end times */}
+                        <div className="w-full border-b border-white/5 pb-1.5 select-none font-mono">
+                          <div className="flex items-center justify-between">
+                            <span className={`text-[8.5px] font-black ${isSelected ? 'text-[#ff007f]' : 'text-zinc-500'}`}>
+                              PANEL ID #{panel.panelId}
                             </span>
+                            <span className="text-[7.5px] text-zinc-600">{(timings.end - timings.start).toFixed(1)}s</span>
+                          </div>
+                          <div className="flex items-center gap-1 mt-1 interactive-card-control">
+                            <div className="flex items-center gap-0.5 flex-1">
+                              <span className="text-[7px] uppercase text-zinc-500 font-bold">S</span>
+                              <input
+                                key={`cstart-${panel.panelId}-${manualPanelStarts[panel.panelId] ?? 'a'}`}
+                                type="text"
+                                inputMode="decimal"
+                                defaultValue={timings.start.toFixed(1)}
+                                onClick={(e) => e.stopPropagation()}
+                                onKeyDown={(e) => { if (e.key === 'Enter') { const v = parseTimeInput((e.target as HTMLInputElement).value); if (v !== null) setPanelStart(panel.panelId, v); (e.target as HTMLInputElement).blur(); } }}
+                                onBlur={(e) => { const v = parseTimeInput(e.target.value); if (v !== null) setPanelStart(panel.panelId, v); }}
+                                className={`w-full min-w-0 text-center bg-zinc-950 border rounded py-1 text-[10px] font-mono outline-none focus:border-[#ff007f]/60 ${manualPanelStarts[panel.panelId] !== undefined ? 'border-emerald-500/40 text-emerald-400' : 'border-white/10 text-zinc-200'}`}
+                                title="Start (seconds or m:ss) — Enter to set"
+                              />
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setPanelStartToPlayhead(panel); }}
+                                className="shrink-0 text-[8px] px-1 py-1 rounded bg-[#ff007f]/15 border border-[#ff007f]/30 text-[#ff007f] hover:bg-[#ff007f] hover:text-zinc-950 transition leading-none"
+                                title="Set start to current playhead"
+                              >⏺</button>
+                            </div>
+                            <div className="flex items-center gap-0.5 flex-1">
+                              <span className="text-[7px] uppercase text-zinc-500 font-bold">E</span>
+                              <input
+                                key={`cend-${panel.panelId}-${manualPanelEnds[panel.panelId] ?? 'a'}`}
+                                type="text"
+                                inputMode="decimal"
+                                defaultValue={timings.end.toFixed(1)}
+                                onClick={(e) => e.stopPropagation()}
+                                onKeyDown={(e) => { if (e.key === 'Enter') { const v = parseTimeInput((e.target as HTMLInputElement).value); if (v !== null) setPanelEnd(panel.panelId, v); (e.target as HTMLInputElement).blur(); } }}
+                                onBlur={(e) => { const v = parseTimeInput(e.target.value); if (v !== null) setPanelEnd(panel.panelId, v); }}
+                                className={`w-full min-w-0 text-center bg-zinc-950 border rounded py-1 text-[10px] font-mono outline-none focus:border-[#ff007f]/60 ${manualPanelEnds[panel.panelId] !== undefined ? 'border-emerald-500/40 text-emerald-400' : 'border-white/10 text-zinc-200'}`}
+                                title="End (seconds or m:ss) — Enter to set"
+                              />
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setPanelEndToPlayhead(panel); }}
+                                className="shrink-0 text-[8px] px-1 py-1 rounded bg-[#ff007f]/15 border border-[#ff007f]/30 text-[#ff007f] hover:bg-[#ff007f] hover:text-zinc-950 transition leading-none"
+                                title="Set end to current playhead"
+                              >⏺</button>
+                            </div>
                           </div>
                         </div>
 

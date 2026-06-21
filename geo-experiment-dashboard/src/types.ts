@@ -35,6 +35,7 @@ export interface StoryboardProject {
   panels: StoryboardPanel[];
   // Optional in-app editing state captured on export so a take is fully reproducible:
   manualPanelStarts?: Record<number, number>;
+  manualPanelEnds?: Record<number, number>;
   panelOffsets?: Record<number, number>;
   autoBrollPanels?: Record<number, boolean>;
   isIntroEnabled?: boolean;

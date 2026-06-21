@@ -47,6 +47,7 @@ export function validateProject(data: any): ProjectValidation {
     baselineDurationSec: typeof data.baselineDurationSec === 'number' ? data.baselineDurationSec : 330,
     panels: data.panels as StoryboardPanel[],
     manualPanelStarts: isNumberRecord(data.manualPanelStarts) ? data.manualPanelStarts : undefined,
+    manualPanelEnds: isNumberRecord(data.manualPanelEnds) ? data.manualPanelEnds : undefined,
     panelOffsets: isNumberRecord(data.panelOffsets) ? data.panelOffsets : undefined,
     autoBrollPanels: isBoolRecord(data.autoBrollPanels) ? data.autoBrollPanels : undefined,
     isIntroEnabled: typeof data.isIntroEnabled === 'boolean' ? data.isIntroEnabled : undefined,

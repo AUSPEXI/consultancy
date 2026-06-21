@@ -24,7 +24,9 @@ app at runtime. The project only carries text, structure, and timing.
 
   // Optional: captured by the app's Export so a take is fully reproducible.
   // A freshly generated project can omit all of these.
-  "manualPanelStarts": { "1": 0, "2": 6.4 },     // tap-sync absolute starts (sec)
+  "manualPanelStarts": { "1": 0, "2": 6.4 },     // edited absolute starts (sec)
+  "manualPanelEnds": { "1": 6.4 },               // edited absolute ends (sec); a panel
+                                                 // defaults to ending where the next starts
   "panelOffsets": { "5": -1.5 },                 // per-panel nudge (sec)
   "autoBrollPanels": { "3": true, "11": true },  // which panels cut to b-roll
   "isIntroEnabled": true,
