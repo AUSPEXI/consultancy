@@ -465,18 +465,32 @@ export default function StoryboardExplorer() {
     return scaledPanelStart(panel);
   };
 
-  // The effective end: an edited value wins; otherwise the next panel's start
-  // (keeps panels back-to-back by default), falling back to the panel's own scaled
-  // end for the last panel.
+  const nextPanelOf = (panelId: number): StoryboardPanel | null => {
+    const idx = STORYBOARD_DATA.findIndex(p => p.panelId === panelId);
+    return (idx >= 0 && idx < STORYBOARD_DATA.length - 1) ? STORYBOARD_DATA[idx + 1] : null;
+  };
+
+  // A panel's end IS the next panel's start — one shared boundary, so a panel can
+  // never end out of step with the one that follows. Only the final panel has its
+  // own independent end.
   const resolvePanelEnd = (panel: StoryboardPanel) => {
+    const next = nextPanelOf(panel.panelId);
+    if (next) return resolvePanelStart(next);
     if (!syncCalibrating && manualPanelEnds[panel.panelId] !== undefined) {
       return Number(manualPanelEnds[panel.panelId].toFixed(2));
     }
-    const idx = STORYBOARD_DATA.findIndex(p => p.panelId === panel.panelId);
-    if (idx >= 0 && idx < STORYBOARD_DATA.length - 1) {
-      return resolvePanelStart(STORYBOARD_DATA[idx + 1]);
-    }
     return scaledPanelEnd(panel);
+  };
+
+  // Is this panel's end (i.e. the next panel's start) a hand-edited value?
+  const isPanelEndEdited = (panelId: number) => {
+    const next = nextPanelOf(panelId);
+    return next ? manualPanelStarts[next.panelId] !== undefined : manualPanelEnds[panelId] !== undefined;
+  };
+  // Key fragment so an End input remounts whenever its underlying value changes.
+  const panelEndKey = (panelId: number) => {
+    const next = nextPanelOf(panelId);
+    return next ? (manualPanelStarts[next.panelId] ?? 'a') : (manualPanelEnds[panelId] ?? 'a');
   };
 
   const getPanelTimings = (panel: StoryboardPanel) => {
@@ -508,10 +522,17 @@ export default function StoryboardExplorer() {
     setManualPanelStarts(prev => ({ ...prev, [panelId]: v }));
   };
 
+  // Editing a panel's end moves the shared boundary: for any non-final panel that
+  // means setting the NEXT panel's start, so the two stay matched automatically.
   const setPanelEnd = (panelId: number, seconds: number) => {
     if (!isFinite(seconds)) return;
     const v = Math.max(0, Number(seconds.toFixed(2)));
-    setManualPanelEnds(prev => ({ ...prev, [panelId]: v }));
+    const next = nextPanelOf(panelId);
+    if (next) {
+      setManualPanelStarts(prev => ({ ...prev, [next.panelId]: v }));
+    } else {
+      setManualPanelEnds(prev => ({ ...prev, [panelId]: v }));
+    }
   };
 
   const setPanelStartToPlayhead = (panel: StoryboardPanel) => {
@@ -532,7 +553,12 @@ export default function StoryboardExplorer() {
   };
 
   const clearPanelEnd = (panelId: number) => {
-    setManualPanelEnds(prev => { const c = { ...prev }; delete c[panelId]; return c; });
+    const next = nextPanelOf(panelId);
+    if (next) {
+      setManualPanelStarts(prev => { const c = { ...prev }; delete c[next.panelId]; return c; });
+    } else {
+      setManualPanelEnds(prev => { const c = { ...prev }; delete c[panelId]; return c; });
+    }
     if (isSynthEnabled) synth.playBeep(420, 0.05);
   };
 
@@ -3114,20 +3140,20 @@ export default function StoryboardExplorer() {
                 {/* END */}
                 <div className="space-y-1">
                   <label className="text-[9px] uppercase tracking-wider font-bold text-zinc-400 flex items-center justify-between">
-                    <span>End (sec)</span>
-                    {manualPanelEnds[selectedPanel.panelId] !== undefined && (
+                    <span>End (sec){nextPanelOf(selectedPanel.panelId) && <span className="text-zinc-600 normal-case"> = next start</span>}</span>
+                    {isPanelEndEdited(selectedPanel.panelId) && (
                       <button onClick={() => clearPanelEnd(selectedPanel.panelId)} className="text-[8px] text-emerald-400 hover:text-white" title="Revert to auto">↺ auto</button>
                     )}
                   </label>
                   <div className="flex items-center gap-1">
                     <input
-                      key={`pend-${selectedPanel.panelId}-${manualPanelEnds[selectedPanel.panelId] ?? 'auto'}`}
+                      key={`pend-${selectedPanel.panelId}-${panelEndKey(selectedPanel.panelId)}`}
                       type="text"
                       inputMode="decimal"
                       defaultValue={resolvePanelEnd(selectedPanel).toFixed(1)}
                       onKeyDown={(e) => { if (e.key === 'Enter') { const v = parseTimeInput((e.target as HTMLInputElement).value); if (v !== null) setPanelEnd(selectedPanel.panelId, v); (e.target as HTMLInputElement).blur(); } }}
                       onBlur={(e) => { const v = parseTimeInput(e.target.value); if (v !== null) setPanelEnd(selectedPanel.panelId, v); }}
-                      className={`w-full text-center bg-zinc-950 border rounded py-1.5 text-[13px] font-mono text-white outline-none focus:border-[#ff007f]/60 ${manualPanelEnds[selectedPanel.panelId] !== undefined ? 'border-emerald-500/40' : 'border-white/10'}`}
+                      className={`w-full text-center bg-zinc-950 border rounded py-1.5 text-[13px] font-mono text-white outline-none focus:border-[#ff007f]/60 ${isPanelEndEdited(selectedPanel.panelId) ? 'border-emerald-500/40' : 'border-white/10'}`}
                       title="Type seconds (e.g. 19.0) or m:ss (e.g. 0:19), then Enter"
                     />
                     <button
@@ -3777,14 +3803,14 @@ export default function StoryboardExplorer() {
                             <div className="flex items-center gap-0.5 flex-1">
                               <span className="text-[7px] uppercase text-zinc-500 font-bold">E</span>
                               <input
-                                key={`cend-${panel.panelId}-${manualPanelEnds[panel.panelId] ?? 'a'}`}
+                                key={`cend-${panel.panelId}-${panelEndKey(panel.panelId)}`}
                                 type="text"
                                 inputMode="decimal"
                                 defaultValue={timings.end.toFixed(1)}
                                 onClick={(e) => e.stopPropagation()}
                                 onKeyDown={(e) => { if (e.key === 'Enter') { const v = parseTimeInput((e.target as HTMLInputElement).value); if (v !== null) setPanelEnd(panel.panelId, v); (e.target as HTMLInputElement).blur(); } }}
                                 onBlur={(e) => { const v = parseTimeInput(e.target.value); if (v !== null) setPanelEnd(panel.panelId, v); }}
-                                className={`w-full min-w-0 text-center bg-zinc-950 border rounded py-1 text-[10px] font-mono outline-none focus:border-[#ff007f]/60 ${manualPanelEnds[panel.panelId] !== undefined ? 'border-emerald-500/40 text-emerald-400' : 'border-white/10 text-zinc-200'}`}
+                                className={`w-full min-w-0 text-center bg-zinc-950 border rounded py-1 text-[10px] font-mono outline-none focus:border-[#ff007f]/60 ${isPanelEndEdited(panel.panelId) ? 'border-emerald-500/40 text-emerald-400' : 'border-white/10 text-zinc-200'}`}
                                 title="End (seconds or m:ss) — Enter to set"
                               />
                               <button
