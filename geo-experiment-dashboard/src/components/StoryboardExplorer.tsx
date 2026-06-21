@@ -3134,10 +3134,10 @@ export default function StoryboardExplorer() {
                 {Object.keys(manualPanelStarts).length > 0 && (
                   <button
                     onClick={clearManualSync}
-                    className="text-[9px] uppercase tracking-wider px-2 py-2 rounded bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white transition"
-                    title="Discard tap-sync marks and fall back to auto-scaled timings"
+                    className="text-[9px] uppercase tracking-wider px-2 py-2 rounded bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white transition whitespace-nowrap"
+                    title="Discard all tap-sync marks and snap every panel back to the original auto-scaled timing"
                   >
-                    Clear
+                    ↺ Reset to Original
                   </button>
                 )}
               </div>
