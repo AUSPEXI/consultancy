@@ -299,6 +299,16 @@ async function analyzePhase(state, backlog) {
   log('Generating video package...');
   await runScript(path.join(__dir, 'generate-video-package.mjs'), [experimentDir]);
 
+  // Build the loadable storyboard project + flat voiceover from the script
+  // (non-fatal — the markdown package is already written; a storyboard hiccup or
+  // missing API key must not fail the run).
+  log('Building storyboard project...');
+  try {
+    await runScript(path.join(__dir, 'build-storyboard.mjs'), [experimentDir]);
+  } catch (err) {
+    log(`⚠️ Storyboard build failed (non-fatal): ${err.message}`);
+  }
+
   // Send email report (non-fatal — a bad SMTP credential must not fail the run
   // after results/FINDING.md are already written, or the commit step never runs)
   log('Sending report email...');

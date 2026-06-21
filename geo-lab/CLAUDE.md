@@ -62,6 +62,8 @@ Spawn them with the Agent tool. Run independent agents in parallel.
 - `/run-probe <experiment>` — execute the probe and save raw data.
 - `/analyze-results <experiment>` — compute stats, write FINDING.md.
 - `/write-video-script <experiment>` — draft the video from the finding.
+- `/build-storyboard <experiment>` — turn the script into the app's loadable
+  storyboard project + a cue-free ElevenLabs voiceover.
 
 ## Core rules
 
@@ -85,7 +87,15 @@ hypothesis
   → /run-probe            (probe-runner → results/raw.json)
   → /analyze-results      (analyst → FINDING.md with p-value + effect size)
   → /write-video-script   (video-producer → video/script.md, titles, thumbnail)
+  → npm run storyboard    (build-storyboard.mjs → video/storyboard.project.json
+                           + video/voiceover.txt — load the project into the
+                           geo-experiment-dashboard app, paste voiceover.txt into
+                           ElevenLabs, drop in Flow b-rolls, record)
 ```
+
+`npm run storyboard <experiment-dir>` turns the finished script into the app's
+loadable storyboard (36 panels, comedic b-roll beats) plus the cue-free voiceover
+text. It also runs automatically at the end of `orchestrate.mjs`.
 
 See `context/experiment-methodology.md` for the statistical method and the
 critical distinction between **fast (in-context) mode** and **live (indexed) mode**.
