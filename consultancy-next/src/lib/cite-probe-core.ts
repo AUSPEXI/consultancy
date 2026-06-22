@@ -75,6 +75,10 @@ export interface PlatformResult {
   // True when the brand's own domain appears in sourceUrls — the strongest
   // "cited as a source" signal for GEO.
   citedInSources?: boolean;
+  // WS2 repeat-sampling: across N trials of this query, how many cited the brand,
+  // out of how many completed (non-skipped) attempts. cited = majority vote.
+  citedTrials?: number;
+  totalTrials?: number;
   error?: string;
   skipped?: boolean;
 }
@@ -246,6 +250,44 @@ export function checkCitation(
 
 const SKIPPED: PlatformResult = { cited: false, accurate: true, misinformation: null, excerpt: null, skipped: true };
 
+// ── Retry / backoff (WS2) ────────────────────────────────────────────────────
+// The OpenAI-compatible SDK retries 429/5xx itself (we bump maxRetries below);
+// the raw-fetch engines (Claude, Google AIO) need their own backoff so one
+// engine rate-limiting doesn't silently shrink its trial count (differential
+// missingness).
+const RETRY_MAX = 3;
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+async function fetchWithRetry(url: string, init: RequestInit, tries = RETRY_MAX): Promise<Response> {
+  let lastErr: any;
+  for (let i = 0; i < tries; i++) {
+    try {
+      const res = await fetch(url, init);
+      if ((res.status === 429 || res.status >= 500) && i < tries - 1) {
+        await sleep(250 * 2 ** i); // 250ms → 500ms → 1s
+        continue;
+      }
+      return res;
+    } catch (e) {
+      lastErr = e;
+      if (i < tries - 1) { await sleep(250 * 2 ** i); continue; }
+      throw e;
+    }
+  }
+  throw lastErr;
+}
+
+// Combine N trial results for ONE engine on ONE query into a single result:
+// cited = majority vote; carry citedTrials/totalTrials for trial-level CIs.
+function combineTrials(results: PlatformResult[]): PlatformResult {
+  const valid = results.filter(r => !r.skipped);
+  if (valid.length === 0) return results[0] ?? SKIPPED;
+  const totalTrials = valid.length;
+  const citedTrials = valid.filter(r => r.cited).length;
+  const cited = citedTrials * 2 >= totalTrials; // ties resolve to cited
+  const rep = valid.find(r => r.cited && r.accurate) ?? valid.find(r => r.cited) ?? valid[0];
+  return { ...rep, cited, citedTrials, totalTrials };
+}
+
 // ── Grounded-mode helpers (WS1) ──────────────────────────────────────────────
 // Does the brand's own domain appear among the engine's returned source URLs?
 function domainInSources(domain: string, sourceUrls: string[] | null | undefined): boolean {
@@ -354,7 +396,7 @@ async function probeGemini(query: string, brand: string, domain: string, knownFa
 async function probeChatGPT(query: string, brand: string, domain: string, knownFalses: string[], pathway: Pathway = 'parametric'): Promise<PlatformResult> {
   const apiKey = process.env.OPENAI_API_KEY || '';
   if (!apiKey) return SKIPPED;
-  const client = new OpenAI({ apiKey });
+  const client = new OpenAI({ apiKey, maxRetries: RETRY_MAX });
 
   if (pathway === 'grounded') {
     // Responses API with the web-search tool. Cast through `any` so this compiles
@@ -390,7 +432,7 @@ async function probePerplexity(query: string, brand: string, domain: string, kno
   const apiKey = process.env.PERPLEXITY_API_KEY || '';
   if (!apiKey) return SKIPPED;
   try {
-    const client = new OpenAI({ apiKey, baseURL: 'https://api.perplexity.ai' });
+    const client = new OpenAI({ apiKey, baseURL: 'https://api.perplexity.ai', maxRetries: RETRY_MAX });
     const response: any = await client.chat.completions.create({
       model: 'sonar',
       messages: [{ role: 'user', content: query }],
@@ -423,7 +465,7 @@ async function probeClaude(query: string, brand: string, domain: string, knownFa
     // against current Anthropic docs at maintenance time — these move.)
     if (grounded) body.tools = [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }];
 
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetchWithRetry('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'x-api-key': apiKey,
@@ -453,7 +495,7 @@ async function probeClaude(query: string, brand: string, domain: string, knownFa
 async function probeGrok(query: string, brand: string, domain: string, knownFalses: string[], pathway: Pathway = 'parametric'): Promise<PlatformResult> {
   const apiKey = process.env.XAI_API_KEY || process.env.GROK_API_KEY || '';
   if (!apiKey) return SKIPPED;
-  const client = new OpenAI({ apiKey, baseURL: 'https://api.x.ai/v1' });
+  const client = new OpenAI({ apiKey, baseURL: 'https://api.x.ai/v1', maxRetries: RETRY_MAX });
 
   if (pathway === 'grounded') {
     // xAI Live Search via search_parameters (passed through the OpenAI-compatible
@@ -490,7 +532,7 @@ async function probeDeepSeek(query: string, brand: string, domain: string, known
   const apiKey = process.env.DEEPSEEK_API_KEY || '';
   if (!apiKey) return SKIPPED;
   try {
-    const client = new OpenAI({ apiKey, baseURL: 'https://api.deepseek.com' });
+    const client = new OpenAI({ apiKey, baseURL: 'https://api.deepseek.com', maxRetries: RETRY_MAX });
     const response = await client.chat.completions.create({
       model: 'deepseek-chat',
       messages: [{ role: 'user', content: query }],
@@ -543,14 +585,14 @@ async function probeGoogleAIO(query: string, brand: string, domain: string, know
   if (!apiKey) return SKIPPED;
   try {
     const url = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(query)}&api_key=${apiKey}`;
-    const res = await fetch(url);
+    const res = await fetchWithRetry(url, {});
     const data = await res.json();
     let aio = data.ai_overview;
 
     // If only a page_token came back, redeem it for the full overview.
     if (aio?.page_token && !aio?.text_blocks) {
       const tokenUrl = `https://serpapi.com/search.json?engine=google_ai_overview&page_token=${encodeURIComponent(aio.page_token)}&api_key=${apiKey}`;
-      const tokenRes = await fetch(tokenUrl);
+      const tokenRes = await fetchWithRetry(tokenUrl, {});
       const tokenData = await tokenRes.json();
       aio = tokenData.ai_overview || aio;
     }
@@ -574,18 +616,30 @@ async function probeGoogleAIO(query: string, brand: string, domain: string, know
 // returned as skipped without making (or paying for) an API call.
 async function probeQuery(
   query: string, brand: string, domain: string, knownFalses: string[], engines: Set<PlatformKey>,
-  mode: ProbeMode = 'parametric',
+  mode: ProbeMode = 'parametric', trials = 1,
 ): Promise<Record<PlatformKey, PlatformResult>> {
   // Each engine runs the pathway it actually supports for the requested mode.
   const pw = (e: PlatformKey) => resolvePathway(e, mode);
+  // Run an engine `trials` times and majority-vote (WS2). trials=1 is identical
+  // to the old single-call behaviour.
+  const run = async (
+    engine: PlatformKey,
+    fn: (p: Pathway) => Promise<PlatformResult>,
+  ): Promise<PlatformResult> => {
+    if (!engines.has(engine)) return SKIPPED;
+    const p = pw(engine);
+    if (trials <= 1) return fn(p);
+    const attempts = await Promise.all(Array.from({ length: trials }, () => fn(p)));
+    return combineTrials(attempts);
+  };
   const [gemini, chatgpt, perplexity, claude, grok, deepseek, google_aio] = await Promise.all([
-    engines.has('gemini') ? probeGemini(query, brand, domain, knownFalses, pw('gemini')) : Promise.resolve(SKIPPED),
-    engines.has('chatgpt') ? probeChatGPT(query, brand, domain, knownFalses, pw('chatgpt')) : Promise.resolve(SKIPPED),
-    engines.has('perplexity') ? probePerplexity(query, brand, domain, knownFalses, pw('perplexity')) : Promise.resolve(SKIPPED),
-    engines.has('claude') ? probeClaude(query, brand, domain, knownFalses, pw('claude')) : Promise.resolve(SKIPPED),
-    engines.has('grok') ? probeGrok(query, brand, domain, knownFalses, pw('grok')) : Promise.resolve(SKIPPED),
-    engines.has('deepseek') ? probeDeepSeek(query, brand, domain, knownFalses, pw('deepseek')) : Promise.resolve(SKIPPED),
-    engines.has('google_aio') ? probeGoogleAIO(query, brand, domain, knownFalses, pw('google_aio')) : Promise.resolve(SKIPPED),
+    run('gemini', (p) => probeGemini(query, brand, domain, knownFalses, p)),
+    run('chatgpt', (p) => probeChatGPT(query, brand, domain, knownFalses, p)),
+    run('perplexity', (p) => probePerplexity(query, brand, domain, knownFalses, p)),
+    run('claude', (p) => probeClaude(query, brand, domain, knownFalses, p)),
+    run('grok', (p) => probeGrok(query, brand, domain, knownFalses, p)),
+    run('deepseek', (p) => probeDeepSeek(query, brand, domain, knownFalses, p)),
+    run('google_aio', (p) => probeGoogleAIO(query, brand, domain, knownFalses, p)),
   ]);
   return { gemini, chatgpt, perplexity, claude, grok, deepseek, google_aio };
 }
@@ -623,22 +677,31 @@ export interface ProbeAggregate {
   // Average normalised position of the brand mention (0–100; lower = earlier).
   // null when the brand was never cited.
   avgPositionPct: number | null;
+  // WS2: trial-level stats per engine. With repeat-sampling the rate is computed
+  // over cited TRIALS / total TRIALS (tighter Wilson CI than the query-level rate).
+  // errorTrials surfaces differential missingness (one engine rate-limiting more).
+  platformTrialStats?: Record<string, {
+    citedTrials: number; totalTrials: number; ratePct: number; ci95: [number, number]; errorTrials: number;
+  }>;
+  // Repeat-sampling depth actually used (1 = single pass).
+  trialsPerQuery?: number;
 }
 
 // Run a full citation probe for one brand across a query set and aggregate it.
 export async function runCitationProbe(opts: {
   brand: string; domain: string; queries: string[];
-  knownFalses?: string[]; engines?: Set<PlatformKey>; mode?: ProbeMode;
+  knownFalses?: string[]; engines?: Set<PlatformKey>; mode?: ProbeMode; trialsPerQuery?: number;
 }): Promise<ProbeAggregate> {
   const { brand, domain, queries } = opts;
   const knownFalses = opts.knownFalses ?? [];
   const engines = opts.engines ?? new Set(ALL_ENGINES);
   const mode = opts.mode ?? 'parametric';
+  const trialsPerQuery = Math.max(1, opts.trialsPerQuery ?? 1);
   const timestamp = new Date().toISOString();
 
   const queryResults = await Promise.all(
     queries.map(async (query) => {
-      const platforms = await probeQuery(query, brand, domain, knownFalses, engines, mode);
+      const platforms = await probeQuery(query, brand, domain, knownFalses, engines, mode, trialsPerQuery);
       const active = Object.values(platforms).filter(p => !p.skipped);
       const citedOnAny = active.some(p => p.cited);
       const hasMisinformation = active.some(p => p.cited && !p.accurate);
@@ -688,9 +751,27 @@ export async function runCitationProbe(opts: {
 
   const ci95 = wilsonCI95(citedCount, queryResults.length);
 
+  // WS2: trial-level stats per engine. citedTrials/totalTrials aggregate the
+  // per-query majority-vote inputs; the Wilson CI here tightens as trials rise.
+  const platformTrialStats: ProbeAggregate['platformTrialStats'] = {};
+  for (const p of ALL_ENGINES) {
+    const pResults = queryResults.map(r => r.platforms[p]).filter(r => !r.skipped);
+    if (pResults.length === 0) continue;
+    const citedTrials = pResults.reduce((s, r) => s + (r.citedTrials ?? (r.cited ? 1 : 0)), 0);
+    const totalTrials = pResults.reduce((s, r) => s + (r.totalTrials ?? 1), 0);
+    const errorTrials = pResults.reduce((s, r) => s + Math.max(0, (trialsPerQuery) - (r.totalTrials ?? 1)), 0);
+    platformTrialStats[p] = {
+      citedTrials, totalTrials,
+      ratePct: totalTrials ? Math.round((citedTrials / totalTrials) * 100) : 0,
+      ci95: wilsonCI95(citedTrials, totalTrials),
+      errorTrials,
+    };
+  }
+
   return {
     queryResults, platformRates, citationRate, ci95, citedCount, misinformationCount,
     activePlatforms: activeRates.length, sentimentBreakdown, avgPositionPct,
+    platformTrialStats, trialsPerQuery,
   };
 }
 

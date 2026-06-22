@@ -4,6 +4,7 @@ import { computeAttribution } from '@/lib/attribution';
 import { requireAuth } from '@/lib/api-auth';
 import { perplexityBudget } from '@/lib/perplexity-budget';
 import { buildQueries, runCitationProbe, probeBrandRate, ENGINE_MODEL_VERSIONS, type ProbeMode } from '@/lib/cite-probe-core';
+import { headToHeadVerdict } from '@/lib/stats';
 import { normalizeTier, checkTierAccess } from '@/constants/tiers';
 import { embeddingService } from '@/lib/embeddings';
 import { computeQueryGeometry, loadEmbeddedFacts, GEOMETRY_SIM_THRESHOLD } from '@/lib/fact-geometry';
@@ -223,11 +224,15 @@ export async function POST(request: Request) {
     }
     const timestamp = new Date().toISOString();
 
+    // WS2: paid tiers repeat-sample each query (tighter CIs, stochastic noise
+    // averaged out); free stays single-pass to control cost.
+    const trialsPerQuery = checkTierAccess(userTier, 'Starter') ? 3 : 1;
+
     const {
       queryResults, platformRates, citationRate, ci95,
       citedCount, misinformationCount, activePlatforms,
-      sentimentBreakdown, avgPositionPct,
-    } = await runCitationProbe({ brand, domain, queries: testQueries, knownFalses, mode: probeMode });
+      sentimentBreakdown, avgPositionPct, platformTrialStats,
+    } = await runCitationProbe({ brand, domain, queries: testQueries, knownFalses, mode: probeMode, trialsPerQuery });
 
     // S7.1: competitor comparison — run the SAME queries for each competitor and
     // compute per-query winners so the user gets a concrete head-to-head benchmark.
@@ -264,6 +269,13 @@ export async function POST(request: Request) {
           wins: comparison.filter(c => c.winner === 'you').length,
           losses: comparison.filter(c => c.winner === 'them').length,
           ties: comparison.filter(c => c.winner === 'tie').length,
+          // WS2: a real two-proportion z-test over the shared query set, so the
+          // head-to-head reports "ahead/behind/inconclusive at this n" + a p-value
+          // rather than implying a win from bare counts.
+          significance: headToHeadVerdict(
+            comparison.filter(c => c.youCited).length, comparison.length,
+            comparison.filter(c => c.themCited).length, comparison.length,
+          ),
           comparison,
         };
       })
@@ -329,6 +341,7 @@ export async function POST(request: Request) {
       citationRate, ci95, citedCount, misinformationCount,
       totalQueries: testQueries.length,
       activePlatforms, platformRates,
+      platformTrialStats, trialsPerQuery,
       sentimentBreakdown, avgPositionPct,
       results: resultsWithGeometry,
       geometry: geometrySummary,
@@ -351,8 +364,9 @@ export async function POST(request: Request) {
           details: { citationRate, citedCount, misinformationCount, totalQueries: testQueries.length, activePlatforms, platformRates },
           timestamp: new Date().toISOString(),
         }).catch(() => {});
-        // Each competitor is a full extra probe pass over the same queries.
-        const passes = 1 + competitors.length;
+        // The brand runs trialsPerQuery passes (repeat-sampling); each competitor
+        // is one extra pass over the same queries.
+        const passes = trialsPerQuery + competitors.length;
         const perPassQueries = testQueries.length;
         const cost = passes * (
           (platformRates.gemini !== null ? (perPassQueries * 500 / 1_000_000) * 0.40 : 0) +

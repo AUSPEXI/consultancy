@@ -62,6 +62,7 @@ interface CompetitorComparison {
   wins: number;
   losses: number;
   ties: number;
+  significance?: { verdict: 'ahead' | 'behind' | 'inconclusive'; diffPp: number; z: number; pValue: number };
   comparison: { query: string; youCited: boolean; themCited: boolean; winner: 'you' | 'them' | 'tie' }[];
 }
 
@@ -507,6 +508,24 @@ export default function CiteProbePage() {
                   <p className={`text-4xl font-black ${rateColor(cmp.citationRate)}`}>{cmp.citationRate}%</p>
                 </div>
               </div>
+              {/* WS2: honest statistical verdict — never claim a win the n can't support. */}
+              {cmp.significance && (
+                <div className="mb-5 text-center">
+                  {cmp.significance.verdict === 'inconclusive' ? (
+                    <span className="inline-block text-xs font-semibold px-3 py-1.5 rounded-full bg-zinc-800/70 border border-zinc-700 text-zinc-300">
+                      Inconclusive at this sample size (p = {cmp.significance.pValue.toFixed(2)}) — run more queries to call it
+                    </span>
+                  ) : (
+                    <span className={`inline-block text-xs font-semibold px-3 py-1.5 rounded-full border ${
+                      cmp.significance.verdict === 'ahead'
+                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                        : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+                    }`}>
+                      Significantly {cmp.significance.verdict} ({cmp.significance.diffPp > 0 ? '+' : ''}{cmp.significance.diffPp}pp, p = {cmp.significance.pValue.toFixed(3)})
+                    </span>
+                  )}
+                </div>
+              )}
               <div className="space-y-1.5">
                 {cmp.comparison.map((c, i) => (
                   <div key={i} className="flex items-center gap-3 bg-zinc-950/60 border border-zinc-800 rounded-lg px-3 py-2">
