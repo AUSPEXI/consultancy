@@ -79,6 +79,9 @@ export interface PlatformResult {
   // out of how many completed (non-skipped) attempts. cited = majority vote.
   citedTrials?: number;
   totalTrials?: number;
+  // When grounded was requested but the call failed and we fell back to parametric,
+  // the reason (so a 🧠 marker in grounded mode is diagnosable, not silent).
+  groundedError?: string;
   error?: string;
   skipped?: boolean;
 }
@@ -376,6 +379,7 @@ async function probeGemini(query: string, brand: string, domain: string, knownFa
   if (!apiKey) return SKIPPED;
   const ai = new GoogleGenAI({ apiKey });
 
+  let groundedError: string | undefined;
   if (pathway === 'grounded') {
     // Google Search grounding tool. Cast config through `any` so it compiles across
     // SDK versions; fall back to the parametric call (labelled honestly) on failure.
@@ -389,7 +393,11 @@ async function probeGemini(query: string, brand: string, domain: string, knownFa
         .map((p: any) => p?.text).filter((t: any) => typeof t === 'string').join('') || '';
       const sourceUrls = extractGeminiCitations(response);
       if (sourceUrls.length > 0) return finalizeGrounded(text, brand, domain, knownFalses, sourceUrls);
-    } catch { /* fall through to parametric */ }
+      groundedError = 'grounding returned no source citations';
+    } catch (e: any) {
+      groundedError = e?.message || String(e);
+      console.warn('[cite-probe] gemini grounded fell back to parametric:', groundedError);
+    }
   }
 
   try {
@@ -399,9 +407,9 @@ async function probeGemini(query: string, brand: string, domain: string, knownFa
       config: { temperature: 0.3, maxOutputTokens: 600 },
     });
     const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text, pathway: 'parametric', sourceUrls: null, citedInSources: false };
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text, pathway: 'parametric', sourceUrls: null, citedInSources: false, groundedError };
   } catch (e: any) {
-    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message, pathway: 'parametric' };
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message, pathway: 'parametric', groundedError };
   }
 }
 
@@ -509,6 +517,7 @@ async function probeGrok(query: string, brand: string, domain: string, knownFals
   if (!apiKey) return SKIPPED;
   const client = new OpenAI({ apiKey, baseURL: 'https://api.x.ai/v1', maxRetries: RETRY_MAX });
 
+  let groundedError: string | undefined;
   if (pathway === 'grounded') {
     // xAI Live Search via search_parameters (passed through the OpenAI-compatible
     // body). Fall back to the parametric call (labelled honestly) on failure.
@@ -524,7 +533,11 @@ async function probeGrok(query: string, brand: string, domain: string, knownFals
         .map((c: any) => (typeof c === 'string' ? c : c?.url))
         .filter((u: any) => typeof u === 'string');
       if (sourceUrls.length > 0) return finalizeGrounded(text, brand, domain, knownFalses, sourceUrls);
-    } catch { /* fall through to parametric */ }
+      groundedError = 'live search returned no citations (model may not support search_parameters)';
+    } catch (e: any) {
+      groundedError = e?.message || String(e);
+      console.warn('[cite-probe] grok grounded fell back to parametric:', groundedError);
+    }
   }
 
   try {
@@ -534,9 +547,9 @@ async function probeGrok(query: string, brand: string, domain: string, knownFals
       max_tokens: 600, temperature: 0.3,
     } as any);
     const text = response.choices[0]?.message?.content || '';
-    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text, pathway: 'parametric', sourceUrls: null, citedInSources: false };
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text, pathway: 'parametric', sourceUrls: null, citedInSources: false, groundedError };
   } catch (e: any) {
-    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message, pathway: 'parametric' };
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message, pathway: 'parametric', groundedError };
   }
 }
 

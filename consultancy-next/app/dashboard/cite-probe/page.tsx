@@ -18,6 +18,7 @@ interface PlatformResult {
   pathway?: 'parametric' | 'grounded';
   sourceUrls?: string[] | null;
   citedInSources?: boolean;
+  groundedError?: string;
   error?: string;
   skipped?: boolean;
 }
@@ -702,13 +703,24 @@ export default function CiteProbePage() {
                   const isConfigured = rate !== null && rate !== undefined;
                   // Pathway this engine actually ran (reflects fallbacks honestly).
                   const enginePathway = probeData.results?.find(r => r.platforms?.[p]?.pathway)?.platforms?.[p]?.pathway;
+                  // If grounded was requested but this engine fell back, why?
+                  const engineGroundedError = probeData.results?.find(r => r.platforms?.[p]?.groundedError)?.platforms?.[p]?.groundedError;
                   return (
                     <div key={p} className={`rounded-xl border p-4 ${isConfigured ? `${meta.bg} ${meta.border}` : 'bg-zinc-900/30 border-zinc-800'}`}>
                       <p className={`text-xs font-semibold mb-2 ${isConfigured ? meta.text : 'text-zinc-600'} flex items-center justify-between gap-1`}>
                         <span>{meta.label}</span>
                         {isConfigured && enginePathway && (
-                          <span className="text-[9px] font-bold uppercase tracking-wide text-zinc-500" title={enginePathway === 'grounded' ? 'Live web retrieval' : 'Training recall (no web search)'}>
-                            {enginePathway === 'grounded' ? '🌐' : '🧠'}
+                          <span
+                            className="text-[9px] font-bold uppercase tracking-wide text-zinc-500 cursor-help"
+                            title={
+                              enginePathway === 'grounded'
+                                ? 'Live web retrieval'
+                                : engineGroundedError
+                                  ? `Fell back to training recall — grounded call failed: ${engineGroundedError}`
+                                  : 'Training recall (no web search)'
+                            }
+                          >
+                            {enginePathway === 'grounded' ? '🌐' : engineGroundedError ? '🧠⚠' : '🧠'}
                           </span>
                         )}
                       </p>
