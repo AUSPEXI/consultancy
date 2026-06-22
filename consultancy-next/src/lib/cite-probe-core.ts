@@ -23,6 +23,10 @@ export const ENGINE_MODEL_VERSIONS: Record<PlatformKey, string> = {
   google_aio: 'serpapi-google-ai-overview',
 };
 
+// Grok's parametric calls use grok-2-latest (above), but the Agent Tools API
+// (web_search via the Responses endpoint) needs a current model.
+const GROK_GROUNDED_MODEL = 'grok-4-1-fast-non-reasoning';
+
 // ── Citation pathway (WS1) ───────────────────────────────────────────────────
 // A bare query measures PARAMETRIC recall (does the model know the brand from
 // training?); a query run with the engine's web tool measures GROUNDED retrieval
@@ -531,21 +535,19 @@ async function probeGrok(query: string, brand: string, domain: string, knownFals
 
   let groundedError: string | undefined;
   if (pathway === 'grounded') {
-    // xAI Live Search via search_parameters (passed through the OpenAI-compatible
-    // body). Fall back to the parametric call (labelled honestly) on failure.
+    // xAI's old Live Search (search_parameters) is deprecated (HTTP 410). The
+    // current path is the Agent Tools API via the OpenAI-compatible Responses
+    // endpoint with a server-side web_search tool, on a current model (the old
+    // grok-2-latest doesn't support it). Reuses the Responses parser.
     try {
-      const response: any = await client.chat.completions.create({
-        model: ENGINE_MODEL_VERSIONS.grok,
-        messages: [{ role: 'user', content: query }],
-        max_tokens: 600, temperature: 0.3,
-        search_parameters: { mode: 'auto', return_citations: true },
-      } as any);
-      const text = response.choices[0]?.message?.content || '';
-      const sourceUrls: string[] = (response.citations ?? [])
-        .map((c: any) => (typeof c === 'string' ? c : c?.url))
-        .filter((u: any) => typeof u === 'string');
-      if (sourceUrls.length > 0) return finalizeGrounded(text, brand, domain, knownFalses, sourceUrls);
-      groundedError = 'live search returned no citations (model may not support search_parameters)';
+      const r: any = await (client as any).responses.create({
+        model: GROK_GROUNDED_MODEL,
+        tools: [{ type: 'web_search' }],
+        input: query,
+      });
+      const text = extractResponsesText(r);
+      if (text) return finalizeGrounded(text, brand, domain, knownFalses, extractResponsesCitations(r));
+      groundedError = 'web_search returned no text';
     } catch (e: any) {
       groundedError = e?.message || String(e);
       console.warn('[cite-probe] grok grounded fell back to parametric:', groundedError);
