@@ -10,6 +10,7 @@
     "analyze": "node scripts/analyze.mjs",
     "video": "node scripts/generate-video-package.mjs",
     "storyboard": "node scripts/build-storyboard.mjs",
+    "fdr": "node scripts/fdr-ledger.mjs",
     "report": "node scripts/send-report.mjs",
     "publish": "node scripts/publish-finding.mjs",
     "dry-run": "node scripts/orchestrate.mjs --dry-run"

@@ -318,6 +318,15 @@ async function analyzePhase(state, backlog) {
     log(`⚠️ Report email failed (non-fatal): ${err.message}`);
   }
 
+  // Refresh the programme-wide FDR ledger BEFORE publishing, so the finding
+  // carries its q-value (FDR-adjusted across every experiment) into the dashboard.
+  log('Updating FDR ledger across all experiments...');
+  try {
+    await runScript(path.join(__dir, 'fdr-ledger.mjs'), []);
+  } catch (err) {
+    log(`⚠️ FDR ledger failed (non-fatal): ${err.message}`);
+  }
+
   // Publish the finding into the dashboard recommendation loop (non-fatal)
   log('Publishing finding to dashboard...');
   try {

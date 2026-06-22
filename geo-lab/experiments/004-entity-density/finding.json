@@ -89,5 +89,15 @@
     "treatment": "B",
     "diffPp": 75,
     "pValue": 0.0019
+  },
+  "qValue": 0.001,
+  "fdr": {
+    "method": "benjamini-hochberg",
+    "alpha": 0.05,
+    "programmeSize": 10,
+    "primaryP": 0.0005,
+    "qValue": 0.001,
+    "survivesFdr": true,
+    "computedAt": "2026-06-22T05:27:47.218Z"
   }
 }

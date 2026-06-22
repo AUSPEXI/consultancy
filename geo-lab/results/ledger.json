@@ -1,0 +1,88 @@
+{
+  "method": "benjamini-hochberg",
+  "alpha": 0.05,
+  "programmeSize": 10,
+  "computedAt": "2026-06-22T05:27:47.218Z",
+  "entries": [
+    {
+      "experiment": "001-statistical-anchors",
+      "lever": "001-statistical-anchors",
+      "verdict": "significant",
+      "primaryP": 0,
+      "qValue": 0,
+      "survivesFdr": true
+    },
+    {
+      "experiment": "003-definition-sentences",
+      "lever": "003-definition-sentences",
+      "verdict": "significant",
+      "primaryP": 0,
+      "qValue": 0,
+      "survivesFdr": true
+    },
+    {
+      "experiment": "013-engine-divergence",
+      "lever": "013-engine-divergence",
+      "verdict": "significant",
+      "primaryP": 0,
+      "qValue": 0,
+      "survivesFdr": true
+    },
+    {
+      "experiment": "002-answer-first-structure",
+      "lever": "002-answer-first-structure",
+      "verdict": "significant",
+      "primaryP": 0.0005,
+      "qValue": 0.001,
+      "survivesFdr": true
+    },
+    {
+      "experiment": "004-entity-density",
+      "lever": "004-entity-density",
+      "verdict": "significant",
+      "primaryP": 0.0005,
+      "qValue": 0.001,
+      "survivesFdr": true
+    },
+    {
+      "experiment": "006-short-sentences",
+      "lever": "006-short-sentences",
+      "verdict": "significant",
+      "primaryP": 0.0007,
+      "qValue": 0.0012,
+      "survivesFdr": true
+    },
+    {
+      "experiment": "008-source-framing",
+      "lever": "008-source-framing",
+      "verdict": "significant",
+      "primaryP": 0.006,
+      "qValue": 0.0086,
+      "survivesFdr": true
+    },
+    {
+      "experiment": "005-list-vs-prose",
+      "lever": "005-list-vs-prose",
+      "verdict": "null",
+      "primaryP": 0.3006,
+      "qValue": 0.3757,
+      "survivesFdr": false
+    },
+    {
+      "experiment": "017-question-vs-statement",
+      "lever": "017-question-vs-statement",
+      "verdict": "null",
+      "primaryP": 0.4227,
+      "qValue": 0.4697,
+      "survivesFdr": false
+    },
+    {
+      "experiment": "007-freshness-signal",
+      "lever": "007-freshness-signal",
+      "verdict": "null",
+      "primaryP": 1,
+      "qValue": 1,
+      "survivesFdr": false
+    }
+  ]
+}

@@ -76,5 +76,15 @@
   "significant": [],
   "verdict": "null",
   "bestVariant": null,
-  "topEffect": null
+  "topEffect": null,
+  "qValue": 0.4697,
+  "fdr": {
+    "method": "benjamini-hochberg",
+    "alpha": 0.05,
+    "programmeSize": 10,
+    "primaryP": 0.4227,
+    "qValue": 0.4697,
+    "survivesFdr": false,
+    "computedAt": "2026-06-22T05:27:47.218Z"
+  }
 }

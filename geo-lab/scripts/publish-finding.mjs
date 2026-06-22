@@ -118,6 +118,10 @@ const payload = {
   appliesTo: guide?.appliesTo || [],
   bestVariant: finding.bestVariant,
   topEffect: finding.topEffect,              // { platform, treatment, diffPp, pValue } | null
+  // Programme-wide Benjamini–Hochberg q-value (set by fdr-ledger.mjs). Survives
+  // FDR when q < 0.05 — the honest, multiple-comparisons-corrected bar.
+  qValue: finding.qValue ?? null,
+  fdr: finding.fdr ?? null,
   significant: finding.significant,
   aggregate: finding.aggregate,
   platforms: finding.platforms,

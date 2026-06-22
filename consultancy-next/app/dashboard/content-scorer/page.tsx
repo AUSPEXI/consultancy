@@ -283,11 +283,23 @@ export default function ContentScorerPage() {
                       )}
                     </div>
                     <p className="text-xs text-zinc-400 mt-1 leading-relaxed">{lev.recommendation}</p>
-                    {lev.topEffect && (
-                      <p className="text-[10px] text-zinc-600 mt-1.5">
-                        p={lev.topEffect.pValue}{lev.trialsPerVariant ? ` · n=${lev.trialsPerVariant}/variant` : ''}
-                      </p>
-                    )}
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      {lev.topEffect && (
+                        <p className="text-[10px] text-zinc-600">
+                          p={lev.topEffect.pValue}{typeof lev.qValue === 'number' ? ` · q=${lev.qValue}` : ''}{lev.trialsPerVariant ? ` · n=${lev.trialsPerVariant}/variant` : ''}
+                        </p>
+                      )}
+                      {lev.survivesFdr && (
+                        <span className="text-[9px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-1.5 py-0.5 rounded-full" title="Survives Benjamini–Hochberg FDR correction across the whole research programme">
+                          ✓ FDR-controlled
+                        </span>
+                      )}
+                      {lev.verificationStatus === 'verified' && lev.lastVerifiedAt && (
+                        <span className="text-[9px] font-bold text-sky-300 bg-sky-400/10 border border-sky-400/20 px-1.5 py-0.5 rounded-full" title="Re-tested and still holds">
+                          ✓ re-verified {String(lev.lastVerifiedAt).slice(0, 10)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

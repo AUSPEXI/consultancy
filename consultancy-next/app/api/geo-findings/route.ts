@@ -32,6 +32,9 @@ interface FindingPayload {
   appliesTo?: string[];
   bestVariant?: string | null;
   topEffect?: { platform: string; treatment: string; diffPp: number; pValue: number } | null;
+  // Programme-wide FDR (Benjamini–Hochberg) q-value + metadata from fdr-ledger.mjs.
+  qValue?: number | null;
+  fdr?: { method: string; alpha: number; programmeSize: number; primaryP: number; qValue: number; survivesFdr: boolean; computedAt: string } | null;
   significant?: unknown[];
   aggregate?: Record<string, unknown>;
   platforms?: string[];
@@ -99,6 +102,9 @@ export async function GET(request: Request) {
         recommendation: f.recommendation || '',
         appliesTo: f.appliesTo || [],
         topEffect: f.topEffect || null,
+        // FDR-adjusted q-value across the whole research programme (q<0.05 survives).
+        qValue: f.qValue ?? null,
+        survivesFdr: f.fdr?.survivesFdr ?? (typeof f.qValue === 'number' ? f.qValue < 0.05 : null),
         platforms: f.platforms || [],
         trialsPerVariant: f.trialsPerVariant ?? null,
         runAt: f.runAt || null,
