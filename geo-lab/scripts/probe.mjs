@@ -82,15 +82,43 @@ console.log(`Trials per variant: ${trialsPerVariant}\n`);
 
 // ── LLM callers ─────────────────────────────────────────────────────────────
 
+// WS6: hold generation conditions constant across engines for reproducibility and
+// to remove the output-length confound (Gemini was previously uncapped — longer
+// answers cite more sources). Temperature is pinned and logged per trial.
+const PROBE_TEMPERATURE = 0.3;
+const PROBE_MAX_TOKENS = 600;
+
+// WS6: exponential backoff on 429/5xx so one engine rate-limiting doesn't
+// silently leave it with fewer trials (differential missingness).
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function fetchRetry(url, init, tries = 3) {
+  let lastErr;
+  for (let i = 0; i < tries; i++) {
+    try {
+      const res = await fetch(url, init);
+      if ((res.status === 429 || res.status >= 500) && i < tries - 1) { await sleep(400 * 2 ** i); continue; }
+      return res;
+    } catch (e) {
+      lastErr = e;
+      if (i < tries - 1) { await sleep(400 * 2 ** i); continue; }
+      throw e;
+    }
+  }
+  throw lastErr;
+}
+
 async function callGemini(prompt) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) return null;
-  const res = await fetch(
+  const res = await fetchRetry(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }] }),
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { temperature: PROBE_TEMPERATURE, maxOutputTokens: PROBE_MAX_TOKENS },
+      }),
     }
   );
   const data = await res.json();
@@ -103,13 +131,14 @@ async function callGemini(prompt) {
 async function callOpenAI(prompt) {
   const key = process.env.OPENAI_API_KEY;
   if (!key) return null;
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+  const res = await fetchRetry('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
-      max_tokens: 600,
+      max_tokens: PROBE_MAX_TOKENS,
+      temperature: PROBE_TEMPERATURE,
     }),
   });
   const data = await res.json();
@@ -120,13 +149,14 @@ async function callOpenAI(prompt) {
 async function callPerplexity(prompt) {
   const key = process.env.PERPLEXITY_API_KEY;
   if (!key) return null;
-  const res = await fetch('https://api.perplexity.ai/chat/completions', {
+  const res = await fetchRetry('https://api.perplexity.ai/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
     body: JSON.stringify({
       model: 'sonar',
       messages: [{ role: 'user', content: prompt }],
-      max_tokens: 600,
+      max_tokens: PROBE_MAX_TOKENS,
+      temperature: PROBE_TEMPERATURE,
     }),
   });
   const data = await res.json();
@@ -137,7 +167,7 @@ async function callPerplexity(prompt) {
 async function callClaude(prompt) {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) return null;
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetchRetry('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'x-api-key': key,
@@ -146,7 +176,8 @@ async function callClaude(prompt) {
     },
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 600,
+      max_tokens: PROBE_MAX_TOKENS,
+      temperature: PROBE_TEMPERATURE,
       messages: [{ role: 'user', content: prompt }],
     }),
   });
@@ -242,6 +273,10 @@ for (let t = 0; t < trialsPerVariant; t++) {
         query,
         platform,
         modelVersion: MODEL_VERSIONS[platform] ?? 'unknown',
+        // WS6: log the held-constant generation conditions per trial for
+        // reproducibility (temperature was previously implicit/provider-default).
+        temperature: PROBE_TEMPERATURE,
+        maxTokens: PROBE_MAX_TOKENS,
         response: response?.slice(0, 500) ?? null,
         error,
         citations,

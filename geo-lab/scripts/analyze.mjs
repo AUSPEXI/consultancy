@@ -301,14 +301,42 @@ if (poolReversesEngines) {
 // ── Robustness: independent LLM-judge attribution cross-check ────────────────
 // Guards against the verbatim scorer's quotability bias. If a neutral judge,
 // scoring by meaning, agrees on direction, the effect is not a quoting artifact.
+let agreement = null;
 if (raw.llmJudge && raw.llmJudge.judged > 0) {
   const js = raw.llmJudge.summary || {};
-  let agree = 0, comparable = 0;
+  // 2×2 agreement counts between the verbatim scorer and the LLM judge.
+  let a = 0, b = 0, c = 0, d = 0; // a=both yes, b=verbatim yes/judge no, c=verbatim no/judge yes, d=both no
   for (const r of results) {
     if (!r.response || !r.citationsLlm || !r.citations) continue;
-    for (const v of variants) { comparable++; if (!!r.citations[v] === !!r.citationsLlm[v]) agree++; }
+    for (const v of variants) {
+      const vb = !!r.citations[v], jg = !!r.citationsLlm[v];
+      if (vb && jg) a++; else if (vb && !jg) b++; else if (!vb && jg) c++; else d++;
+    }
   }
-  const agreePct = comparable ? (100 * agree / comparable).toFixed(1) : 'n/a';
+  const comparable = a + b + c + d;
+  const agreePct = comparable ? (100 * (a + d) / comparable).toFixed(1) : 'n/a';
+  // Raw % agreement is inflated by the common "neither cited" cell. Report
+  // chance-corrected agreement: Cohen's κ and Gwet's AC1 (AC1 is more stable
+  // than κ when base rates are skewed, which citation data is).
+  let kappaStr = 'n/a', ac1Str = 'n/a';
+  if (comparable > 0) {
+    const po = (a + d) / comparable;
+    const pVb = (a + b) / comparable;   // verbatim "yes" rate
+    const pJg = (a + c) / comparable;   // judge "yes" rate
+    const peK = pVb * pJg + (1 - pVb) * (1 - pJg);
+    const kappa = peK < 1 ? (po - peK) / (1 - peK) : 1;
+    const q = (pVb + pJg) / 2;
+    const peG = 2 * q * (1 - q);
+    const ac1 = peG < 1 ? (po - peG) / (1 - peG) : 1;
+    kappaStr = kappa.toFixed(2);
+    ac1Str = ac1.toFixed(2);
+    agreement = {
+      rawPct: comparable ? +(100 * (a + d) / comparable).toFixed(1) : null,
+      cohenKappa: +kappa.toFixed(3),
+      gwetAC1: +ac1.toFixed(3),
+      n: comparable,
+    };
+  }
   const ctrlV = variants[0], trtV = variants[1];
   const fpDir = (agg[trtV].total ? agg[trtV].cited / agg[trtV].total : 0) - (agg[ctrlV].total ? agg[ctrlV].cited / agg[ctrlV].total : 0);
   const jTrt = js[trtV]?.n ? js[trtV].cited / js[trtV].n : 0;
@@ -323,7 +351,7 @@ if (raw.llmJudge && raw.llmJudge.judged > 0) {
     const jj = js[v]?.n ? (100 * js[v].cited / js[v].n).toFixed(1) + '%' : 'n/a';
     report += `| ${v} | ${fp} | ${jj} |\n`;
   }
-  report += `\nRecord-level agreement between the two methods: **${agreePct}%**. `;
+  report += `\nInter-method agreement: raw **${agreePct}%**, but raw agreement is inflated by the common "neither cited" case — chance-corrected, Cohen's κ = **${kappaStr}**, Gwet's AC1 = **${ac1Str}**. `;
   report += sameDir
     ? `Both methods show the effect in the **same direction** — the result is not a verbatim-quotability artifact.\n\n`
     : `**⚠ The two methods disagree in direction** — the verbatim result may be a quotability artifact. Do not publish as a citation-preference finding until resolved.\n\n`;
@@ -352,6 +380,8 @@ if (driftedPlatforms.length > 0) {
 }
 
 report += `- **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.\n`;
+report += `- **External validity (API ≠ consumer surface)**: Probes hit the provider APIs (e.g. Claude via Haiku, no web tools), which are NOT the same systems as Claude.ai with search, ChatGPT search, or Google AI Overviews. These findings transfer as *mechanism evidence* about how models weight content, not as a literal prediction of any consumer product's behaviour.\n`;
+report += `- **Trial independence**: Trials sharing a query use the same fixed variant text and are not fully independent. The primary CMH test stratifies by engine but not by query, so reported p-values are mildly anti-conservative; treat marginal results (p just under 0.05) with extra caution pending a query-clustered re-analysis.\n`;
 if (raw.attribution?.lowSensitivity) {
   report += `- **⚠ Low attribution sensitivity**: the variants share almost all text (smallest unique-fingerprint set = ${raw.attribution.minUniqueFingerprints}). The content-fingerprint scorer can barely tell them apart, so a null result here may be a measurement artifact rather than a true no-effect. Treat any null with extreme caution; make the variants more distinct on the tested dimension.\n`;
 }
@@ -399,6 +429,7 @@ const findingJson = {
   aggregate,
   cmh: cmhResults,
   llmJudge: raw.llmJudge ?? null,
+  agreement,
   significant: allSignificant.map(s => ({
     platform: s.platform,
     control: s.control,
