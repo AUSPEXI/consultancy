@@ -170,6 +170,15 @@ function extractKeywords(statement: string): string[] {
     .filter(w => w.length > 3 && !STOP_WORDS.has(w));
 }
 
+// Whole-word(s) match of `needle` in already-lowercased `haystack`. Treats any
+// non-alphanumeric as a boundary so multi-word brands and punctuation work.
+function wordBoundaryMatch(haystack: string, needle: string): boolean {
+  const n = (needle || '').trim();
+  if (!n) return false;
+  const esc = n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(?:^|[^a-z0-9])${esc}(?:[^a-z0-9]|$)`, 'i').test(haystack);
+}
+
 export function checkCitation(
   response: string,
   brand: string,
@@ -191,7 +200,10 @@ export function checkCitation(
   ];
 
   const hasNegative = NEGATIVE_PATTERNS.some(p => lower.includes(p));
-  const mentionsBrand = lower.includes(brandLower) || lower.includes(domainLower);
+  // WS7: match the brand on WORD BOUNDARIES, not bare substring — otherwise a brand
+  // whose name is a common word (e.g. "Arc", "Notion", "Apple") false-positives on
+  // any incidental occurrence. The domain stays a substring match (it's distinctive).
+  const mentionsBrand = wordBoundaryMatch(lower, brandLower) || (!!domainLower && lower.includes(domainLower));
 
   if (!mentionsBrand || hasNegative) {
     return { cited: false, accurate: true, misinformation: null, excerpt: null, sentiment: null, position: null, positionPct: null };
@@ -369,7 +381,7 @@ async function probeGemini(query: string, brand: string, domain: string, knownFa
     // SDK versions; fall back to the parametric call (labelled honestly) on failure.
     try {
       const response: any = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: ENGINE_MODEL_VERSIONS.gemini,
         contents: query,
         config: { temperature: 0.3, tools: [{ googleSearch: {} }] } as any,
       });
@@ -382,7 +394,7 @@ async function probeGemini(query: string, brand: string, domain: string, knownFa
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: ENGINE_MODEL_VERSIONS.gemini,
       contents: query,
       config: { temperature: 0.3, maxOutputTokens: 600 },
     });
@@ -404,7 +416,7 @@ async function probeChatGPT(query: string, brand: string, domain: string, knownF
     // label the result honestly. (Verify the tool string against current docs.)
     try {
       const r: any = await (client as any).responses.create({
-        model: 'gpt-4o-mini',
+        model: ENGINE_MODEL_VERSIONS.chatgpt,
         tools: [{ type: 'web_search' }],
         input: query,
         temperature: 0.3,
@@ -416,7 +428,7 @@ async function probeChatGPT(query: string, brand: string, domain: string, knownF
 
   try {
     const response = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: ENGINE_MODEL_VERSIONS.chatgpt,
       messages: [{ role: 'user', content: query }],
       max_tokens: 600,
       temperature: 0.3,
@@ -434,7 +446,7 @@ async function probePerplexity(query: string, brand: string, domain: string, kno
   try {
     const client = new OpenAI({ apiKey, baseURL: 'https://api.perplexity.ai', maxRetries: RETRY_MAX });
     const response: any = await client.chat.completions.create({
-      model: 'sonar',
+      model: ENGINE_MODEL_VERSIONS.perplexity,
       messages: [{ role: 'user', content: query }],
       max_tokens: 600,
     } as any);
@@ -457,7 +469,7 @@ async function probeClaude(query: string, brand: string, domain: string, knownFa
   const grounded = pathway === 'grounded';
   try {
     const body: any = {
-      model: 'claude-haiku-4-5-20251001',
+      model: ENGINE_MODEL_VERSIONS.claude,
       max_tokens: 600,
       messages: [{ role: 'user', content: query }],
     };
@@ -502,7 +514,7 @@ async function probeGrok(query: string, brand: string, domain: string, knownFals
     // body). Fall back to the parametric call (labelled honestly) on failure.
     try {
       const response: any = await client.chat.completions.create({
-        model: 'grok-2-latest',
+        model: ENGINE_MODEL_VERSIONS.grok,
         messages: [{ role: 'user', content: query }],
         max_tokens: 600, temperature: 0.3,
         search_parameters: { mode: 'auto', return_citations: true },
@@ -517,7 +529,7 @@ async function probeGrok(query: string, brand: string, domain: string, knownFals
 
   try {
     const response = await client.chat.completions.create({
-      model: 'grok-2-latest',
+      model: ENGINE_MODEL_VERSIONS.grok,
       messages: [{ role: 'user', content: query }],
       max_tokens: 600, temperature: 0.3,
     } as any);
@@ -534,7 +546,7 @@ async function probeDeepSeek(query: string, brand: string, domain: string, known
   try {
     const client = new OpenAI({ apiKey, baseURL: 'https://api.deepseek.com', maxRetries: RETRY_MAX });
     const response = await client.chat.completions.create({
-      model: 'deepseek-chat',
+      model: ENGINE_MODEL_VERSIONS.deepseek,
       messages: [{ role: 'user', content: query }],
       max_tokens: 600, temperature: 0.3,
     } as any);
