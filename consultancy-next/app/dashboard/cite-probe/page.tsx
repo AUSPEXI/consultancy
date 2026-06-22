@@ -735,6 +735,11 @@ export default function CiteProbePage() {
                               style={{ width: `${rate}%`, backgroundColor: meta.color }}
                             />
                           </div>
+                          {enginePathway === 'parametric' && engineGroundedError && (
+                            <p className="mt-2 text-[9px] leading-snug text-amber-400/80">
+                              ⚠ grounded fell back: {engineGroundedError}
+                            </p>
+                          )}
                         </>
                       ) : (
                         <div className="text-xs text-zinc-600 mt-1">Add API key to enable</div>

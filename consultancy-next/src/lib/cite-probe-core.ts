@@ -418,6 +418,7 @@ async function probeChatGPT(query: string, brand: string, domain: string, knownF
   if (!apiKey) return SKIPPED;
   const client = new OpenAI({ apiKey, maxRetries: RETRY_MAX });
 
+  let groundedError: string | undefined;
   if (pathway === 'grounded') {
     // Responses API with the web-search tool. Cast through `any` so this compiles
     // across SDK versions; on any failure we fall back to the parametric call and
@@ -431,7 +432,11 @@ async function probeChatGPT(query: string, brand: string, domain: string, knownF
       });
       const text = extractResponsesText(r);
       if (text) return finalizeGrounded(text, brand, domain, knownFalses, extractResponsesCitations(r));
-    } catch { /* fall through to parametric */ }
+      groundedError = 'web_search returned no text';
+    } catch (e: any) {
+      groundedError = e?.message || String(e);
+      console.warn('[cite-probe] chatgpt grounded fell back to parametric:', groundedError);
+    }
   }
 
   try {
@@ -442,9 +447,9 @@ async function probeChatGPT(query: string, brand: string, domain: string, knownF
       temperature: 0.3,
     });
     const text = response.choices[0]?.message?.content || '';
-    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text, pathway: 'parametric', sourceUrls: null, citedInSources: false };
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text, pathway: 'parametric', sourceUrls: null, citedInSources: false, groundedError };
   } catch (e: any) {
-    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message, pathway: 'parametric' };
+    return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message, pathway: 'parametric', groundedError };
   }
 }
 
@@ -499,13 +504,20 @@ async function probeClaude(query: string, brand: string, domain: string, knownFa
       .filter((b: any) => b?.type === 'text' && typeof b.text === 'string')
       .map((b: any) => b.text).join('\n') || data.content?.[0]?.text || '';
 
+    let groundedError: string | undefined;
     if (grounded) {
-      const sourceUrls = extractClaudeCitations(data);
-      // Only claim "grounded" if the tool actually engaged (returned sources);
-      // otherwise label parametric so we never overstate the pathway.
-      if (sourceUrls.length > 0) return finalizeGrounded(text, brand, domain, knownFalses, sourceUrls);
+      if (data.error) {
+        groundedError = data.error.message || JSON.stringify(data.error);
+        console.warn('[cite-probe] claude grounded fell back to parametric:', groundedError);
+      } else {
+        const sourceUrls = extractClaudeCitations(data);
+        // Only claim "grounded" if the tool actually engaged (returned sources);
+        // otherwise label parametric so we never overstate the pathway.
+        if (sourceUrls.length > 0) return finalizeGrounded(text, brand, domain, knownFalses, sourceUrls);
+        groundedError = 'web_search tool did not engage (model answered without searching)';
+      }
     }
-    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text, pathway: 'parametric', sourceUrls: null, citedInSources: false };
+    return { ...checkCitation(text, brand, domain, knownFalses), rawResponse: text, pathway: 'parametric', sourceUrls: null, citedInSources: false, groundedError };
   } catch (e: any) {
     return { cited: false, accurate: true, misinformation: null, excerpt: null, error: e.message, pathway };
   }
