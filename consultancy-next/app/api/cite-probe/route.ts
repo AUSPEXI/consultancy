@@ -5,6 +5,8 @@ import { requireAuth } from '@/lib/api-auth';
 import { perplexityBudget } from '@/lib/perplexity-budget';
 import { buildQueries, runCitationProbe, probeBrandRate, ENGINE_MODEL_VERSIONS, type ProbeMode } from '@/lib/cite-probe-core';
 import { headToHeadVerdict } from '@/lib/stats';
+import { judgeCitation, cohenKappa, type CiteJudgeVerdict } from '@/lib/cite-judge';
+import type { PlatformKey } from '@/lib/cite-probe-core';
 import { normalizeTier, checkTierAccess } from '@/constants/tiers';
 import { embeddingService } from '@/lib/embeddings';
 import { computeQueryGeometry, loadEmbeddedFacts, GEOMETRY_SIM_THRESHOLD } from '@/lib/fact-geometry';
@@ -162,6 +164,7 @@ export async function POST(request: Request) {
       competitorBrand = '', competitorDomain = '',
       competitors: competitorDomains = [],
       pathwayMode = 'parametric',
+      scoring = 'heuristic',
     } = await request.json();
 
     if (!brand || !domain) {
@@ -233,6 +236,26 @@ export async function POST(request: Request) {
       citedCount, misinformationCount, activePlatforms,
       sentimentBreakdown, avgPositionPct, platformTrialStats,
     } = await runCitationProbe({ brand, domain, queries: testQueries, knownFalses, mode: probeMode, trialsPerQuery });
+
+    // WS3: optional semantic LLM-judge scoring tier (paid). Re-judges each engine's
+    // raw answer by meaning, with a judge family different from the engine, and
+    // reports chance-corrected agreement (Cohen's κ) with the heuristic scorer.
+    // Attached as additional fields — the primary heuristic metrics are unchanged.
+    let judgeAgreement: { cohenKappa: number | null; n: number } | null = null;
+    if (scoring === 'semantic' && checkTierAccess(userTier, 'Starter')) {
+      const pairs: { a: boolean; b: boolean }[] = [];
+      for (const r of queryResults) {
+        await Promise.all((Object.keys(r.platforms) as PlatformKey[]).map(async (engine) => {
+          const pr: any = r.platforms[engine];
+          if (!pr || pr.skipped || !pr.rawResponse) return;
+          const verdict: CiteJudgeVerdict | null = await judgeCitation({ userId, brand, domain, response: pr.rawResponse, engine });
+          if (!verdict) return;
+          pr.semantic = verdict;
+          pairs.push({ a: !!pr.cited, b: verdict.cited });
+        }));
+      }
+      judgeAgreement = { cohenKappa: cohenKappa(pairs), n: pairs.length };
+    }
 
     // S7.1: competitor comparison — run the SAME queries for each competitor and
     // compute per-query winners so the user gets a concrete head-to-head benchmark.
@@ -350,6 +373,8 @@ export async function POST(request: Request) {
       attribution,
       mode: isCompetitorMode ? 'competitor' : 'standard',
       pathwayMode: probeMode,
+      scoring: judgeAgreement ? 'semantic' : 'heuristic',
+      judgeAgreement,
       competitorDomain: competitor?.domain ?? null,
       competitor,
       competitors,
