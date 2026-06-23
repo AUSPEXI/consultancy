@@ -1,5 +1,318 @@
 export const blogPosts = [
   {
+    slug: "parametric-vs-grounded-why-ai-can-ignore-you-and-still-cite-you",
+    title: "Parametric vs Grounded: Why AI Can Ignore Your Brand and Cite It Minutes Later",
+    excerpt: "An AI engine can fail to mention your brand when asked cold, then cite it accurately when it searches the web. Those are two different questions, and most AI-visibility tools only measure one. Here is the distinction, and why it decides what you should fix.",
+    date: "June 23, 2026",
+    category: "Explainer",
+    author: "L8EntSpace Team",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## The same question, two very different answers
+
+Ask an AI engine "what is [your brand]?" with no internet access and you are testing one thing: whether the model learned about you during training. Ask the same engine with web search switched on and you are testing something else entirely: whether it finds and cites you when it goes looking. A brand can score zero on the first and win the second. Most AI-visibility tools only measure one of these, then report it as the whole story. That gap is what our Citation Probe now closes.
+
+## Two pathways, plainly
+
+Think of an AI engine like a new colleague. Ask about your company off the top of their head (this is parametric recall) and they either remember you or they do not. Hand them a laptop and let them search first (this is grounded retrieval) and the answer depends on what is published, crawlable, and clearly written. These are separate skills. A young brand is usually invisible to recall, because it was not famous when the model was trained. The same brand can absolutely win retrieval today, because retrieval rewards clear, current, well-structured pages rather than fame.
+
+Grounded retrieval is the mechanism behind Perplexity and Google AI Overviews, and behind the web-search modes of ChatGPT, Gemini, and Claude. It is a form of retrieval-augmented generation ([what that means](https://en.wikipedia.org/wiki/Retrieval-augmented_generation)). Parametric recall is what you get when the model answers from memory alone.
+
+## Why conflating them is dangerous
+
+Here is the trap. If a tool quietly sends a bare question (no web search) to five engines and you are a six-month-old brand, you will see a wall of zeros. The honest reading is "the models have not memorised us yet," which is expected and not very actionable. The misleading reading is "our GEO is failing." Acting on the second reading wastes money. Worse, every lever you can actually pull (clearer pages, verifiable facts, structured data) moves retrieval, not memory. So a tool that measures only recall is grading you on a game you cannot directly play.
+
+## What L8EntSpace does about it
+
+The Citation Probe now labels every result by pathway. Each engine shows whether the answer came from parametric recall or grounded retrieval, with a clear marker. There is a Parametric mode, a Grounded mode, and a Both mode that runs the two side by side. A result like "the model does not know us from training, but in live retrieval we are cited and described accurately" is the honest, useful picture: it tells you where you stand and which lever to pull next.
+
+In our own recent probe, that was exactly the pattern: cited and described correctly in grounded mode on brand-name questions, and missing entirely on the broad category questions. That contrast is the roadmap.
+
+## What to do next
+
+Run a Both probe on your brand and read the brand-name questions and the category questions separately. If you win grounded retrieval on your own name but miss the category questions ("best tools for X"), you do not have a visibility problem, you have a content-coverage problem, and that is fixable. For why a single run can still mislead you, read [One AI Probe Will Lie to You](/blog/one-ai-probe-will-lie-to-you-intervals-and-significance).
+
+## Key Takeaways
+
+- Parametric recall (does the model remember you?) and grounded retrieval (does it cite you when it searches?) are different questions.
+- New brands often fail recall but can win retrieval today, because retrieval rewards clarity and structure, not fame.
+- The levers you control move retrieval, so measuring only recall grades you on the wrong game.
+- The Citation Probe labels every result by pathway and offers Parametric, Grounded, and Both modes.
+- Read brand-name and category questions separately: they point to different fixes.
+`,
+  },
+  {
+    slug: "one-ai-probe-will-lie-to-you-intervals-and-significance",
+    title: "One AI Probe Will Lie to You",
+    excerpt: "Ask an AI engine the same question twice and you can get two different answers. So a single probe is a coin flip, not a measurement. Here are the three changes we made so our numbers admit their own uncertainty instead of hiding it.",
+    date: "June 22, 2026",
+    category: "Building in Public",
+    author: "Gwylym Pryce-Owen",
+    readTime: "6 min read",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## A single AI answer is a coin flip, not a measurement
+
+Ask an AI engine the same question twice and you can get two different answers. That is not a bug, it is how these models work (they sample). So if you probe your brand once and see "cited on 2 of 7 questions," the honest version of that number is not a clean 29%. It is "somewhere in a wide range, and we are not sure yet." Treating one probe as truth is the most common way AI-visibility dashboards mislead people. Here is what we changed so ours does not.
+
+## The problem with one pull
+
+Imagine judging a coin as biased after three flips. Two heads and you declare it weighted, when you have actually learned almost nothing. AI probes are the same: a handful of stochastic answers cannot pin down a real rate. The number looks precise (a tidy "29%") but the uncertainty around it is enormous. Reporting the tidy number alone is a quiet lie of false precision.
+
+## Three honest fixes
+
+We made three changes, all aimed at not fooling you (or ourselves).
+
+First, repeat sampling. On paid plans the probe now asks each question several times per engine and takes the majority, so one weird answer does not swing the result. More samples, tighter estimate.
+
+Second, confidence intervals. Every citation rate ships with a 95% Wilson interval ([what that is](https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval)), a standard way to say "the true rate is probably in this band." At small sample sizes the band is wide on purpose. If your rate is "14% (interval 8% to 64%)," movement inside that band is noise, not progress. Seeing the band stops you celebrating randomness.
+
+Third, a real significance test on head-to-heads. When you compare against a competitor, we run a two-proportion z-test and report a plain verdict: ahead, behind, or "inconclusive at this sample size," with a p-value. No more reading a win into two bars that are basically tied.
+
+## Why this is the whole point
+
+The entire value of a GEO measurement tool is that you can trust the number enough to spend money against it. A tool that hands you confident-looking figures with hidden uncertainty is worse than no tool, because it sends you chasing noise. Showing the interval, sampling more, and testing differences are not academic niceties. They are the difference between a dashboard you can bet on and a slot machine with a nice font.
+
+We would rather tell you "we cannot call this yet, run more questions" than pretend a coin flip is a trend. That honesty is the product.
+
+## What to do next
+
+When you run a probe, look at the interval before the headline number. If it is wide, add more target questions and re-sample before drawing conclusions. For competitor comparisons, read the verdict, not the bar heights. And if your rate is zero on some engines in the first place, that is usually a pathway issue, explained in [Parametric vs Grounded](/blog/parametric-vs-grounded-why-ai-can-ignore-you-and-still-cite-you).
+
+## Key Takeaways
+
+- AI answers are sampled, so one probe is a coin flip, not a measurement.
+- Paid probes now repeat-sample each question per engine and take the majority.
+- Every rate ships with a 95% Wilson confidence interval; movement inside a wide band is noise.
+- Competitor comparisons use a two-proportion z-test with an honest "ahead, behind, or inconclusive" verdict.
+- If the interval is wide, gather more questions before acting.
+`,
+  },
+  {
+    slug: "counting-mentions-is-not-measuring-citations",
+    title: "Counting Mentions Is Not Measuring Citations",
+    excerpt: "The cheap way to score an AI answer is to search the text for your brand name. It is fast, free, and wrong often enough to matter. Here is why, and the optional semantic layer we built to read meaning instead of just matching words.",
+    date: "June 21, 2026",
+    category: "Building in Public",
+    author: "Gwylym Pryce-Owen",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## "Your brand appeared" is not "your brand was recommended"
+
+The cheap way to score an AI answer is to search the text for your brand name. If it is there, mark it cited. That is fast and free, and it is wrong often enough to matter. "Acme is not a good fit for this" contains your brand and is a negative. "Acme" inside "architecture" is not a mention at all. If your scoring cannot tell those apart, your citation rate is partly fiction. We built an optional semantic layer to fix it.
+
+## Where simple matching breaks
+
+There are two failure modes. The first is the common word. If your brand is "Arc" or "Notion" or "Apple," a plain text search lights up on every incidental use of the word. We already tightened this: the probe now matches your brand on word boundaries, so "Arc" no longer triggers on "architecture." That removes the silliest false positives.
+
+The second failure mode is harder: meaning. A wordlist cannot reliably read tone. "X is often recommended" is positive. "People used to recommend X, but not anymore" is negative, and a naive scorer counts the word "recommend" and calls it a win. Sarcasm, negation, and "mentioned but dismissed" all slip through.
+
+## The semantic judge
+
+For when accuracy matters, the probe now has an optional scoring tier: a neutral language model reads the full answer and decides three things by meaning. Was the brand genuinely cited or recommended (not just name-dropped)? Was what the answer said about it accurate? And what was the sentiment toward it?
+
+One design choice we care about: the judge is never from the same model family as the engine being judged. We do not grade Claude's answer with Claude, or ChatGPT's with ChatGPT. Judging your own family invites a quiet bias toward your own outputs, and the easiest way to avoid that critique is to not do it. We also report how often the cheap heuristic and the semantic judge agree, using a chance-corrected score ([Cohen's kappa](https://en.wikipedia.org/wiki/Cohen%27s_kappa)) so that "they both said not-cited" does not inflate the agreement.
+
+## Why we keep both
+
+We did not throw the heuristic away. It is fast, free, and good enough for a quick read, so it stays the default. The semantic judge costs an extra model call per answer, so it is a deliberate, paid step for when you need the accurate number (a client report, a published case study). Two tiers, honest about the trade-off: speed by default, precision on demand.
+
+## What to do next
+
+If you are scanning your AI visibility casually, the default heuristic is fine. When you are about to make a decision or show a number to someone else, run the semantic tier and check the agreement score. If the two methods disagree a lot, trust the judge and treat the heuristic number with caution. For why the raw rate is uncertain even before scoring choices, see [One AI Probe Will Lie to You](/blog/one-ai-probe-will-lie-to-you-intervals-and-significance).
+
+## Key Takeaways
+
+- Searching for your brand name overcounts: common-word names and negative mentions both fool it.
+- The probe matches brands on word boundaries to kill the obvious false positives.
+- An optional semantic tier judges, by meaning, whether you were genuinely cited, accurately, and with what sentiment.
+- The judge is always a different model family from the engine under test, to avoid self-preference bias.
+- Heuristic stays the fast default; semantic is the paid, accurate option for reports and decisions.
+`,
+  },
+  {
+    slug: "every-geo-recommendation-should-come-with-a-receipt",
+    title: "Every GEO Recommendation Should Come With a Receipt",
+    excerpt: "Add more statistics. Use schema markup. Write clearer answers. The GEO advice industry is full of confident tips with nothing behind them. Our content scorer now links each recommendation to the experiment that earned it, or labels it a hypothesis.",
+    date: "June 20, 2026",
+    category: "Explainer",
+    author: "L8EntSpace Team",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## Most GEO advice is vibes. Ours has a footnote.
+
+"Add more statistics." "Use schema markup." "Write clearer answers." The GEO advice industry is full of confident tips with nothing behind them. The honest question to ask any of them is simple: how do you know? Our content scorer now answers that on every recommendation, by linking it to the experiment that earned it. If we cannot show the receipt, we label the advice a hypothesis. That is the whole idea.
+
+## The problem with confident tips
+
+A tip with no evidence is a guess wearing a suit. Some popular GEO tips are real, some are folklore, and from the outside they look identical. If you follow ten tips and your citations move, you have no idea which tip did the work, so you cannot do more of it. The field stays stuck at "best practices" nobody has tested. Google's early advantage in search came partly from publishing a clear, testable rulebook for the open web. AI search has no such rulebook yet. We are trying to write one, with data.
+
+## How the scorer changed
+
+The content scorer reads your page and rates it on machine-readability dimensions (entity density, citation likelihood, structure, and statistical anchors). That part is not new. What is new is where the weight and the wording come from.
+
+The scorer now reads our own GEO Lab findings. The lab runs controlled A/B experiments and records each lever's measured effect with a p-value and a verification date. The scorer pulls those in. So a recommendation reads like "lead with a specific statistic," followed by the measured effect, the p-value, and when we last re-checked it, linked to the experiment. A lever we have not validated can still appear, but it is clearly labelled "hypothesis, not yet validated in our lab." Proven and unproven never wear the same clothes.
+
+One guard rail: the numbers come from the findings database, not from the language model writing the feedback. A model cannot invent an effect size, because the effect size is fetched, not generated. (Structured data, by the way, means [schema.org](https://schema.org) markup, which makes a page easier for engines to parse.)
+
+## Why this is the moat
+
+Any competitor can render a score from an opinion. Almost none can attach a reproducible experiment, an effect size, a corrected p-value, and a "last verified" date to each suggestion, because almost none run the lab. That is the defensible part of L8EntSpace: not the dashboard, the evidence behind it. When a recommendation can show its work, you can trust it, and trust is the thing this category is short of.
+
+## What to do next
+
+Run the content scorer on a page you care about. Read past the score to the recommendations, and check each one for its evidence. Act on the validated levers first (they have a number and a date). Treat the hypotheses as experiments to try, not facts. To see how we keep those findings honest across many experiments, read [Run Enough Experiments and One Will Look Significant by Luck](/blog/run-enough-experiments-and-one-looks-significant-by-luck).
+
+## Key Takeaways
+
+- Most GEO advice has no evidence behind it; the honest test is "how do you know?"
+- The content scorer links each recommendation to a GEO Lab experiment, with effect size, p-value, and verification date.
+- Unvalidated levers still appear but are clearly labelled hypotheses, never presented as proven.
+- Effect sizes are fetched from the findings database, so the model cannot invent them.
+- The evidence behind the score, not the score itself, is the defensible part.
+`,
+  },
+  {
+    slug: "run-enough-experiments-and-one-looks-significant-by-luck",
+    title: "Run Enough Experiments and One Will Look Significant by Luck",
+    excerpt: "Run twenty independent tests at the usual threshold and roughly one will look significant by pure chance. A lab that ignores this will eventually publish noise as a finding. Here is the programme-wide guard we built against exactly that.",
+    date: "June 19, 2026",
+    category: "Building in Public",
+    author: "Gwylym Pryce-Owen",
+    readTime: "6 min read",
+    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## Do twenty experiments and roughly one "significant" result is a fluke
+
+Statistics has an uncomfortable rule. Run twenty independent tests at the usual significance threshold and about one will look significant by pure chance, even when nothing is happening. A lab that publishes findings without accounting for this will, sooner or later, publish a confident result that is just noise. We run a growing programme of GEO experiments, so we built a guard against it. Here is how it works in plain terms.
+
+## The many-tests problem
+
+Significance at the common 0.05 threshold means "there is a 1 in 20 chance of seeing this result if nothing real is going on." That is a fine bar for one test. Run many tests and the flukes accumulate: with enough experiments, a false positive is not unlucky, it is expected. This is why a single eye-catching p-value, taken alone, is weak evidence in any research programme.
+
+## What we built: a programme-wide ledger
+
+After every experiment, we now run a Benjamini-Hochberg false-discovery-rate correction ([what that is](https://en.wikipedia.org/wiki/False_discovery_rate)) across the primary result of every experiment we have ever run, not just the latest one. The output is a q-value next to each finding. In plain terms: the p-value asks "is this one result significant?" while the q-value asks "does it still hold up once we account for every other test we have run?" A finding earns a confident place on the dashboard only if it survives that programme-wide check.
+
+We ran it across our experiments so far, and most of the significant findings survived. The ones that did not are demoted, not deleted, because a result that fails the stricter bar is still data. It is just not something we will state as fact.
+
+## Honesty all the way to the public page
+
+There is one more guard. Our public findings page is hand-written, and hand-written pages drift from the underlying data over time. So we added a build test that fails if the public page ever claims a result is "supported" when the committed experiment does not survive the false-discovery check. In other words, the system cannot let the marketing overstate the science. If they disagree, the build breaks until we fix the page.
+
+## Why bother
+
+Because the entire pitch of L8EntSpace is that you can trust the numbers. "Every claim on our dashboard is corrected for false discovery across our whole research programme" is a sentence almost no competitor can say, and it is only worth saying if it is enforced rather than promised. The treadmill of running experiments builds trust only if the experiments are scored honestly.
+
+## What to do next
+
+When you read one of our findings, look for the q-value, not just the p-value. If a result survives false-discovery control, it has cleared a high bar. If it is marked preliminary, treat it as a lead, not a law. For how a single experiment is made trustworthy before it ever reaches the ledger, read [How We Tried to Break Our Own GEO Findings](/blog/how-we-tried-to-break-our-own-geo-findings).
+
+## Key Takeaways
+
+- Run about twenty tests at p < 0.05 and roughly one false positive is expected by chance.
+- We apply a Benjamini-Hochberg false-discovery correction across every experiment, producing a q-value per finding.
+- A finding must survive the programme-wide check to earn a confident place on the dashboard.
+- A build test stops the public page from claiming "supported" for anything that fails the check.
+- Read the q-value, not just the p-value: it accounts for every test we have run.
+`,
+  },
+  {
+    slug: "how-we-tried-to-break-our-own-geo-findings",
+    title: "How We Tried to Break Our Own GEO Findings (and What Survived)",
+    excerpt: "Before we show a finding to anyone, we try to break it. Any weakness we find ourselves is one a skeptical client cannot use against us later. Here are the confounds we hunted in our own experiments, and what held up under the tougher test.",
+    date: "June 18, 2026",
+    category: "Building in Public",
+    author: "Gwylym Pryce-Owen",
+    readTime: "6 min read",
+    image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## The fastest way to lose trust is to be caught overclaiming
+
+So we attack our own results first. Before we show a GEO finding to anyone, we try to break it. The logic is simple: any weakness we find ourselves is one a skeptical client (or a rival) cannot use against us later. Recently we ran a batch of hardening checks against our own experiments to see which findings would survive a tougher test. Most did. Here is what we checked and why it matters to you.
+
+## The confounds we hunted
+
+A few specific things can quietly inflate an AI experiment.
+
+Generation settings. If one engine is allowed to write longer answers than another, the longer answers cite more sources, and you mistake answer length for a real effect. We pinned the temperature and capped output length the same way across engines, and we log those settings on every trial.
+
+The self-judging problem. Our experiments include Claude, so judging answers with Claude invites bias toward Claude. We switched the neutral judge to a different model family and recorded which family did the judging.
+
+Counting agreement honestly. We used to report raw percent agreement between two scoring methods. Raw agreement is flattering, because most answers are "not cited" and both methods agree on those by default. We switched to chance-corrected scores (Cohen's kappa and Gwet's AC1), which strip out the easy agreement.
+
+## The big one: trials that are not independent
+
+This is the subtle one. If you ask the same question several times, those answers are not independent of each other (they share the same wording and intent). Our main test used to group results by engine only. We changed it to group by question and engine together, so repeated answers to the same question stay in their own bucket rather than counting as fresh evidence. We kept the looser test alongside as a sensitivity check, and if the two disagree, we flag the result inconclusive rather than pick the flattering one.
+
+We also added a power note to every finding ([statistical power](https://en.wikipedia.org/wiki/Power_(statistics)) is the chance of detecting a real effect). When a result is null ("no detectable effect"), we now state the smallest effect we could have caught at that sample size. That turns an ambiguous null into an honest one: "no effect larger than X," rather than the lazy "it does not matter."
+
+## What survived
+
+We re-ran every experiment under the stricter rules. Reassuringly, none of our significant findings flipped to null under the harder test, and the nulls stayed null. That is the outcome you want: results that do not depend on the generous version of the maths.
+
+## What to do next
+
+When you evaluate any GEO claim (ours or anyone's), ask the boring questions: were the generation settings held constant, who judged the answers, and were repeated queries treated as independent? If a vendor cannot answer those, the number is decorative. For the programme-wide layer that sits on top of all this, read [Run Enough Experiments and One Will Look Significant by Luck](/blog/run-enough-experiments-and-one-looks-significant-by-luck).
+
+## Key Takeaways
+
+- We pin temperature and cap output length across engines, and log both, to remove a length confound.
+- The neutral judge is never from the same family as the engine under test.
+- Agreement is reported chance-corrected (Cohen's kappa, Gwet's AC1), not raw percent.
+- The main test groups by question and engine, so repeated answers are not counted as independent evidence.
+- Re-running every experiment under the stricter rules flipped none of our significant findings.
+`,
+  },
+  {
+    slug: "what-broke-running-real-ai-searches-across-seven-engines",
+    title: "What Broke When We Ran Real AI Searches Across Seven Engines",
+    excerpt: "We shipped grounded probing: making seven AI engines actually search the live web instead of answering from memory. It worked in testing, then a full run returned a baffling error. The fix is a good lesson in how slow real work breaks serverless apps.",
+    date: "June 17, 2026",
+    category: "Building in Public",
+    author: "Gwylym Pryce-Owen",
+    readTime: "6 min read",
+    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## A feature that works for one user can fall over the moment it does real work
+
+We shipped grounded probing: instead of asking AI engines from memory, the probe makes them actually search the live web, across seven engines (ChatGPT, Gemini, Claude, Perplexity, Grok, DeepSeek, and Google AI Overviews). It worked beautifully in testing. Then a full run hit a wall and returned an error that read, oddly, "Unexpected token, not valid JSON." That error is a good story about how real web work breaks serverless apps, and what we did about it.
+
+## The clue in a strange error
+
+"Not valid JSON" was a red herring. The truth underneath was a 504, a gateway timeout ([what that is](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/504)). Our app runs on serverless functions capped at about 26 seconds. A grounded probe does real web searches across seven engines, repeated for reliability, plus a competitor comparison. Each live search takes several seconds. Stack them up and the work runs well past 26 seconds, so the platform kills the request and returns an error page. The browser then tries to read that HTML error page as data and complains about the "less-than" sign it found. The scary message was just a timeout wearing a costume.
+
+## Why you cannot just "make it faster"
+
+The obvious instinct is to trim the work until it fits. We did some of that (the side-by-side comparison now uses a lighter pass). But trimming is fragile: a single slow search from one engine can still blow the budget, and we are not willing to drop engines or accuracy to win a race against a stopwatch. The real fix was to stop racing.
+
+## The fix: do the slow work in the background
+
+We moved the heavy probe to a background job. Now when you click run, the request returns immediately with a ticket, a separate background process (allowed to run for up to fifteen minutes) does the actual searching, and the dashboard quietly checks back every couple of seconds until the results are ready. You see a "running in the background" note, then the full result appears. No timeout, because nothing is waiting on a 26-second clock anymore.
+
+This is a standard pattern for any genuinely slow job: hand back a ticket, work in the background, let the client poll. It is less glamorous than a single instant response, but it is the difference between a feature that demos well and one that survives real use.
+
+## The honest footnote
+
+We were straight with ourselves about the trade-offs. Two enrichment features (a semantic-space logging step and the optional meaning-based judge) are not in the background path yet, because they depend on parts of the app that do not bundle cleanly into a background process. They still work in the fast path. Moving them over is a follow-up, and we would rather ship the working core than block it on the extras.
+
+## What to do next
+
+If you run a grounded or "both" probe, expect it to think for a minute or two and fill in when ready. That pause is the system doing real web searches properly rather than cutting corners. For what those grounded results actually mean once they arrive, read [Parametric vs Grounded](/blog/parametric-vs-grounded-why-ai-can-ignore-you-and-still-cite-you).
+
+## Key Takeaways
+
+- Grounded probing makes seven AI engines search the live web, which is genuinely slow.
+- A "not valid JSON" error was really a 504 timeout: serverless functions cap at about 26 seconds.
+- Trimming work to fit the clock is fragile, because one slow search can still blow the budget.
+- The fix is a background job plus polling: instant ticket, work runs up to fifteen minutes, dashboard checks back.
+- Two enrichment steps are not in the background path yet; that is an honest, scoped follow-up.
+`,
+  },
+  {
     slug: "faq-architect-probe-grounded-faq-pages-that-win-ai-citations",
     title: "FAQ Architect: How Probe-Grounded FAQ Pages Win AI Citations",
     excerpt: "Most FAQ generators invent questions. Ours doesn't. FAQ Architect reads the queries AI engines are actually being asked about your category (including the ones where your brand isn't cited) and builds a complete, deploy-ready FAQ page that closes those exact gaps.",
