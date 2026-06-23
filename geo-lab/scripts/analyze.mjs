@@ -107,6 +107,23 @@ for (const r of results) {
   }
 }
 
+// Per (query × engine) cell counts, for the query-clustered CMH (WS6). Stratifying
+// by query AND engine controls for the fact that trials sharing a query use the
+// same fixed variant text and are not independent.
+const statsByQE = {}; // statsByQE[`${query}|${platform}`][variant] = { cited, total }
+for (const r of results) {
+  if (!r.query || !stats[r.platform]) continue;
+  const key = `${r.query}|${r.platform}`;
+  if (!statsByQE[key]) {
+    statsByQE[key] = {};
+    for (const v of variants) statsByQE[key][v] = { cited: 0, total: 0 };
+  }
+  for (const v of variants) {
+    statsByQE[key][v].total++;
+    if (r.citations[v]) statsByQE[key][v].cited++;
+  }
+}
+
 // ── Temporal spread analysis ─────────────────────────────────────────────────
 // Good temporal coverage means results aren't a snapshot of one model state.
 // We flag experiments collected over < 5 days as having low temporal coverage.
@@ -211,16 +228,39 @@ report += '\n';
 const [aggControl, ...aggTreatments] = variants;
 const cmhResults = [];
 for (const trt of aggTreatments) {
-  const strata = platforms.map(p => ({
+  // PRIMARY: stratify by query × engine, so trials that share a query (and thus
+  // the same fixed variant text) are kept within-stratum rather than treated as
+  // independent. This is the conservative, defensible endpoint.
+  const qeStrata = Object.values(statsByQE).map(cell => ({
+    a: cell[trt].cited,
+    b: cell[trt].total - cell[trt].cited,
+    c: cell[aggControl].cited,
+    d: cell[aggControl].total - cell[aggControl].cited,
+  }));
+  const cmhQE = cochranMantelHaenszel(qeStrata);
+
+  // Engine-only stratification (sensitivity check, and the fallback for older
+  // raw.json that lacks a per-trial query field).
+  const engineStrata = platforms.map(p => ({
     a: stats[p][trt].cited,
     b: stats[p][trt].total - stats[p][trt].cited,
     c: stats[p][aggControl].cited,
     d: stats[p][aggControl].total - stats[p][aggControl].cited,
   }));
-  const cmh = cochranMantelHaenszel(strata);
-  cmhResults.push({ treatment: trt, control: aggControl, ...cmh });
+  const cmhByEngine = cochranMantelHaenszel(engineStrata);
+
+  // Prefer query × engine; fall back to engine-only if there are no usable
+  // per-query strata (so re-analysing legacy data can never nullify a finding).
+  const haveQE = cmhQE.strata > 0;
+  const cmh = haveQE ? cmhQE : cmhByEngine;
+  const stratifiedBy = haveQE ? 'query×engine' : 'engine';
+
+  cmhResults.push({ treatment: trt, control: aggControl, ...cmh, stratifiedBy, cmhByEngine });
   const cmhSig = cmh.pValue < 0.05;
-  report += `**PRIMARY — Cochran–Mantel–Haenszel (stratified by engine)**, ${trt} vs ${aggControl}: χ²(1)=${cmh.chi2}, p=${cmh.pValue}${cmh.oddsRatio != null ? `, common odds ratio=${cmh.oddsRatio}` : ''} — ${cmhSig ? '✓ significant' : '✗ not significant'}\n\n`;
+  report += `**PRIMARY — Cochran–Mantel–Haenszel (stratified by ${stratifiedBy === 'query×engine' ? 'query × engine' : 'engine'})**, ${trt} vs ${aggControl}: χ²(1)=${cmh.chi2}, p=${cmh.pValue}${cmh.oddsRatio != null ? `, common odds ratio=${cmh.oddsRatio}` : ''} (${cmh.strata} informative strata) — ${cmhSig ? '✓ significant' : '✗ not significant'}\n\n`;
+  if (haveQE) {
+    report += `*Sensitivity (stratified by engine only)*: p=${cmhByEngine.pValue}${cmhByEngine.oddsRatio != null ? `, OR=${cmhByEngine.oddsRatio}` : ''}. ${Math.sign(cmhQE.pValue - 0.05) === Math.sign(cmhByEngine.pValue - 0.05) ? 'Both stratifications agree on significance.' : '⚠ The two stratifications disagree on significance — treat as inconclusive.'}\n\n`;
+  }
 
   // Descriptive only — naive pooling, shown for context (susceptible to Simpson's).
   const ctrl = agg[aggControl];
@@ -230,6 +270,30 @@ for (const trt of aggTreatments) {
   const { z: aggZ, pValue: aggP } = twoProportionZ(trtRate, trtS.total, ctrlRate, ctrl.total);
   const aggDiff = +((trtRate - ctrlRate) * 100).toFixed(1);
   report += `_Descriptive (naive pooled, not the primary test): ${trt} vs ${aggControl} ${aggDiff > 0 ? '+' : ''}${aggDiff}pp, z=${aggZ}, p=${aggP}._\n\n`;
+}
+
+// Per-query breakdown (pooled across engines) — surfaces query-level variation so
+// a result driven by one or two queries is visible rather than hidden in the average.
+{
+  const firstTrt = aggTreatments[0];
+  if (firstTrt) {
+    const byQuery = {}; // query -> { c:{cited,total}, t:{cited,total} }
+    for (const [key, cell] of Object.entries(statsByQE)) {
+      const q = key.split('|')[0];
+      if (!byQuery[q]) byQuery[q] = { c: { cited: 0, total: 0 }, t: { cited: 0, total: 0 } };
+      byQuery[q].c.cited += cell[aggControl].cited; byQuery[q].c.total += cell[aggControl].total;
+      byQuery[q].t.cited += cell[firstTrt].cited;   byQuery[q].t.total += cell[firstTrt].total;
+    }
+    report += `### Per-query breakdown (${firstTrt} vs ${aggControl}, pooled across engines)\n\n`;
+    report += `| Query | ${aggControl} cited | ${firstTrt} cited |\n|---|---|---|\n`;
+    for (const [q, b] of Object.entries(byQuery)) {
+      const cr = b.c.total ? `${b.c.cited}/${b.c.total} (${(100 * b.c.cited / b.c.total).toFixed(0)}%)` : 'n/a';
+      const tr = b.t.total ? `${b.t.cited}/${b.t.total} (${(100 * b.t.cited / b.t.total).toFixed(0)}%)` : 'n/a';
+      const shortQ = q.length > 70 ? q.slice(0, 67) + '...' : q;
+      report += `| ${shortQ} | ${cr} | ${tr} |\n`;
+    }
+    report += '\n';
+  }
 }
 
 // ── Holm–Bonferroni step-down across the k per-engine tests ──────────────────
@@ -381,7 +445,7 @@ if (driftedPlatforms.length > 0) {
 
 report += `- **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.\n`;
 report += `- **External validity (API ≠ consumer surface)**: Probes hit the provider APIs (e.g. Claude via Haiku, no web tools), which are NOT the same systems as Claude.ai with search, ChatGPT search, or Google AI Overviews. These findings transfer as *mechanism evidence* about how models weight content, not as a literal prediction of any consumer product's behaviour.\n`;
-report += `- **Trial independence**: Trials sharing a query use the same fixed variant text and are not fully independent. The primary CMH test stratifies by engine but not by query, so reported p-values are mildly anti-conservative; treat marginal results (p just under 0.05) with extra caution pending a query-clustered re-analysis.\n`;
+report += `- **Trial independence**: Trials sharing a query use the same fixed variant text and are not independent. The primary CMH now stratifies by query × engine to control for this, with the engine-only test reported as a sensitivity check. When the two stratifications disagree, the result is flagged inconclusive above.\n`;
 if (raw.attribution?.lowSensitivity) {
   report += `- **⚠ Low attribution sensitivity**: the variants share almost all text (smallest unique-fingerprint set = ${raw.attribution.minUniqueFingerprints}). The content-fingerprint scorer can barely tell them apart, so a null result here may be a measurement artifact rather than a true no-effect. Treat any null with extreme caution; make the variants more distinct on the tested dimension.\n`;
 }
@@ -390,6 +454,22 @@ if (raw.attribution?.lowSensitivity) {
   const perPlatformN = stats[platforms[0]]?.[fv]?.total ?? 0;
   const pooledN = platforms.reduce((sum, p) => sum + (stats[p]?.[fv]?.total ?? 0), 0);
   report += `- **Sample size**: ${perPlatformN} trials per platform-variant (${pooledN} pooled per variant). ${perPlatformN >= 30 ? 'Meets the lab minimum of 30 per platform-variant.' : '⚠ Below the lab minimum of 30 per platform-variant — treat as preliminary.'}\n`;
+
+  // Post-hoc minimum detectable effect (WS6): at this n, what lift could we even
+  // have caught? Two-proportion test, two-sided α=0.05, power=0.80. Makes a null
+  // interpretable — "no detectable effect" vs "too small a sample to tell".
+  const ctrlAgg = agg[aggControl];
+  const p0 = ctrlAgg && ctrlAgg.total > 0 ? ctrlAgg.cited / ctrlAgg.total : 0.5;
+  const Z_ALPHA = 1.96, Z_POWER = 0.8416;
+  if (pooledN > 0) {
+    const mde = (Z_ALPHA + Z_POWER) * Math.sqrt(2 * p0 * (1 - p0) / pooledN);
+    const mdePp = +(mde * 100).toFixed(1);
+    // n per arm needed to detect a 10pp lift from this baseline, for pre-registration.
+    const target = 0.10;
+    const nFor10 = Math.ceil(2 * p0 * (1 - p0) * ((Z_ALPHA + Z_POWER) / target) ** 2);
+    const verdictIsNull = allSignificant.length === 0;
+    report += `- **Statistical power**: at ${pooledN} pooled trials per variant and a ${(p0 * 100).toFixed(0)}% control baseline, the minimum reliably detectable lift is ~${mdePp}pp (two-sided α=0.05, 80% power). ${verdictIsNull ? `This null is therefore only evidence against effects **larger** than ~${mdePp}pp; a smaller true effect could be missed at this n.` : ''} Detecting a 10pp lift from this baseline needs ~${nFor10} trials per variant.\n`;
+  }
 }
 report += `- **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.\n`;
 report += `- **Multiple comparisons**: ${kTests} per-engine tests are family-wise-error controlled via Holm–Bonferroni step-down (more powerful than plain Bonferroni, whose fixed threshold would be α=${bonferroniAlpha}). The aggregate is the single pre-registered primary endpoint.\n`;

@@ -59,9 +59,20 @@ Primary endpoint is the Cochran–Mantel–Haenszel stratified test (below). The
 | A | 2 | 32 | 6.3% |
 | B | 14 | 32 | 43.8% |
 
-**PRIMARY — Cochran–Mantel–Haenszel (stratified by engine)**, B vs A: χ²(1)=12.1, p=0.0005, common odds ratio=49 — ✓ significant
+**PRIMARY — Cochran–Mantel–Haenszel (stratified by query × engine)**, B vs A: χ²(1)=12.1, p=0.0005 (16 informative strata) — ✓ significant
+
+*Sensitivity (stratified by engine only)*: p=0.0005, OR=49. Both stratifications agree on significance.
 
 _Descriptive (naive pooled, not the primary test): B vs A +37.5pp, z=3.464, p=0.0005._
+
+### Per-query breakdown (B vs A, pooled across engines)
+
+| Query | A cited | B cited |
+|---|---|---|
+| How much can NovaCRM shorten a sales cycle? | 0/8 (0%) | 3/8 (38%) |
+| Does NovaCRM actually help sales teams close deals faster? | 0/8 (0%) | 2/8 (25%) |
+| What measurable results do sales teams get from NovaCRM? | 0/8 (0%) | 4/8 (50%) |
+| Is there data on NovaCRM's impact on deal velocity? | 2/8 (25%) | 5/8 (63%) |
 
 ---
 
@@ -87,7 +98,7 @@ A neutral judge (claude-haiku-4-5-20251001) re-attributed every answer by meanin
 | A | 6.3% | 96.9% |
 | B | 43.8% | 81.3% |
 
-Record-level agreement between the two methods: **29.7%**. **⚠ The two methods disagree in direction** — the verbatim result may be a quotability artifact. Do not publish as a citation-preference finding until resolved.
+Inter-method agreement: raw **29.7%**, but raw agreement is inflated by the common "neither cited" case — chance-corrected, Cohen's κ = **-0.01**, Gwet's AC1 = **-0.38**. **⚠ The two methods disagree in direction** — the verbatim result may be a quotability artifact. Do not publish as a citation-preference finding until resolved.
 
 ---
 
@@ -97,8 +108,11 @@ Record-level agreement between the two methods: **29.7%**. **⚠ The two methods
   - Trials per day: 2026-06-16: 32
 - **Model versions stable**: No model version changes detected across batches (gemini: gemini-2.5-flash, openai: gpt-4o-mini, perplexity: sonar, claude: claude-haiku-4-5-20251001).
 - **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.
+- **External validity (API ≠ consumer surface)**: Probes hit the provider APIs (e.g. Claude via Haiku, no web tools), which are NOT the same systems as Claude.ai with search, ChatGPT search, or Google AI Overviews. These findings transfer as *mechanism evidence* about how models weight content, not as a literal prediction of any consumer product's behaviour.
+- **Trial independence**: Trials sharing a query use the same fixed variant text and are not independent. The primary CMH now stratifies by query × engine to control for this, with the engine-only test reported as a sensitivity check. When the two stratifications disagree, the result is flagged inconclusive above.
 - **⚠ Low attribution sensitivity**: the variants share almost all text (smallest unique-fingerprint set = 11). The content-fingerprint scorer can barely tell them apart, so a null result here may be a measurement artifact rather than a true no-effect. Treat any null with extreme caution; make the variants more distinct on the tested dimension.
 - **Sample size**: 8 trials per platform-variant (32 pooled per variant). ⚠ Below the lab minimum of 30 per platform-variant — treat as preliminary.
+- **Statistical power**: at 32 pooled trials per variant and a 6% control baseline, the minimum reliably detectable lift is ~17pp (two-sided α=0.05, 80% power).  Detecting a 10pp lift from this baseline needs ~92 trials per variant.
 - **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.
 - **Multiple comparisons**: 4 per-engine tests are family-wise-error controlled via Holm–Bonferroni step-down (more powerful than plain Bonferroni, whose fixed threshold would be α=0.0125). The aggregate is the single pre-registered primary endpoint.
 - **Cross-experiment error rate**: significance within one experiment does not correct for the whole research programme — across many experiments, ~1 in 20 nominal positives is expected by chance. Replicate before treating any single result as settled.

@@ -59,9 +59,20 @@ Primary endpoint is the Cochran–Mantel–Haenszel stratified test (below). The
 | A | 7 | 32 | 21.9% |
 | B | 3 | 32 | 9.4% |
 
-**PRIMARY — Cochran–Mantel–Haenszel (stratified by engine)**, B vs A: χ²(1)=1.071, p=0.3006, common odds ratio=0.36 — ✗ not significant
+**PRIMARY — Cochran–Mantel–Haenszel (stratified by query × engine)**, B vs A: χ²(1)=1.125, p=0.2888, common odds ratio=0.38 (16 informative strata) — ✗ not significant
+
+*Sensitivity (stratified by engine only)*: p=0.3006, OR=0.36. Both stratifications agree on significance.
 
 _Descriptive (naive pooled, not the primary test): B vs A -12.5pp, z=-1.377, p=0.1685._
+
+### Per-query breakdown (B vs A, pooled across engines)
+
+| Query | A cited | B cited |
+|---|---|---|
+| What features does NovaCRM offer to help sales teams close deals fa... | 2/8 (25%) | 2/8 (25%) |
+| How does NovaCRM speed up the sales cycle? | 4/8 (50%) | 0/8 (0%) |
+| What are the key capabilities of NovaCRM for sales teams? | 1/8 (13%) | 1/8 (13%) |
+| Can you summarize what NovaCRM does and its main benefits? | 0/8 (0%) | 0/8 (0%) |
 
 ---
 
@@ -89,7 +100,7 @@ A neutral judge (claude-haiku-4-5-20251001) re-attributed every answer by meanin
 | A | 21.9% | 93.8% |
 | B | 9.4% | 50.0% |
 
-Record-level agreement between the two methods: **40.6%**. Both methods show the effect in the **same direction** — the result is not a verbatim-quotability artifact.
+Inter-method agreement: raw **40.6%**, but raw agreement is inflated by the common "neither cited" case — chance-corrected, Cohen's κ = **0.09**, Gwet's AC1 = **-0.17**. Both methods show the effect in the **same direction** — the result is not a verbatim-quotability artifact.
 
 ---
 
@@ -99,7 +110,10 @@ Record-level agreement between the two methods: **40.6%**. Both methods show the
   - Trials per day: 2026-06-17: 32
 - **Model versions stable**: No model version changes detected across batches (gemini: gemini-2.5-flash, openai: gpt-4o-mini, perplexity: sonar, claude: claude-haiku-4-5-20251001).
 - **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.
+- **External validity (API ≠ consumer surface)**: Probes hit the provider APIs (e.g. Claude via Haiku, no web tools), which are NOT the same systems as Claude.ai with search, ChatGPT search, or Google AI Overviews. These findings transfer as *mechanism evidence* about how models weight content, not as a literal prediction of any consumer product's behaviour.
+- **Trial independence**: Trials sharing a query use the same fixed variant text and are not independent. The primary CMH now stratifies by query × engine to control for this, with the engine-only test reported as a sensitivity check. When the two stratifications disagree, the result is flagged inconclusive above.
 - **Sample size**: 8 trials per platform-variant (32 pooled per variant). ⚠ Below the lab minimum of 30 per platform-variant — treat as preliminary.
+- **Statistical power**: at 32 pooled trials per variant and a 22% control baseline, the minimum reliably detectable lift is ~29pp (two-sided α=0.05, 80% power). This null is therefore only evidence against effects **larger** than ~29pp; a smaller true effect could be missed at this n. Detecting a 10pp lift from this baseline needs ~269 trials per variant.
 - **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.
 - **Multiple comparisons**: 4 per-engine tests are family-wise-error controlled via Holm–Bonferroni step-down (more powerful than plain Bonferroni, whose fixed threshold would be α=0.0125). The aggregate is the single pre-registered primary endpoint.
 - **Cross-experiment error rate**: significance within one experiment does not correct for the whole research programme — across many experiments, ~1 in 20 nominal positives is expected by chance. Replicate before treating any single result as settled.

@@ -1,9 +1,9 @@
 # Experiment Finding
 
-**Hypothesis**: If content includes explicit date markers ("As of 2026…", "Updated June 2026"), then citation rate will be higher than undated equivalent content for factual queries, because LLMs prefer temporally anchored sources for factual queries.
+**Hypothesis**: If content explicitly addresses and refutes a common false claim about the topic, then citation rate will be higher for evaluative/comparison queries than content that ignores competing narratives, because LLMs prioritise sources that resolve ambiguity.
 
-**Run at**: 2026-06-18T01:05:43.039Z
-**Collection window**: < 1 day (2026-06-18 → 2026-06-18)
+**Run at**: 2026-06-22T14:31:11.555Z
+**Collection window**: 2.1 days (2026-06-20 → 2026-06-22)
 **Variants**: A, B
 **Platforms**: gemini, openai, perplexity, claude
 **Trials per variant**: 2
@@ -16,8 +16,8 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 2 | 8 | 25.0% | [7.1%, 59.1%] |
-| B | 2 | 8 | 25.0% | [7.1%, 59.1%] |
+| A | 0 | 24 | 0.0% | [0%, 13.8%] |
+| B | 0 | 24 | 0.0% | [0%, 13.8%] |
 
 **B vs A**: 0.0pp, z=0, p=1
 
@@ -25,8 +25,8 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 0 | 8 | 0.0% | [0%, 32.4%] |
-| B | 0 | 8 | 0.0% | [0%, 32.4%] |
+| A | 0 | 24 | 0.0% | [0%, 13.8%] |
+| B | 0 | 24 | 0.0% | [0%, 13.8%] |
 
 **B vs A**: 0.0pp, z=0, p=1
 
@@ -34,8 +34,8 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 0 | 8 | 0.0% | [0%, 32.4%] |
-| B | 0 | 8 | 0.0% | [0%, 32.4%] |
+| A | 0 | 24 | 0.0% | [0%, 13.8%] |
+| B | 0 | 24 | 0.0% | [0%, 13.8%] |
 
 **B vs A**: 0.0pp, z=0, p=1
 
@@ -43,8 +43,8 @@
 
 | Variant | Cited | n | Citation Rate | 95% CI |
 |---------|-------|---|---------------|--------|
-| A | 2 | 8 | 25.0% | [7.1%, 59.1%] |
-| B | 2 | 8 | 25.0% | [7.1%, 59.1%] |
+| A | 0 | 24 | 0.0% | [0%, 13.8%] |
+| B | 0 | 24 | 0.0% | [0%, 13.8%] |
 
 **B vs A**: 0.0pp, z=0, p=1
 
@@ -56,12 +56,12 @@ Primary endpoint is the Cochran–Mantel–Haenszel stratified test (below). The
 
 | Variant | Cited | n | Citation Rate |
 |---------|-------|---|---------------|
-| A | 4 | 32 | 12.5% |
-| B | 4 | 32 | 12.5% |
+| A | 0 | 96 | 0.0% |
+| B | 0 | 96 | 0.0% |
 
-**PRIMARY — Cochran–Mantel–Haenszel (stratified by query × engine)**, B vs A: χ²(1)=0, p=1, common odds ratio=1 (16 informative strata) — ✗ not significant
+**PRIMARY — Cochran–Mantel–Haenszel (stratified by query × engine)**, B vs A: χ²(1)=0, p=1 (16 informative strata) — ✗ not significant
 
-*Sensitivity (stratified by engine only)*: p=1, OR=1. Both stratifications agree on significance.
+*Sensitivity (stratified by engine only)*: p=1. Both stratifications agree on significance.
 
 _Descriptive (naive pooled, not the primary test): B vs A 0pp, z=0, p=1._
 
@@ -69,10 +69,10 @@ _Descriptive (naive pooled, not the primary test): B vs A 0pp, z=0, p=1._
 
 | Query | A cited | B cited |
 |---|---|---|
-| What is the latest version of NovaCRM and what does it do for sales... | 2/8 (25%) | 1/8 (13%) |
-| How current is NovaCRM's pricing and feature set? | 0/8 (0%) | 1/8 (13%) |
-| Is NovaCRM up to date for 2026 sales workflows? | 0/8 (0%) | 1/8 (13%) |
-| What are NovaCRM's most recent performance numbers for closing deals? | 2/8 (25%) | 1/8 (13%) |
+| Is NovaCRM only suitable for large enterprise sales teams? | 0/24 (0%) | 0/24 (0%) |
+| Can a small sales team actually use NovaCRM, or is it overkill? | 0/24 (0%) | 0/24 (0%) |
+| Is it true that NovaCRM is too complex for startups? | 0/24 (0%) | 0/24 (0%) |
+| Does NovaCRM work for small businesses or just big companies? | 0/24 (0%) | 0/24 (0%) |
 
 ---
 
@@ -89,29 +89,16 @@ Per-engine verdicts, family-wise-error controlled via the **Holm–Bonferroni st
 
 ---
 
-## Robustness — independent LLM-judge attribution
-
-A neutral judge (claude-haiku-4-5-20251001) re-attributed every answer by meaning, not verbatim phrasing — this rules out a "more-quotable-variant" artifact in the primary scorer. Citation rate by method:
-
-| Variant | Verbatim scorer | LLM-judge (semantic) |
-|---------|-----------------|----------------------|
-| A | 12.5% | 43.8% |
-| B | 12.5% | 93.8% |
-
-Inter-method agreement: raw **37.5%**, but raw agreement is inflated by the common "neither cited" case — chance-corrected, Cohen's κ = **0.02**, Gwet's AC1 = **-0.21**. **⚠ The two methods disagree in direction** — the verbatim result may be a quotability artifact. Do not publish as a citation-preference finding until resolved.
-
----
-
 ## Threats to Validity
 
-- **⚠ Low temporal coverage**: All 32 trials collected over < 1 day. Results reflect a narrow snapshot of model behaviour. Target ≥ 10 days for robust temporal coverage.
-  - Trials per day: 2026-06-18: 32
+- **⚠ Low temporal coverage**: All 96 trials collected over 2.1 days. Results reflect a narrow snapshot of model behaviour. Target ≥ 10 days for robust temporal coverage.
+  - Trials per day: 2026-06-20: 32, 2026-06-21: 32, 2026-06-22: 32
 - **Model versions stable**: No model version changes detected across batches (gemini: gemini-2.5-flash, openai: gpt-4o-mini, perplexity: sonar, claude: claude-haiku-4-5-20251001).
 - **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.
 - **External validity (API ≠ consumer surface)**: Probes hit the provider APIs (e.g. Claude via Haiku, no web tools), which are NOT the same systems as Claude.ai with search, ChatGPT search, or Google AI Overviews. These findings transfer as *mechanism evidence* about how models weight content, not as a literal prediction of any consumer product's behaviour.
 - **Trial independence**: Trials sharing a query use the same fixed variant text and are not independent. The primary CMH now stratifies by query × engine to control for this, with the engine-only test reported as a sensitivity check. When the two stratifications disagree, the result is flagged inconclusive above.
-- **Sample size**: 8 trials per platform-variant (32 pooled per variant). ⚠ Below the lab minimum of 30 per platform-variant — treat as preliminary.
-- **Statistical power**: at 32 pooled trials per variant and a 13% control baseline, the minimum reliably detectable lift is ~23.2pp (two-sided α=0.05, 80% power). This null is therefore only evidence against effects **larger** than ~23.2pp; a smaller true effect could be missed at this n. Detecting a 10pp lift from this baseline needs ~172 trials per variant.
+- **Sample size**: 24 trials per platform-variant (96 pooled per variant). ⚠ Below the lab minimum of 30 per platform-variant — treat as preliminary.
+- **Statistical power**: at 96 pooled trials per variant and a 0% control baseline, the minimum reliably detectable lift is ~0pp (two-sided α=0.05, 80% power). This null is therefore only evidence against effects **larger** than ~0pp; a smaller true effect could be missed at this n. Detecting a 10pp lift from this baseline needs ~0 trials per variant.
 - **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.
 - **Multiple comparisons**: 4 per-engine tests are family-wise-error controlled via Holm–Bonferroni step-down (more powerful than plain Bonferroni, whose fixed threshold would be α=0.0125). The aggregate is the single pre-registered primary endpoint.
 - **Cross-experiment error rate**: significance within one experiment does not correct for the whole research programme — across many experiments, ~1 in 20 nominal positives is expected by chance. Replicate before treating any single result as settled.

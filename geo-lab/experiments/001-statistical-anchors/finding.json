@@ -42,10 +42,17 @@
     {
       "treatment": "B",
       "control": "A",
-      "chi2": 21.162,
+      "chi2": 23.366,
       "pValue": 0,
-      "oddsRatio": 10.2,
-      "strata": 4
+      "oddsRatio": 24,
+      "strata": 16,
+      "stratifiedBy": "query×engine",
+      "cmhByEngine": {
+        "chi2": 21.162,
+        "pValue": 0,
+        "oddsRatio": 10.2,
+        "strata": 4
+      }
     }
   ],
   "llmJudge": {
@@ -63,6 +70,12 @@
       }
     },
     "scoredAt": "2026-06-18T16:36:38.879Z"
+  },
+  "agreement": {
+    "rawPct": 60.7,
+    "cohenKappa": 0.234,
+    "gwetAC1": 0.214,
+    "n": 112
   },
   "significant": [
     {
@@ -92,10 +105,10 @@
   "fdr": {
     "method": "benjamini-hochberg",
     "alpha": 0.05,
-    "programmeSize": 10,
+    "programmeSize": 11,
     "primaryP": 0,
     "qValue": 0,
     "survivesFdr": true,
-    "computedAt": "2026-06-22T05:27:47.218Z"
+    "computedAt": "2026-06-23T08:49:50.949Z"
   }
 }

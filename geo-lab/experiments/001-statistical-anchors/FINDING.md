@@ -59,9 +59,20 @@ Primary endpoint is the Cochran–Mantel–Haenszel stratified test (below). The
 | A | 12 | 64 | 18.8% |
 | B | 35 | 64 | 54.7% |
 
-**PRIMARY — Cochran–Mantel–Haenszel (stratified by engine)**, B vs A: χ²(1)=21.162, p=0, common odds ratio=10.2 — ✓ significant
+**PRIMARY — Cochran–Mantel–Haenszel (stratified by query × engine)**, B vs A: χ²(1)=23.366, p=0, common odds ratio=24 (16 informative strata) — ✓ significant
+
+*Sensitivity (stratified by engine only)*: p=0, OR=10.2. Both stratifications agree on significance.
 
 _Descriptive (naive pooled, not the primary test): B vs A +35.9pp, z=4.217, p=0._
+
+### Per-query breakdown (B vs A, pooled across engines)
+
+| Query | A cited | B cited |
+|---|---|---|
+| How much faster can NovaCRM help sales teams close deals? | 2/16 (13%) | 6/16 (38%) |
+| Does NovaCRM actually speed up the sales cycle? | 3/16 (19%) | 11/16 (69%) |
+| What performance results does NovaCRM deliver for closing deals? | 2/16 (13%) | 8/16 (50%) |
+| Is NovaCRM effective at shortening deal-closing time for sales teams? | 5/16 (31%) | 10/16 (63%) |
 
 ---
 
@@ -87,7 +98,7 @@ A neutral judge (claude-haiku-4-5-20251001) re-attributed every answer by meanin
 | A | 18.8% | 21.4% |
 | B | 54.7% | 94.6% |
 
-Record-level agreement between the two methods: **60.7%**. Both methods show the effect in the **same direction** — the result is not a verbatim-quotability artifact.
+Inter-method agreement: raw **60.7%**, but raw agreement is inflated by the common "neither cited" case — chance-corrected, Cohen's κ = **0.23**, Gwet's AC1 = **0.21**. Both methods show the effect in the **same direction** — the result is not a verbatim-quotability artifact.
 
 ---
 
@@ -97,8 +108,11 @@ Record-level agreement between the two methods: **60.7%**. Both methods show the
   - Trials per day: 2026-06-10: 32, 2026-06-11: 32
 - **Model versions stable**: No model version changes detected across batches ().
 - **Fast-mode vs live index**: This experiment tests in-context retrieval preference, not parametric training weight. Live-mode tests would be required for stronger external validity.
+- **External validity (API ≠ consumer surface)**: Probes hit the provider APIs (e.g. Claude via Haiku, no web tools), which are NOT the same systems as Claude.ai with search, ChatGPT search, or Google AI Overviews. These findings transfer as *mechanism evidence* about how models weight content, not as a literal prediction of any consumer product's behaviour.
+- **Trial independence**: Trials sharing a query use the same fixed variant text and are not independent. The primary CMH now stratifies by query × engine to control for this, with the engine-only test reported as a sensitivity check. When the two stratifications disagree, the result is flagged inconclusive above.
 - **⚠ Low attribution sensitivity**: the variants share almost all text (smallest unique-fingerprint set = 6). The content-fingerprint scorer can barely tell them apart, so a null result here may be a measurement artifact rather than a true no-effect. Treat any null with extreme caution; make the variants more distinct on the tested dimension.
 - **Sample size**: 16 trials per platform-variant (64 pooled per variant). ⚠ Below the lab minimum of 30 per platform-variant — treat as preliminary.
+- **Statistical power**: at 64 pooled trials per variant and a 19% control baseline, the minimum reliably detectable lift is ~19.3pp (two-sided α=0.05, 80% power).  Detecting a 10pp lift from this baseline needs ~240 trials per variant.
 - **Single variable assumption**: Valid only if variants differ in exactly the tested dimension.
 - **Multiple comparisons**: 4 per-engine tests are family-wise-error controlled via Holm–Bonferroni step-down (more powerful than plain Bonferroni, whose fixed threshold would be α=0.0125). The aggregate is the single pre-registered primary endpoint.
 - **Cross-experiment error rate**: significance within one experiment does not correct for the whole research programme — across many experiments, ~1 in 20 nominal positives is expected by chance. Replicate before treating any single result as settled.

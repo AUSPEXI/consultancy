@@ -1,8 +1,8 @@
 {
   "method": "benjamini-hochberg",
   "alpha": 0.05,
-  "programmeSize": 10,
-  "computedAt": "2026-06-22T05:27:47.218Z",
+  "programmeSize": 11,
+  "computedAt": "2026-06-23T08:49:50.949Z",
   "entries": [
     {
       "experiment": "001-statistical-anchors",
@@ -29,56 +29,64 @@
       "survivesFdr": true
     },
     {
+      "experiment": "004-entity-density",
+      "lever": "004-entity-density",
+      "verdict": "significant",
+      "primaryP": 0.0003,
+      "qValue": 0.0008,
+      "survivesFdr": true
+    },
+    {
       "experiment": "002-answer-first-structure",
       "lever": "002-answer-first-structure",
       "verdict": "significant",
       "primaryP": 0.0005,
-      "qValue": 0.001,
-      "survivesFdr": true
-    },
-    {
-      "experiment": "004-entity-density",
-      "lever": "004-entity-density",
-      "verdict": "significant",
-      "primaryP": 0.0005,
-      "qValue": 0.001,
+      "qValue": 0.0011,
       "survivesFdr": true
     },
     {
       "experiment": "006-short-sentences",
       "lever": "006-short-sentences",
       "verdict": "significant",
-      "primaryP": 0.0007,
-      "qValue": 0.0012,
+      "primaryP": 0.0012,
+      "qValue": 0.0022,
       "survivesFdr": true
     },
     {
       "experiment": "008-source-framing",
       "lever": "008-source-framing",
       "verdict": "significant",
-      "primaryP": 0.006,
-      "qValue": 0.0086,
+      "primaryP": 0.0083,
+      "qValue": 0.013,
       "survivesFdr": true
     },
     {
       "experiment": "005-list-vs-prose",
       "lever": "005-list-vs-prose",
       "verdict": "null",
-      "primaryP": 0.3006,
-      "qValue": 0.3757,
+      "primaryP": 0.2888,
+      "qValue": 0.3971,
       "survivesFdr": false
     },
     {
       "experiment": "017-question-vs-statement",
       "lever": "017-question-vs-statement",
       "verdict": "null",
-      "primaryP": 0.4227,
-      "qValue": 0.4697,
+      "primaryP": 0.4334,
+      "qValue": 0.5297,
       "survivesFdr": false
     },
     {
       "experiment": "007-freshness-signal",
       "lever": "007-freshness-signal",
+      "verdict": "null",
+      "primaryP": 1,
+      "qValue": 1,
+      "survivesFdr": false
+    },
+    {
+      "experiment": "009-contradiction-handling",
+      "lever": "009-contradiction-handling",
       "verdict": "null",
       "primaryP": 1,
       "qValue": 1,

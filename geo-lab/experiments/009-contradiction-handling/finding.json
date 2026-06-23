@@ -1,10 +1,18 @@
 {
-  "runAt": "2026-06-18T01:05:43.039Z",
-  "firstRunAt": "2026-06-18T01:05:43.039Z",
-  "collectionSpanDays": 0,
+  "runAt": "2026-06-22T14:31:11.555Z",
+  "firstRunAt": "2026-06-20T11:11:39.305Z",
+  "collectionSpanDays": 2.1,
   "collectionDays": [
     {
-      "date": "2026-06-18",
+      "date": "2026-06-20",
+      "n": 32
+    },
+    {
+      "date": "2026-06-21",
+      "n": 32
+    },
+    {
+      "date": "2026-06-22",
       "n": 32
     }
   ],
@@ -34,17 +42,17 @@
     "claude"
   ],
   "trialsPerVariant": 2,
-  "hypothesis": "If content includes explicit date markers (\"As of 2026…\", \"Updated June 2026\"), then citation rate will be higher than undated equivalent content for factual queries, because LLMs prefer temporally anchored sources for factual queries.",
+  "hypothesis": "If content explicitly addresses and refutes a common false claim about the topic, then citation rate will be higher for evaluative/comparison queries than content that ignores competing narratives, because LLMs prioritise sources that resolve ambiguity.",
   "aggregate": {
     "A": {
-      "cited": 4,
-      "total": 32,
-      "rate": 12.5
+      "cited": 0,
+      "total": 96,
+      "rate": 0
     },
     "B": {
-      "cited": 4,
-      "total": 32,
-      "rate": 12.5
+      "cited": 0,
+      "total": 96,
+      "rate": 0
     }
   },
   "cmh": [
@@ -53,39 +61,19 @@
       "control": "A",
       "chi2": 0,
       "pValue": 1,
-      "oddsRatio": 1,
+      "oddsRatio": null,
       "strata": 16,
       "stratifiedBy": "query×engine",
       "cmhByEngine": {
         "chi2": 0,
         "pValue": 1,
-        "oddsRatio": 1,
+        "oddsRatio": null,
         "strata": 4
       }
     }
   ],
-  "llmJudge": {
-    "model": "claude-haiku-4-5-20251001",
-    "judged": 32,
-    "failed": 0,
-    "summary": {
-      "A": {
-        "cited": 14,
-        "n": 32
-      },
-      "B": {
-        "cited": 30,
-        "n": 32
-      }
-    },
-    "scoredAt": "2026-06-18T16:39:35.267Z"
-  },
-  "agreement": {
-    "rawPct": 37.5,
-    "cohenKappa": 0.024,
-    "gwetAC1": -0.208,
-    "n": 64
-  },
+  "llmJudge": null,
+  "agreement": null,
   "significant": [],
   "verdict": "null",
   "bestVariant": null,
