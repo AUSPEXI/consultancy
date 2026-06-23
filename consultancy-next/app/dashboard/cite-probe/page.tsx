@@ -726,11 +726,15 @@ export default function CiteProbePage() {
               <div className="flex items-center gap-2 mb-3 flex-wrap">
                 <h3 className="text-sm font-semibold text-white">Platform Breakdown</h3>
                 <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border ${
-                  (probeData.pathwayMode ?? 'parametric') === 'grounded'
-                    ? 'bg-pink-500/10 border-pink-500/30 text-pink-300'
-                    : 'bg-zinc-700/30 border-zinc-700 text-zinc-300'
+                  (probeData.pathwayMode ?? 'parametric') === 'parametric'
+                    ? 'bg-zinc-700/30 border-zinc-700 text-zinc-300'
+                    : 'bg-pink-500/10 border-pink-500/30 text-pink-300'
                 }`}>
-                  {(probeData.pathwayMode ?? 'parametric') === 'grounded' ? 'Grounded · live retrieval' : 'Parametric · training recall'}
+                  {probeData.pathwayMode === 'both'
+                    ? 'Both · grounded vs parametric'
+                    : probeData.pathwayMode === 'grounded'
+                      ? 'Grounded · live retrieval'
+                      : 'Parametric · training recall'}
                 </span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
