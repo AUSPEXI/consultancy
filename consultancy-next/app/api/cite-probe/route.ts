@@ -11,6 +11,12 @@ import { normalizeTier, checkTierAccess } from '@/constants/tiers';
 import { embeddingService } from '@/lib/embeddings';
 import { computeQueryGeometry, loadEmbeddedFacts, GEOMETRY_SIM_THRESHOLD } from '@/lib/fact-geometry';
 
+// This is one of the heaviest routes: up to 7 engines × repeat-sampled queries ×
+// competitors, and grounded calls perform real (slow) web searches. Give it room
+// so it doesn't hit the platform's short default timeout (the 504 → HTML → "not
+// valid JSON" the client saw). Mirrors the other heavy routes that set this.
+export const maxDuration = 300;
+
 // Mine real questions from Reddit/Quora threads stored by the Brand Monitor.
 // Returns up to `max` question-shaped strings, or an empty array if nothing found.
 async function buildQueriesFromBrandMonitor(userId: string, max = 5): Promise<string[]> {
@@ -246,7 +252,9 @@ export async function POST(request: Request) {
     let parametricCitationRate: number | null = null;
     if (wantBoth) {
       try {
-        const pPass = await runCitationProbe({ brand, domain, queries: testQueries, knownFalses, mode: 'parametric', trialsPerQuery });
+        // Comparison only needs a rate per engine, so a single pass keeps "both"
+        // close to the cost/time of one grounded run rather than tripling it.
+        const pPass = await runCitationProbe({ brand, domain, queries: testQueries, knownFalses, mode: 'parametric', trialsPerQuery: 1 });
         parametricPlatformRates = pPass.platformRates;
         parametricCitationRate = pPass.citationRate;
       } catch (e) {
@@ -410,8 +418,8 @@ export async function POST(request: Request) {
         }).catch(() => {});
         // The brand runs trialsPerQuery passes (repeat-sampling); each competitor
         // is one extra pass over the same queries.
-        // "both" mode adds one more full pass (the parametric comparison run).
-        const passes = trialsPerQuery + competitors.length + (wantBoth ? trialsPerQuery : 0);
+        // "both" mode adds one more single-trial pass (the parametric comparison).
+        const passes = trialsPerQuery + competitors.length + (wantBoth ? 1 : 0);
         const perPassQueries = testQueries.length;
         const cost = passes * (
           (platformRates.gemini !== null ? (perPassQueries * 500 / 1_000_000) * 0.40 : 0) +
