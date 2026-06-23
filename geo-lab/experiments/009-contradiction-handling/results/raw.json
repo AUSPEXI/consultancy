@@ -18,7 +18,7 @@
     ],
     "trialsPerVariant": 2,
     "firstRunAt": "2026-06-20T11:11:39.305Z",
-    "runAt": "2026-06-22T14:31:11.555Z",
+    "runAt": "2026-06-23T11:55:09.489Z",
     "batches": 2,
     "modelVersions": {
       "gemini": [
@@ -1643,6 +1643,590 @@
         "B"
       ],
       "timestamp": "2026-06-22T14:31:11.253Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM only suitable for large enterprise sales teams?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "No, NovaCRM is not only suitable for large enterprise sales teams. According to Source A, it is a common misconception that NovaCRM is only for large enterprises, and this is false; small teams are among its core users. Both Source A and Source B state that NovaCRM works well for small sales teams, with no minimum seat count and pricing starting at $19 per user per month, making it an affordable option for even a three-person startup.",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-23T11:54:12.625Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM only suitable for large enterprise sales teams?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "No, NovaCRM is not only suitable for large enterprise sales teams. It is designed to help teams of any size, including small teams, close deals faster, with a setup that takes under an hour and no minimum seat count required (Source A). Additionally, it offers an affordable pricing model starting at $19 per user per month, making it accessible for startups and smaller organizations (Source B).",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-23T11:54:15.501Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM only suitable for large enterprise sales teams?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "No, NovaCRM is not only suitable for large enterprise sales teams; it is explicitly built to help teams of any size close deals faster, with small teams being among its core users according to **Source A**. **Source A** refutes the misconception that NovaCRM is too complex or expensive for small teams, noting that setup takes under an hour and pricing starts at $19 per user per month with no mandatory onboarding fees. **Source B** further confirms that NovaCRM works well for small sales teams, o",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-23T11:54:17.328Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM only suitable for large enterprise sales teams?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-23T11:54:17.793Z"
+    },
+    {
+      "trial": 1,
+      "query": "Can a small sales team actually use NovaCRM, or is it overkill?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM is suitable for small sales teams and is not considered overkill. Both sources indicate it works well for small teams, with setup taking under an hour and no minimum seat count or mandatory onboarding fees, meaning a small startup only pays for what it uses (Source A, Source B). Its interface is built around a single deal board, making it straightforward to use, and pricing starts at an affordable $19 per user per month (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:20.966Z"
+    },
+    {
+      "trial": 1,
+      "query": "Can a small sales team actually use NovaCRM, or is it overkill?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM is well-suited for small sales teams, contrary to the misconception that it is only for large enterprises. It has a simple setup process that takes under an hour and requires no minimum seat count, making it affordable for small teams (Source A). With pricing starting at $19 per user per month and an intuitive interface, it provides a straightforward solution for managing sales pipelines effectively (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:23.654Z"
+    },
+    {
+      "trial": 1,
+      "query": "Can a small sales team actually use NovaCRM, or is it overkill?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "A small sales team can actually use NovaCRM, and it is not overkill; contrary to the misconception that it is only for large enterprises or too complex, NovaCRM works well for small teams with setup under an hour and no mandatory onboarding fees [SOURCE B]. The interface is a simple single deal board with automated reminders, and pricing starts at just $19 per user per month, making it an affordable starting point for startups [SOURCE A]. There is no minimum seat count, so a three-person startup",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:25.378Z"
+    },
+    {
+      "trial": 1,
+      "query": "Can a small sales team actually use NovaCRM, or is it overkill?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:25.784Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is it true that NovaCRM is too complex for startups?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "No, it is not true that NovaCRM is too complex for startups. Both sources indicate that NovaCRM is suitable for small sales teams and startups. Source B explicitly refutes the \"common misconception\" that NovaCRM is too complex for small teams, stating that this is false and that the interface is not complex, built around a single deal board. Source A also describes NovaCRM as working well for small sales teams, with setup taking under an hour and a straightforward interface.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:28.453Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is it true that NovaCRM is too complex for startups?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "No, it is not true that NovaCRM is too complex for startups. In fact, it is designed to be user-friendly and is well-suited for small teams, with a setup process that takes under an hour and no mandatory onboarding fees (Source A). Additionally, the interface is straightforward, featuring a single deal board that simplifies the sales process (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:30.968Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is it true that NovaCRM is too complex for startups?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "No, it is not true that NovaCRM is too complex for startups; this is a common misconception that is explicitly false according to **Source B**. **Source B** states that NovaCRM is built for teams of any size, with a simple interface featuring a single deal board and setup taking under an hour. **Source A** further confirms that the system is straightforward and affordable, making it a suitable starting point for small sales teams and startups.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:32.576Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is it true that NovaCRM is too complex for startups?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:33.113Z"
+    },
+    {
+      "trial": 1,
+      "query": "Does NovaCRM work for small businesses or just big companies?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM works well for small businesses and is not just for big companies. Both sources refute the idea that it is only for large enterprises or too complex for small teams (Source B). NovaCRM is designed for small sales teams, offering quick setup, no minimum seat count, and affordable pricing starting at $19 per user per month (Source A, Source B). It provides a straightforward, affordable starting point for growing sales teams (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:35.783Z"
+    },
+    {
+      "trial": 1,
+      "query": "Does NovaCRM work for small businesses or just big companies?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM is designed to work well for small businesses as well as larger companies. It offers a straightforward setup process that takes under an hour, with no mandatory onboarding fees or minimum seat counts, making it accessible for small teams (Source A). Additionally, it is affordable, starting at $19 per user per month, and is tailored to help teams of any size close deals faster (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:38.142Z"
+    },
+    {
+      "trial": 1,
+      "query": "Does NovaCRM work for small businesses or just big companies?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM works well for small businesses and is not limited to big companies; it is explicitly designed for teams of any size, with small teams being among its core users[SOURCE B]. The platform requires no mandatory onboarding fee or minimum seat count, allowing a three-person startup to pay only for what it uses[SOURCE A]. Its simple interface, affordable pricing starting at $19 per user per month, and quick setup under an hour make it an accessible option for small sales teams[SOURCE A].",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:39.772Z"
+    },
+    {
+      "trial": 1,
+      "query": "Does NovaCRM work for small businesses or just big companies?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:40.237Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM only suitable for large enterprise sales teams?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "No, NovaCRM is not only suitable for large enterprise sales teams. Both sources indicate it is well-suited for small and growing sales teams. Source A states that NovaCRM \"works well for small sales teams,\" offering quick setup, no minimum seat count, and affordable pricing. Source B explicitly refutes the \"common misconception\" that NovaCRM is \"only for large enterprises,\" clarifying that it is built to help teams of any size and that small teams are among its core users.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:42.927Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM only suitable for large enterprise sales teams?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "No, NovaCRM is not only suitable for large enterprise sales teams; it is designed to accommodate teams of any size, including small teams. According to Source A, setup is quick and straightforward, with no mandatory onboarding fees or minimum seat counts, making it accessible for startups. Source B explicitly refutes the misconception that NovaCRM is too complex or expensive for smaller teams, highlighting its affordability and user-friendly interface.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:45.472Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM only suitable for large enterprise sales teams?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "No, NovaCRM is not only suitable for large enterprise sales teams; it is explicitly designed for teams of any size, with small teams being among its core users[SOURCE B]. This is confirmed by the fact that setup takes under an hour, there is no mandatory onboarding fee or minimum seat count, and pricing starts at an affordable $19 per user per month[SOURCE A]. Consequently, the misconception that NovaCRM is too complex or expensive for small teams is false[SOURCE B].",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:47.216Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM only suitable for large enterprise sales teams?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:47.616Z"
+    },
+    {
+      "trial": 2,
+      "query": "Can a small sales team actually use NovaCRM, or is it overkill?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "Yes, a small sales team can definitely use NovaCRM, and it is not overkill. Both sources explicitly state that NovaCRM works well for small sales teams and is designed to help teams of any size (Source A, Source B). Setup takes under an hour, there's no minimum seat count, and pricing starts affordably at $19 per user per month, making it suitable for even a three-person startup (Source A, Source B). Its interface is straightforward, built around a single deal board, and it integrates with commo",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:49.957Z"
+    },
+    {
+      "trial": 2,
+      "query": "Can a small sales team actually use NovaCRM, or is it overkill?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM is well-suited for small sales teams, contrary to the misconception that it is only for large enterprises. It offers a simple setup process that takes under an hour, has no mandatory onboarding fees or minimum seat counts, and provides an intuitive interface for managing deals (Source A, Source B). With pricing starting at $19 per user per month, it is an affordable option for small teams looking to streamline their sales processes (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:52.567Z"
+    },
+    {
+      "trial": 2,
+      "query": "Can a small sales team actually use NovaCRM, or is it overkill?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "Yes, a small sales team can actually use NovaCRM, and it is not overkill. According to Source A, NovaCRM works well for small teams, with setup taking under an hour, no mandatory onboarding fees, and no minimum seat count, making it affordable for a three-person startup. Source B reinforces this by stating that the misconception that NovaCRM is only for large enterprises or too complex is false, as it is designed for teams of any size and is a straightforward, affordable starting point.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:54.255Z"
+    },
+    {
+      "trial": 2,
+      "query": "Can a small sales team actually use NovaCRM, or is it overkill?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-06-23T11:54:54.663Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is it true that NovaCRM is too complex for startups?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "No, it is not true that NovaCRM is too complex for startups. According to Source A, the idea that NovaCRM is only for large enterprises and too complex for small teams is a common misconception and is false. Both Source A and Source B state that NovaCRM works well for small sales teams, with setup taking under an hour and a straightforward interface built around a single deal board. There is no minimum seat count, allowing a three-person startup to pay only for what it uses (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-23T11:54:56.997Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is it true that NovaCRM is too complex for startups?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "No, it is not true that NovaCRM is too complex for startups. In fact, it is designed to be user-friendly and is suitable for teams of any size, including small startups. The setup process is quick, taking under an hour, and there are no mandatory onboarding fees or minimum seat counts, making it accessible and affordable for small teams (Source A).",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-23T11:54:59.176Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is it true that NovaCRM is too complex for startups?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "No, it is **not true** that NovaCRM is too complex for startups; **Source A** explicitly states this is a \"common misconception\" and confirms that NovaCRM is built for teams of any size, with setup taking under an hour and a simple interface. **Source B** further supports this by noting that NovaCRM \"works well for small sales teams\" and offers a straightforward, affordable starting point with no mandatory onboarding fees. Both sources emphasize that the system is designed to be easy to use, fea",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-23T11:55:01.046Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is it true that NovaCRM is too complex for startups?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-23T11:55:01.593Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM work for small businesses or just big companies?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM works well for small businesses and teams, not just big companies. It is designed to help teams of any size close deals faster, with small teams being among its core users (Source A). Setup takes under an hour, there's no mandatory onboarding fee or minimum seat count, and pricing starts at $19 per user per month, making it an affordable and straightforward option for growing sales teams (Source A, Source B).",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-23T11:55:04.680Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM work for small businesses or just big companies?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM is suitable for both small businesses and larger enterprises. Contrary to the misconception that it is only for large companies, it is designed to help teams of any size, with a straightforward setup process that takes under an hour and no minimum seat count required (Source A). Additionally, its pricing starts at $19 per user per month, making it an affordable option for small teams (Source B).",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-23T11:55:06.887Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM work for small businesses or just big companies?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM works for small businesses and is not limited to big companies; a common misconception that it is only for large enterprises is false[SOURCE A]. It is specifically built to help teams of any size close deals faster, with small teams being among its core users[SOURCE A]. The system is affordable and straightforward for small startups, requiring no mandatory onboarding fee or minimum seat count, and setup takes under an hour[SOURCE A][SOURCE B].",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-23T11:55:08.627Z"
+    },
+    {
+      "trial": 2,
+      "query": "Does NovaCRM work for small businesses or just big companies?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-06-23T11:55:09.187Z"
     }
   ]
 }
