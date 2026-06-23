@@ -107,6 +107,7 @@ export default function CiteProbePage() {
   const { tier, role, userData, user } = useAuth();
   const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
+  const [runNote, setRunNote] = useState<string | null>(null);
   const [probeData, setProbeData] = useState<ProbeRun | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<{ date: string; rate: number }[]>([]);
@@ -247,12 +248,17 @@ export default function CiteProbePage() {
     setIsRunning(true);
     setError(null);
     setProbeData(null);
+    setRunNote(null);
+    // Grounded/both runs do slow web searches and exceed the serverless time
+    // limit, so they run in a background function and we poll for the result.
+    const useAsync = pathwayMode !== 'parametric';
     try {
       const res = await authFetch('/api/cite-probe', {
         method: 'POST',
         body: JSON.stringify({
           brand, domain,
           pathwayMode,
+          async: useAsync,
           keywords: userData?.keywords || [],
           negativeStatements,
           // Head-to-head against ALL saved competitors by default — zero extra
@@ -262,8 +268,26 @@ export default function CiteProbePage() {
           competitorDomain: showCompetitorPanel ? competitorDomain.trim() : '',
         }),
       });
-      const json = await res.json();
+      let json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || 'Probe failed');
+
+      // Async: poll the job until it finishes (grounded probes can take a few minutes).
+      if (json.async && json.jobId) {
+        setRunNote('Running in the background (grounded searches take a minute or two)...');
+        const jobId = json.jobId;
+        const started = Date.now();
+        const TIMEOUT_MS = 10 * 60 * 1000;
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          await new Promise(r => setTimeout(r, 2500));
+          const pollRes = await authFetch(`/api/cite-probe?jobId=${encodeURIComponent(jobId)}`);
+          const poll = await pollRes.json();
+          if (poll.status === 'done') { json = poll; break; }
+          if (poll.status === 'error') throw new Error(poll.error || 'Background probe failed');
+          if (Date.now() - started > TIMEOUT_MS) throw new Error('Probe timed out after 10 minutes.');
+        }
+      }
+
       setProbeData(json);
       setHistory(prev => [{ date: new Date().toLocaleTimeString(), rate: json.citationRate }, ...prev].slice(0, 10));
       loadHistory(); // refresh persistent trend with the run just saved to Firestore
@@ -273,6 +297,7 @@ export default function CiteProbePage() {
       setError(e.message);
     } finally {
       setIsRunning(false);
+      setRunNote(null);
     }
   };
 
@@ -468,6 +493,9 @@ export default function CiteProbePage() {
             Firing 7 questions at Gemini, ChatGPT, Perplexity, and Claude simultaneously.
             Checking each response for <span className="text-white">{brand}</span>{negativeStatements.length > 0 ? ` and ${negativeStatements.length} known-false statement${negativeStatements.length > 1 ? 's' : ''}` : ''}.
           </p>
+          {runNote && (
+            <p className="text-pink-300/90 text-xs mt-3">{runNote}</p>
+          )}
           <div className="flex justify-center gap-3 mt-6">
             {(Object.keys(PLATFORM_META) as PlatformKey[]).map(p => (
               <div key={p} className={`px-3 py-1.5 rounded-full text-xs font-semibold ${PLATFORM_META[p].bg} ${PLATFORM_META[p].border} border ${PLATFORM_META[p].text} animate-pulse`}>

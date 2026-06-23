@@ -5,6 +5,8 @@ import { requireAuth } from '@/lib/api-auth';
 import { perplexityBudget } from '@/lib/perplexity-budget';
 import { buildQueries, runCitationProbe, probeBrandRate, ENGINE_MODEL_VERSIONS, type ProbeMode } from '@/lib/cite-probe-core';
 import { headToHeadVerdict } from '@/lib/stats';
+import { resolveCompetitorTargets } from '@/lib/cite-probe-job';
+import { randomUUID } from 'node:crypto';
 import { judgeCitation, cohenKappa, type CiteJudgeVerdict } from '@/lib/cite-judge';
 import type { PlatformKey } from '@/lib/cite-probe-core';
 import { normalizeTier, checkTierAccess } from '@/constants/tiers';
@@ -120,6 +122,21 @@ export async function GET(request: Request) {
     if (!dbAdmin) {
       return NextResponse.json({ success: true, history: [] });
     }
+
+    // Async job status poll: GET ?jobId=... returns the job's status and, when
+    // finished, its result (the same shape the sync probe returns).
+    const jobId = searchParams.get('jobId');
+    if (jobId) {
+      const jobSnap = await dbAdmin.collection('cite_probe_jobs').doc(jobId).get();
+      if (!jobSnap.exists) return NextResponse.json({ success: false, error: 'job not found' }, { status: 404 });
+      const job = jobSnap.data() as any;
+      if (job.userId !== userId) return NextResponse.json({ success: false, error: 'forbidden' }, { status: 403 });
+      if (job.status === 'done') {
+        return NextResponse.json({ success: true, status: 'done', ...job.result });
+      }
+      return NextResponse.json({ success: job.status !== 'error', status: job.status, error: job.error ?? null });
+    }
+
     const limit = Math.min(Number(searchParams.get('limit')) || 30, 100);
     const snap = await dbAdmin
       .collection('citation_tests')
@@ -171,6 +188,7 @@ export async function POST(request: Request) {
       competitors: competitorDomains = [],
       pathwayMode = 'parametric',
       scoring = 'heuristic',
+      async: wantAsync = false,
     } = await request.json();
 
     if (!brand || !domain) {
@@ -238,6 +256,43 @@ export async function POST(request: Request) {
     // WS2: paid tiers repeat-sample each query (tighter CIs, stochastic noise
     // averaged out); free stays single-pass to control cost.
     const trialsPerQuery = checkTierAccess(userTier, 'Starter') ? 3 : 1;
+
+    // ── Async path ────────────────────────────────────────────────────────────
+    // Grounded/both runs do real (slow) web searches across engines + competitors
+    // and blow Netlify's ~26s synchronous-function limit. When the client asks for
+    // async, persist a job, kick off the background function (15-min budget), and
+    // return a jobId for the client to poll. Sync path (below) stays for fast
+    // parametric runs.
+    if (wantAsync && dbAdmin && userId !== 'anonymous') {
+      const maxCompetitors = normalizeTier(userTier) === 'Business' ? 50 : 20;
+      const competitorTargets = resolveCompetitorTargets(competitorDomains, competitorBrand, competitorDomain, maxCompetitors);
+      const jobId = randomUUID();
+      const params = {
+        brand, domain, userId,
+        queries: testQueries, knownFalses,
+        mode: probeMode, wantBoth, trialsPerQuery,
+        competitorTargets, queriesSource,
+      };
+      await dbAdmin.collection('cite_probe_jobs').doc(jobId).set({
+        jobId, userId, status: 'pending', params,
+        createdAt: new Date().toISOString(),
+      });
+
+      const base = process.env.URL || process.env.DEPLOY_PRIME_URL || new URL(request.url).origin;
+      try {
+        // Invoking a "-background" function returns 202 immediately, then runs async.
+        await fetch(`${base}/.netlify/functions/cite-probe-run-background`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ jobId, secret: process.env.CITE_PROBE_WORKER_SECRET }),
+        });
+      } catch (err: any) {
+        await dbAdmin.collection('cite_probe_jobs').doc(jobId).update({ status: 'error', error: `Failed to start worker: ${err?.message || err}` });
+        return NextResponse.json({ success: false, error: 'Could not start the background probe.' }, { status: 502 });
+      }
+
+      return NextResponse.json({ success: true, async: true, jobId, status: 'pending', queries: testQueries, pathwayMode: wantBoth ? 'both' : probeMode });
+    }
 
     const {
       queryResults, platformRates, citationRate, ci95,
