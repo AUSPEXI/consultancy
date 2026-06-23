@@ -50,7 +50,9 @@ interface ProbeRun {
   timestamp: string;
   attribution?: Attribution | null;
   mode?: 'standard' | 'competitor';
-  pathwayMode?: 'parametric' | 'grounded';
+  pathwayMode?: 'parametric' | 'grounded' | 'both';
+  parametricPlatformRates?: Record<string, number | null> | null;
+  parametricCitationRate?: number | null;
   competitorDomain?: string | null;
   competitor?: CompetitorComparison | null;
   competitors?: CompetitorComparison[];
@@ -154,7 +156,7 @@ export default function CiteProbePage() {
 
   // WS1: parametric (does the model know you from training?) vs grounded (does it
   // cite you when it searches the live web?). Different questions — label both.
-  const [pathwayMode, setPathwayMode] = useState<'parametric' | 'grounded'>('parametric');
+  const [pathwayMode, setPathwayMode] = useState<'parametric' | 'grounded' | 'both'>('parametric');
   // S7.2: industry benchmark
   const [benchmark, setBenchmark] = useState<{ industry: string; averageRate: number; medianRate: number; sampleSize: number } | null>(null);
 
@@ -316,10 +318,17 @@ export default function CiteProbePage() {
             </button>
             <button
               onClick={() => setPathwayMode('grounded')}
-              title="Engine searches the live web — does it cite you when it retrieves?"
+              title="Engine searches the live web. Does it cite you when it retrieves?"
               className={`px-3 py-1.5 rounded-md transition-colors ${pathwayMode === 'grounded' ? 'bg-pink-600 text-white' : 'text-zinc-400 hover:text-white'}`}
             >
               Grounded
+            </button>
+            <button
+              onClick={() => setPathwayMode('both')}
+              title="Run both pathways and compare per engine (uses an extra pass)."
+              className={`px-3 py-1.5 rounded-md transition-colors ${pathwayMode === 'both' ? 'bg-pink-600 text-white' : 'text-zinc-400 hover:text-white'}`}
+            >
+              Both
             </button>
           </div>
           <button
@@ -333,7 +342,7 @@ export default function CiteProbePage() {
             ) : probeData ? (
               <><RefreshCw className="w-4 h-4" />Run Again</>
             ) : (
-              <><Zap className="w-4 h-4" />Run {pathwayMode === 'grounded' ? 'Grounded' : 'Parametric'} Probe</>
+              <><Zap className="w-4 h-4" />Run {pathwayMode === 'grounded' ? 'Grounded' : pathwayMode === 'both' ? 'Both-Pathway' : 'Parametric'} Probe</>
             )}
           </button>
         </div>
@@ -738,6 +747,12 @@ export default function CiteProbePage() {
                           {enginePathway === 'parametric' && engineGroundedError && (
                             <p className="mt-2 text-[9px] leading-snug text-amber-400/80">
                               ⚠ grounded fell back: {engineGroundedError}
+                            </p>
+                          )}
+                          {probeData.parametricPlatformRates && probeData.parametricPlatformRates[p] !== null && probeData.parametricPlatformRates[p] !== undefined && (
+                            <p className="mt-2 text-[10px] text-zinc-500" title="Training recall: does the model name you with no web search?">
+                              🧠 parametric: <span className="font-semibold text-zinc-300">{probeData.parametricPlatformRates[p]}%</span>
+                              {' '}<span className="text-zinc-600">vs 🌐 grounded {rate}%</span>
                             </p>
                           )}
                         </>

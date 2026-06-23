@@ -172,8 +172,10 @@ export async function POST(request: Request) {
     }
 
     // WS1: parametric (training recall) vs grounded (live retrieval). Defaults to
-    // parametric so existing behaviour is unchanged.
-    const probeMode: ProbeMode = pathwayMode === 'grounded' ? 'grounded' : 'parametric';
+    // parametric so existing behaviour is unchanged. "both" runs grounded as the
+    // primary result and a second parametric pass for a side-by-side comparison.
+    const wantBoth = pathwayMode === 'both';
+    const probeMode: ProbeMode = (pathwayMode === 'grounded' || wantBoth) ? 'grounded' : 'parametric';
 
     // Free-tier monthly meter (paid tiers + admins pass through).
     const meterBlock = await enforceFreeProbeMeter(userId);
@@ -236,6 +238,21 @@ export async function POST(request: Request) {
       citedCount, misinformationCount, activePlatforms,
       sentimentBreakdown, avgPositionPct, platformTrialStats,
     } = await runCitationProbe({ brand, domain, queries: testQueries, knownFalses, mode: probeMode, trialsPerQuery });
+
+    // "both" mode: a second parametric pass over the same queries, so each engine
+    // can be shown training-recall vs grounded-retrieval side by side. Only the
+    // per-engine rates are kept (the grounded run remains the primary result).
+    let parametricPlatformRates: Record<string, number | null> | null = null;
+    let parametricCitationRate: number | null = null;
+    if (wantBoth) {
+      try {
+        const pPass = await runCitationProbe({ brand, domain, queries: testQueries, knownFalses, mode: 'parametric', trialsPerQuery });
+        parametricPlatformRates = pPass.platformRates;
+        parametricCitationRate = pPass.citationRate;
+      } catch (e) {
+        console.warn('[cite-probe] parametric comparison pass failed (non-fatal):', e);
+      }
+    }
 
     // WS3: optional semantic LLM-judge scoring tier (paid). Re-judges each engine's
     // raw answer by meaning, with a judge family different from the engine, and
@@ -372,7 +389,9 @@ export async function POST(request: Request) {
       engineVersions: ENGINE_MODEL_VERSIONS,
       attribution,
       mode: isCompetitorMode ? 'competitor' : 'standard',
-      pathwayMode: probeMode,
+      pathwayMode: wantBoth ? 'both' : probeMode,
+      parametricPlatformRates,
+      parametricCitationRate,
       scoring: judgeAgreement ? 'semantic' : 'heuristic',
       judgeAgreement,
       competitorDomain: competitor?.domain ?? null,
@@ -391,7 +410,8 @@ export async function POST(request: Request) {
         }).catch(() => {});
         // The brand runs trialsPerQuery passes (repeat-sampling); each competitor
         // is one extra pass over the same queries.
-        const passes = trialsPerQuery + competitors.length;
+        // "both" mode adds one more full pass (the parametric comparison run).
+        const passes = trialsPerQuery + competitors.length + (wantBoth ? trialsPerQuery : 0);
         const perPassQueries = testQueries.length;
         const cost = passes * (
           (platformRates.gemini !== null ? (perPassQueries * 500 / 1_000_000) * 0.40 : 0) +
