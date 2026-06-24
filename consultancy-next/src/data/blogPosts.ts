@@ -1,5 +1,249 @@
 export const blogPosts = [
   {
+    slug: "best-tools-for-generative-engine-optimization-geo",
+    title: "The Best Tools for Generative Engine Optimization (GEO): How to Choose",
+    excerpt: "GEO is young enough that anyone selling the single best tool is guessing. The honest answer to what are the best GEO tools is a set of criteria, not a winner. Here is a buyer's framework you can apply to any product in the space, including ours.",
+    date: "June 23, 2026",
+    category: "Explainer",
+    author: "L8EntSpace Team",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## There is no single "best" GEO tool yet, so here is how to actually choose
+
+Generative Engine Optimization (GEO) is young enough that anyone claiming to sell the single best tool is guessing. The honest answer to "what are the best tools for GEO?" is a set of criteria, not a winner. Pick the tool that measures the right thing, admits its uncertainty, and can show evidence for its advice. Here is a buyer's framework you can apply to any product in the space, including ours.
+
+## What GEO tools are actually for
+
+GEO is the practice of getting your brand cited inside AI-generated answers (ChatGPT, Gemini, Claude, Perplexity, Google AI Overviews), the way search engine optimization ([SEO](https://en.wikipedia.org/wiki/Search_engine_optimization)) is about ranking in classic search. A GEO tool should help you do three things: measure where you stand, find the gaps, and fix them with changes that actually move citations.
+
+## The three kinds of tool you will meet
+
+1. Established SEO suites adding an "AI visibility" module. Convenient if you already pay for one, but AI visibility is often a bolt-on rather than the core.
+2. Dedicated AI-visibility startups. Newer, more focused, and varying a lot in rigor.
+3. Do-it-yourself probing. You can prompt the engines yourself and log results. Free, but noisy and hard to keep consistent.
+
+## Five questions that separate a serious tool from a dashboard
+
+- Does it measure the right pathway? A bare question tests whether the model remembers you (training recall). A web-search query tests whether it cites you when it retrieves. These are different, and a tool that conflates them will mislead you (we explain this in [Parametric vs Grounded](/blog/parametric-vs-grounded-why-ai-can-ignore-you-and-still-cite-you)).
+- Does it admit uncertainty? AI answers are random samples, so a single probe is a coin flip. A serious tool repeat-samples and shows a confidence interval, not a tidy, false-precise number.
+- Does it back its advice with evidence? "Add more statistics" is worthless without proof. The best tools link each recommendation to a tested result.
+- Does it cover the engines you care about? Coverage varies. Check that the tool probes the engines your buyers actually use.
+- Is it honest about what it cannot measure? A tool that flags its own limits is more trustworthy than one that claims certainty.
+
+## Where L8EntSpace fits
+
+We built L8EntSpace to pass its own checklist: it separates training recall from live retrieval, repeat-samples with confidence intervals, runs significance tests on competitor comparisons, and links recommendations to a research lab so each one carries an effect size and a date. We are not going to tell you we are the only option. We will tell you to apply the five questions above to everything you try, ours included.
+
+## What to do next
+
+Shortlist two or three tools, run the same brand and the same questions through each, and compare not just the headline numbers but whether each tool shows its uncertainty and its evidence. For the practical side of actually earning citations once you can measure them, read [How to Get Your Brand Cited by AI](/blog/how-to-get-your-brand-cited-by-ai-chatgpt-perplexity).
+
+## Key Takeaways
+
+- GEO is new; treat "best tool" claims as criteria, not winners.
+- Tools fall into SEO-suite add-ons, dedicated AI-visibility startups, and DIY probing.
+- Demand a tool that separates training recall from live retrieval.
+- Demand repeat sampling, confidence intervals, and significance tests, not single tidy numbers.
+- Demand evidence behind recommendations, and honesty about limits.
+`,
+  },
+  {
+    slug: "how-to-get-your-brand-cited-by-ai-chatgpt-perplexity",
+    title: "How to Get Your Brand Cited by AI (ChatGPT, Perplexity, and the Rest)",
+    excerpt: "The most common GEO question has a reassuring answer: there is no secret lever. Getting cited is mostly the same craft across every engine, because they share the same machinery. Make your content findable, clear, and verifiable, and you become the thing the model reaches for.",
+    date: "June 23, 2026",
+    category: "Explainer",
+    author: "L8EntSpace Team",
+    readTime: "6 min read",
+    image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## You do not bribe an AI to cite you. You make your content the easiest thing to quote.
+
+"How do I get my brand cited by AI like ChatGPT and Perplexity?" is the most common GEO question, and the honest answer is reassuring: there is no secret lever. Getting cited is mostly the same craft across every engine, because they share the same basic machinery. Make your content findable, clear, and verifiable, and you become the thing the model reaches for. Here is how, in plain steps.
+
+## First, be retrievable at all
+
+When an AI engine answers using the live web (which is how ChatGPT search, Perplexity, and Google AI Overviews work, a process called [retrieval-augmented generation](https://en.wikipedia.org/wiki/Retrieval-augmented_generation)), it can only cite pages it can fetch. So step zero is boring but decisive: your pages must be crawlable, reasonably fast, and not hidden behind JavaScript that only renders in a browser. If a plain fetch of your page returns an empty shell, you are invisible before the contest even starts.
+
+## Write passages that survive being lifted out
+
+AI engines quote passages, not whole pages. A paragraph that makes complete sense on its own gets lifted cleanly. A paragraph that says "as mentioned above, it rose 12%" is useless out of context. State the subject, the number, the date, and the unit inside the sentence: "As of early 2026, our platform probed seven AI engines per run." Self-contained passages are the single most underused move in GEO.
+
+## Lead with the answer
+
+Put the direct answer in the first sentence, then support it. This inverted-pyramid style matches how models extract a response: they grab the topic sentence. Burying your answer in paragraph four means the model never reaches it.
+
+## Be specific and verifiable
+
+Models prefer to quote text that looks falsifiable: named sources, dates, real numbers, primary data. Vague claims ("significantly faster") are skipped in favour of specific ones ("cut response time to under two seconds"). Specificity is citation bait, honestly earned.
+
+## Earn corroboration and structure
+
+A claim that shows up consistently across several reputable places is stated more confidently by the model. And clean structure (real headings, lists, tables, and structured data) survives the chunking process AI retrieval relies on. None of this is a trick. It is just being legible to a machine reader.
+
+## The honest caveat
+
+Two things you cannot shortcut. If your brand is new, the models will not recall you from memory yet, and that is fine: focus on retrieval, where the levers above work today. And effects take time. Published changes usually take a few weeks to surface in AI answers, so measure patiently.
+
+## What to do next
+
+Pick one page, rewrite its opening to answer a real buyer question in the first sentence, break it into self-contained passages with specific facts, and add structured data. Then probe before and after. For the on-page structure in more depth, read [How to Optimize Content to Appear in AI-Generated Answers](/blog/how-to-optimize-content-to-appear-in-ai-generated-answers).
+
+## Key Takeaways
+
+- There is no secret lever; the craft is mostly shared across engines.
+- Be crawlable first: pages hidden behind browser-only rendering cannot be cited.
+- Write self-contained passages with subject, number, date, and unit inside the sentence.
+- Lead with the answer, be specific and verifiable, and use clean structure.
+- New brands should focus on retrieval, and measure patiently (effects take weeks).
+`,
+  },
+  {
+    slug: "what-is-ai-share-of-voice-and-who-tracks-it",
+    title: "What Is AI Share of Voice, and Who Tracks It?",
+    excerpt: "AI Share of Voice moves the old marketing idea into a new arena: across the answers AI engines give, how often is your brand the one cited, versus your rivals? As people ask ChatGPT and Perplexity for recommendations, it becomes a leading indicator of who gets discovered.",
+    date: "June 23, 2026",
+    category: "Explainer",
+    author: "L8EntSpace Team",
+    readTime: "5 min read",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## A new scoreboard for who AI recommends
+
+Classic "share of voice" measures how much of the conversation your brand owns against competitors. AI Share of Voice (AI SoV) moves the same idea to a new arena: across the answers AI engines give, how often is your brand the one cited, compared with your rivals? As people increasingly ask ChatGPT, Gemini, Claude, and Perplexity for recommendations instead of scrolling a results page, AI SoV becomes a leading indicator of who gets discovered.
+
+## How it differs from classic share of voice
+
+Traditional share of voice ([what that is](https://en.wikipedia.org/wiki/Share_of_voice)) counts impressions or rankings on a page you can see. AI SoV is harder, for three reasons. AI answers are generated fresh each time, so the same question can yield different citations on different runs. There is often no ranked list, just a paragraph that names a few sources. And the answer depends on which engine, and on whether it searched the web or answered from memory. So measuring AI SoV is less like reading a scoreboard and more like running a careful survey.
+
+## What tracking AI SoV actually involves
+
+A credible AI SoV tracker has to do several things a simple "ask once and count" approach skips:
+
+- Probe a fixed set of buyer questions across the engines that matter, on a schedule, so you compare like with like over time.
+- Repeat each question, because a single answer is a coin flip, and report the uncertainty rather than a tidy false number.
+- Separate training recall from live retrieval, because they answer different questions about your visibility.
+- Compare against named competitors with a real statistical test, so "you are ahead" is a finding, not a guess from two similar bars.
+- Detect when an engine changed its underlying model, because that can move results independently of anything you did.
+
+## Who tracks it
+
+The category is young. You will find AI-visibility features bolted onto established SEO suites, a wave of dedicated AI-visibility startups, and teams who roll their own probing. They vary enormously in rigor, which is exactly why the criteria above matter more than any brand name.
+
+## Where L8EntSpace fits
+
+We built L8EntSpace as an AI SoV tracker that tries to meet that bar honestly: a Citation Probe across seven engines, repeat sampling with confidence intervals, pathway labelling, competitor comparisons with significance tests, and model-version logging. We would rather show you an honest band of uncertainty than a confident number we cannot stand behind.
+
+## What to do next
+
+Define your fixed question set first (the real questions your buyers ask), then pick a tracker that probes them consistently and shows its uncertainty. For why that uncertainty matters so much, read [One AI Probe Will Lie to You](/blog/one-ai-probe-will-lie-to-you-intervals-and-significance).
+
+## Key Takeaways
+
+- AI Share of Voice measures how often AI engines cite your brand versus competitors.
+- It is harder than classic share of voice: answers are generated, unranked, and engine-dependent.
+- Real tracking needs a fixed question set, repeat sampling, pathway separation, and significance tests.
+- The category is young and varies in rigor, so judge by method, not brand name.
+- Start by defining the questions your buyers actually ask.
+`,
+  },
+  {
+    slug: "how-to-optimize-content-to-appear-in-ai-generated-answers",
+    title: "How to Optimize Content to Appear in AI-Generated Answers",
+    excerpt: "Getting cited by AI is partly strategy and partly craft: how do you structure a page so an engine can extract and quote it? This is the craft. The goal is to turn each page into clean, self-contained answer units a model can lift without losing the meaning.",
+    date: "June 23, 2026",
+    category: "Explainer",
+    author: "L8EntSpace Team",
+    readTime: "6 min read",
+    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## Structure your page so a machine can quote it
+
+Getting cited by AI is partly a strategy question (which pages, which queries) and partly a craft question: how do you structure a page so an AI engine can extract and quote it? This post is about the craft. The goal is to turn each page into a set of clean, self-contained answer units a model can lift without losing the meaning. This is sometimes called Answer Engine Optimization (AEO), and it is mostly about structure.
+
+## One claim per paragraph, complete on its own
+
+AI engines retrieve passages, not pages, then quote the most useful one. So write paragraphs that stand alone. Each should carry its own subject, number, date, and unit, so it survives being pulled out of context. Replace "it improved by 12%" with "the redesign cut bounce rate by 12% in the first quarter of 2026." The second sentence is quotable anywhere. The first is meaningless without its neighbours.
+
+## Answer first, support second
+
+Lead each section with the direct answer, then explain. Models grab topic sentences, so a section that opens with the conclusion gets extracted accurately. A section that builds slowly to its point often gets misquoted or skipped.
+
+## Use structure the machine can parse
+
+Real headings, bulleted and numbered lists, comparison tables, and a clear FAQ format all map neatly onto how people phrase questions, and they survive the chunking step retrieval relies on. Add structured data ([schema.org](https://schema.org) markup, such as FAQPage and Article) so a parser knows exactly which text answers which question. A definition, a comparison ("X vs Y"), or a step list is far more likely to be cited than the same information buried in prose.
+
+## Be specific, and let the facts do the work
+
+Specific, verifiable statements get quoted more than vague ones, because they read as falsifiable and sourced. Name things. Give numbers with their units and dates. Cite your own sources. This is not about stuffing keywords. It is about being the clearest, most checkable answer on the page.
+
+## Make it self-contained at the page level too
+
+A page that depends on a logged-in state, a cookie wall, or browser-only rendering may never be fetched cleanly. Server-render the content that matters, give important questions their own stable anchors, and make sure a plain fetch returns the real text.
+
+## The honest caveat
+
+Structure helps the model extract you, but it cannot manufacture authority you have not earned, and it cannot make a brand-new page instantly famous. Treat these as necessary, not sufficient: they remove the reasons a model would skip you, and then your specificity and corroboration do the rest. Measure after a few weeks, because AI answers update slowly.
+
+## What to do next
+
+Take one important page and rewrite it as answer units: a lead-sentence answer per section, self-contained paragraphs, a real FAQ with schema, and specific facts. Then probe it before and after. For the strategy layer (which pages and queries to prioritise), read [How to Get Your Brand Cited by AI](/blog/how-to-get-your-brand-cited-by-ai-chatgpt-perplexity).
+
+## Key Takeaways
+
+- AI engines quote passages, so write one self-contained claim per paragraph.
+- Lead each section with the answer, then support it.
+- Use real headings, lists, tables, an FAQ, and schema.org structured data.
+- Be specific and verifiable: numbers with units and dates beat vague claims.
+- Structure removes reasons to skip you; authority and corroboration still have to be earned.
+`,
+  },
+  {
+    slug: "best-software-for-tracking-ai-citations-and-brand-mentions",
+    title: "Best Software for Tracking AI Citations and Brand Mentions in LLMs",
+    excerpt: "Doing it by hand does not scale or stay consistent, so you need tracking software. But best depends entirely on whether the software measures honestly. Here is the checklist we would hold any AI citation tracker to, including our own.",
+    date: "June 23, 2026",
+    category: "Explainer",
+    author: "L8EntSpace Team",
+    readTime: "6 min read",
+    image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?q=80&w=1200&auto=format&fit=crop",
+    content: `
+## "Best" means "most honest," not "biggest number"
+
+If you want to know how often ChatGPT, Gemini, Claude, Perplexity, and the rest mention or cite your brand across large language models ([what those are](https://en.wikipedia.org/wiki/Large_language_model)), you need tracking software, because doing it by hand does not scale and does not stay consistent. But "best" depends entirely on whether the software measures honestly. Here is the checklist we would hold any AI citation tracker to, including our own.
+
+## Why eyeballing it does not work
+
+You can ask an engine about your brand yourself, and you should, once, to get a feel for it. But AI answers vary every time you ask, engines differ, and your memory of "it mentioned us last week" is not data. Tracking software exists to turn that noise into a number you can compare over time. The only question that matters is whether the number is honest.
+
+## The checklist a serious tracker must pass
+
+- It separates training recall from live retrieval. Asking an engine cold tests whether it remembers your brand; making it search tests whether it cites you when it retrieves. A tracker that mixes these reports a misleading score, especially for newer brands.
+- It repeat-samples and shows uncertainty. One answer is a coin flip. Good software asks each question several times and reports a confidence interval, not a tidy single percentage.
+- It tests competitor comparisons properly. "You beat them" should come with a significance test, and an honest "inconclusive at this sample size" when the data cannot support a claim.
+- It covers the engines your buyers use. Check coverage. The set that matters for you might include Google AI Overviews and Perplexity as much as ChatGPT.
+- It detects model changes. Engines update their models, which can move your numbers independently of anything you did. A tracker should log model versions so you can tell drift from real change.
+- It is honest about sentiment and accuracy. Counting your brand name is not enough: a mention can be negative or wrong. The better tools judge by meaning, not just string matching.
+
+## Where L8EntSpace fits
+
+We built L8EntSpace against exactly this checklist: a Citation Probe across seven engines, pathway labelling, repeat sampling with confidence intervals, competitor significance tests, model-version logging, and an optional meaning-based scoring tier. We are not interested in selling you a confident number we cannot defend. The honest band is the product.
+
+## What to do next
+
+Before you buy anything, write down your fixed question set and the engines that matter to your buyers. Then test candidate tools against the checklist above, paying particular attention to whether they show uncertainty and back their advice with evidence. For why recommendations should carry evidence at all, read [Every GEO Recommendation Should Come With a Receipt](/blog/every-geo-recommendation-should-come-with-a-receipt).
+
+## Key Takeaways
+
+- Manual checking does not scale or stay consistent; tracking software turns noise into comparable numbers.
+- Demand separation of training recall and live retrieval.
+- Demand repeat sampling, confidence intervals, and significance tests on competitor comparisons.
+- Demand model-version logging and meaning-based scoring, not just name matching.
+- Judge a tracker by its honesty about uncertainty, not its headline number.
+`,
+  },
+  {
     slug: "parametric-vs-grounded-why-ai-can-ignore-you-and-still-cite-you",
     title: "Parametric vs Grounded: Why AI Can Ignore Your Brand and Cite It Minutes Later",
     excerpt: "An AI engine can fail to mention your brand when asked cold, then cite it accurately when it searches the web. Those are two different questions, and most AI-visibility tools only measure one. Here is the distinction, and why it decides what you should fix.",
