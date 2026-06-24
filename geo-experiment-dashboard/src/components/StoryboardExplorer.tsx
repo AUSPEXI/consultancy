@@ -432,7 +432,12 @@ export default function StoryboardExplorer() {
     return `00:${pad(mins)}:${pad(secs)}:${pad(ms)}`;
   };
 
-  const totalDuration = (scaleTimingsToAudio && userAudioUrl && audioDuration > 0) ? audioDuration : 330;
+  // The length the panels were authored against. Auto-scaling fits that authored
+  // timeline onto the loaded audio, so the divisor MUST be this baseline (not a
+  // hardcoded constant) — otherwise re-timing the storyboard would silently
+  // re-stretch every panel.
+  const baselineSec = activeProject.baselineDurationSec ?? 330;
+  const totalDuration = (scaleTimingsToAudio && userAudioUrl && audioDuration > 0) ? audioDuration : baselineSec;
   const selectedPanel = STORYBOARD_DATA.find(p => p.panelId === selectedPanelId) || STORYBOARD_DATA[0];
 
   // The auto-scaled (or offset-nudged) start for a panel — the baseline before
@@ -442,7 +447,7 @@ export default function StoryboardExplorer() {
     const activeOffset = panelOffsets[panel.panelId] ?? 0;
     const shifted = Math.max(0, originalStart + activeOffset);
     if (scaleTimingsToAudio && userAudioUrl && audioDuration > 0) {
-      return Number((shifted * (audioDuration / 330)).toFixed(2));
+      return Number((shifted * (audioDuration / baselineSec)).toFixed(2));
     }
     return Number(shifted.toFixed(2));
   };
@@ -452,7 +457,7 @@ export default function StoryboardExplorer() {
     const activeOffset = panelOffsets[panel.panelId] ?? 0;
     const shifted = Math.max(0, originalEnd + activeOffset);
     if (scaleTimingsToAudio && userAudioUrl && audioDuration > 0) {
-      return Number((shifted * (audioDuration / 330)).toFixed(2));
+      return Number((shifted * (audioDuration / baselineSec)).toFixed(2));
     }
     return Number(shifted.toFixed(2));
   };
