@@ -747,6 +747,22 @@ export function LandingPageClient() {
               </Link>
             ))}
           </div>
+
+          {blogPosts.length > 3 && (
+            <div className="mt-12 border-t border-zinc-900 pt-8">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 mb-4">More from the blog</h3>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+                {blogPosts.slice(3, 11).map((post) => (
+                  <li key={post.slug}>
+                    <Link href={`/blog/${post.slug}`} className="group flex items-baseline gap-3 text-zinc-400 hover:text-white transition-colors">
+                      <span className="text-xs text-pink-400/80 shrink-0">{post.category}</span>
+                      <span className="text-sm leading-snug line-clamp-1 group-hover:underline">{post.title}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </section>
 

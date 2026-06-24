@@ -48,6 +48,21 @@ export default async function BlogPostPage(
 
   if (!post) notFound();
 
+  // "Keep reading" links: every post links onward to a few others so Googlebot
+  // (and readers) always have a crawl path between articles. Same-category posts
+  // come first, then the most recent of the rest, so no post is an internal-link
+  // dead end. This funnels crawl equity from already-indexed posts into newer
+  // ones that are still waiting to be picked up.
+  const related = blogPosts
+    .filter((p) => p.slug !== post.slug)
+    .sort((a, b) => {
+      const aSameCat = a.category === post.category ? 0 : 1;
+      const bSameCat = b.category === post.category ? 0 : 1;
+      if (aSameCat !== bSameCat) return aSameCat - bSameCat;
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    })
+    .slice(0, 3);
+
   const blogPostingJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -138,6 +153,26 @@ export default async function BlogPostPage(
             </div>
           </div>
         </article>
+
+        {related.length > 0 && (
+          <section className="max-w-3xl mx-auto px-6 mt-16 pt-12 border-t border-zinc-800">
+            <h2 className="text-2xl font-bold font-heading mb-6">Keep reading</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {related.map((r) => (
+                <Link
+                  href={`/blog/${r.slug}`}
+                  key={r.slug}
+                  className="group block bg-zinc-900 rounded-xl p-5 transition-colors hover:bg-zinc-800 shadow-[0_0_0_2px_rgba(255,255,255,1),0_0_0_4px_rgba(255,20,147,1)]"
+                >
+                  <span className="text-xs font-medium text-pink-400 bg-pink-400/10 px-2 py-1 rounded-md">{r.category}</span>
+                  <h3 className="mt-3 text-base font-semibold leading-snug text-zinc-200 line-clamp-3 group-hover:text-white">
+                    {r.title}
+                  </h3>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       <Footerdemo />
