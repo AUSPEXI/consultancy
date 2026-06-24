@@ -19,12 +19,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/acceptable-use`,    lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3 },
   ];
 
-  const blogRoutes: MetadataRoute.Sitemap = blogPosts.map((post) => ({
-    url: `${base}/blog/${post.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly',
-    priority: 0.8,
-  }));
+  const blogRoutes: MetadataRoute.Sitemap = blogPosts.map((post) => {
+    // Use the post's real publish date so the sitemap reports honest change
+    // signals, rather than every URL claiming it changed on every build.
+    const parsed = new Date(post.date);
+    const lastModified = isNaN(parsed.getTime()) ? new Date() : parsed;
+    return {
+      url: `${base}/blog/${post.slug}`,
+      lastModified,
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    };
+  });
 
   return [...staticRoutes, ...blogRoutes];
 }
