@@ -87,7 +87,7 @@
     "failed": 0,
     "summary": {
       "A": {
-        "cited": 55,
+        "cited": 58,
         "n": 136
       },
       "B": {
@@ -95,12 +95,12 @@
         "n": 136
       }
     },
-    "scoredAt": "2026-06-24T11:43:18.386Z"
+    "scoredAt": "2026-06-25T11:35:47.186Z"
   },
   "agreement": {
-    "rawPct": 59.2,
-    "cohenKappa": 0.114,
-    "gwetAC1": 0.25,
+    "rawPct": 58.8,
+    "cohenKappa": 0.102,
+    "gwetAC1": 0.248,
     "n": 272
   },
   "significant": [

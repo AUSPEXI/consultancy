@@ -305,7 +305,7 @@
       ],
       "timestamp": "2026-06-20T11:11:00.826Z",
       "citationsLlm": {
-        "A": false,
+        "A": true,
         "B": true
       }
     },
@@ -410,7 +410,7 @@
       ],
       "timestamp": "2026-06-20T11:11:12.026Z",
       "citationsLlm": {
-        "A": false,
+        "A": true,
         "B": true
       }
     },
@@ -1250,7 +1250,7 @@
       ],
       "timestamp": "2026-06-21T11:41:16.209Z",
       "citationsLlm": {
-        "A": false,
+        "A": true,
         "B": true
       }
     },
@@ -1509,7 +1509,7 @@
       ],
       "timestamp": "2026-06-22T14:30:23.596Z",
       "citationsLlm": {
-        "A": true,
+        "A": false,
         "B": true
       }
     },
@@ -1796,7 +1796,7 @@
       ],
       "timestamp": "2026-06-22T14:30:49.444Z",
       "citationsLlm": {
-        "A": false,
+        "A": true,
         "B": true
       }
     },
@@ -3368,7 +3368,7 @@
     "failed": 0,
     "summary": {
       "A": {
-        "cited": 55,
+        "cited": 58,
         "n": 136
       },
       "B": {
@@ -3376,6 +3376,6 @@
         "n": 136
       }
     },
-    "scoredAt": "2026-06-24T11:43:18.386Z"
+    "scoredAt": "2026-06-25T11:35:47.186Z"
   }
 }
