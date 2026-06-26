@@ -97,10 +97,10 @@ A neutral judge (gpt-4o-mini) re-attributed every answer by meaning, not verbati
 
 | Variant | Verbatim scorer | LLM-judge (semantic) |
 |---------|-----------------|----------------------|
-| A | 41.9% | 42.6% |
+| A | 41.9% | 40.4% |
 | B | 60.0% | 99.3% |
 
-Inter-method agreement: raw **58.8%**, but raw agreement is inflated by the common "neither cited" case — chance-corrected, Cohen's κ = **0.10**, Gwet's AC1 = **0.25**. Both methods show the effect in the **same direction** — the result is not a verbatim-quotability artifact.
+Inter-method agreement: raw **58.5%**, but raw agreement is inflated by the common "neither cited" case — chance-corrected, Cohen's κ = **0.10**, Gwet's AC1 = **0.24**. Both methods show the effect in the **same direction** — the result is not a verbatim-quotability artifact.
 
 ---
 
