@@ -94,6 +94,61 @@ function runScript(scriptPath, args = []) {
   });
 }
 
+// Record that an experiment's finding is complete but its video package could not
+// be generated (e.g. a depleted Anthropic balance). The science is already saved;
+// the video is downstream marketing content, so we flag it for later instead of
+// failing the whole run. retryPendingVideos() picks these up on a future run.
+async function flagVideoPending(state, exp, reason, experimentDir) {
+  try {
+    state.pending_video = state.pending_video ?? [];
+    if (!state.pending_video.some(p => p.id === exp.id)) {
+      state.pending_video.push({ id: exp.id, slug: exp.slug, dir: exp.dir, since: new Date().toISOString(), reason });
+    }
+    await writeJson(statePath, state);
+    await fs.mkdir(path.join(experimentDir, 'video'), { recursive: true });
+    await fs.writeFile(
+      path.join(experimentDir, 'video', 'VIDEO_PENDING.md'),
+      `# Video package pending\n\n` +
+      `The statistical finding for this experiment is complete and committed, but ` +
+      `the video package was not generated on the run that produced it.\n\n` +
+      `Reason: ${reason}\n\n` +
+      `Flagged: ${new Date().toISOString()}\n\n` +
+      `It will be retried automatically on the next orchestrator run, or you can ` +
+      `regenerate it manually:\n\n    node scripts/generate-video-package.mjs ${exp.dir}\n`
+    );
+  } catch (e) {
+    log(`⚠ Could not flag video as pending (non-fatal): ${e.message}`);
+  }
+}
+
+// Opportunistically regenerate any video packages that were flagged pending on an
+// earlier run (e.g. once the Anthropic balance is topped up). Cheap no-op when the
+// queue is empty. Successes are cleared and their PENDING marker removed.
+async function retryPendingVideos(state) {
+  const pending = state.pending_video ?? [];
+  if (pending.length === 0) return;
+  log(`Retrying ${pending.length} pending video package(s)...`);
+  const stillPending = [];
+  for (const p of pending) {
+    const expDir = path.join(ROOT, p.dir);
+    try {
+      await runScript(path.join(__dir, 'generate-video-package.mjs'), [expDir]);
+      try { await fs.rm(path.join(expDir, 'video', 'VIDEO_PENDING.md'), { force: true }); } catch { /* marker may be gone */ }
+      try {
+        await runScript(path.join(__dir, 'build-storyboard.mjs'), [expDir]);
+      } catch (e) {
+        log(`⚠ Storyboard for pending video ${p.id} failed (non-fatal): ${e.message}`);
+      }
+      log(`✓ Regenerated video package for experiment ${p.id}`);
+    } catch (err) {
+      log(`⚠ Video package still pending for ${p.id}: ${err.message}`);
+      stillPending.push(p);
+    }
+  }
+  state.pending_video = stillPending;
+  await writeJson(statePath, state);
+}
+
 // ── Load experiment raw.json and count n ──────────────────────────────────────
 
 async function countN(experimentDir) {
@@ -295,9 +350,17 @@ async function analyzePhase(state, backlog) {
   log('Running statistical analysis...');
   await runScript(path.join(__dir, 'analyze.mjs'), [experimentDir]);
 
-  // Generate video package
+  // Generate video package (non-fatal — analyze.mjs above has already written
+  // FINDING.md/finding.json, so the experiment has succeeded. The video is
+  // downstream marketing content and must never fail an otherwise-good run, e.g.
+  // when the Anthropic balance is depleted. Flag it for automatic retry instead).
   log('Generating video package...');
-  await runScript(path.join(__dir, 'generate-video-package.mjs'), [experimentDir]);
+  try {
+    await runScript(path.join(__dir, 'generate-video-package.mjs'), [experimentDir]);
+  } catch (err) {
+    log(`⚠️ Video package generation failed (non-fatal): ${err.message}`);
+    await flagVideoPending(state, exp, err.message, experimentDir);
+  }
 
   // Build the loadable storyboard project + flat voiceover from the script
   // (non-fatal — the markdown package is already written; a storyboard hiccup or
@@ -485,6 +548,10 @@ const backlogPath = path.join(ROOT, 'experiments', 'backlog.json');
 
 const state = await readJson(statePath);
 const backlog = await readJson(backlogPath);
+
+// Catch up any video packages that an earlier run flagged pending (e.g. after a
+// depleted Anthropic balance is topped up). No-op when nothing is pending.
+await retryPendingVideos(state);
 
 const hasActiveExperiment = !!state.active_experiment;
 
