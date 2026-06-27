@@ -1,4 +1,4 @@
-Canonical rescore — 2026-06-26T11:40:24.332Z
+Canonical rescore — 2026-06-27T10:53:56.833Z
 Scored 136 responses; 0 citation records changed.
 Method: content-fingerprint (auto-derived unique phrases per variant)
 

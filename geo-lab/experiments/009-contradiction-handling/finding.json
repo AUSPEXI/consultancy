@@ -95,7 +95,7 @@
         "n": 136
       }
     },
-    "scoredAt": "2026-06-26T11:42:15.966Z"
+    "scoredAt": "2026-06-27T10:55:19.477Z"
   },
   "agreement": {
     "rawPct": 58.5,
@@ -119,5 +119,15 @@
     "treatment": "B",
     "diffPp": 55,
     "pValue": 0
+  },
+  "qValue": 0.0019,
+  "fdr": {
+    "method": "benjamini-hochberg",
+    "alpha": 0.05,
+    "programmeSize": 11,
+    "primaryP": 0.0011,
+    "qValue": 0.0019,
+    "survivesFdr": true,
+    "computedAt": "2026-06-27T10:55:20.349Z"
   }
 }

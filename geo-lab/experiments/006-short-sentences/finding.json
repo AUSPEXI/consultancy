@@ -103,14 +103,14 @@
     "diffPp": -62.5,
     "pValue": 0.0117
   },
-  "qValue": 0.0022,
+  "qValue": 0.0019,
   "fdr": {
     "method": "benjamini-hochberg",
     "alpha": 0.05,
     "programmeSize": 11,
     "primaryP": 0.0012,
-    "qValue": 0.0022,
+    "qValue": 0.0019,
     "survivesFdr": true,
-    "computedAt": "2026-06-23T08:49:50.949Z"
+    "computedAt": "2026-06-27T10:55:20.349Z"
   }
 }

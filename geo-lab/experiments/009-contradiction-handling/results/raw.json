@@ -305,7 +305,7 @@
       ],
       "timestamp": "2026-06-20T11:11:00.826Z",
       "citationsLlm": {
-        "A": true,
+        "A": false,
         "B": true
       }
     },
@@ -326,7 +326,7 @@
       ],
       "timestamp": "2026-06-20T11:11:03.308Z",
       "citationsLlm": {
-        "A": false,
+        "A": true,
         "B": true
       }
     },
@@ -410,7 +410,7 @@
       ],
       "timestamp": "2026-06-20T11:11:12.026Z",
       "citationsLlm": {
-        "A": true,
+        "A": false,
         "B": true
       }
     },
@@ -683,7 +683,7 @@
       ],
       "timestamp": "2026-06-20T11:11:37.216Z",
       "citationsLlm": {
-        "A": false,
+        "A": true,
         "B": true
       }
     },
@@ -1292,7 +1292,7 @@
       ],
       "timestamp": "2026-06-21T11:41:19.623Z",
       "citationsLlm": {
-        "A": true,
+        "A": false,
         "B": true
       }
     },
@@ -1488,7 +1488,7 @@
       ],
       "timestamp": "2026-06-22T14:30:20.684Z",
       "citationsLlm": {
-        "A": false,
+        "A": true,
         "B": true
       }
     },
@@ -1509,7 +1509,7 @@
       ],
       "timestamp": "2026-06-22T14:30:23.596Z",
       "citationsLlm": {
-        "A": true,
+        "A": false,
         "B": true
       }
     },
@@ -1915,7 +1915,7 @@
       ],
       "timestamp": "2026-06-22T14:31:00.275Z",
       "citationsLlm": {
-        "A": false,
+        "A": true,
         "B": true
       }
     },
@@ -3376,6 +3376,6 @@
         "n": 136
       }
     },
-    "scoredAt": "2026-06-26T11:42:15.966Z"
+    "scoredAt": "2026-06-27T10:55:19.477Z"
   }
 }
