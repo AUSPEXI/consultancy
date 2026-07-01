@@ -313,26 +313,15 @@ export default function StoryboardExplorer() {
   const [recordingError, setRecordingError] = useState<string | null>(null);
   const [autoFullscreenOnRecord, setAutoFullscreenOnRecord] = useState<boolean>(true);
   const [customBrollUrls, setCustomBrollUrls] = useState<Record<number, { url: string; isVideo: boolean }>>({});
-  const [panelOffsets, setPanelOffsets] = useState<Record<number, number>>({});
+  const [panelOffsets, setPanelOffsets] = useState<Record<number, number>>(() => activeProject.panelOffsets ?? {});
   // Editable per-panel timing overrides (seconds). A panel's start/end default to
-  // the auto-scaled timeline; type a value here to pin it exactly. Stored separately
-  // so you can edit just the panels that drift.
-  const [manualPanelStarts, setManualPanelStarts] = useState<Record<number, number>>(() => {
-    try {
-      const s = localStorage.getItem('manualPanelStarts');
-      return s ? JSON.parse(s) : {};
-    } catch (e) {
-      return {};
-    }
-  });
-  const [manualPanelEnds, setManualPanelEnds] = useState<Record<number, number>>(() => {
-    try {
-      const s = localStorage.getItem('manualPanelEnds');
-      return s ? JSON.parse(s) : {};
-    } catch (e) {
-      return {};
-    }
-  });
+  // the auto-scaled timeline; type a value here to pin it exactly. These live INSIDE
+  // the active project (single source of truth) so a project reset or reload clears
+  // them along with the panels. They must NEVER live in a separate global key: a
+  // stale override surviving a re-timed storyboard silently clamps panels back to old
+  // times and can push a panel's end before its start.
+  const [manualPanelStarts, setManualPanelStarts] = useState<Record<number, number>>(() => activeProject.manualPanelStarts ?? {});
+  const [manualPanelEnds, setManualPanelEnds] = useState<Record<number, number>>(() => activeProject.manualPanelEnds ?? {});
   const [syncCalibrating, setSyncCalibrating] = useState<boolean>(false);
   const [syncMarkIndex, setSyncMarkIndex] = useState<number>(0);
   const [isBRollFeedEnabled, setIsBRollFeedEnabled] = useState<boolean>(true);
@@ -573,17 +562,16 @@ export default function StoryboardExplorer() {
   const brollDisplayTimeoutRef = useRef<number | null>(null);
   const brollTransitionTimeoutRef = useRef<number | null>(null);
 
+  // One-time cleanup: earlier versions persisted per-panel timing overrides in their
+  // own global localStorage keys, which could outlive a project reset and clamp a
+  // re-timed storyboard back to stale values (panels running backwards). Overrides
+  // now live inside the project, so purge the orphaned legacy keys.
   useEffect(() => {
     try {
-      localStorage.setItem('manualPanelStarts', JSON.stringify(manualPanelStarts));
+      localStorage.removeItem('manualPanelStarts');
+      localStorage.removeItem('manualPanelEnds');
     } catch (e) {}
-  }, [manualPanelStarts]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('manualPanelEnds', JSON.stringify(manualPanelEnds));
-    } catch (e) {}
-  }, [manualPanelEnds]);
+  }, []);
 
   useEffect(() => {
     try {
@@ -1846,11 +1834,6 @@ export default function StoryboardExplorer() {
   }, [syncCalibrating, syncMarkIndex, currentTimeSec]);
 
   // ── Project import / export ──────────────────────────────────────────────
-  // Persist the active experiment so a reload restores the right storyboard.
-  useEffect(() => {
-    saveActiveProject(activeProject);
-  }, [activeProject]);
-
   // Gather the live editing state into a single portable project file.
   const buildCurrentProject = (): StoryboardProject => ({
     ...activeProject,
@@ -1864,6 +1847,15 @@ export default function StoryboardExplorer() {
     isOutroEnabled,
     createdAt: activeProject.createdAt ?? new Date().toISOString().slice(0, 10),
   });
+
+  // Persist the FULL editing state (panels + manual timing overrides + toggles) as
+  // ONE project object, so a reload restores exactly what you see and a reset/clear
+  // drops the overrides with it. (They used to persist in separate global keys that
+  // could survive a project change and corrupt a re-timed storyboard.)
+  useEffect(() => {
+    saveActiveProject(buildCurrentProject());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeProject, manualPanelStarts, manualPanelEnds, panelOffsets, autoBrollPanels, isIntroEnabled, isOutroEnabled]);
 
   const handleExportProject = () => {
     try {
