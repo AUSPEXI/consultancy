@@ -1,0 +1,5 @@
+- **Shorts (Day 1):** Post the 45–60s hook — "2.5% → 57.5% on OpenAI, nothing on Claude." Result card animation + A/B split. Drive to the long-form.
+- **Long-form (Day 2–3):** Full 10-min breakdown with per-engine charts, Simpson's-paradox explainer, and threats section. Pin the raw-data comment.
+- **LinkedIn (Day 3):** One paragraph — "Refuting a myth about your product lifted AI citations 55pp on OpenAI — and did nothing on Gemini or Claude. Same content. GEO isn't one-size-fits-all." + link.
+- **X/Twitter thread (Day 4):** 5 tweets — (1) hook: +55pp on one engine, (2) method: identical variants, 4 engines, n=320, (3) result: per-engine table + Simpson's warning, (4) implication: name-and-refute works, but measure per engine, (5) CTA: full video + raw data link.
+- **Community post (Day 5):** Announce raw data + reproduction steps are public; invite viewers to replicate and report their split.

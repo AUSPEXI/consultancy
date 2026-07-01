@@ -1,0 +1,71 @@
+The exact same content. One version refutes a common myth about the product. The other just... states the facts. On OpenAI's model, the myth-busting version went from a 2.5% citation rate to a 57.5% citation rate. That's a 55-percentage-point swing.
+
+But here's the catch — and it's a big one. On Claude, that same trick did nothing. Slightly negative, even. So which is the real finding? Let's rewind.
+
+Here's the idea we tested. There's a GEO lever called contradiction handling. The theory: if your content names a common false claim about your topic and explicitly refutes it, AI engines will prefer to cite you — because you resolve the ambiguity the user is actually asking about.
+
+Think about it. When someone asks is it true that NovaCRM is too complex for startups — a page that says actually, that's a myth, here's why is directly answering the question. A page that just lists features isn't.
+
+So our prediction was: the myth-busting variant wins by maybe 8 to 15 points on evaluative queries. That's the hypothesis.
+
+Now let me show you exactly how we tested it, so you can decide whether to trust a word I say.
+
+Two variants. Same brand, same facts, same length — within 10%. Variant A describes NovaCRM's fit for small teams as plain positive claims. Variant B takes the identical facts and reframes them as a refutation: a common misconception is that NovaCRM is only for large enterprises. This is false.
+
+That's the only difference. Naming and refuting the false claim. Everything else is controlled.
+
+This design was pre-registered before the run — the hypothesis, the metric, the success criterion, all locked in. That matters. It stops me quietly moving the goalposts after I see the data.
+
+We pushed four evaluative queries — all of them embedding the misconception — across four engines: Gemini 2.5 Flash, GPT-4o-mini, Perplexity Sonar, and Claude Haiku. Forty trials per variant per engine. 160 trials per variant, 320 total.
+
+The metric is citation rate: how often does the engine actually cite our content when answering? Simple, binary, countable.
+
+One honest caveat up front, and I'll come back to it: these are provider APIs, not the consumer apps. This is Claude Haiku with no web tools — not Claude.ai with search. So treat this as mechanism evidence about how models weight content, not a literal prediction of what Google AI Overviews will do tomorrow.
+
+Watching it run is the fun part. Each probe sends a query, gets an answer, and we score whether our variant was cited. Source order is randomised so we're not just measuring the model cites whatever's first.
+
+And the OpenAI results jumped out immediately. Variant A — the plain version — was basically invisible to GPT-4o-mini. One citation out of forty.
+
+Then Variant B lights up. Answer after answer pulling in the this is a common misconception, and it's false framing.
+
+Meanwhile, over on Claude, the two variants traded blows and basically tied. Same content. Completely different behaviour. That contrast is the whole story here.
+
+Let's go engine by engine, because — spoiler — the aggregate lies to you here.
+
+OpenAI: 2.5% to 57.5%. A 55-point lift. p is essentially zero. This survives multiple-comparison correction. This is real, and it's enormous.
+
+Perplexity: 55% to 75%. A 20-point lift — but p is 0.061. Just misses significance after correction. Directionally consistent, not proven.
+
+Gemini: basically flat. Plus 2.5 points, p of 0.81. No detectable effect at this sample size.
+
+Claude: went the other way. Down 5 points, not significant.
+
+Now, if you pool everything together, you get a tidy +18-point lift with a significant p-value. And the stratified primary test — Cochran-Mantel-Haenszel — does come back significant, odds ratio 2.15, p equals 0.0011. But one engine points the opposite direction. When that happens, the pooled number is misleading. The honest reporting is per engine.
+
+So the bottom line: contradiction handling produced a massive, verified lift on one engine, a promising-but-unproven lift on a second, and nothing detectable on the other two.
+
+One robustness check worth flagging. We had an independent judge re-score every answer by meaning, not exact wording, to rule out Variant B is just more quotable. Both methods show the effect in the same direction — so it's not a quotability artifact.
+
+But note the agreement between methods is weak — Cohen's kappa of just 0.10. The two scorers agree on the direction, not the magnitude. Read the semantic 99% as B's ideas show up almost everywhere, not as a hard citation rate.
+
+Here's where I tell you why to be skeptical. This is the part that separates a scientist from a hype merchant.
+
+One: this is a four-day snapshot. All 320 trials ran across four days in June. Model behaviour drifts. Four days is a narrow window — I want ten-plus days before I'd call anything settled.
+
+Two, the good news: no model version changed mid-experiment. Consistent engine versions throughout. That's a point in favour of the numbers being internally clean.
+
+Three: fast-mode APIs, not live consumer surfaces. As I said — this is in-context retrieval preference on the raw APIs, with no web search. It's mechanism evidence, not a promise about ChatGPT search or AI Overviews.
+
+Four: multiple comparisons. We ran four engine tests, so we corrected for that with Holm-Bonferroni. OpenAI survives. And across a whole research programme, roughly one in twenty nominal positives is chance — so replicate before betting the farm.
+
+And on power: at this sample size we can reliably detect about a 15-point lift. Perplexity's 20-point signal missed significance — that's a need more data, not a no. Absence of evidence isn't evidence of absence.
+
+So what do you actually do with this? If your buyers carry a misconception about you — too complex, enterprise-only, too expensive — naming it and refuting it directly can dramatically improve whether AI cites you. On GPT-4o-mini it was the difference between invisible and cited more than half the time.
+
+But — and this is the whole point of testing across engines — it is not universal. It crushed on OpenAI, trended positive on Perplexity, and did nothing measurable on Gemini or Claude. So don't blanket-apply it and assume it's working everywhere. Measure per engine.
+
+If you want to run this across your own brand at scale — probing all four engines, tracking share-of-voice over time — that's exactly what we built L8EntSpace for. Link below.
+
+Raw data's in the pinned comment. Run it yourself, and tell me if you get the same split.
+
+See you next experiment.

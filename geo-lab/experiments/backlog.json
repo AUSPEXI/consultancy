@@ -251,8 +251,9 @@
       ],
       "n_per_variant": 30,
       "priority": 12,
-      "status": "queued",
-      "youtube_angle": "Extension of the statistics experiment — tests whether the *format* of precision matters."
+      "status": "running",
+      "youtube_angle": "Extension of the statistics experiment — tests whether the *format* of precision matters.",
+      "started_at": "2026-07-01T11:57:35.650Z"
     },
     {
       "id": "010",

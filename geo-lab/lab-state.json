@@ -1,8 +1,20 @@
 {
   "_comment": "Managed by orchestrate.mjs — do not hand-edit.",
-  "active_experiment": null,
+  "active_experiment": {
+    "id": "015",
+    "slug": "claim-specificity",
+    "dir": "experiments/015-claim-specificity",
+    "started_at": "2026-07-01T11:57:35.650Z",
+    "n_target": 120,
+    "platforms": [
+      "gemini",
+      "openai",
+      "perplexity",
+      "claude"
+    ]
+  },
   "last_probe_run": "2026-06-24T11:41:31.168Z",
-  "last_design_run": "2026-06-19T12:42:32.363Z",
+  "last_design_run": "2026-07-01T11:57:35.651Z",
   "queue_position": 11,
   "history": [
     {
@@ -161,13 +173,5 @@
     }
   ],
   "retestLog": {},
-  "pending_video": [
-    {
-      "id": "009",
-      "slug": "contradiction-handling",
-      "dir": "experiments/009-contradiction-handling",
-      "since": "2026-06-27T10:55:19.856Z",
-      "reason": "Script exited with code 1"
-    }
-  ]
+  "pending_video": []
 }
