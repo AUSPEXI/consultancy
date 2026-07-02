@@ -1,0 +1,624 @@
+{
+  "meta": {
+    "variants": [
+      "A",
+      "B"
+    ],
+    "queries": [
+      "How much has NovaCRM improved its platform performance?",
+      "Is NovaCRM's API fast enough for high-volume sales teams?",
+      "What performance gains did NovaCRM's latest release deliver?",
+      "Has NovaCRM reduced its API latency and error rates recently?"
+    ],
+    "platforms": [
+      "gemini",
+      "openai",
+      "perplexity",
+      "claude"
+    ],
+    "trialsPerVariant": 2,
+    "firstRunAt": "2026-07-02T11:28:59.695Z",
+    "runAt": "2026-07-02T11:28:59.695Z",
+    "batches": 1,
+    "modelVersions": {
+      "gemini": [
+        "gemini-2.5-flash"
+      ],
+      "openai": [
+        "gpt-4o-mini"
+      ],
+      "perplexity": [
+        "sonar"
+      ],
+      "claude": [
+        "claude-haiku-4-5-20251001"
+      ]
+    }
+  },
+  "results": [
+    {
+      "trial": 1,
+      "query": "How much has NovaCRM improved its platform performance?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM has significantly improved its platform performance, reducing median API latency from 340ms to 197ms, making response times 42% faster (Source A). Dashboards now load in 1.8 seconds, down from 4.1 seconds, and the error rate has been cut from 1.9% to 0.4%, meaning API requests fail 79% less often (Source A). Additionally, uptime rose from 99.5% to 99.98%, and background jobs complete 55% faster (Source A).",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:27:59.812Z"
+    },
+    {
+      "trial": 1,
+      "query": "How much has NovaCRM improved its platform performance?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM has significantly improved its platform performance by reducing median API latency from 340ms to 197ms, resulting in response times that are now 42% faster. Additionally, dashboard loading times decreased from 4.1 seconds to 1.8 seconds, and the error rate was cut from 1.9% to 0.4%, leading to 79% fewer API request failures (Source A). Uptime also increased from 99.5% to 99.98% over the past year (Source A).",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:03.990Z"
+    },
+    {
+      "trial": 1,
+      "query": "How much has NovaCRM improved its platform performance?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "According to Source A, NovaCRM reduced median API latency from 340ms to 197ms, making response times 42% faster. Dashboard load times improved from 4.1 seconds to 1.8 seconds, and the error rate dropped from 1.9% to 0.4%, cutting API request failures by 79%. Source B confirms these improvements qualitatively, stating that API latency was \"significantly improved,\" response times are \"much faster,\" and error rates were \"substantially reduced,\" though it lacks the precise metrics found in Source A.",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:06.067Z"
+    },
+    {
+      "trial": 1,
+      "query": "How much has NovaCRM improved its platform performance?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:06.742Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM's API fast enough for high-volume sales teams?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "Yes, NovaCRM's API has been significantly optimized for speed and reliability, making it suitable for high-volume sales teams. Median API latency has been reduced from 340ms to 197ms, making response times 42% faster (Source A). This improvement means \"large sales teams pulling deal data in bulk experience far less waiting\" (Source A, Source B). Additionally, the error rate was cut from 1.9% to 0.4%, leading to fewer sync failures during busy sales days (Source A).",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:09.619Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM's API fast enough for high-volume sales teams?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "Yes, NovaCRM's API is fast enough for high-volume sales teams. The latest update reduced median API latency from 340ms to 197ms, resulting in a 42% improvement in response times. Additionally, the error rate has dropped significantly, with API requests failing 79% less often, which enhances reliability during busy sales periods (Source A).",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:11.695Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM's API fast enough for high-volume sales teams?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "Yes, NovaCRM's API is fast enough for high-volume sales teams, as **Source A** reports that median API latency was reduced from 340ms to 197ms, making response times 42% faster. **Source A** further states that large sales teams pulling deal data in bulk now experience far less waiting, with dashboards loading in just 1.8 seconds instead of 4.1 seconds. While **Source B** mentions that response times are \"much faster,\" it lacks the precise metrics found in **Source A** that confirm the system's ",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:13.723Z"
+    },
+    {
+      "trial": 1,
+      "query": "Is NovaCRM's API fast enough for high-volume sales teams?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:14.288Z"
+    },
+    {
+      "trial": 1,
+      "query": "What performance gains did NovaCRM's latest release deliver?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM's latest release delivered significant performance gains, including a 42% reduction in median API latency, from 340ms to 197ms, and dashboards now load in 1.8 seconds, down from 4.1 seconds (Source A). The error rate was cut by 79%, from 1.9% to 0.4%, and pipeline report generation dropped from 6.2 seconds to 2.3 seconds (Source A). Additionally, uptime rose to 99.98% from 99.5%, and background jobs complete 55% faster (Source A).",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:16.744Z"
+    },
+    {
+      "trial": 1,
+      "query": "What performance gains did NovaCRM's latest release deliver?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM's latest release delivered significant performance gains, including a reduction in median API latency from 340ms to 197ms, resulting in response times that are now 42% faster. Dashboards load in 1.8 seconds compared to 4.1 seconds previously, and the error rate was cut from 1.9% to 0.4%, leading to 79% fewer API request failures (Source A). Additionally, uptime improved from 99.5% to 99.98%, and background jobs complete 55% faster than before (Source A).",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:20.553Z"
+    },
+    {
+      "trial": 1,
+      "query": "What performance gains did NovaCRM's latest release deliver?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM's latest release reduced median API latency from 340ms to 197ms, making response times 42% faster, according to Source A. Dashboard load times dropped from 4.1 seconds to 1.8 seconds, and the error rate fell from 1.9% to 0.4%, per Source A. Additionally, pipeline report generation improved from 6.2s to 2.3s, and uptime rose from 99.5% to 99.98%, as detailed in Source A. Source B confirms these gains only vaguely, using terms like \"significantly improved\" and \"much faster\" without specifi",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:22.678Z"
+    },
+    {
+      "trial": 1,
+      "query": "What performance gains did NovaCRM's latest release deliver?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:23.092Z"
+    },
+    {
+      "trial": 1,
+      "query": "Has NovaCRM reduced its API latency and error rates recently?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "Yes, NovaCRM has recently reduced both its API latency and error rates. In its most recent update, NovaCRM significantly improved API latency, making response times much faster (Source A). Specifically, median API latency was reduced from 340ms to 197ms, a 42% improvement (Source B).\n\nThe company also substantially reduced its error rate, meaning API requests fail far less often (Source A). This reduction saw the error rate drop from 1.9% to 0.4%, representing a 79% decrease in failed API reques",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-07-02T11:28:25.351Z"
+    },
+    {
+      "trial": 1,
+      "query": "Has NovaCRM reduced its API latency and error rates recently?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "Yes, NovaCRM has recently reduced its API latency and error rates. According to Source B, median API latency decreased from 340ms to 197ms, making response times 42% faster, while the error rate was cut from 1.9% to 0.4%, resulting in a 79% reduction in API request failures. Overall, these improvements contribute to a more reliable and efficient experience for users.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-07-02T11:28:27.560Z"
+    },
+    {
+      "trial": 1,
+      "query": "Has NovaCRM reduced its API latency and error rates recently?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "Yes, NovaCRM has reduced both its API latency and error rates recently. According to Source A, the company \"significantly improved API latency\" and \"substantially reduced our error rate\" in its most recent update [SOURCE A]. Source B provides precise metrics confirming these improvements, stating median API latency dropped from 340ms to 197ms and the error rate fell from 1.9% to 0.4% [SOURCE B].",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-07-02T11:28:29.456Z"
+    },
+    {
+      "trial": 1,
+      "query": "Has NovaCRM reduced its API latency and error rates recently?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-07-02T11:28:29.861Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much has NovaCRM improved its platform performance?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM has significantly improved its platform performance with its latest update. Median API latency was reduced from 340ms to 197ms, making response times 42% faster, and dashboards now load in 1.8 seconds, down from 4.1 seconds (Source A). The error rate was cut from 1.9% to 0.4%, meaning API requests fail 79% less often, and uptime rose from 99.5% to 99.98% (Source A). Additionally, generating a pipeline report now takes 2.3 seconds, down from 6.2 seconds, and background jobs complete 55% f",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:32.502Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much has NovaCRM improved its platform performance?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM has significantly improved its platform performance by reducing median API latency from 340ms to 197ms, resulting in response times that are now 42% faster. Additionally, dashboard loading times decreased from 4.1 seconds to 1.8 seconds, and the error rate was cut from 1.9% to 0.4%, leading to 79% fewer API request failures (Source A). Overall, uptime increased from 99.5% to 99.98%, and background jobs now complete 55% faster than before (Source A).",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:35.014Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much has NovaCRM improved its platform performance?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM improved its median API latency from 340ms to 197ms, making response times 42% faster [SOURCE A]. Dashboard load times dropped from 4.1 seconds to 1.8 seconds, and the error rate was cut from 1.9% to 0.4% [SOURCE A]. While Source B only states that performance was \"significantly improved\" and \"much faster\" without specific metrics, Source A provides the precise numeric improvements [SOURCE A][SOURCE B].",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:36.948Z"
+    },
+    {
+      "trial": 2,
+      "query": "How much has NovaCRM improved its platform performance?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:37.669Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM's API fast enough for high-volume sales teams?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "Yes, NovaCRM's API is fast enough for high-volume sales teams. According to Source A, NovaCRM significantly improved API latency, making response times much faster for large sales teams pulling deal data in bulk, leading to a \"meaningfully smoother experience.\" Source B provides specific metrics, stating that median API latency was reduced from 340ms to 197ms, making response times 42% faster for large sales teams.",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-07-02T11:28:40.002Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM's API fast enough for high-volume sales teams?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "Yes, NovaCRM's API is fast enough for high-volume sales teams. The recent updates have reduced median API latency from 340ms to 197ms, making response times 42% faster, and significantly improved reliability by cutting the error rate from 1.9% to 0.4% (Source B). Additionally, tasks like generating pipeline reports and record lookups are now much quicker, enhancing the overall experience for teams handling large volumes of data (Source A).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-07-02T11:28:42.707Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM's API fast enough for high-volume sales teams?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "Yes, NovaCRM's API is fast enough for high-volume sales teams, as median API latency was reduced from 340ms to 197ms, making response times 42% faster[Source B]. Large teams pulling deal data in bulk now experience far less waiting, with dashboards loading in just 1.8 seconds instead of 4.1 seconds[Source B]. Additionally, the error rate dropped from 1.9% to 0.4%, meaning API requests fail 79% less often and sync interruptions are significantly reduced[Source B]. Overall reliability has improved",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-07-02T11:28:44.838Z"
+    },
+    {
+      "trial": 2,
+      "query": "Is NovaCRM's API fast enough for high-volume sales teams?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-07-02T11:28:45.237Z"
+    },
+    {
+      "trial": 2,
+      "query": "What performance gains did NovaCRM's latest release deliver?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM's latest release delivered significant performance gains, including a 42% reduction in median API latency, from 340ms to 197ms, and dashboard load times dropping from 4.1 seconds to 1.8 seconds (Source B). The error rate was cut by 79%, from 1.9% to 0.4%, and generating a pipeline report now takes 2.3 seconds, down from 6.2 seconds (Source B). Additionally, uptime rose from 99.5% to 99.98%, and background jobs complete 55% faster (Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-07-02T11:28:47.666Z"
+    },
+    {
+      "trial": 2,
+      "query": "What performance gains did NovaCRM's latest release deliver?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM's latest release delivered significant performance gains, including a reduction in median API latency from 340ms to 197ms, resulting in response times that are 42% faster. The error rate was cut from 1.9% to 0.4%, leading to 79% fewer failed API requests. Additionally, generating pipeline reports became quicker, dropping from 6.2 seconds to 2.3 seconds, and uptime improved from 99.5% to 99.98% (according to Source B).",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-07-02T11:28:50.693Z"
+    },
+    {
+      "trial": 2,
+      "query": "What performance gains did NovaCRM's latest release deliver?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "NovaCRM's latest release reduced median API latency from 340ms to 197ms (a 42% speed increase) and cut dashboard load times from 4.1 seconds to 1.8 seconds[Source B]. The error rate dropped from 1.9% to 0.4% (a 79% reduction), while pipeline report generation sped up from 6.2 seconds to 2.3 seconds[Source B]. Additionally, uptime improved from 99.5% to 99.98%, and background jobs now complete 55% faster than in earlier versions[Source B]. These precise metrics confirm the qualitative improvement",
+      "error": null,
+      "citations": {
+        "A": false,
+        "B": false
+      },
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-07-02T11:28:52.887Z"
+    },
+    {
+      "trial": 2,
+      "query": "What performance gains did NovaCRM's latest release deliver?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "A",
+        "B"
+      ],
+      "timestamp": "2026-07-02T11:28:53.323Z"
+    },
+    {
+      "trial": 2,
+      "query": "Has NovaCRM reduced its API latency and error rates recently?",
+      "platform": "gemini",
+      "modelVersion": "gemini-2.5-flash",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "Yes, NovaCRM has recently reduced both its API latency and error rates. In their most recent update, median API latency was reduced from 340ms to 197ms, making response times 42% faster (Source A). They also cut their error rate from 1.9% to 0.4%, meaning API requests now fail 79% less often (Source A). Source B also confirms that API latency was \"significantly improved\" and the error rate \"substantially reduced.\"",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:55.681Z"
+    },
+    {
+      "trial": 2,
+      "query": "Has NovaCRM reduced its API latency and error rates recently?",
+      "platform": "openai",
+      "modelVersion": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "Yes, NovaCRM has recently reduced its API latency and error rates. The median API latency decreased from 340ms to 197ms, making response times 42% faster, while the error rate was cut from 1.9% to 0.4%, resulting in 79% fewer failed API requests (Source A).",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:57.099Z"
+    },
+    {
+      "trial": 2,
+      "query": "Has NovaCRM reduced its API latency and error rates recently?",
+      "platform": "perplexity",
+      "modelVersion": "sonar",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": "Yes, NovaCRM has reduced both its API latency and error rates recently. According to Source A, the company reduced median API latency from 340ms to 197ms and cut its error rate from 1.9% to 0.4%. Source B confirms these improvements qualitatively, stating that NovaCRM \"significantly improved API latency\" and \"substantially reduced our error rate.\"",
+      "error": null,
+      "citations": {
+        "B": false,
+        "A": false
+      },
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:58.928Z"
+    },
+    {
+      "trial": 2,
+      "query": "Has NovaCRM reduced its API latency and error rates recently?",
+      "platform": "claude",
+      "modelVersion": "claude-haiku-4-5-20251001",
+      "temperature": 0.3,
+      "maxTokens": 600,
+      "response": null,
+      "error": "claude: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.",
+      "citations": {},
+      "shuffleMap": [
+        "B",
+        "A"
+      ],
+      "timestamp": "2026-07-02T11:28:59.394Z"
+    }
+  ]
+}
